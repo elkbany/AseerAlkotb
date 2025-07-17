@@ -1,0 +1,6 @@
+@AseerAlkotb.API_HostAddress = http://localhost:5234
+
+GET {{AseerAlkotb.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
