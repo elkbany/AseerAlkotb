@@ -7,11 +7,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="12.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.7" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.3" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Controllers\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AseerAlkotb.Application\AseerAlkotb.Application.csproj" />
+    <ProjectReference Include="..\AseerAlkotb.Domain\AseerAlkotb.Domain.csproj" />
+    <ProjectReference Include="..\AseerAlkotb.Infrastructure\AseerAlkotb.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

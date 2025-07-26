@@ -1,4 +1,6 @@
 
+using AseerAlkotb.Infrastructure.Context;
+using Microsoft.EntityFrameworkCore;
 namespace AseerAlkotb.API
 {
     public class Program
@@ -7,18 +9,39 @@ namespace AseerAlkotb.API
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            #region  Context Registeration
+            #endregion
+            #region Repositories Registerations
+            #endregion
+            #region Services Registerations
+            #endregion
+            #region AutoMapper 
+            #endregion
+            #region Validation
+            #endregion
+
 
             builder.Services.AddControllers();
-            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-            builder.Services.AddOpenApi();
+            #region Swagger
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
+            #endregion
 
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
-                app.MapOpenApi();
+                #region Swagger
+                app.UseSwagger();
+                app.UseSwaggerUI(options =>
+                {
+                    options.SwaggerEndpoint("/swagger/v1/swagger.json", "AseerAlktob API V1");
+                    //// Add these for better CORS handling
+                    //options.EnableTryItOutByDefault();
+                    //options.DisplayRequestDuration();
+                });
+                #endregion
             }
 
             app.UseHttpsRedirection();
