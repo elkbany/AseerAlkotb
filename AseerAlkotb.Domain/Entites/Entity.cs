@@ -9,6 +9,10 @@ namespace AseerAlkotb.Domain.Entites
     public abstract class Entity<Key> where Key : struct
     {
         public Key Id { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+
         public Entity()
         {
             Id = default;
