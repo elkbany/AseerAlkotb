@@ -1,4 +1,4 @@
-﻿namespace AseerAlkotb.Domain.Entites
+﻿namespace AseerAlkotb.Domain.Enums
 {
     public enum PaymentStatus
     {

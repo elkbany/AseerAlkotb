@@ -5,8 +5,8 @@ using System.Linq.Expressions;
 using System.Linq;
 using AseerAlkotb.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
-using AseerAlkotb.Domain.Entites;
 using AseerAlkotb.Domain.Interfaces.Base;
+using AseerAlkotb.Domain.Entites.Base;
 
 namespace AseerAlkotb.Infrastructure.Repositories.Base
 {

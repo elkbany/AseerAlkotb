@@ -1,11 +1,7 @@
-﻿using AseerAlkotb.Domain.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using AseerAlkotb.Domain.Entites.Base;
+using AseerAlkotb.Domain.Enums;
 
-namespace AseerAlkotb.Domain.Entites
+namespace AseerAlkotb.Domain.Entites.Models
 {
     public class Order : Entity<int>
     {
@@ -17,13 +13,15 @@ namespace AseerAlkotb.Domain.Entites
         public PaymentMethod PaymentMethod { get; set; }
         public PaymentStatus PaymentStatus { get; set; }
         public string ShippingAddress { get; set; }
-        public string BillingAddress { get; set; }
         public OrderStatus Status { get; set; }
         public string TrackingNumber { get; set; } // What i Added Assuming a tracking number for the order
-        // Navigation properties
-        public int UserId { get; set; }
+        #region Navigation Properties
+
+        //public int UserId { get; set; }
         //public User User { get; set; } // Assuming a User entity exists
-        public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+        public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>(); 
+        #endregion
+
     }
     
     

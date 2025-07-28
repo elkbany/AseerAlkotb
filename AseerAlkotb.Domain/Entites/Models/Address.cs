@@ -1,10 +1,11 @@
-﻿using System;
+﻿using AseerAlkotb.Domain.Entites.Base;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AseerAlkotb.Domain.Entites
+namespace AseerAlkotb.Domain.Entites.Models
 {
     public class Address : Entity<int>
     {

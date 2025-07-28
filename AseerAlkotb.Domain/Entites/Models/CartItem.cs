@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using AseerAlkotb.Domain.Entites.Base;
 
-namespace AseerAlkotb.Domain.Entites
+namespace AseerAlkotb.Domain.Entites.Models
 {
     public class CartItem : Entity<int>
     {
@@ -14,6 +10,7 @@ namespace AseerAlkotb.Domain.Entites
         public int Quantity { get; set; } = 1; // Default quantity is 1
         public decimal UnitPrice { get; set; }
         public decimal TotalPrice => UnitPrice * Quantity;
+        //public User user { get; set; } // Navigation property to User entity
     }
     
     

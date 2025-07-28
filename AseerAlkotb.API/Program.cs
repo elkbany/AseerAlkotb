@@ -10,6 +10,11 @@ namespace AseerAlkotb.API
             var builder = WebApplication.CreateBuilder(args);
 
             #region  Context Registeration
+            builder.Services.AddDbContext<ApplicationDbContext>(options =>
+            {
+                var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+                options.UseSqlServer(connectionString);
+            });
             #endregion
             #region Repositories Registerations
             #endregion

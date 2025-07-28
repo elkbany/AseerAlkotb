@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using AseerAlkotb.Domain.Entites.Base;
 
-namespace AseerAlkotb.Domain.Entites
+namespace AseerAlkotb.Domain.Entites.Models
 {
     public class Publisher : Entity<int>
     {
@@ -12,5 +8,8 @@ namespace AseerAlkotb.Domain.Entites
         public string Description { get; set; }
         public string LogoUrl { get; set; }
         public string ContactEmail { get; set; }
+        #region Navigation Properties
+        public ICollection<Book> Books { get; set; } = [];
+        #endregion
     }
 }

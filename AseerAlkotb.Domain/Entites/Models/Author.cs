@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using AseerAlkotb.Domain.Entites.Base;
 
-namespace AseerAlkotb.Domain.Entites
+namespace AseerAlkotb.Domain.Entites.Models
 {
     public class Author : Entity<int>
     {
@@ -12,5 +8,6 @@ namespace AseerAlkotb.Domain.Entites
         public string Bio { get; set; }
         public string ImageUrl { get; set; }
         public bool IsActive { get; set; }
+        public ICollection<Book> Books { get; set; } = [];
     }
 }
