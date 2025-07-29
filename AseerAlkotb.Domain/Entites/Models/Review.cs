@@ -10,7 +10,7 @@ namespace AseerAlkotb.Domain.Entites.Models
 
         #region Navigation Properties
         public int BookId { get; set; }
-        public Book Book { get; set; }
+        public virtual Book Book { get; set; }
         //public int UserId { get; set; }
         //public User User { get; set; }
         #endregion

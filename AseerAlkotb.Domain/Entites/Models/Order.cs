@@ -19,7 +19,7 @@ namespace AseerAlkotb.Domain.Entites.Models
 
         //public int UserId { get; set; }
         //public User User { get; set; } // Assuming a User entity exists
-        public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>(); 
+        public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>(); 
         #endregion
 
     }

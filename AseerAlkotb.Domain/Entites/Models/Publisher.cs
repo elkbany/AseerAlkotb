@@ -9,7 +9,7 @@ namespace AseerAlkotb.Domain.Entites.Models
         public string LogoUrl { get; set; }
         public string ContactEmail { get; set; }
         #region Navigation Properties
-        public ICollection<Book> Books { get; set; } = [];
+        public  virtual ICollection<Book> Books { get; set; } = [];
         #endregion
     }
 }

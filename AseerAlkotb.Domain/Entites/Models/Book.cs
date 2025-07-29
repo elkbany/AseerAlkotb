@@ -24,13 +24,13 @@ namespace AseerAlkotb.Domain.Entites.Models
        
         #region Navigation Properties
         public int AuthorId { get; set; }
-        public Author Author { get; set; }
+        public virtual Author Author { get; set; }
         public int PublisherId { get; set; }
-        public Publisher Publisher { get; set; }
-        public ICollection<Category> Categories { get; set; } = [];
-        public ICollection<Review> Reviews { get; set; } = [];
-        public ICollection<OrderItem> OrderItems { get; set; } = [];
-        public ICollection<CartItem> CartItems { get; set; } = []; 
+        public virtual Publisher Publisher { get; set; }
+        public virtual ICollection<Category> Categories { get; set; } = [];
+        public virtual ICollection<Review> Reviews { get; set; } = [];
+        public virtual ICollection<OrderItem> OrderItems { get; set; } = [];
+        public virtual ICollection<CartItem> CartItems { get; set; } = []; 
         #endregion
 
 

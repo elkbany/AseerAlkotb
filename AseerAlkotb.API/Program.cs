@@ -13,7 +13,7 @@ namespace AseerAlkotb.API
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             {
                 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-                options.UseSqlServer(connectionString);
+                options.UseSqlServer(connectionString).UseLazyLoadingProxies();
             });
             #endregion
             #region Repositories Registerations
