@@ -1,5 +1,7 @@
 ﻿using AseerAlkotb.Domain.Interfaces.Base;
+using AseerAlkotb.Domain.Interfaces.Repositories;
 using AseerAlkotb.Infrastructure.Context;
+using AseerAlkotb.Infrastructure.Repositories.Implementations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,8 +18,10 @@ namespace AseerAlkotb.Infrastructure.Repositories.Base
         {
             this.dbContext = dbContext;
             // EntityRepository = new  EntityRepository(dbcontext);
+            Authors = new AuthorRepository(dbContext);
         }
         //public IEntityrepository EntityRepository {get; private set;}
+        public IAuthorRepository Authors { get; private set; }
         public async Task<int> CommitAsync()
         {
             return await dbContext.SaveChangesAsync();

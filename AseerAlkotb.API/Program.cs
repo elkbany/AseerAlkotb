@@ -1,6 +1,11 @@
 
+using AseerAlkotb.API.Extensions;
 using AseerAlkotb.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
+using Mapster;
+using MapsterMapper;
+using System.Reflection;
+using AseerAlkotb.API.Middlewares;
 namespace AseerAlkotb.API
 {
     public class Program
@@ -21,8 +26,10 @@ namespace AseerAlkotb.API
             #region Services Registerations
             #endregion
             #region AutoMapper 
+            builder.Services.AddMapster();
             #endregion
             #region Validation
+            builder.Services.AddFluentValidationValidators();
             #endregion
 
 
@@ -48,7 +55,7 @@ namespace AseerAlkotb.API
                 });
                 #endregion
             }
-
+            app.UseMiddleware<ExceptionHandlerMiddleware>();
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
