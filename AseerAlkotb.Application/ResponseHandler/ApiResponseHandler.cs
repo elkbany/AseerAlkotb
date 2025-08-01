@@ -81,11 +81,12 @@ namespace AseerAlkotb.Application.ResponseHandler
             };
         }
 
-        public static ApiResponse<T> NotFound<T>(string? Message = null)
+        public static ApiResponse<T> NotFound<T>(string Message="")
         {
             return new ApiResponse<T>()
             {
                 StatusCode = System.Net.HttpStatusCode.NotFound,
+                Message = Message
             };
         }
         public static ApiResponse<T> NotFound<T>(T entity, object? Meta = null, string? Message = null)

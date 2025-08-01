@@ -6,6 +6,12 @@ using Mapster;
 using MapsterMapper;
 using System.Reflection;
 using AseerAlkotb.API.Middlewares;
+using AseerAlkotb.Infrastructure.Repositories.Implementations;
+using AseerAlkotb.Domain.Interfaces.Repositories;
+using AseerAlkotb.Application.Contracts;
+using AseerAlkotb.Application.Services;
+using AseerAlkotb.Domain.Interfaces.Base;
+using AseerAlkotb.Infrastructure.Repositories.Base;
 namespace AseerAlkotb.API
 {
     public class Program
@@ -22,14 +28,18 @@ namespace AseerAlkotb.API
             });
             #endregion
             #region Repositories Registerations
+            builder.Services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            builder.Services.AddScoped<IAuthorRepository, AuthorRepository>();
             #endregion
             #region Services Registerations
+            builder.Services.AddScoped<IAuthorServices,AuthorServices>();
             #endregion
             #region AutoMapper 
             builder.Services.AddMapster();
             #endregion
             #region Validation
-            builder.Services.AddFluentValidationValidators();
+            //builder.Services.AddFluentValidationValidators();
             #endregion
 
 

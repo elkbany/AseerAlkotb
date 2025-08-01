@@ -21,10 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\AseerAlkotb.Application\AseerAlkotb.Application.csproj" />
     <ProjectReference Include="..\AseerAlkotb.Domain\AseerAlkotb.Domain.csproj" />
     <ProjectReference Include="..\AseerAlkotb.Infrastructure\AseerAlkotb.Infrastructure.csproj" />

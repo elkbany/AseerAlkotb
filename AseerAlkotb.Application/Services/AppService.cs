@@ -23,21 +23,21 @@ namespace AseerAlkotb.Application.Services
         protected async Task DoValidationAsync<TValidator, TRequest>(TRequest request, params object[] constructorParameters)
         where TValidator : AbstractValidator<TRequest>
         {
-            var validator = serviceProvider.GetRequiredService<TValidator>();
-            var result = await validator.ValidateAsync(request);
+            //var validator = serviceProvider.GetRequiredService<TValidator>();
+            //var result = await validator.ValidateAsync(request);
 
-            if (!result.IsValid)
-            {
-                throw new ValidationException(result.Errors);
-            }
-
-            //var instance = (TValidator)Activator.CreateInstance(typeof(TValidator), constructorParameters)!;
-
-            //var validateResult = await instance.ValidateAsync(request);
-            //if (!validateResult.IsValid)
+            //if (!result.IsValid)
             //{
-            //    throw new ValidationException(validateResult.Errors);
+            //    throw new ValidationException(result.Errors);
             //}
+
+            var instance = (TValidator)Activator.CreateInstance(typeof(TValidator), constructorParameters)!;
+
+            var validateResult = await instance.ValidateAsync(request);
+            if (!validateResult.IsValid)
+            {
+                throw new ValidationException(validateResult.Errors);
+            }
         }
     
     #endregion
