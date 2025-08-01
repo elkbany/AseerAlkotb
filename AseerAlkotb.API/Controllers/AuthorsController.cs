@@ -17,7 +17,7 @@ namespace AseerAlkotb.API.Controllers
             this.authorServices = authorServices;
         }
         [HttpPost]
-        public async Task<IActionResult> Add(AddAuthorRequest request)
+        public async Task<IActionResult> Add([FromQuery]AddAuthorRequest request)
         {
             var result = await authorServices.AddAuthorAsync(request);
             return ApiResult(result);
@@ -41,7 +41,7 @@ namespace AseerAlkotb.API.Controllers
             return ApiResult(result);
         }
         [HttpPut]
-        public async Task<IActionResult> Update(UpdateAuthorRequest request)
+        public async Task<IActionResult> Update([FromQuery]UpdateAuthorRequest request)
         {
             var result = await authorServices.UpdateAuthorAsync(request);
             return ApiResult(result);

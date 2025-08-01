@@ -24,8 +24,12 @@ namespace AseerAlkotb.Application.Services
         public async Task<ApiResponse<AddAuthorResponse>> AddAuthorAsync(AddAuthorRequest request)
         {
             await DoValidationAsync<AddAuthorRequestValidator, AddAuthorRequest>(request);
-            //upload image
+           
             var author = request.Adapt<Author>();
+            if (request.Image != null)
+            {
+                author.ImageUrl = await UploadImageAsync(request.Image, "authors");
+            }
             await unitOfWork.Authors.InsertAsync(author);
             await unitOfWork.CommitAsync();
 
@@ -40,8 +44,11 @@ namespace AseerAlkotb.Application.Services
             {
                 return NotFound<DeleteAuthorResponse>("Author not found");
             }
-            //delete image
-             unitOfWork.Authors.Delete(author);
+            if (!string.IsNullOrEmpty(author.ImageUrl))
+            {
+                await DeleteImageAsync(author.ImageUrl);
+            }
+            unitOfWork.Authors.Delete(author);
             await unitOfWork.CommitAsync();
             var authMap= author.Adapt<DeleteAuthorResponse>();
             return Success(authMap);
@@ -55,9 +62,16 @@ namespace AseerAlkotb.Application.Services
             {
                 return NotFound<UpdateAuthorResponse>("Auhtor not found");
             }
-            // update image
             author = request.Adapt<Author>();
-            unitOfWork.Authors.Update(author);
+            if (request.Image != null)
+            {
+                author.ImageUrl = await UpdateImageAsync(
+                    request.Image,
+                    author.ImageUrl,
+                    "authors"
+               );
+            }
+                unitOfWork.Authors.Update(author);
             await unitOfWork.CommitAsync();
            var authMap = author.Adapt<UpdateAuthorResponse>();
             return Success(authMap);
