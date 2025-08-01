@@ -31,9 +31,11 @@ namespace AseerAlkotb.API
             builder.Services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IAuthorRepository, AuthorRepository>();
+            builder.Services.AddScoped<IBookRepository, BookRepository>();
             #endregion
             #region Services Registerations
             builder.Services.AddScoped<IAuthorServices,AuthorServices>();
+            builder.Services.AddScoped<IBookServices, BookServices>();
             #endregion
             #region AutoMapper 
             builder.Services.AddMapster();
