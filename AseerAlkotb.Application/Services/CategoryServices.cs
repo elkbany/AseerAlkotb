@@ -53,8 +53,7 @@ namespace AseerAlkotb.Application.Services
             {
                 return NotFound<UpdateCategoryResponse>("Category not found");
             }
-            category = request.Adapt<Category>();
-
+            request.Adapt(category);
             unitOfWork.Categories.Update(category);
             await unitOfWork.CommitAsync();
             var categoryMap = category.Adapt<UpdateCategoryResponse>();
@@ -67,7 +66,7 @@ namespace AseerAlkotb.Application.Services
             var category = await unitOfWork.Categories.FirstOrDefaultAsync(a => a.Id == request.Id);
             if (category == null)
             {
-                return NotFound<GetCategoryByIdResponse>("Auhtor not found");
+                return NotFound<GetCategoryByIdResponse>("Category not found");
             }
             var categoryMap = category.Adapt<GetCategoryByIdResponse>();
             return Success(categoryMap);
