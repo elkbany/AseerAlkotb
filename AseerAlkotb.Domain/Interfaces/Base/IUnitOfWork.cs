@@ -13,6 +13,7 @@ namespace AseerAlkotb.Domain.Interfaces.Base
         public IAuthorRepository Authors { get; }
         public ICategoryRepository Categories { get; }
 
+        public IBookRepository Books { get; }
         public Task<int> CommitAsync();
     }
 }

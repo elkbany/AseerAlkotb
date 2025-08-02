@@ -29,13 +29,13 @@ namespace AseerAlkotb.API.Controllers
             return ApiResult(result);
         }
         [HttpGet]
-        public async Task<IActionResult> GetById(GetAuthorByIdRequest request)
+        public async Task<IActionResult> GetById([FromQuery]GetAuthorByIdRequest request)
         {
             var result = await authorServices.GetAuthorByIdAsync(request);
             return ApiResult(result);
         }
         [HttpGet("GetAll")]
-        public async Task<IActionResult> GetAll(GetAllAuthorsPaginatedRequest request)
+        public async Task<IActionResult> GetAll([FromQuery]GetAllAuthorsPaginatedRequest request)
         {
             var result = await authorServices.GetAllAuthorsPaginatedAsync(request);
             return ApiResult(result);

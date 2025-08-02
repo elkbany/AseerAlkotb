@@ -25,7 +25,7 @@ namespace AseerAlkotb.Domain.Entites.Models
         #region Navigation Properties
         public int AuthorId { get; set; }
         public virtual Author Author { get; set; }
-        public int PublisherId { get; set; }
+        public int? PublisherId { get; set; }
         public virtual Publisher Publisher { get; set; }
         public virtual ICollection<Category> Categories { get; set; } = [];
         public virtual ICollection<Review> Reviews { get; set; } = [];

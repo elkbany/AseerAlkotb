@@ -7,6 +7,6 @@ using System.Threading.Tasks;
 
 namespace AseerAlkotb.Application.Features.Authors.Responses
 {
-   public record AddAuthorResponse(int Id, string Name, string Bio, string Image);
+   public record AddAuthorResponse(int Id, string Name, string Bio, string ImageUrl);
    
 }

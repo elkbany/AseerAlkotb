@@ -43,11 +43,11 @@ namespace AseerAlkotb.Infrastructure.Configurations
                 .HasForeignKey(oi => oi.OrderId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            //builder.HasOne(o => o.User)
-            //    .WithMany(u => u.Orders)
-            //    .HasForeignKey(o => o.UserId)
-            //    .OnDelete(DeleteBehavior.Restrict);
-            
+            builder.HasOne(o => o.User)
+                .WithMany(u => u.Orders)
+                .HasForeignKey(o => o.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
         }
     }
 }
