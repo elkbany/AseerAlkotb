@@ -15,23 +15,22 @@ namespace AseerAlkotb.Infrastructure.Configurations
         {
             builder.ToTable("Wishlists");
 
-          
-            // Composite key: UserId + BookId (one user can't have same book twice in wishlist)
-            // builder.HasKey(w => new { w.UserId, w.BookId });
 
-            // Many-to-One: Wishlist --> Book
-            builder.HasOne(w => w.Book)
-                .WithMany()
-                .HasForeignKey(w => w.BookId)
+         
+
+            // Many-to-One: Wishlist --> WishlistItems
+            builder.HasMany(w => w.WishlistItems)
+                .WithOne(wi=>wi.Wishlist)
+                .HasForeignKey(w => w.WishlistId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-           
-            
-            //builder.HasOne(w => w.User)
-            //    .WithMany(u => u.Wishlists)
-            //    .HasForeignKey(w => w.UserId)
-            //    .OnDelete(DeleteBehavior.Cascade);
-            
+
+
+            builder.HasOne(w => w.User)
+                .WithOne(u => u.Wishlist)
+               .HasForeignKey<Wishlist>("UserId")
+               .OnDelete(DeleteBehavior.Cascade);
+
         }
     }
 }

@@ -5,9 +5,10 @@ namespace AseerAlkotb.Domain.Entites.Models
     public class Wishlist : Entity<int>
     {
         #region Navigation Properties
-        //public int UserId { get; set; }
-        public int BookId { get; set; }
-        public virtual Book Book { get; set; }
+        public virtual User User { get; set; }
+        public int UserId { get; set; }
+        public virtual ICollection<WishlistItem> WishlistItems { get; set; }
+
         #endregion
     }
 }

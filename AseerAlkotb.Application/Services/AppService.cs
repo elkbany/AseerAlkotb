@@ -39,20 +39,24 @@ namespace AseerAlkotb.Application.Services
                 throw new ValidationException(validateResult.Errors);
             }
         }
-    
-    #endregion
-    #region Uploading Files
-     public async Task<string> UploadImageAsync(IFormFile imageFile, string folder)
+
+        #endregion
+        #region Uploading Files
+        public async Task<string> UploadImageAsync(IFormFile imageFile, string folder)
         {
             var allowedContentTypes = new[] { "image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp" };
-               if (!allowedContentTypes.Contains(imageFile.ContentType.ToLowerInvariant()))
+            if (!allowedContentTypes.Contains(imageFile.ContentType.ToLowerInvariant()))
                 throw new ArgumentException("Invalid image file");
 
             // Generate unique filename
             var fileName = GenerateUniqueFileName(imageFile.FileName);
 
-            // Create folder path
-            var uploadsFolder = Path.Combine(_environment.ContentRootPath, "uploads", folder);
+            // Get wwwroot path using current directory
+            var currentDirectory = Directory.GetCurrentDirectory();
+            var wwwrootPath = Path.Combine(currentDirectory, "wwwroot");
+            var uploadsFolder = Path.Combine(wwwrootPath, "uploads", folder);
+
+            // Create directory if it doesn't exist
             Directory.CreateDirectory(uploadsFolder);
 
             // Full file path
@@ -75,9 +79,13 @@ namespace AseerAlkotb.Application.Services
 
             try
             {
+                // Get wwwroot path
+                var currentDirectory = Directory.GetCurrentDirectory();
+                var wwwrootPath = Path.Combine(currentDirectory, "wwwroot");
+
                 // Convert URL to physical path
                 var relativePath = imageUrl.TrimStart('/');
-                var filePath = Path.Combine(_environment.ContentRootPath, relativePath);
+                var filePath = Path.Combine(wwwrootPath, relativePath);
 
                 if (File.Exists(filePath))
                 {
@@ -90,9 +98,9 @@ namespace AseerAlkotb.Application.Services
                 // Log exception
                 return false;
             }
-
             return false;
         }
+
 
         public async Task<string> UpdateImageAsync(IFormFile newImage, string oldImageUrl, string folder)
         {
