@@ -1,5 +1,5 @@
-﻿using AseerAlkotb.Application.Features.Authors.Requests;
-using AseerAlkotb.Application.Features.Authors.Responses;
+﻿using AseerAlkotb.Application.Features.Categories.Requests;
+using AseerAlkotb.Application.Features.Categories.Responses;
 using AseerAlkotb.Domain.Entites.Models;
 using Mapster;
 using System;
@@ -17,7 +17,7 @@ namespace AseerAlkotb.Application.Features.Categories.Mapping
 
             TypeAdapterConfig<AddCategoryRequest, Category>.NewConfig();
             config.NewConfig<AddCategoryRequest, Category>()
-                .Ignore(a => a.SubCategory);
+                .Ignore(a => a.SubCategory)
                 .Ignore(a => a.ParentCategory);
 
             config.NewConfig<Category, AddCategoryResponse>();
