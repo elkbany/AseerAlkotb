@@ -1,7 +1,4 @@
 ﻿using AseerAlkotb.Application.Contracts;
-using AseerAlkotb.Application.Features.Authors.Requests;
-using AseerAlkotb.Application.Features.Authors.Responses;
-using AseerAlkotb.Application.Features.Authors.Validators;
 using AseerAlkotb.Application.Features.Books.Mapping;
 using AseerAlkotb.Application.Features.Books.Requests;
 using AseerAlkotb.Application.Features.Books.Responses;
@@ -11,11 +8,6 @@ using AseerAlkotb.Domain.Entites.Models;
 using AseerAlkotb.Domain.Interfaces.Base;
 using Mapster;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static AseerAlkotb.Application.ResponseHandler.ApiResponseHandler;
 
 
