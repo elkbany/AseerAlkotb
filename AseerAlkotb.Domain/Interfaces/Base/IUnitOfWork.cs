@@ -11,6 +11,8 @@ namespace AseerAlkotb.Domain.Interfaces.Base
     {
         //public IEntityRepository EntityRepository {get;}
         public IAuthorRepository Authors { get; }
+        public ICategoryRepository Categories { get; }
+
         public Task<int> CommitAsync();
     }
 }
