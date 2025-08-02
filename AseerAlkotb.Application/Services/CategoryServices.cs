@@ -23,10 +23,10 @@ namespace AseerAlkotb.Application.Services
         public async Task<ApiResponse<AddCategoryResponse>> AddCategoryAsync(AddCategoryRequest request)
         {
             await DoValidationAsync<AddCategoryRequestValidator, AddCategoryRequest>(request);
-            var category = request.Adapt<category>();
-            await unitOfWork.Categories.IInsertAsync(category);
+            var category = request.Adapt<Category>();
+            await unitOfWork.Categories.InsertAsync(category);
             await unitOfWork.CommitAsync();
-            var categoryMap = category.adapt<AddCategoryResponse>();
+            var categoryMap = category.Adapt<AddCategoryResponse>();
             return Success(categoryMap);
         }
 
@@ -55,7 +55,7 @@ namespace AseerAlkotb.Application.Services
             }
             category = request.Adapt<Category>();
 
-            unitOfWork.Category.Update(category);
+            unitOfWork.Categories.Update(category);
             await unitOfWork.CommitAsync();
             var categoryMap = category.Adapt<UpdateCategoryResponse>();
             return Success(categoryMap);

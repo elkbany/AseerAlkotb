@@ -7,6 +7,6 @@ using System.Threading.Tasks;
 
 namespace AseerAlkotb.Application.Features.Categories.Responses
 {
-    public record AddCategoryResponse(string Name, string? Description, bool IsActive);
+    public record AddCategoryResponse(int Id,string Name, string? Description, bool IsActive);
 
 }
