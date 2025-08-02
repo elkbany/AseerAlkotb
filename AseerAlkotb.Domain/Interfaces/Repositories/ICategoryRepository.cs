@@ -3,7 +3,7 @@ using AseerAlkotb.Domain.Interfaces.Base;
 
 namespace AseerAlkotb.Domain.Interfaces.Repositories
 {
-    public interface ICategoryRepository : IGenericRepository<Author, int>
+    public interface ICategoryRepository : IGenericRepository<Category, int>
     {
     }
 }

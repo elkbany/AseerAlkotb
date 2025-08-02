@@ -6,6 +6,6 @@ using System.Threading.Tasks;
 
 namespace AseerAlkotb.Application.Features.Categories.Requests
 {
-    public record DeleteDeleteCategoryRequest(int Id);
+    public record DeleteCategoryRequest(int Id);
 
 }
