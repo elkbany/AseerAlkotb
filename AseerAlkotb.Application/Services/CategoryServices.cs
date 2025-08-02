@@ -67,7 +67,7 @@ namespace AseerAlkotb.Application.Services
             var category = await unitOfWork.Categories.FirstOrDefaultAsync(a => a.Id == request.Id);
             if (category == null)
             {
-                return NotFound<GetCategoryByIdResponse>("Auhtor not found");
+                return NotFound<GetCategoryByIdResponse>("Category not found");
             }
             var categoryMap = category.Adapt<GetCategoryByIdResponse>();
             return Success(categoryMap);
