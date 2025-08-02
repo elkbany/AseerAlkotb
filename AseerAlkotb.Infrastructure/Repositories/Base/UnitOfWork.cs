@@ -1,4 +1,5 @@
-﻿using AseerAlkotb.Domain.Interfaces.Base;
+﻿using AseerAlkotb.Domain.Entites.Models;
+using AseerAlkotb.Domain.Interfaces.Base;
 using AseerAlkotb.Domain.Interfaces.Repositories;
 using AseerAlkotb.Infrastructure.Context;
 using AseerAlkotb.Infrastructure.Repositories.Implementations;
@@ -25,6 +26,11 @@ namespace AseerAlkotb.Infrastructure.Repositories.Base
         }
         //public IEntityrepository EntityRepository {get; private set;}
         public IAuthorRepository Authors { get; private set; }
+
+        public ICategoryRepository Categories { get; private set; }
+
+        public IBookRepository Books { get; private set; }
+
         public async Task<int> CommitAsync()
         {
             return await dbContext.SaveChangesAsync();

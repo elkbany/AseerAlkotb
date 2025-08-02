@@ -444,9 +444,6 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.Property<int?>("BookId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("BookId1")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -462,8 +459,6 @@ namespace AseerAlkotb.Infrastructure.Migrations
 
                     b.HasIndex("UserId")
                         .IsUnique();
-
-                    b.HasIndex("BookId1");
 
                     b.ToTable("Wishlists", (string)null);
                 });
@@ -628,6 +623,12 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("AseerAlkotb.Domain.Entites.Models.Wishlist", "Wishlist")
+                        .WithMany("WishlistItems")
+                        .HasForeignKey("WishlistId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Book");
 
                     b.Navigation("Wishlist");
@@ -660,6 +661,16 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.Navigation("OrderItems");
 
                     b.Navigation("Reviews");
+
+                    b.Navigation("Wishlists");
+                });
+
+            modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Cart", b =>
+                {
+                    b.Navigation("CartItems");
+
+                    b.Navigation("User")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Category", b =>
