@@ -13,7 +13,9 @@ namespace AseerAlkotb.Infrastructure.Configurations
     {
         public void Configure(EntityTypeBuilder<OrderItem> builder)
         {
+
             builder.ToTable("OrderItems");
+            builder.HasKey(oi => new { oi.OrderId, oi.BookId });
 
             builder.Property(oi => oi.UnitPrice)
                 .HasColumnType("decimal(18,2)");

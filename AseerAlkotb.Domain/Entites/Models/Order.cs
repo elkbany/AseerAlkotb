@@ -17,8 +17,8 @@ namespace AseerAlkotb.Domain.Entites.Models
         public string TrackingNumber { get; set; } // What i Added Assuming a tracking number for the order
         #region Navigation Properties
 
-        //public int UserId { get; set; }
-        //public User User { get; set; } // Assuming a User entity exists
+        public int UserId { get; set; }
+        public  virtual User User { get; set; } // Assuming a User entity exists
         public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>(); 
         #endregion
 

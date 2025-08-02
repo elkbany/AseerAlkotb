@@ -25,7 +25,7 @@ namespace AseerAlkotb.Infrastructure.Configurations
             builder.Ignore(ci => ci.TotalPrice);
 
             // Composite key: UserId + BookId (one user can't have same book twice in cart)
-            builder.HasKey(ci => new { ci.UserId, ci.BookId });
+            builder.HasKey(ci => new { ci.CartId, ci.BookId });
 
             // Many-to-One: CartItem --> Book
             builder.HasOne(ci => ci.Book)
@@ -33,12 +33,12 @@ namespace AseerAlkotb.Infrastructure.Configurations
                 .HasForeignKey(ci => ci.BookId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-          
-            //builder.HasOne(ci => ci.User)
-            //    .WithMany(u => u.CartItems)
-            //    .HasForeignKey(ci => ci.UserId)
-            //    .OnDelete(DeleteBehavior.Cascade);
-            
+
+            builder.HasOne(ci => ci.Cart)
+                .WithMany(u => u.CartItems)
+                .HasForeignKey(ci => ci.CartId)
+                .OnDelete(DeleteBehavior.Cascade);
+
         }
     }
 }

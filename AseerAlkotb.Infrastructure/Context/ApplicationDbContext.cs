@@ -22,6 +22,11 @@ namespace AseerAlkotb.Infrastructure.Context
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
             modelBuilder.Entity<Review>().ToTable(t=>t.HasCheckConstraint("CK_Review_Rating", "Rating >= 1 AND Rating <= 5"));
+            modelBuilder.Entity<Cart>()
+                .HasOne(c=>c.User)
+                .WithOne(u=>u.Cart).HasForeignKey<User>("CartId")
+                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<WishlistItem>().HasKey(wi => new { wi.BookId, wi.WishlistId });
 
         }
         public DbSet<Author> Authors { get; set; }

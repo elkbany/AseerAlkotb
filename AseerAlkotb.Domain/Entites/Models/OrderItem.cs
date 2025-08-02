@@ -1,7 +1,7 @@
 ﻿using AseerAlkotb.Domain.Entites.Base;
 namespace AseerAlkotb.Domain.Entites.Models
 {
-    public class OrderItem: Entity<int> 
+    public class OrderItem
     {
 
         public decimal UnitPrice { get; set; }

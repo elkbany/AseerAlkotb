@@ -62,7 +62,7 @@ namespace AseerAlkotb.Application.Services
             {
                 return NotFound<UpdateAuthorResponse>("Auhtor not found");
             }
-            author = request.Adapt<Author>();
+            request.Adapt(author); 
             if (request.Image != null)
             {
                 author.ImageUrl = await UpdateImageAsync(

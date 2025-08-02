@@ -5,8 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AseerAlkotb.Application.Features.Authors.Responses
+namespace AseerAlkotb.Application.Features.Categories.Responses
 {
-   public record AddAuthorResponse(int Id, string Name, string Bio, string ImageUrl);
-   
+    public record AddCategoryResponse(string Name, string? Description, bool IsActive);
+
 }
