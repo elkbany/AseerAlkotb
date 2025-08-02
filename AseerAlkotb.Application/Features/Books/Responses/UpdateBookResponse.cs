@@ -1,22 +1,22 @@
-﻿using Microsoft.AspNetCore.Http;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AseerAlkotb.Application.Features.Books.Mapping
+namespace AseerAlkotb.Application.Features.Books.Responses
 {
-    public record AddBookRequest(
+    public record UpdateBookResponse(
+        int Id,
         string Title,
-        string Description,
         string ISBN,
         decimal Price,
         decimal DiscountPercentage,
         DateTime PublishedDate,
         int PageCount,
         string Language,
-        IFormFile? CoverImageUrl,
+        string? CoverImageUrl,
         string Format,
         int StockQuantity,
         int AuthorId,

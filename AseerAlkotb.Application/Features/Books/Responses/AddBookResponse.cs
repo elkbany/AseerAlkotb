@@ -21,5 +21,7 @@ namespace AseerAlkotb.Application.Features.Books.Mapping
         int StockQuantity,
         string AuthorName,       
         string PublisherName,    
-        List<string> CategoryNames);
+        List<string> CategoryNames,
+        bool IsActive
+        );
 }

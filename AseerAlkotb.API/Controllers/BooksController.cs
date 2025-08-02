@@ -1,6 +1,7 @@
 ﻿using AseerAlkotb.API.Bases;
 using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Features.Books.Mapping;
+using AseerAlkotb.Application.Features.Books.Requests;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,5 +25,33 @@ namespace AseerAlkotb.API.Controllers
             return ApiResult(result);
         }
 
+        [HttpPut]
+        public async Task<IActionResult> Update([FromQuery] UpdateBookRequest request)
+        {
+            var result = await _bookServices.UpdateBookAsync(request);
+            return ApiResult(result);
+
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> Delete(DeleteBookRequest request)
+        {
+            var result = await _bookServices.DeleteBookAsync(request);
+            return ApiResult(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetById([FromQuery] GetBookByIdRequest request)
+        {
+            var result = await _bookServices.GetBookByIdAsync(request);
+            return ApiResult(result);
+        }
+
+        [HttpGet("GetAll")]
+        public async Task<IActionResult> GetAll([FromQuery]GetAllBooksPaginatedRequest request)
+        {
+            var result = await _bookServices.GetAllBooksPaginatedAsync(request);
+            return ApiResult(result);
+        }
     }
 }

@@ -38,6 +38,7 @@ namespace AseerAlkotb.API
             builder.Services.AddScoped<IAuthorServices,AuthorServices>();
             builder.Services.AddScoped<IBookServices, BookServices>();
             builder.Services.AddScoped<ICategoryServices, CategoryServices>();
+
             #endregion
             #region AutoMapper 
             builder.Services.AddMapster();

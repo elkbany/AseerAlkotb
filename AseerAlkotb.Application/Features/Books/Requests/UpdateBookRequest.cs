@@ -5,9 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AseerAlkotb.Application.Features.Books.Mapping
+namespace AseerAlkotb.Application.Features.Books.Requests
 {
-    public record AddBookRequest(
+    public record UpdateBookRequest(
+        int Id,
         string Title,
         string Description,
         string ISBN,
