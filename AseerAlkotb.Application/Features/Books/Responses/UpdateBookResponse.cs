@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AseerAlkotb.Domain.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
@@ -12,10 +13,11 @@ namespace AseerAlkotb.Application.Features.Books.Responses
         string Title,
         string ISBN,
         decimal Price,
+        string Description,
         decimal DiscountPercentage,
         DateTime PublishedDate,
         int PageCount,
-        string Language,
+        BookLanguage Language,
         string? CoverImageUrl,
         string Format,
         int StockQuantity,

@@ -5,10 +5,14 @@ using AseerAlkotb.Application.Features.Books.Responses;
 using AseerAlkotb.Application.Features.Books.Validators;
 using AseerAlkotb.Application.ResponseHandler;
 using AseerAlkotb.Domain.Entites.Models;
+using AseerAlkotb.Domain.Enums;
 using AseerAlkotb.Domain.Interfaces.Base;
 using Mapster;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
+using System.Linq.Expressions;
 using static AseerAlkotb.Application.ResponseHandler.ApiResponseHandler;
+
 
 
 namespace AseerAlkotb.Application.Services
@@ -109,8 +113,60 @@ namespace AseerAlkotb.Application.Services
             (request.PageNumber - 1) * request.PageSize, request.PageSize);
 
             var totalCount = await _uniteOfWork.Books.CountAsync(s => s.Title.Contains(request.Search));
-            var authMap = books.Adapt<List<GetAllBooksPaginatedResponse>>();
-            return Success(authMap, totalCount, request.PageNumber, request.PageSize);
+            var bookMap = books.Adapt<List<GetAllBooksPaginatedResponse>>();
+            return Success(bookMap, totalCount, request.PageNumber, request.PageSize);
+    }
+        public async Task<ApiResponsePaginated<List<GetAllBooksPaginatedResponse>>> FilterBooksAsync(FilterBooksRequest request)
+        {
+            var query = _uniteOfWork.Books.GetQueryable()
+                .Include(b => b.Author)
+                .Include(b => b.Publisher)
+                .Include(b => b.Categories)
+                .AsNoTracking();
+
+            // فلتر حسب الكلمة
+            if (!string.IsNullOrWhiteSpace(request.SearchTerm))
+                query = query.Where(b => b.Title.Contains(request.SearchTerm) || b.Description.Contains(request.SearchTerm));
+
+            // فلتر اللغة
+            if (request.Language is not null)
+                query = query.Where(b => b.Language == request.Language.Value);
+
+
+            // فلتر التصنيفات
+            if (request.CategoryIds is not null && request.CategoryIds.Any())
+                query = query.Where(b => b.Categories.Any(c => request.CategoryIds.Contains(c.Id)));
+
+            // فلتر الناشرين
+            query = query.Where(b => b.PublisherId.HasValue && request.PublisherIds.Contains(b.PublisherId.Value));
+
+
+            // الترتيب
+            query = request.SortBy switch
+            {
+                BookSortOption.Newest => query.OrderByDescending(b => b.PublishedDate),
+                BookSortOption.Oldest => query.OrderBy(b => b.PublishedDate),
+                BookSortOption.PriceAsc => query.OrderBy(b => b.Price),
+                BookSortOption.PriceDesc => query.OrderByDescending(b => b.Price),
+                BookSortOption.MostPopular => query.OrderByDescending(b => b.ViewCount),
+                _ => query.OrderByDescending(b => b.CreatedAt) // fallback في حالة null
+            };
+
+            var totalCount = await query.CountAsync();
+
+            var paginatedBooks = await query
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToListAsync();
+
+            var response = paginatedBooks.Adapt<List<GetAllBooksPaginatedResponse>>();
+
+            return Success(
+                response, totalCount, request.PageNumber, request.PageSize
+            );
         }
+
+
+
     }
 }

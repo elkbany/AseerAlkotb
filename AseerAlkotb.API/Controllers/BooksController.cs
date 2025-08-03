@@ -2,6 +2,7 @@
 using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Features.Books.Mapping;
 using AseerAlkotb.Application.Features.Books.Requests;
+using AseerAlkotb.Application.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -53,5 +54,13 @@ namespace AseerAlkotb.API.Controllers
             var result = await _bookServices.GetAllBooksPaginatedAsync(request);
             return ApiResult(result);
         }
+
+        [HttpGet("Filter")]
+        public async Task<IActionResult> FilterBooksAsync([FromQuery] FilterBooksRequest request)
+        {
+            var result = await _bookServices.FilterBooksAsync(request);
+            return Ok(result);
+        }
+
     }
 }

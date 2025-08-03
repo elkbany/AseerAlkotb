@@ -1,4 +1,5 @@
 ﻿using AseerAlkotb.Domain.Entites.Models;
+using AseerAlkotb.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System;
@@ -20,6 +21,7 @@ namespace AseerAlkotb.Infrastructure.Context
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            DataSeeder.SeedData(modelBuilder);
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
             modelBuilder.Entity<Review>().ToTable(t=>t.HasCheckConstraint("CK_Review_Rating", "Rating >= 1 AND Rating <= 5"));
             modelBuilder.Entity<Cart>()

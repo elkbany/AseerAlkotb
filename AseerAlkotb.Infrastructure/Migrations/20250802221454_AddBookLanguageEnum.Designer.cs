@@ -4,6 +4,7 @@ using AseerAlkotb.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AseerAlkotb.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250802221454_AddBookLanguageEnum")]
+    partial class AddBookLanguageEnum
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -59,35 +62,6 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Authors", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Bio = "أديب مصري",
-                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsActive = true,
-                            Name = "نجيب محفوظ",
-                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Bio = "كاتب مصري",
-                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsActive = true,
-                            Name = "أحمد خالد توفيق",
-                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Bio = "كاتب مصري",
-                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsActive = true,
-                            Name = "يوسف إدريس",
-                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        });
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Book", b =>
@@ -172,74 +146,6 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.HasIndex("PublisherId");
 
                     b.ToTable("Books", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            AuthorId = 1,
-                            CoverImageUrl = "cover.jpg",
-                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "رواية شهيرة لنجيب محفوظ",
-                            DiscountPercentage = 10m,
-                            Format = "ورقي",
-                            ISBN = "1234567890123",
-                            IsActive = true,
-                            Language = 1,
-                            PageCount = 240,
-                            Price = 150m,
-                            PublishedDate = new DateTime(1950, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            PublisherId = 1,
-                            SalesCount = 0,
-                            StockQuantity = 20,
-                            Title = "زقاق المدق",
-                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            ViewCount = 0
-                        },
-                        new
-                        {
-                            Id = 2,
-                            AuthorId = 1,
-                            CoverImageUrl = "new_cover.jpg",
-                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "وصف الكتاب الجديد",
-                            DiscountPercentage = 15m,
-                            Format = "ورقي",
-                            ISBN = "9876543210123",
-                            IsActive = true,
-                            Language = 1,
-                            PageCount = 350,
-                            Price = 200m,
-                            PublishedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            PublisherId = 1,
-                            SalesCount = 0,
-                            StockQuantity = 30,
-                            Title = "كتاب جديد",
-                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            ViewCount = 0
-                        },
-                        new
-                        {
-                            Id = 3,
-                            AuthorId = 2,
-                            CoverImageUrl = "another_cover.jpg",
-                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "وصف الكتاب الآخر",
-                            DiscountPercentage = 5m,
-                            Format = "ورقي",
-                            ISBN = "1234567890124",
-                            IsActive = true,
-                            Language = 1,
-                            PageCount = 300,
-                            Price = 250m,
-                            PublishedDate = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            PublisherId = 2,
-                            SalesCount = 0,
-                            StockQuantity = 15,
-                            Title = "كتاب آخر",
-                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            ViewCount = 0
-                        });
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Cart", b =>
@@ -321,35 +227,6 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.HasIndex("ParentCategoryId");
 
                     b.ToTable("Categories", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "كتب روائية",
-                            IsActive = true,
-                            Name = "روايات",
-                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "كتب تاريخية",
-                            IsActive = true,
-                            Name = "تاريخ",
-                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = 3,
-                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "كتب علمية",
-                            IsActive = true,
-                            Name = "علوم",
-                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        });
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Order", b =>
@@ -472,35 +349,6 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Publishers", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            ContactEmail = "info@aseeralkotob.com",
-                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "دار نشر مصرية",
-                            Name = "عصير الكتب",
-                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = 2,
-                            ContactEmail = "info2@aseeralkotob.com",
-                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "دار نشر عربية",
-                            Name = "دار الشروق",
-                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = 3,
-                            ContactEmail = "info3@aseeralkotob.com",
-                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "دار نشر لبنانية",
-                            Name = "دار الساقي",
-                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        });
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Review", b =>
@@ -643,33 +491,6 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.HasIndex("CategoryId");
 
                     b.ToTable("BookCategories");
-
-                    b.HasData(
-                        new
-                        {
-                            BookId = 1,
-                            CategoryId = 1
-                        },
-                        new
-                        {
-                            BookId = 1,
-                            CategoryId = 2
-                        },
-                        new
-                        {
-                            BookId = 2,
-                            CategoryId = 2
-                        },
-                        new
-                        {
-                            BookId = 3,
-                            CategoryId = 1
-                        },
-                        new
-                        {
-                            BookId = 3,
-                            CategoryId = 3
-                        });
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Book", b =>

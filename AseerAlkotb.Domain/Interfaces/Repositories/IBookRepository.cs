@@ -10,5 +10,6 @@ namespace AseerAlkotb.Domain.Interfaces.Repositories
 {
     public interface IBookRepository : IGenericRepository<Book,int>
     {
+        public IQueryable<Book> GetQueryable();
     }
 }

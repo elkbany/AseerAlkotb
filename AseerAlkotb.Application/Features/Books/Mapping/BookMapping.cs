@@ -60,6 +60,7 @@ namespace AseerAlkotb.Application.Features.Books.Mapping
             config.NewConfig<Book, GetAllBooksPaginatedResponse>()
                 .Map(dest => dest.AuthorName, src => src.AuthorId != null ? src.Author.Name : string.Empty)
                 .Map(dest => dest.PublisherName, src => src.Publisher.Name != null ? src.Publisher.Name : string.Empty)
+                .Map(dest => dest.CategoryIds, src => src.Categories.Select(c => c.Id).ToList())
                 .Map(dest => dest.CategoryNames, src => src.Categories != null ? src.Categories.Select(c => c.Name).ToList() : new List<string>());
             #endregion
         }

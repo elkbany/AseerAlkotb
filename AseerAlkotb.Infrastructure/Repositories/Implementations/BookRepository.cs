@@ -2,9 +2,11 @@
 using AseerAlkotb.Domain.Interfaces.Repositories;
 using AseerAlkotb.Infrastructure.Context;
 using AseerAlkotb.Infrastructure.Repositories.Base;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -18,5 +20,11 @@ namespace AseerAlkotb.Infrastructure.Repositories.Implementations
         {
             _context = Context;
         }
+
+        public IQueryable<Book> GetQueryable()
+        {
+            return _context.Books.AsQueryable();
+        }
+
     }
 }

@@ -17,6 +17,8 @@ namespace AseerAlkotb.Application.Contracts
         public Task<ApiResponse<DeleteBookResponse>> DeleteBookAsync(DeleteBookRequest request);
         public Task<ApiResponse<GetBookByIdResponse>> GetBookByIdAsync(GetBookByIdRequest request);
         public Task<ApiResponsePaginated<List<GetAllBooksPaginatedResponse>>> GetAllBooksPaginatedAsync(GetAllBooksPaginatedRequest request);
+        public Task<ApiResponsePaginated<List<GetAllBooksPaginatedResponse>>> FilterBooksAsync(FilterBooksRequest request);
+
 
     }
 }
