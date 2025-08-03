@@ -47,6 +47,16 @@ namespace AseerAlkotb.API
             //builder.Services.AddFluentValidationValidators();
             #endregion
 
+            #region Cors
+            // Add CORS policy
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowLocalhost4200",
+                    policy => policy.WithOrigins("http://localhost:4200")
+                                    .AllowAnyHeader()
+                                    .AllowAnyMethod());
+            });
+            #endregion
 
             builder.Services.AddControllers();
             #region Swagger
@@ -55,6 +65,9 @@ namespace AseerAlkotb.API
             #endregion
 
             var app = builder.Build();
+
+            // Use CORS
+            app.UseCors("AllowLocalhost4200");
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -72,6 +85,7 @@ namespace AseerAlkotb.API
             }
             app.UseMiddleware<ExceptionHandlerMiddleware>();
             app.UseHttpsRedirection();
+
 
             app.UseAuthorization();
 
