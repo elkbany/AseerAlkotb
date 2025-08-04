@@ -36,8 +36,10 @@ namespace AseerAlkotb.Application.Features.Authors.Mapping
                 .Ignore(a => a.Books);
 
             config.NewConfig<Author, AddAuthorResponse>();
-            config.NewConfig<Author, GetAuthorByIdResponse>();
-            config.NewConfig<Author, GetAllAuthorsPaginatedResponse>();
+            config.NewConfig<Author, GetAuthorByIdResponse>()
+               .Map(dest => dest.Books, src => src.Books);
+            config.NewConfig<Author, GetAllAuthorsPaginatedResponse>()
+                .Map(dest => dest.Books, src => src.Books);
             config.NewConfig<Author, DeleteAuthorResponse>();
             config.NewConfig<UpdateAuthorRequest, Author>();
             config.NewConfig<Author, UpdateAuthorResponse>();

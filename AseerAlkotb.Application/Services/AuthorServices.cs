@@ -79,7 +79,7 @@ namespace AseerAlkotb.Application.Services
         public async Task<ApiResponse<GetAuthorByIdResponse>> GetAuthorByIdAsync(GetAuthorByIdRequest request)
         {
             await DoValidationAsync<GetAuthorByIdRequestValidator, GetAuthorByIdRequest>(request);
-            var author = await unitOfWork.Authors.FirstOrDefaultAsync(a => a.Id == request.Id);
+            var author = await unitOfWork.Authors.FirstOrDefaultAsync(a => a.Id == request.Id,default,a=>a.Books);
             if (author == null)
             {
                 return NotFound<GetAuthorByIdResponse>("Auhtor not found");
@@ -92,7 +92,7 @@ namespace AseerAlkotb.Application.Services
             await DoValidationAsync<GetAllAuthorsPaginatedRequestValidator, GetAllAuthorsPaginatedRequest>(request);
             var authors = await unitOfWork.Authors
                 .GetAllAsync(s => s.Name.Contains(request.Search), 
-                (request.PageNumber - 1) * request.PageSize, request.PageSize);
+                (request.PageNumber - 1) * request.PageSize, request.PageSize,default,a=>a.Books);
             var totalCount = await unitOfWork.Authors.CountAsync((s => s.Name.Contains(request.Search)));
             var authsMap = authors.Adapt<List<GetAllAuthorsPaginatedResponse>>();
 

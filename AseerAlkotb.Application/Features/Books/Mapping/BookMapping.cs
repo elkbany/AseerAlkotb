@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using AseerAlkotb.Domain.Entites.Models;
 using AseerAlkotb.Application.Features.Books.Requests;
 using AseerAlkotb.Application.Features.Books.Responses;
+using AseerAlkotb.Application.Features.Books.DTOs;
 
 namespace AseerAlkotb.Application.Features.Books.Mapping
 {
@@ -14,6 +15,12 @@ namespace AseerAlkotb.Application.Features.Books.Mapping
     {
         public void Register(TypeAdapterConfig config)
         {
+            TypeAdapterConfig<Book, BookCardDto>
+                    .NewConfig()
+                    .Map(dest => dest.AuthorName, src => src.Author.Name)
+                    .Map(dest => dest.Rating, src => src.Reviews.Any()
+                      ? (int)Math.Round(src.Reviews.Average(r => r.Rating))
+                      : 0);
             #region Add Book Mapping
             config.NewConfig<AddBookRequest, Book>()
             .Ignore(dest => dest.Id)
