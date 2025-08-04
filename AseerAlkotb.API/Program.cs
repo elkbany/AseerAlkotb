@@ -11,6 +11,7 @@ using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Services;
 using AseerAlkotb.Domain.Interfaces.Base;
 using AseerAlkotb.Infrastructure.Repositories.Base;
+using Microsoft.Extensions.FileProviders;
 namespace AseerAlkotb.API
 {
     public class Program
@@ -46,6 +47,7 @@ namespace AseerAlkotb.API
             #region Validation
             //builder.Services.AddFluentValidationValidators();
             #endregion
+           
 
             #region Cors
             // Add CORS policy
@@ -65,7 +67,15 @@ namespace AseerAlkotb.API
             #endregion
 
             var app = builder.Build();
-
+            #region Access Images
+            app.UseStaticFiles();
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(
+        Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads")),
+                RequestPath = "/uploads"
+            });
+            #endregion
             // Use CORS
             app.UseCors("AllowLocalhost4200");
 
