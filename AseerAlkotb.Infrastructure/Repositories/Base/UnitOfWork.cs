@@ -31,6 +31,8 @@ namespace AseerAlkotb.Infrastructure.Repositories.Base
 
         public IBookRepository Books { get; private set; }
 
+        public IPublisherRepository Publishers { get; private set; }
+
         public async Task<int> CommitAsync()
         {
             return await dbContext.SaveChangesAsync();

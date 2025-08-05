@@ -21,6 +21,7 @@ namespace AseerAlkotb.API.Extensions
                         services.AddScoped(serviceType, validatorType);
                     }
                 }
+
             }
 
             // Extension method to check if a type is assignable to a generic type
@@ -42,6 +43,8 @@ namespace AseerAlkotb.API.Extensions
 
                 return IsAssignableToGenericType(baseType, genericType);
             }
+
+
         }
     }
 
