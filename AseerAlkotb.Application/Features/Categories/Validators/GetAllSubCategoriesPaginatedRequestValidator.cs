@@ -1,17 +1,22 @@
-﻿using AseerAlkotb.Application.Features.Categories.Requests;
-using FluentValidation;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using AseerAlkotb.Application.Features.Categories.Requests;
+using FluentValidation;
 
 namespace AseerAlkotb.Application.Features.Categories.Validators
 {
-    public class GetAllCategoriesPaginatedRequestValidator : AbstractValidator<GetAllCategoriesPaginatedRequest>
+    public class GetAllSubCategoriesPaginatedRequestValidator : AbstractValidator<GetAllSubCategoriesPaginatedRequest>
     {
-        public GetAllCategoriesPaginatedRequestValidator()
+        public GetAllSubCategoriesPaginatedRequestValidator()
         {
+            RuleFor(x => x.ParentCategoryId)
+                .GreaterThan(0)
+                .WithMessage("ParentCategoryId must be greater than 0");
+
             RuleFor(x => x.PageNumber)
                 .GreaterThan(0)
                 .WithMessage("Page number must be greater than 0");
@@ -26,15 +31,13 @@ namespace AseerAlkotb.Application.Features.Categories.Validators
                 .MaximumLength(100)
                 .WithMessage("Search term cannot exceed 100 characters")
                 .Must(BeValidSearchTerm)
-                .When(x => !string.IsNullOrEmpty(x.Search))
+                .When(x => !string.IsNullOrWhiteSpace(x.Search))
                 .WithMessage("Search term contains invalid characters");
         }
 
         private bool BeValidSearchTerm(string search)
         {
-            if (string.IsNullOrEmpty(search)) return true;
-
-            return System.Text.RegularExpressions.Regex.IsMatch(search, @"^[a-zA-Z\u0600-\u06FF0-9\s\-_.]+$");
+            return Regex.IsMatch(search, @"^[a-zA-Z\u0600-\u06FF0-9\s\-_.]+$");
         }
     }
 }
