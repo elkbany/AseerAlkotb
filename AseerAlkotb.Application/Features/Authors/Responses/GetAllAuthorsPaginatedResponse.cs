@@ -16,7 +16,7 @@ namespace AseerAlkotb.Application.Features.Authors.Responses
         public string Bio { get; set; }
         public string ImageUrl { get; set; }
         public int Rating { get; set; }
-        public CountryCode CountryCode { get; set; }
+        public string CountryCode { get; set; }
         public List<BookCardDto> Books { get; set; }
     }
 

@@ -36,14 +36,15 @@ namespace AseerAlkotb.Application.Features.Authors.Mapping
 
             config.NewConfig<Author, AddAuthorResponse>();
             config.NewConfig<Author, GetAuthorByIdResponse>()
-
+                .Map(dest => dest.CountryCode, src => src.CountryCode.ToString())
+                .Map(dest => dest.Books, src => src.Books)
                 .Map(dest => dest.Books, src => src.Books)
                 .Ignore(dest=>dest.Rating);
     
             config.NewConfig<Author, GetAllAuthorsPaginatedResponse>()
                .Map(dest => dest.Books, src => src.Books)
                .Ignore(dest=>dest.Rating);
-    
+
 
 
 

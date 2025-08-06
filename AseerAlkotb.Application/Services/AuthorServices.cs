@@ -88,7 +88,7 @@ namespace AseerAlkotb.Application.Services
                 return NotFound<GetAuthorByIdResponse>("Auhtor not found");
             }
             var authMap = author.Adapt<GetAuthorByIdResponse>();
-            authMap.Rating=(int)Math.Round(author.Reviews.Average(a=>a.Rating));
+            //authMap.Rating=(int)Math.Round(author.Reviews.Average(a=>a.Rating));
             authMap.Books = author.Books.Select(book =>
             {
                 var bookDto = book.Adapt<BookCardDto>();
