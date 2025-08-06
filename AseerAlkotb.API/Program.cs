@@ -34,20 +34,25 @@ namespace AseerAlkotb.API
 
             builder.Services.AddScoped<IBookRepository, BookRepository>();
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+            builder.Services.AddScoped<ICartRepository, CartRepository>();
             #endregion
             #region Services Registerations
             builder.Services.AddScoped<IAuthorServices,AuthorServices>();
             builder.Services.AddScoped<IBookServices, BookServices>();
             builder.Services.AddScoped<ICategoryServices, CategoryServices>();
+            builder.Services.AddScoped<ICartServices, CartServices>();
+
+
 
             #endregion
             #region AutoMapper 
             builder.Services.AddMapster();
+            TypeAdapterConfig.GlobalSettings.Compile();
             #endregion
             #region Validation
             //builder.Services.AddFluentValidationValidators();
             #endregion
-           
+
 
             #region Cors
             // Add CORS policy

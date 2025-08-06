@@ -23,6 +23,10 @@ namespace AseerAlkotb.Infrastructure.Repositories.Base
             Categories = new CategoryRepository(dbContext);
 
             Books = new BookRepository(dbContext);
+
+            Carts = new CartRepository(dbContext);
+            
+
         }
         //public IEntityrepository EntityRepository {get; private set;}
         public IAuthorRepository Authors { get; private set; }
@@ -30,6 +34,7 @@ namespace AseerAlkotb.Infrastructure.Repositories.Base
         public ICategoryRepository Categories { get; private set; }
 
         public IBookRepository Books { get; private set; }
+        public ICartRepository Carts { get; private set; }
 
         public async Task<int> CommitAsync()
         {

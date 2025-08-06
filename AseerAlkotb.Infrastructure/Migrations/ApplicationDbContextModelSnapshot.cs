@@ -261,7 +261,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Cart");
+                    b.ToTable("Cart", (string)null);
 
                     b.HasData(
                         new
@@ -591,7 +591,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.HasIndex("CartId")
                         .IsUnique();
 
-                    b.ToTable("User");
+                    b.ToTable("User", (string)null);
 
                     b.HasData(
                         new
@@ -650,7 +650,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
 
                     b.HasIndex("WishlistId");
 
-                    b.ToTable("WishlistItem");
+                    b.ToTable("WishlistItem", (string)null);
                 });
 
             modelBuilder.Entity("BookCategories", b =>
@@ -665,7 +665,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("BookCategories");
+                    b.ToTable("BookCategories", (string)null);
 
                     b.HasData(
                         new
