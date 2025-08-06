@@ -92,7 +92,7 @@ namespace AseerAlkotb.Application.Services
             authMap.Books = author.Books.Select(book =>
             {
                 var bookDto = book.Adapt<BookCardDto>();
-                bookDto.Rating = book.Reviews?.Count == 0 ? (int)Math.Round(book.Reviews.Average(r => r.Rating)) : 0;
+                bookDto.Rating = book.Reviews?.Any() == true ? (int)Math.Round(book.Reviews.Average(r => r.Rating)) : 0;
                 return bookDto;
             }).ToList();
             return Success(authMap);
