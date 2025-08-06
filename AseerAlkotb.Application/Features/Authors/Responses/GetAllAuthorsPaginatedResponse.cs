@@ -15,16 +15,10 @@ namespace AseerAlkotb.Application.Features.Authors.Responses
         public string Name { get; set; }
         public string Bio { get; set; }
         public string ImageUrl { get; set; }
-        public int Rating { get; set; } // now mutable
+        public int Rating { get; set; }
+        public CountryCode CountryCode { get; set; }
         public List<BookCardDto> Books { get; set; }
     }
-    public record GetAllAuthorsPaginatedResponse(
-        int Id,
-        string Name,
-        string Bio,
-        string ImageUrl,
-        CountryCode CountryCode,
-        List<BookCardDto> Books
-        );
-    
+
+
 }
