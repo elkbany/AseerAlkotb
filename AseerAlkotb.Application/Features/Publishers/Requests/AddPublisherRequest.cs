@@ -1,0 +1,12 @@
+﻿using Microsoft.AspNetCore.Http;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace AseerAlkotb.Application.Features.Publishers.Requests
+{
+    public record AddPublisherRequest(string Name, string Description, IFormFile LogoUrl, string ContactEmail);
+
+}
