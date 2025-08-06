@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AseerAlkotb.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250802131809_init")]
-    partial class init
+    [Migration("20250805103736_addAuthorReviewedit")]
+    partial class addAuthorReviewedit
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -62,6 +62,35 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Authors", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Bio = "أديب مصري",
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsActive = true,
+                            Name = "نجيب محفوظ",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Bio = "كاتب مصري",
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsActive = true,
+                            Name = "أحمد خالد توفيق",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Bio = "كاتب مصري",
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsActive = true,
+                            Name = "يوسف إدريس",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        });
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Book", b =>
@@ -84,7 +113,6 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasMaxLength(2000)
                         .HasColumnType("nvarchar(2000)");
 
@@ -104,10 +132,9 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Language")
-                        .IsRequired()
+                    b.Property<int>("Language")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("int");
 
                     b.Property<int>("PageCount")
                         .HasColumnType("int");
@@ -148,6 +175,74 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.HasIndex("PublisherId");
 
                     b.ToTable("Books", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            AuthorId = 1,
+                            CoverImageUrl = "cover.jpg",
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "رواية شهيرة لنجيب محفوظ",
+                            DiscountPercentage = 10m,
+                            Format = "ورقي",
+                            ISBN = "1234567890123",
+                            IsActive = true,
+                            Language = 1,
+                            PageCount = 240,
+                            Price = 150m,
+                            PublishedDate = new DateTime(1950, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PublisherId = 1,
+                            SalesCount = 0,
+                            StockQuantity = 20,
+                            Title = "زقاق المدق",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ViewCount = 0
+                        },
+                        new
+                        {
+                            Id = 2,
+                            AuthorId = 1,
+                            CoverImageUrl = "new_cover.jpg",
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "وصف الكتاب الجديد",
+                            DiscountPercentage = 15m,
+                            Format = "ورقي",
+                            ISBN = "9876543210123",
+                            IsActive = true,
+                            Language = 1,
+                            PageCount = 350,
+                            Price = 200m,
+                            PublishedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PublisherId = 1,
+                            SalesCount = 0,
+                            StockQuantity = 30,
+                            Title = "كتاب جديد",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ViewCount = 0
+                        },
+                        new
+                        {
+                            Id = 3,
+                            AuthorId = 2,
+                            CoverImageUrl = "another_cover.jpg",
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "وصف الكتاب الآخر",
+                            DiscountPercentage = 5m,
+                            Format = "ورقي",
+                            ISBN = "1234567890124",
+                            IsActive = true,
+                            Language = 1,
+                            PageCount = 300,
+                            Price = 250m,
+                            PublishedDate = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PublisherId = 2,
+                            SalesCount = 0,
+                            StockQuantity = 15,
+                            Title = "كتاب آخر",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ViewCount = 0
+                        });
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Cart", b =>
@@ -170,6 +265,15 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Cart");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            UserId = 1
+                        });
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.CartItem", b =>
@@ -229,6 +333,35 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.HasIndex("ParentCategoryId");
 
                     b.ToTable("Categories", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب روائية",
+                            IsActive = true,
+                            Name = "روايات",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب تاريخية",
+                            IsActive = true,
+                            Name = "تاريخ",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب علمية",
+                            IsActive = true,
+                            Name = "علوم",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        });
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Order", b =>
@@ -337,7 +470,6 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         .HasColumnType("nvarchar(1000)");
 
                     b.Property<string>("LogoUrl")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
@@ -352,6 +484,35 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Publishers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            ContactEmail = "info@aseeralkotob.com",
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "دار نشر مصرية",
+                            Name = "عصير الكتب",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 2,
+                            ContactEmail = "info2@aseeralkotob.com",
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "دار نشر عربية",
+                            Name = "دار الشروق",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 3,
+                            ContactEmail = "info3@aseeralkotob.com",
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "دار نشر لبنانية",
+                            Name = "دار الساقي",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        });
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Review", b =>
@@ -362,7 +523,10 @@ namespace AseerAlkotb.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("BookId")
+                    b.Property<int?>("AuthorId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("BookId")
                         .HasColumnType("int");
 
                     b.Property<string>("Comment")
@@ -376,6 +540,9 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.Property<int>("Rating")
                         .HasColumnType("int");
 
+                    b.Property<int>("ReviewFor")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -384,12 +551,16 @@ namespace AseerAlkotb.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AuthorId");
+
                     b.HasIndex("BookId");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("Reviews", null, t =>
                         {
+                            t.HasCheckConstraint("CK_Review_OneTarget", "(BookId IS NOT NULL AND AuthorId IS NULL) OR (BookId IS NULL AND AuthorId IS NOT NULL)");
+
                             t.HasCheckConstraint("CK_Review_Rating", "Rating >= 1 AND Rating <= 5");
                         });
                 });
@@ -434,6 +605,20 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("User");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CartId = 1,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateOfBirth = new DateTime(1990, 5, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FirstName = "Ahmed",
+                            Gender = 0,
+                            IsActive = true,
+                            LastName = "Hassan",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        });
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Wishlist", b =>
@@ -494,6 +679,33 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.HasIndex("CategoryId");
 
                     b.ToTable("BookCategories");
+
+                    b.HasData(
+                        new
+                        {
+                            BookId = 1,
+                            CategoryId = 1
+                        },
+                        new
+                        {
+                            BookId = 1,
+                            CategoryId = 2
+                        },
+                        new
+                        {
+                            BookId = 2,
+                            CategoryId = 2
+                        },
+                        new
+                        {
+                            BookId = 3,
+                            CategoryId = 1
+                        },
+                        new
+                        {
+                            BookId = 3,
+                            CategoryId = 3
+                        });
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Book", b =>
@@ -575,17 +787,23 @@ namespace AseerAlkotb.Infrastructure.Migrations
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Review", b =>
                 {
+                    b.HasOne("AseerAlkotb.Domain.Entites.Models.Author", "Author")
+                        .WithMany("Reviews")
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("AseerAlkotb.Domain.Entites.Models.Book", "Book")
                         .WithMany("Reviews")
                         .HasForeignKey("BookId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("AseerAlkotb.Domain.Entites.Models.User", "User")
                         .WithMany("Reviews")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Author");
 
                     b.Navigation("Book");
 
@@ -655,6 +873,8 @@ namespace AseerAlkotb.Infrastructure.Migrations
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Author", b =>
                 {
                     b.Navigation("Books");
+
+                    b.Navigation("Reviews");
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Book", b =>

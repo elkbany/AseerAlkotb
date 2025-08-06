@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AseerAlkotb.Domain.Entites.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -76,6 +77,8 @@ namespace AseerAlkotb.Domain.Interfaces.Base
         Task<List<TResult>> Select<TResult>(Expression<Func<TEntity, TResult>> selector,
             Expression<Func<TEntity, bool>>? criteria = null,
             CancellationToken cancellationToken = default);
+
+
 
         //Task<List<TEntity>> GetAllOrderedAsync<TKey>(Expression<Func<TEntity, TKey>> orderBy,
         //    bool descending = false,

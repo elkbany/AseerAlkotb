@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AseerAlkotb.Domain.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,16 +11,19 @@ namespace AseerAlkotb.Application.Features.Books.Mapping
         int Id,
         string Title,
         string ISBN,
+        string Description,
         decimal Price,
         decimal DiscountPercentage,
         decimal DiscountedPrice,
         DateTime PublishedDate,
         int PageCount,
-        string Language,
+        BookLanguage Language,
         string Format,
         string CoverImageUrl,
         int StockQuantity,
         string AuthorName,       
         string PublisherName,    
-        List<string> CategoryNames);
+        List<string> CategoryNames,
+        bool IsActive
+        );
 }

@@ -29,13 +29,13 @@ namespace AseerAlkotb.API.Controllers
             return ApiResult(result);
         }
         [HttpGet]
-        public async Task<IActionResult> GetById(GetCategoryByIdRequest request)
+        public async Task<IActionResult> GetById([FromQuery] GetCategoryByIdRequest request)
         {
             var result = await categoryServices.GetCategoryByIdAsync(request);
             return ApiResult(result);
         }
         [HttpGet("GetAll")]
-        public async Task<IActionResult> GetAll(GetAllCategoriesPaginatedRequest request)
+        public async Task<IActionResult> GetAll([FromQuery] GetAllCategoriesPaginatedRequest request)
         {
             var result = await categoryServices.GetAllCategoriesPaginatedAsync(request);
             return ApiResult(result);
@@ -46,6 +46,28 @@ namespace AseerAlkotb.API.Controllers
             var result = await categoryServices.UpdateCategoryAsync(request);
             return ApiResult(result);
         }
+
+        [HttpPost("SubCategory")]
+        public async Task<IActionResult> AddSubCategory([FromBody] AddSubCategoryRequest request)
+        {
+            var result = await categoryServices.AddSubCategoryAsync(request);
+            return ApiResult(result);
+        }
+
+        [HttpGet("GetSubCategories")]
+        public async Task<IActionResult> GetAllSubCategoriesPaginated([FromQuery] GetAllSubCategoriesPaginatedRequest request)
+        {
+            var result = await categoryServices.GetAllSubCategoriesPaginatedAsync(request);
+            return ApiResult(result);
+        }
+
+        [HttpDelete("SubCategory")]
+        public async Task<IActionResult> DeleteSubCategory([FromQuery] DeleteCategoryRequest request)
+        {
+            var result = await categoryServices.DeleteCategoryAsync(request);
+            return ApiResult(result);
+        }
+
 
     }
 }

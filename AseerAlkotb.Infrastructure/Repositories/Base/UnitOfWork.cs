@@ -21,8 +21,8 @@ namespace AseerAlkotb.Infrastructure.Repositories.Base
             // EntityRepository = new  EntityRepository(dbcontext);
             Authors = new AuthorRepository(dbContext);
             Categories = new CategoryRepository(dbContext);
-
             Books = new BookRepository(dbContext);
+            Reviews = new ReviewRepository(dbContext);
         }
         //public IEntityrepository EntityRepository {get; private set;}
         public IAuthorRepository Authors { get; private set; }
@@ -30,6 +30,7 @@ namespace AseerAlkotb.Infrastructure.Repositories.Base
         public ICategoryRepository Categories { get; private set; }
 
         public IBookRepository Books { get; private set; }
+        public IReviewRepository Reviews { get; private set; }
 
         public IPublisherRepository Publishers { get; private set; }
 
