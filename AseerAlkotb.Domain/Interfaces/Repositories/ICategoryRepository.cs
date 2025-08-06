@@ -5,5 +5,7 @@ namespace AseerAlkotb.Domain.Interfaces.Repositories
 {
     public interface ICategoryRepository : IGenericRepository<Category, int>
     {
+        public Task<List<Category>> GetSubCategoriesAsync(int parentCategoryId);
+
     }
 }
