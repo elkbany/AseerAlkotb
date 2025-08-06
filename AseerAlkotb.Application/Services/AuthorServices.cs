@@ -4,6 +4,8 @@ using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Features.Authors.Requests;
 using AseerAlkotb.Application.Features.Authors.Responses;
 using AseerAlkotb.Application.Features.Authors.Validators;
+using AseerAlkotb.Application.Features.Books.DTOs;
+using AseerAlkotb.Application.Features.Reviews.Responses;
 using AseerAlkotb.Application.ResponseHandler;
 using AseerAlkotb.Domain.Entites.Models;
 using AseerAlkotb.Domain.Interfaces.Base;
@@ -79,12 +81,20 @@ namespace AseerAlkotb.Application.Services
         public async Task<ApiResponse<GetAuthorByIdResponse>> GetAuthorByIdAsync(GetAuthorByIdRequest request)
         {
             await DoValidationAsync<GetAuthorByIdRequestValidator, GetAuthorByIdRequest>(request);
-            var author = await unitOfWork.Authors.FirstOrDefaultAsync(a => a.Id == request.Id,default,a=>a.Books);
+            var author = await unitOfWork.Authors.FirstOrDefaultAsync(a => a.Id == request.Id,default,a=>a.Books,a=>a.Reviews);
+
             if (author == null)
             {
                 return NotFound<GetAuthorByIdResponse>("Auhtor not found");
             }
             var authMap = author.Adapt<GetAuthorByIdResponse>();
+            authMap.Rating=(int)Math.Round(author.Reviews.Average(a=>a.Rating));
+            authMap.Books = author.Books.Select(book =>
+            {
+                var bookDto = book.Adapt<BookCardDto>();
+                bookDto.Rating = book.Reviews?.Count == 0 ? (int)Math.Round(book.Reviews.Average(r => r.Rating)) : 0;
+                return bookDto;
+            }).ToList();
             return Success(authMap);
         }
         public async Task<ApiResponsePaginated<List<GetAllAuthorsPaginatedResponse>>> GetAllAuthorsPaginatedAsync(GetAllAuthorsPaginatedRequest request)
@@ -92,9 +102,20 @@ namespace AseerAlkotb.Application.Services
             await DoValidationAsync<GetAllAuthorsPaginatedRequestValidator, GetAllAuthorsPaginatedRequest>(request);
             var authors = await unitOfWork.Authors
                 .GetAllAsync(s => s.Name.Contains(request.Search), 
-                (request.PageNumber - 1) * request.PageSize, request.PageSize,default,a=>a.Books);
+                (request.PageNumber - 1) * request.PageSize, request.PageSize,default,a=>a.Books,a=>a.Reviews);
             var totalCount = await unitOfWork.Authors.CountAsync((s => s.Name.Contains(request.Search)));
-            var authsMap = authors.Adapt<List<GetAllAuthorsPaginatedResponse>>();
+            var authsMap = authors.Select(author =>
+            {
+                var authorDto = author.Adapt<GetAllAuthorsPaginatedResponse>();
+                authorDto.Rating = author.Reviews?.Any() == true ? (int)Math.Round(author.Reviews.Average(r => r.Rating)) : 0;
+                authorDto.Books = author.Books.Select(book =>
+                {
+                    var bookDto = book.Adapt<BookCardDto>();
+                    bookDto.Rating = book.Reviews?.Any() == true ? (int)Math.Round(book.Reviews.Average(r => r.Rating)) : 0;
+                    return bookDto;
+                }).ToList();
+                return authorDto;
+            }).ToList();
 
             return Success(authsMap, totalCount, request.PageNumber, request.PageSize);
 

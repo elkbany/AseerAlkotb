@@ -1,4 +1,5 @@
 ﻿using AseerAlkotb.Domain.Entites.Base;
+using AseerAlkotb.Domain.Enums;
 
 namespace AseerAlkotb.Domain.Entites.Models
 {
@@ -9,8 +10,11 @@ namespace AseerAlkotb.Domain.Entites.Models
         public int Rating { get; set; } // Assuming rating is an integer value
 
         #region Navigation Properties
-        public int BookId { get; set; }
+        public ReviewFor ReviewFor { get; set; }
+        public int? BookId { get; set; }
         public virtual Book Book { get; set; }
+        public int? AuthorId { get; set; }
+        public virtual Author Author { get; set; }
         public int UserId { get; set; }
         public virtual User User { get; set; }
         #endregion

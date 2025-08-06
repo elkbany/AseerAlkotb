@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using System.Linq.Expressions;
 using static AseerAlkotb.Application.ResponseHandler.ApiResponseHandler;
+using static System.Reflection.Metadata.BlobBuilder;
 
 
 
@@ -95,12 +96,14 @@ namespace AseerAlkotb.Application.Services
         public async Task<ApiResponse<GetBookByIdResponse>> GetBookByIdAsync(GetBookByIdRequest request)
         {
             await DoValidationAsync<GetBookByIdRequestValidator, GetBookByIdRequest>(request);
-            var book = await _uniteOfWork.Books.FirstOrDefaultAsync(b => b.Id == request.Id);
+            var book = await _uniteOfWork.Books.FirstOrDefaultAsync(b => b.Id == request.Id,default,b=>b.Reviews);
             if (book == null)
             {
                 return NotFound<GetBookByIdResponse>("Book not found");
             }
             var bookMap = book.Adapt<GetBookByIdResponse>();
+            bookMap.Rating = (int)Math.Round(book.Reviews.Average(a => a.Rating));
+
             return Success(bookMap);
         }
      
@@ -110,10 +113,15 @@ namespace AseerAlkotb.Application.Services
         await DoValidationAsync<GetAllBooksPaginatedValidator, GetAllBooksPaginatedRequest>(request);
         var books = await _uniteOfWork.Books
                 .GetAllAsync(s => s.Title.Contains(request.Search),
-            (request.PageNumber - 1) * request.PageSize, request.PageSize);
+            (request.PageNumber - 1) * request.PageSize, request.PageSize,default,b=>b.Reviews);
 
             var totalCount = await _uniteOfWork.Books.CountAsync(s => s.Title.Contains(request.Search));
-            var bookMap = books.Adapt<List<GetAllBooksPaginatedResponse>>();
+            var bookMap = books.Select(book =>
+            {
+                var bookDto = book.Adapt<GetAllBooksPaginatedResponse>();
+                bookDto.Rating = book.Reviews?.Any() == true ? (int)Math.Round(book.Reviews.Average(r => r.Rating)) : 0;
+                return bookDto;
+            }).ToList();
             return Success(bookMap, totalCount, request.PageNumber, request.PageSize);
     }
         public async Task<ApiResponsePaginated<List<GetAllBooksPaginatedResponse>>> FilterBooksAsync(FilterBooksRequest request)
@@ -122,6 +130,7 @@ namespace AseerAlkotb.Application.Services
                 .Include(b => b.Author)
                 .Include(b => b.Publisher)
                 .Include(b => b.Categories)
+                .Include(b=>b.Reviews)
                 .AsNoTracking();
 
             // فلتر حسب الكلمة
@@ -159,11 +168,14 @@ namespace AseerAlkotb.Application.Services
                 .Take(request.PageSize)
                 .ToListAsync();
 
-            var response = paginatedBooks.Adapt<List<GetAllBooksPaginatedResponse>>();
+            var bookMap = paginatedBooks.Select(book =>
+            {
+                var bookDto = book.Adapt<GetAllBooksPaginatedResponse>();
+                bookDto.Rating = book.Reviews?.Any() == true ? (int)Math.Round(book.Reviews.Average(r => r.Rating)) : 0;
+                return bookDto;
+            }).ToList();
 
-            return Success(
-                response, totalCount, request.PageNumber, request.PageSize
-            );
+            return Success(bookMap, totalCount, request.PageNumber, request.PageSize);
         }
 
 
