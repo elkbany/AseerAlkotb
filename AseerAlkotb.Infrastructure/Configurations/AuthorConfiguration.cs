@@ -26,6 +26,9 @@ namespace AseerAlkotb.Infrastructure.Configurations
                 .WithOne(b => b.Author)
                 .HasForeignKey(b => b.AuthorId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Property(a => a.CountryCode)
+                .HasConversion<string>();
         }
     }  
 }

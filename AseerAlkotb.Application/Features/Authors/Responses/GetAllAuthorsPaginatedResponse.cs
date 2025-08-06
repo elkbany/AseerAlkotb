@@ -1,4 +1,5 @@
 ﻿using AseerAlkotb.Application.Features.Books.DTOs;
+using AseerAlkotb.Domain.Enums;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,7 @@ namespace AseerAlkotb.Application.Features.Authors.Responses
         string Name,
         string Bio,
         string ImageUrl,
+        CountryCode CountryCode,
         List<BookCardDto> Books
         );
     

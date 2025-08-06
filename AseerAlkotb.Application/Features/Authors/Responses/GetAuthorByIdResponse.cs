@@ -1,4 +1,5 @@
 ﻿using AseerAlkotb.Application.Features.Books.DTOs;
+using AseerAlkotb.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,8 +11,8 @@ namespace AseerAlkotb.Application.Features.Authors.Responses
     public record GetAuthorByIdResponse(int Id, 
         string Name,
         string Bio, 
-        string ImageUr,
-        List<BookCardDto> Books
-        );
+        string ImageUrl,
+        CountryCode CountryCode,
+        List<BookCardDto> Books);
    
 }
