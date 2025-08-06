@@ -85,5 +85,58 @@ namespace AseerAlkotb.Application.Services
 
         }
 
+        public async Task<ApiResponse<AddSubCategoryResponse>> AddSubCategoryAsync(AddSubCategoryRequest request)
+        {
+            await DoValidationAsync<AddSubCategoryRequestValidator, AddSubCategoryRequest>(request);
+
+            var parentCategory = await unitOfWork.Categories.FirstOrDefaultAsync(c => c.Id == request.ParentCategoryId);
+            if (parentCategory == null)
+            {
+                return NotFound<AddSubCategoryResponse>("Parent category not found");
+            }
+
+            var subCategory = request.Adapt<Category>();
+            await unitOfWork.Categories.InsertAsync(subCategory);
+            await unitOfWork.CommitAsync();
+
+            var response = subCategory.Adapt<AddSubCategoryResponse>();
+            return Success(response);
+        }
+
+        public async Task<ApiResponse<DeleteSubCategoryResponse>> DeleteSubCategoryAsync(DeleteSubCategoryRequest request)
+        {
+            await DoValidationAsync<DeleteSubCategoryRequestValidator, DeleteSubCategoryRequest>(request);
+
+            var subCategory = await unitOfWork.Categories.FirstOrDefaultAsync(c => c.Id == request.Id && c.ParentCategoryId == request.ParentCategoryId);
+            if (subCategory == null)
+            {
+                return NotFound<DeleteSubCategoryResponse>("Subcategory not found under the specified parent");
+            }
+
+            unitOfWork.Categories.Delete(subCategory);
+            await unitOfWork.CommitAsync();
+
+            var response = subCategory.Adapt<DeleteSubCategoryResponse>();
+            return Success(response);
+        }
+
+        public async Task<ApiResponsePaginated<List<GetAllSubCategoriesPaginatedResponse>>> GetAllSubCategoriesPaginatedAsync(GetAllSubCategoriesPaginatedRequest request)
+        {
+            await DoValidationAsync<GetAllSubCategoriesPaginatedRequestValidator, GetAllSubCategoriesPaginatedRequest>(request);
+
+            var query = await unitOfWork.Categories.GetAllAsync(
+                c => c.ParentCategoryId == request.ParentCategoryId && c.Name.Contains(request.Search),
+                (request.PageNumber - 1) * request.PageSize,
+                request.PageSize
+            );
+
+            var totalCount = await unitOfWork.Categories.CountAsync(c => c.ParentCategoryId == request.ParentCategoryId && c.Name.Contains(request.Search));
+
+            var result = query.Adapt<List<GetAllSubCategoriesPaginatedResponse>>();
+
+            return Success(result, totalCount, request.PageNumber, request.PageSize);
+        }
+
+
     }
 }

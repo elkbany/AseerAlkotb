@@ -6,13 +6,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace AseerAlkotb.Application.Features.Authors.Responses
 {
     public record GetAuthorByIdResponse(int Id, 
         string Name,
         string Bio, 
-        string ImageUrl,
-        CountryCode CountryCode,
-        List<BookCardDto> Books);
+        string ImageUr,
+        List<BookCardDto> Books
+        );
    
 }

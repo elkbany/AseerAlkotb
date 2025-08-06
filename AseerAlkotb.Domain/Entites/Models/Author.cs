@@ -11,5 +11,6 @@ namespace AseerAlkotb.Domain.Entites.Models
         public CountryCode CountryCode { get; set; } = CountryCode.EG;
         public bool IsActive { get; set; }
         public virtual ICollection<Book> Books { get; set; } = [];
+        public virtual ICollection<Review> Reviews { get; set; } = [];
     }
 }
