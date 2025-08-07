@@ -7,6 +7,6 @@ using System.Threading.Tasks;
 
 namespace AseerAlkotb.Application.Features.Publishers.Requests
 {
-    public record AddPublisherRequest(string Name, string Description, IFormFile LogoUrl, string ContactEmail);
+    public record AddPublisherRequest(string Name, string Description, IFormFile? LogoUrl, string ContactEmail);
 
 }
