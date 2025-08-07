@@ -88,11 +88,11 @@ namespace AseerAlkotb.Application.Services
                 return NotFound<GetAuthorByIdResponse>("Auhtor not found");
             }
             var authMap = author.Adapt<GetAuthorByIdResponse>();
-            //authMap.Rating=(int)Math.Round(author.Reviews.Average(a=>a.Rating));
+            authMap.Rating=author.Reviews?.Any() == true ? (decimal)author.Reviews.Average(r => r.Rating) : 0;
             authMap.Books = author.Books.Select(book =>
             {
                 var bookDto = book.Adapt<BookCardDto>();
-                bookDto.Rating = book.Reviews?.Any() == true ? (int)Math.Round(book.Reviews.Average(r => r.Rating)) : 0;
+                bookDto.Rating = book.Reviews?.Any() == true ? (decimal)book.Reviews.Average(r => r.Rating): 0;
                 return bookDto;
             }).ToList();
             return Success(authMap);
@@ -107,11 +107,11 @@ namespace AseerAlkotb.Application.Services
             var authsMap = authors.Select(author =>
             {
                 var authorDto = author.Adapt<GetAllAuthorsPaginatedResponse>();
-                authorDto.Rating = author.Reviews?.Any() == true ? (int)Math.Round(author.Reviews.Average(r => r.Rating)) : 0;
+                authorDto.Rating = author.Reviews?.Any() == true ? (decimal)author.Reviews.Average(r => r.Rating): 0;
                 authorDto.Books = author.Books.Select(book =>
                 {
                     var bookDto = book.Adapt<BookCardDto>();
-                    bookDto.Rating = book.Reviews?.Any() == true ? (int)Math.Round(book.Reviews.Average(r => r.Rating)) : 0;
+                    bookDto.Rating = book.Reviews?.Any() == true ? (decimal)book.Reviews.Average(r => r.Rating): 0;
                     return bookDto;
                 }).ToList();
                 return authorDto;
