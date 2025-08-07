@@ -31,13 +31,23 @@ namespace AseerAlkotb.Application.Features.Authors.Mapping
             */
             #endregion
 
-            TypeAdapterConfig<AddAuthorRequest, Author>.NewConfig();
             config.NewConfig<AddAuthorRequest, Author>()
                 .Ignore(a => a.Books);
 
             config.NewConfig<Author, AddAuthorResponse>();
-            config.NewConfig<Author, GetAuthorByIdResponse>();
-            config.NewConfig<Author, GetAllAuthorsPaginatedResponse>();
+            config.NewConfig<Author, GetAuthorByIdResponse>()
+
+                .Map(dest => dest.Books, src => src.Books)
+                .Ignore(dest=>dest.Rating);
+    
+            config.NewConfig<Author, GetAllAuthorsPaginatedResponse>()
+               .Map(dest => dest.Books, src => src.Books)
+               .Ignore(dest=>dest.Rating);
+    
+
+
+
+
             config.NewConfig<Author, DeleteAuthorResponse>();
             config.NewConfig<UpdateAuthorRequest, Author>();
             config.NewConfig<Author, UpdateAuthorResponse>();

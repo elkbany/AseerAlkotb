@@ -7,6 +7,7 @@ using AseerAlkotb.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using AseerAlkotb.Domain.Interfaces.Base;
 using AseerAlkotb.Domain.Entites.Base;
+using AseerAlkotb.Domain.Entites.Models;
 
 namespace AseerAlkotb.Infrastructure.Repositories.Base
 {
@@ -331,6 +332,8 @@ namespace AseerAlkotb.Infrastructure.Repositories.Base
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+
+
 
         #endregion
     }

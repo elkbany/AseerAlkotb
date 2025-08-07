@@ -1,4 +1,3 @@
-
 using AseerAlkotb.API.Extensions;
 using AseerAlkotb.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +11,7 @@ using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Services;
 using AseerAlkotb.Domain.Interfaces.Base;
 using AseerAlkotb.Infrastructure.Repositories.Base;
+using Microsoft.Extensions.FileProviders;
 namespace AseerAlkotb.API
 {
     public class Program
@@ -31,6 +31,7 @@ namespace AseerAlkotb.API
             builder.Services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IAuthorRepository, AuthorRepository>();
+
             builder.Services.AddScoped<IBookRepository, BookRepository>();
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
             builder.Services.AddScoped<IPublisherRepository , PublisherRepository>();
@@ -40,6 +41,8 @@ namespace AseerAlkotb.API
             builder.Services.AddScoped<IAuthorServices,AuthorServices>();
             builder.Services.AddScoped<IBookServices, BookServices>();
             builder.Services.AddScoped<ICategoryServices, CategoryServices>();
+            builder.Services.AddScoped<IReviewServices, ReviewServices>();
+
             builder.Services.AddScoped<IPublisherServices, PublisherService>();
             #endregion
             #region AutoMapper 
@@ -48,7 +51,18 @@ namespace AseerAlkotb.API
             #region Validation
             builder.Services.AddFluentValidationValidators();
             #endregion
+           
 
+            #region Cors
+            // Add CORS policy
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowLocalhost4200",
+                    policy => policy.WithOrigins("http://localhost:4200")
+                                    .AllowAnyHeader()
+                                    .AllowAnyMethod());
+            });
+            #endregion
 
             builder.Services.AddControllers();
 
@@ -69,6 +83,17 @@ namespace AseerAlkotb.API
             #endregion
 
             var app = builder.Build();
+            #region Access Images
+            app.UseStaticFiles();
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(
+        Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads")),
+                RequestPath = "/uploads"
+            });
+            #endregion
+            // Use CORS
+            app.UseCors("AllowLocalhost4200");
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -87,7 +112,7 @@ namespace AseerAlkotb.API
             app.UseMiddleware<ExceptionHandlerMiddleware>();
             app.UseHttpsRedirection();
 
-            app.UseCors("AllowAllOrigins");
+
             app.UseAuthorization();
 
 
