@@ -47,5 +47,27 @@ namespace AseerAlkotb.API.Controllers
             return ApiResult(result);
         }
 
+        [HttpPost("SubCategory")]
+        public async Task<IActionResult> AddSubCategory([FromBody] AddSubCategoryRequest request)
+        {
+            var result = await categoryServices.AddSubCategoryAsync(request);
+            return ApiResult(result);
+        }
+
+        [HttpGet("GetSubCategories")]
+        public async Task<IActionResult> GetAllSubCategoriesPaginated([FromQuery] GetAllSubCategoriesPaginatedRequest request)
+        {
+            var result = await categoryServices.GetAllSubCategoriesPaginatedAsync(request);
+            return ApiResult(result);
+        }
+
+        [HttpDelete("SubCategory")]
+        public async Task<IActionResult> DeleteSubCategory([FromQuery] DeleteCategoryRequest request)
+        {
+            var result = await categoryServices.DeleteCategoryAsync(request);
+            return ApiResult(result);
+        }
+
+
     }
 }

@@ -28,6 +28,14 @@ namespace AseerAlkotb.Application.Features.Categories.Mapping
             config.NewConfig<Category, DeleteCategoryResponse>();
             config.NewConfig<UpdateCategoryRequest, Category>();
             config.NewConfig<Category, UpdateCategoryResponse>();
+
+            config.NewConfig<AddSubCategoryRequest, Category>()
+               .Ignore(dest => dest.SubCategory)
+               .Ignore(dest => dest.ParentCategory);
+
+            config.NewConfig<Category, AddSubCategoryResponse>();
+            config.NewConfig<Category, DeleteSubCategoryResponse>();
+            config.NewConfig<Category, GetAllSubCategoriesPaginatedResponse>();
         }
     }
 }
