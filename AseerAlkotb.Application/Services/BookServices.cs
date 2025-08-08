@@ -102,7 +102,12 @@ namespace AseerAlkotb.Application.Services
                 return NotFound<GetBookByIdResponse>("Book not found");
             }
             var bookMap = book.Adapt<GetBookByIdResponse>();
-            bookMap.Rating = (int)Math.Round(book.Reviews.Average(a => a.Rating));
+            //bookMap.Rating = (int)Math.Round(book.Reviews.Average(a => a.Rating));
+            bookMap.Rating = book.Reviews.Any()
+                ? (int)Math.Round(book.Reviews.Average(a => a.Rating))
+                : 0;
+
+            // عملت كدا عشان لو الريفيو فاضى مش هيكون ب 0 هيكون ب null ف حطينا الشرط دا عشان الفنكشن تشتغل
 
             return Success(bookMap);
         }
