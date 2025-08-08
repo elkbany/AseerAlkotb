@@ -6,6 +6,6 @@ using System.Threading.Tasks;
 
 namespace AseerAlkotb.Application.Features.Reviews.Requests
 {
-    public record LikeReviewRequest(int ReviewId,int UserId,bool IslikeDisLike);
+    public record LikeReviewRequest(int ReviewId,int UserId,bool? IslikeDisLike);
    
 }
