@@ -23,10 +23,18 @@ namespace AseerAlkotb.Infrastructure.Context
         {
             var fixedDate = new DateTime(2024, 8, 1); // fixed date for consistency
             var dateOfBirth = new DateTime(1990, 5, 15); // Example date of birth for user
+
             base.OnModelCreating(modelBuilder);
+
             DataSeeder.SeedData(modelBuilder);
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+
             modelBuilder.Entity<Review>().ToTable(t=>t.HasCheckConstraint("CK_Review_Rating", "Rating >= 1 AND Rating <= 5"));
+
+            modelBuilder.Entity<Review>().ToTable(r => r.HasCheckConstraint("CK_Review_OneTarget",
+                      "(BookId IS NOT NULL AND AuthorId IS NULL) OR (BookId IS NULL AND AuthorId IS NOT NULL)"));
+
             modelBuilder.Entity<Cart>()
                 .HasOne(c=>c.User)
                 .WithOne(u=>u.Cart).HasForeignKey<User>("CartId")

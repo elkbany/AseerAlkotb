@@ -35,6 +35,10 @@ namespace AseerAlkotb.Application.Features.Authors.Validators
                 .Must(BeValidImage)
                 .When(x => x.Image != null)
                 .WithMessage("Image must be a valid image file (jpg, jpeg, png, gif) and less than 5MB");
+
+            RuleFor(x => x.CountryCode)
+                .IsInEnum()
+                .WithMessage("Country code is invalid");
         }
         private bool BeValidImage(IFormFile? image)
         {

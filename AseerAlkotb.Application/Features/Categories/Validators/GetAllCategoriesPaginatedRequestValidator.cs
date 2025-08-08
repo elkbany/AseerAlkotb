@@ -34,7 +34,6 @@ namespace AseerAlkotb.Application.Features.Categories.Validators
         {
             if (string.IsNullOrEmpty(search)) return true;
 
-            // Allow letters, numbers, spaces, and common punctuation
             return System.Text.RegularExpressions.Regex.IsMatch(search, @"^[a-zA-Z\u0600-\u06FF0-9\s\-_.]+$");
         }
     }

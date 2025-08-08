@@ -1,20 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 
 namespace AseerAlkotb.Application.Features.Books.DTOs
 {
     public record BookCardDto
-    (
-        int Id ,
-        string Title,
-        decimal Price,
-        decimal DiscountedPrice,
-        string CoverImageUrl,
-        string AuthorName,
-        int Rating
-    );
-    
+    {
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public decimal Price { get; set; }
+        public decimal DiscountedPrice { get; set; }
+        public string CoverImageUrl { get; set; }
+        public string AuthorName { get; set; }
+        public decimal Rating { get; set; } // now mutable
+        public string Comment { get; set; }
+    }
+
 }

@@ -1,4 +1,5 @@
 ﻿using AseerAlkotb.Domain.Entites.Base;
+using AseerAlkotb.Domain.Enums;
 
 namespace AseerAlkotb.Domain.Entites.Models
 {
@@ -7,7 +8,9 @@ namespace AseerAlkotb.Domain.Entites.Models
         public string Name { get; set; }
         public string Bio { get; set; }
         public string? ImageUrl { get; set; }
+        public CountryCode CountryCode { get; set; } = CountryCode.EG;
         public bool IsActive { get; set; }
         public virtual ICollection<Book> Books { get; set; } = [];
+        public virtual ICollection<Review> Reviews { get; set; } = [];
     }
 }

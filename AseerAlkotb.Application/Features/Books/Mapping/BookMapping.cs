@@ -18,9 +18,7 @@ namespace AseerAlkotb.Application.Features.Books.Mapping
             TypeAdapterConfig<Book, BookCardDto>
                     .NewConfig()
                     .Map(dest => dest.AuthorName, src => src.Author.Name)
-                    .Map(dest => dest.Rating, src => src.Reviews.Any()
-                      ? (int)Math.Round(src.Reviews.Average(r => r.Rating))
-                      : 0);
+                    .Ignore(dest=>dest.Rating);
             #region Add Book Mapping
             config.NewConfig<AddBookRequest, Book>()
             .Ignore(dest => dest.Id)
@@ -60,7 +58,8 @@ namespace AseerAlkotb.Application.Features.Books.Mapping
             #region Get Book By Id Mapping
             TypeAdapterConfig<Book, GetBookByIdResponse>.NewConfig()
                 .Map(dest => dest.CategoryIds, src => src.Categories.Select(c => c.Id).ToList())
-                .Map(dest => dest.CategoryNames, src => src.Categories.Select(c => c.Name).ToList());
+                .Map(dest => dest.CategoryNames, src => src.Categories.Select(c => c.Name).ToList())
+                .Ignore(dest=>dest.Rating);
             #endregion
 
             #region Get All Books Mapping
@@ -68,7 +67,8 @@ namespace AseerAlkotb.Application.Features.Books.Mapping
                 .Map(dest => dest.AuthorName, src => src.AuthorId != null ? src.Author.Name : string.Empty)
                 .Map(dest => dest.PublisherName, src => src.Publisher.Name != null ? src.Publisher.Name : string.Empty)
                 .Map(dest => dest.CategoryIds, src => src.Categories.Select(c => c.Id).ToList())
-                .Map(dest => dest.CategoryNames, src => src.Categories != null ? src.Categories.Select(c => c.Name).ToList() : new List<string>());
+                .Map(dest => dest.CategoryNames, src => src.Categories != null ? src.Categories.Select(c => c.Name).ToList() : new List<string>())
+                .Ignore(dest=>dest.Rating);
             #endregion
         }
     }
