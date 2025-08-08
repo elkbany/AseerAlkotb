@@ -38,7 +38,7 @@ namespace AseerAlkotb.API
             builder.Services.AddScoped<ICartRepository, CartRepository>();
 
             builder.Services.AddScoped<IPublisherRepository , PublisherRepository>();
-
+            builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
             #endregion
             #region Services Registerations
             builder.Services.AddScoped<IAuthorServices,AuthorServices>();
