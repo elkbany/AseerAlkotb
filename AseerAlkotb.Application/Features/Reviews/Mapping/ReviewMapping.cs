@@ -14,6 +14,7 @@ namespace AseerAlkotb.Application.Features.Reviews.Mapping
     {
         public void Register(TypeAdapterConfig config)
         {
+            config.NewConfig<LikeReviewRequest, LikeDisLike>();
             config.NewConfig<AddReviewRequest, Review>()
                 .Ignore(r => r.Book);
             config.NewConfig<Review, AddReviewResponse>();

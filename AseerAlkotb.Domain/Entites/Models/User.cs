@@ -23,7 +23,8 @@ namespace AseerAlkotb.Domain.Entites.Models
         public virtual ICollection<Order> Orders { get; set; } = [];
         public virtual ICollection<Review> Reviews { get; set; } = [];
 
-        public virtual Wishlist Wishlist { get; set; } 
+        public virtual Wishlist Wishlist { get; set; }
+        public virtual ICollection<LikeDisLike> LikeDisLikes { get; set; } = [];
         #endregion
 
 

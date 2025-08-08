@@ -47,5 +47,12 @@ namespace AseerAlkotb.API.Controllers
             var response = await reviewServices.GetAllReviewsAsync(request);
             return ApiResult(response);
         }
+        [HttpPost("Like")]
+        public async Task<IActionResult> LikeReviewAsync(LikeReviewRequest request)
+        {
+            var response = await reviewServices.LikeReviewAsync(request);
+            return ApiResult(response);
+        }
+
     }
 }

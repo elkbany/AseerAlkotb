@@ -117,6 +117,35 @@ namespace AseerAlkotb.Application.Services
             return Success(revMap, totalCount, request.PageNumber, request.PageSize);
 
         }
+        
+        public async Task<ApiResponse<GetReviewByIdResponse>> LikeReviewAsync(LikeReviewRequest request)
+        {
+            var review = await unitOfWork.Reviews
+                .FirstOrDefaultAsync(r => r.Id == request.ReviewId, default, r => r.LikeDisLikes);
+
+            if (review == null)
+                return NotFound<GetReviewByIdResponse>("Review not found");
+
+            var existing = review.LikeDisLikes.FirstOrDefault(l => l.UserId == request.UserId);
+
+            if (existing != null)
+            {
+                
+                existing.IsLike = request.IslikeDisLike;
+                existing.UpdatedAt = DateTime.UtcNow;
+            }
+            else
+            {
+                
+                var like = request.Adapt<LikeDisLike>();
+                like.CreatedAt = DateTime.UtcNow;
+                review.LikeDisLikes.Add(like);
+            }
+            var revMap = review.Adapt<GetReviewByIdResponse>();
+
+            await unitOfWork.CommitAsync();
+            return Success(revMap);
+        }
 
 
     }

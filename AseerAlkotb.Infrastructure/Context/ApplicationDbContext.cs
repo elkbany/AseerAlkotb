@@ -40,7 +40,7 @@ namespace AseerAlkotb.Infrastructure.Context
                 .WithOne(u=>u.Cart).HasForeignKey<User>("CartId")
                 .OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<WishlistItem>().HasKey(wi => new { wi.BookId, wi.WishlistId });
-
+    
             modelBuilder.Entity<Cart>().HasData(
               new Cart
               {
