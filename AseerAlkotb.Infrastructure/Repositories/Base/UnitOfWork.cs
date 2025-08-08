@@ -22,7 +22,10 @@ namespace AseerAlkotb.Infrastructure.Repositories.Base
             Authors = new AuthorRepository(dbContext);
             Categories = new CategoryRepository(dbContext);
             Books = new BookRepository(dbContext);
+            Publishers = new PublisherRepository(dbContext);
+
             Reviews = new ReviewRepository(dbContext);
+
         }
         //public IEntityrepository EntityRepository {get; private set;}
         public IAuthorRepository Authors { get; private set; }

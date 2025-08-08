@@ -34,7 +34,8 @@ namespace AseerAlkotb.API
 
             builder.Services.AddScoped<IBookRepository, BookRepository>();
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-            builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
+            builder.Services.AddScoped<IPublisherRepository , PublisherRepository>();
+
             #endregion
             #region Services Registerations
             builder.Services.AddScoped<IAuthorServices,AuthorServices>();
@@ -42,12 +43,13 @@ namespace AseerAlkotb.API
             builder.Services.AddScoped<ICategoryServices, CategoryServices>();
             builder.Services.AddScoped<IReviewServices, ReviewServices>();
 
+            builder.Services.AddScoped<IPublisherServices, PublisherService>();
             #endregion
             #region AutoMapper 
             builder.Services.AddMapster();
             #endregion
             #region Validation
-            //builder.Services.AddFluentValidationValidators();
+            builder.Services.AddFluentValidationValidators();
             #endregion
            
 
@@ -63,6 +65,18 @@ namespace AseerAlkotb.API
             #endregion
 
             builder.Services.AddControllers();
+
+            #region CORS
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllOrigins",
+                    builder => builder.AllowAnyOrigin()
+                                      .AllowAnyMethod()
+                                      .AllowAnyHeader());
+            });
+
+            #endregion
+
             #region Swagger
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
