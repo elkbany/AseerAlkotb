@@ -13,9 +13,9 @@ namespace AseerAlkotb.Infrastructure.Data
 
             // Authors
             modelBuilder.Entity<Author>().HasData(
-                new Author { Id = 1, Name = "نجيب محفوظ", Bio = "أديب مصري", IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
-                new Author { Id = 2, Name = "أحمد خالد توفيق", Bio = "كاتب مصري", IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
-                new Author { Id = 3, Name = "يوسف إدريس", Bio = "كاتب مصري", IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate }
+                new Author { Id = 1, Name = "نجيب محفوظ", Bio = "أديب مصري", ImageUrl= "/uploads/authors/8a48bbe0-f12a-4be4-b5bc-72d3a442dcae.jpg",CountryCode=CountryCode.EG, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Author { Id = 2, Name = "أحمد خالد توفيق", Bio = "كاتب مصري", ImageUrl = "/uploads/authors/8a48bbe0-f12a-4be4-b5bc-72d3a442dcae.jpg", CountryCode = CountryCode.EG, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Author { Id = 3, Name = "يوسف إدريس", Bio = "كاتب مصري", ImageUrl = "/uploads/authors/8a48bbe0-f12a-4be4-b5bc-72d3a442dcae.jpg", CountryCode = CountryCode.EG, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate }
 
             );
 
@@ -46,7 +46,7 @@ namespace AseerAlkotb.Infrastructure.Data
                     PublishedDate = new DateTime(1950, 1, 1),
                     PageCount = 240,
                     Language = BookLanguage.Arabic,
-                    CoverImageUrl = "cover.jpg",
+                    CoverImageUrl = "/uploads/Books/94147f51-d713-47a3-86dd-f88eef6198d4.webp",
                     Format = "ورقي",
                     StockQuantity = 20,
                     IsActive = true,
@@ -68,7 +68,7 @@ namespace AseerAlkotb.Infrastructure.Data
                     PublishedDate = new DateTime(2023, 1, 1),
                     PageCount = 350,
                     Language = BookLanguage.Arabic,
-                    CoverImageUrl = "new_cover.jpg",
+                    CoverImageUrl = "/uploads/Books/6fdbe335-1a34-4564-9564-e30dc38cf6ea.webp",
                     Format = "ورقي",
                     StockQuantity = 30,
                     IsActive = true,
@@ -90,7 +90,7 @@ namespace AseerAlkotb.Infrastructure.Data
                     PublishedDate = new DateTime(2022, 1, 1),
                     PageCount = 300,
                     Language = BookLanguage.Arabic,
-                    CoverImageUrl = "another_cover.jpg",
+                    CoverImageUrl = "/uploads/Books/6fdbe335-1a34-4564-9564-e30dc38cf6ea.webp",
                     Format = "ورقي",
                     StockQuantity = 15,
                     IsActive = true,

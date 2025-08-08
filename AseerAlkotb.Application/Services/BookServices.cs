@@ -102,12 +102,9 @@ namespace AseerAlkotb.Application.Services
                 return NotFound<GetBookByIdResponse>("Book not found");
             }
             var bookMap = book.Adapt<GetBookByIdResponse>();
-            //bookMap.Rating = (int)Math.Round(book.Reviews.Average(a => a.Rating));
-            bookMap.Rating = book.Reviews.Any()
-                ? (int)Math.Round(book.Reviews.Average(a => a.Rating))
-                : 0;
 
-            // عملت كدا عشان لو الريفيو فاضى مش هيكون ب 0 هيكون ب null ف حطينا الشرط دا عشان الفنكشن تشتغل
+            bookMap.Rating = book.Reviews?.Any() == true ? (decimal)book.Reviews.Average(r => r.Rating) : 0;
+
 
             return Success(bookMap);
         }
@@ -124,7 +121,7 @@ namespace AseerAlkotb.Application.Services
             var bookMap = books.Select(book =>
             {
                 var bookDto = book.Adapt<GetAllBooksPaginatedResponse>();
-                bookDto.Rating = book.Reviews?.Any() == true ? (int)Math.Round(book.Reviews.Average(r => r.Rating)) : 0;
+                bookDto.Rating = book.Reviews?.Any() == true ? (decimal)book.Reviews.Average(r => r.Rating) : 0;
                 return bookDto;
             }).ToList();
             return Success(bookMap, totalCount, request.PageNumber, request.PageSize);
