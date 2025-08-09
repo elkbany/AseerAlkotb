@@ -10,6 +10,7 @@ namespace AseerAlkotb.Domain.Entites.Models
         public string ContactEmail { get; set; }
         #region Navigation Properties
         public  virtual ICollection<Book> Books { get; set; } = [];
+        public virtual ICollection<UserFollow> Followers { get; set; } = [];
         #endregion
     }
 }

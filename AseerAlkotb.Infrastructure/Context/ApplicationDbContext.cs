@@ -78,6 +78,7 @@ namespace AseerAlkotb.Infrastructure.Context
         public DbSet<Publisher> Publishers { get; set; }
         public DbSet<Review> Reviews { get; set; }
         public DbSet<Wishlist> Wishlists { get; set; }
+        public DbSet<UserFollow> UserFollows { get; set; }
 
     }
 }
