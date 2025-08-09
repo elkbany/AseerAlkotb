@@ -12,5 +12,7 @@ namespace AseerAlkotb.Application.Contracts
         Task<ApiResponse<DeleteReviewResponse>> DeleteReviewAsync(DeleteReviewRequest request);
         Task<ApiResponse<GetReviewByIdResponse>> GetReviewByIdAsync(GetReviewByIdRequest request);
         Task<ApiResponsePaginated<List<GetAllReviewsPaginatedResponse>>> GetAllReviewsAsync(GetAllReviewsPaginatedRequest request);
+        Task<ApiResponse<GetReviewByIdResponse>> LikeReviewAsync(LikeReviewRequest request);
+
     }
 }

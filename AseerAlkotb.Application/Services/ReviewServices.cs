@@ -118,6 +118,53 @@ namespace AseerAlkotb.Application.Services
 
         }
 
+        public async Task<ApiResponse<GetReviewByIdResponse>> LikeReviewAsync(LikeReviewRequest request)
+        {
+            var review = await unitOfWork.Reviews
+                .FirstOrDefaultAsync(r => r.Id == request.ReviewId, default, r => r.LikeDisLikes);
+
+            if (review == null)
+                return NotFound<GetReviewByIdResponse>("Review not found");
+
+            var existing = review.LikeDisLikes.FirstOrDefault(l => l.UserId == request.UserId);
+
+            if (request.IslikeDisLike == null)
+            {
+                // Remove like/dislike (undo)
+                if (existing != null)
+                {
+                    review.LikeDisLikes.Remove(existing);
+                }
+                // If no existing like/dislike, nothing to remove
+            }
+            else
+            {
+                // Add or update like/dislike
+                if (existing != null)
+                {
+                    // Update existing
+                    existing.IsLike = request.IslikeDisLike.Value;
+                    existing.UpdatedAt = DateTime.UtcNow;
+                }
+                else
+                {
+                    // Create new
+                    var like = new LikeDisLike
+                    {
+                        ReviewId = request.ReviewId,
+                        UserId = request.UserId,
+                        IsLike = request.IslikeDisLike.Value,
+                        CreatedAt = DateTime.UtcNow
+                    };
+                    review.LikeDisLikes.Add(like);
+                }
+            }
+
+            await unitOfWork.CommitAsync();
+
+            var revMap = review.Adapt<GetReviewByIdResponse>();
+            return Success(revMap);
+        }
 
     }
 }

@@ -4,6 +4,7 @@ using AseerAlkotb.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AseerAlkotb.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250808162932_like")]
+    partial class like
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -37,10 +40,6 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(2000)
                         .HasColumnType("nvarchar(2000)");
-
-                    b.Property<string>("CountryCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -69,9 +68,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         {
                             Id = 1,
                             Bio = "أديب مصري",
-                            CountryCode = "EG",
                             CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            ImageUrl = "/uploads/authors/8a48bbe0-f12a-4be4-b5bc-72d3a442dcae.jpg",
                             IsActive = true,
                             Name = "نجيب محفوظ",
                             UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -80,9 +77,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         {
                             Id = 2,
                             Bio = "كاتب مصري",
-                            CountryCode = "EG",
                             CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            ImageUrl = "/uploads/authors/8a48bbe0-f12a-4be4-b5bc-72d3a442dcae.jpg",
                             IsActive = true,
                             Name = "أحمد خالد توفيق",
                             UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -91,9 +86,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         {
                             Id = 3,
                             Bio = "كاتب مصري",
-                            CountryCode = "EG",
                             CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            ImageUrl = "/uploads/authors/8a48bbe0-f12a-4be4-b5bc-72d3a442dcae.jpg",
                             IsActive = true,
                             Name = "يوسف إدريس",
                             UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -188,7 +181,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         {
                             Id = 1,
                             AuthorId = 1,
-                            CoverImageUrl = "/uploads/Books/94147f51-d713-47a3-86dd-f88eef6198d4.webp",
+                            CoverImageUrl = "cover.jpg",
                             CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "رواية شهيرة لنجيب محفوظ",
                             DiscountPercentage = 10m,
@@ -210,7 +203,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         {
                             Id = 2,
                             AuthorId = 1,
-                            CoverImageUrl = "/uploads/Books/6fdbe335-1a34-4564-9564-e30dc38cf6ea.webp",
+                            CoverImageUrl = "new_cover.jpg",
                             CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "وصف الكتاب الجديد",
                             DiscountPercentage = 15m,
@@ -232,7 +225,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         {
                             Id = 3,
                             AuthorId = 2,
-                            CoverImageUrl = "/uploads/Books/6fdbe335-1a34-4564-9564-e30dc38cf6ea.webp",
+                            CoverImageUrl = "another_cover.jpg",
                             CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "وصف الكتاب الآخر",
                             DiscountPercentage = 5m,
@@ -271,7 +264,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Cart", (string)null);
+                    b.ToTable("Cart");
 
                     b.HasData(
                         new
@@ -644,7 +637,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.HasIndex("CartId")
                         .IsUnique();
 
-                    b.ToTable("User", (string)null);
+                    b.ToTable("User");
 
                     b.HasData(
                         new
@@ -703,7 +696,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
 
                     b.HasIndex("WishlistId");
 
-                    b.ToTable("WishlistItem", (string)null);
+                    b.ToTable("WishlistItem");
                 });
 
             modelBuilder.Entity("BookCategories", b =>
@@ -718,7 +711,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("BookCategories", (string)null);
+                    b.ToTable("BookCategories");
 
                     b.HasData(
                         new
