@@ -38,6 +38,8 @@ namespace AseerAlkotb.Infrastructure.Configurations
                 .WithMany(a => a.Reviews)
                 .HasForeignKey(r => r.AuthorId)
                 .OnDelete(DeleteBehavior.Cascade);
+         
+           
 
 
         }

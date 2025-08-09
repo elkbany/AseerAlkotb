@@ -4,7 +4,6 @@ namespace AseerAlkotb.Domain.Entites.Models
 {
     public class CartItem 
     {
-    
         public int Quantity { get; set; } = 1; // Default quantity is 1
         public decimal UnitPrice { get; set; }
         public decimal TotalPrice => UnitPrice * Quantity;

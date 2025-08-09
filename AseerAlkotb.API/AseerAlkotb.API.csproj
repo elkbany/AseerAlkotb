@@ -30,4 +30,9 @@
     <Folder Include="wwwroot\uploads\authors\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="wwwroot\uploads\Books\6fdbe335-1a34-4564-9564-e30dc38cf6ea.webp" />
+    <None Include="wwwroot\uploads\Books\94147f51-d713-47a3-86dd-f88eef6198d4.webp" />
+  </ItemGroup>
+
 </Project>

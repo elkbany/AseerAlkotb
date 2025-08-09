@@ -102,7 +102,9 @@ namespace AseerAlkotb.Application.Services
                 return NotFound<GetBookByIdResponse>("Book not found");
             }
             var bookMap = book.Adapt<GetBookByIdResponse>();
+
             bookMap.Rating = book.Reviews?.Any() == true ? (decimal)book.Reviews.Average(r => r.Rating) : 0;
+
 
             return Success(bookMap);
         }
