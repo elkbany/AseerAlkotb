@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AseerAlkotb.Application.Features.Wishlist.Requests
+namespace AseerAlkotb.Application.Features.Wishlist.Responses
 {
-    public record GetUserWishlistRequest(int UserId);
+    public record IsBookInWishlistResponse(bool Exists);
 
 }

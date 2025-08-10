@@ -21,9 +21,4 @@
     <ProjectReference Include="..\AseerAlkotb.Domain\AseerAlkotb.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Features\Wishlist\Validators\" />
-    <Folder Include="Features\Wishlist\Responses\" />
-  </ItemGroup>
-
 </Project>

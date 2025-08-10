@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AseerAlkotb.Domain.Entites.Models;
+using AseerAlkotb.Domain.Interfaces.Base;
 
 namespace AseerAlkotb.Domain.Interfaces.Repositories
 {
-    public interface IWishlistRepository
+    public interface IWishlistRepository : IGenericRepository<Wishlist, int>
     {
         Task<Wishlist> GetUserWishlistAsync(int userId);
         Task AddWishlistItemAsync(WishlistItem item);
