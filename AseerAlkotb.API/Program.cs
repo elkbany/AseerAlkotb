@@ -35,7 +35,7 @@ namespace AseerAlkotb.API
             builder.Services.AddScoped<IBookRepository, BookRepository>();
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
             builder.Services.AddScoped<IPublisherRepository , PublisherRepository>();
-
+            builder.Services.AddScoped<IQuoteRepository, QuoteRepository>();
             #endregion
             #region Services Registerations
             builder.Services.AddScoped<IAuthorServices,AuthorServices>();
@@ -44,6 +44,7 @@ namespace AseerAlkotb.API
             builder.Services.AddScoped<IReviewServices, ReviewServices>();
 
             builder.Services.AddScoped<IPublisherServices, PublisherService>();
+            builder.Services.AddScoped<IQuoteService, QuoteService>();
             #endregion
             #region AutoMapper 
             builder.Services.AddMapster();
