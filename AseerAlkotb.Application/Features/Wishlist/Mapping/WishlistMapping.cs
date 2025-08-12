@@ -10,28 +10,17 @@ namespace AseerAlkotb.Application.Features.Wishlist.Mapping
     {
         public void Register(TypeAdapterConfig config)
         {
-            TypeAdapterConfig<DomainWishlist, GetUserWishlistResponse>
-                .NewConfig()
-                .Map(dest => dest.UserId, src => src.UserId)
-                .Map(dest => dest.Items, src => src.WishlistItems.Adapt<IEnumerable<WishlistItem>>());
+            config.NewConfig<DomainWishlist, GetUserWishlistResponse>()
+                  .Map(dest => dest.UserId, src => src.UserId)
+                  .Map(dest => dest.Items, src => src.WishlistItems);
 
-            TypeAdapterConfig<WishlistItem, AddWishlistItemResponse>
-                .NewConfig()
-                .Map(dest => dest.WishlistId, src => src.WishlistId)
-                .Map(dest => dest.BookId, src => src.BookId);
-
-            TypeAdapterConfig<DomainWishlist, ClearWishlistResponse>
-                .NewConfig()
-                .Map(dest => dest.UserId, src => src.UserId);
-
-            TypeAdapterConfig<WishlistItem, DeleteWishlistItemResponse>
-                .NewConfig()
-                .Map(dest => dest.WishlistId, src => src.WishlistId)
-                .Map(dest => dest.BookId, src => src.BookId);
+            config.NewConfig<WishlistItem, AddWishlistItemResponse>();
+            config.NewConfig<DomainWishlist, ClearWishlistResponse>();
+            config.NewConfig<WishlistItem, DeleteWishlistItemResponse>();
 
             TypeAdapterConfig<int, GetWishlistItemCountResponse>
-                .NewConfig()
-                .Map(dest => dest.Count, src => src);
+                        .NewConfig()
+                        .Map(dest => dest.Count, src => src);
 
             TypeAdapterConfig<bool, IsBookInWishlistResponse>
                 .NewConfig()

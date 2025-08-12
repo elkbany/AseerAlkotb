@@ -4,7 +4,6 @@ using AseerAlkotb.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -12,11 +11,9 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AseerAlkotb.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250808092002_AddUserFollow")]
-    partial class AddUserFollow
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -274,7 +271,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Cart");
+                    b.ToTable("Cart", (string)null);
 
                     b.HasData(
                         new
@@ -372,6 +369,40 @@ namespace AseerAlkotb.Infrastructure.Migrations
                             Name = "علوم",
                             UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
+                });
+
+            modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.LikeDisLike", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsLike")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("ReviewId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReviewId");
+
+                    b.HasIndex("UserId", "ReviewId")
+                        .IsUnique()
+                        .HasFilter("[ReviewId] IS NOT NULL");
+
+                    b.ToTable("LikeDisLike", (string)null);
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Order", b =>
@@ -540,7 +571,6 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Comment")
-                        .IsRequired()
                         .HasMaxLength(2000)
                         .HasColumnType("nvarchar(2000)");
 
@@ -614,7 +644,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.HasIndex("CartId")
                         .IsUnique();
 
-                    b.ToTable("User");
+                    b.ToTable("User", (string)null);
 
                     b.HasData(
                         new
@@ -713,7 +743,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
 
                     b.HasIndex("WishlistId");
 
-                    b.ToTable("WishlistItem");
+                    b.ToTable("WishlistItems", (string)null);
                 });
 
             modelBuilder.Entity("BookCategories", b =>
@@ -728,7 +758,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("BookCategories");
+                    b.ToTable("BookCategories", (string)null);
 
                     b.HasData(
                         new
@@ -803,6 +833,25 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("ParentCategory");
+                });
+
+            modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.LikeDisLike", b =>
+                {
+                    b.HasOne("AseerAlkotb.Domain.Entites.Models.Review", "Review")
+                        .WithMany("LikeDisLikes")
+                        .HasForeignKey("ReviewId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AseerAlkotb.Domain.Entites.Models.User", "User")
+                        .WithMany("LikeDisLikes")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Review");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Order", b =>
@@ -986,21 +1035,20 @@ namespace AseerAlkotb.Infrastructure.Migrations
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Publisher", b =>
                 {
                     b.Navigation("Books");
-<<<<<<<< HEAD:AseerAlkotb.Infrastructure/Migrations/20250808092002_AddUserFollow.Designer.cs
-========
 
                     b.Navigation("Followers");
                 });
->>>>>>>> origin/master:AseerAlkotb.Infrastructure/Migrations/ApplicationDbContextModelSnapshot.cs
 
-                    b.Navigation("Followers");
+            modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Review", b =>
+                {
+                    b.Navigation("LikeDisLikes");
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.User", b =>
                 {
                     b.Navigation("Following");
 
-                    b.Navigation("Following");
+                    b.Navigation("LikeDisLikes");
 
                     b.Navigation("Orders");
 

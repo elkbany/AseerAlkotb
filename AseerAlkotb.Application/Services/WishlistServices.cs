@@ -9,6 +9,7 @@ using AseerAlkotb.Application.Features.Wishlist.Validators;
 using AseerAlkotb.Application.ResponseHandler;
 using AseerAlkotb.Domain.Entites.Models;
 using AseerAlkotb.Domain.Interfaces.Base;
+using Mapster;
 using Microsoft.Extensions.Hosting;
 using static AseerAlkotb.Application.ResponseHandler.ApiResponseHandler;
 
@@ -29,8 +30,17 @@ namespace AseerAlkotb.Application.Services
             await DoValidationAsync<GetUserWishlistValidation, GetUserWishlistRequest>(request);
             var wishlist = await unitOfWork.Wishlists.GetUserWishlistAsync(request.UserId);
             var wishlistItems = wishlist?.WishlistItems ?? new List<WishlistItem>();
-            var response = new GetUserWishlistResponse(request.UserId, wishlistItems);
-            return Success(response);
+            var response = new GetUserWishlistResponse(
+                request.UserId,
+                wishlistItems.Select(wi => new WishlistItemResponse(
+                    wi.BookId,
+                    wi.Book.Title,
+                    wi.Book.Description,
+                    wi.Book.Price,
+                    wi.Book.Author?.Name ?? string.Empty,
+                    wi.Book.CoverImageUrl
+                ))
+            ); return Success(response);
         }
 
         public async Task<ApiResponse<AddWishlistItemResponse>> AddToWishlistAsync(AddWishlistItemRequest request)
@@ -69,7 +79,7 @@ namespace AseerAlkotb.Application.Services
             await unitOfWork.Wishlists.AddWishlistItemAsync(wishlistItem);
             await unitOfWork.CommitAsync();
 
-            var response = new AddWishlistItemResponse(wishlist.Id, request.BookId);
+            var response = wishlistItem.Adapt<AddWishlistItemResponse>();
             return Success(response);
         }
 
@@ -91,7 +101,7 @@ namespace AseerAlkotb.Application.Services
             await unitOfWork.Wishlists.RemoveWishlistItemAsync(wishlistItem);
             await unitOfWork.CommitAsync();
 
-            var response = new DeleteWishlistItemResponse(wishlist.Id, request.BookId);
+            var response = wishlistItem.Adapt<DeleteWishlistItemResponse>();
             return Success(response);
         }
 
@@ -123,7 +133,7 @@ namespace AseerAlkotb.Application.Services
             await unitOfWork.Wishlists.ClearWishlistAsync(request.UserId);
             await unitOfWork.CommitAsync();
 
-            var response = new ClearWishlistResponse(request.UserId);
+            var response = wishlist.Adapt<ClearWishlistResponse>();
             return Success(response);
         }
     }

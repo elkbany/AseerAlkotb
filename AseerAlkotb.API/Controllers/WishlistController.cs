@@ -25,7 +25,7 @@ namespace AseerAlkotb.API.Controllers
             var result = await wishlistServices.AddToWishlistAsync(request);
             return ApiResult(result);
         }
-        [HttpDelete]
+        [HttpDelete("DeleteItem")]
         public async Task<IActionResult> Delete([FromQuery] DeleteWishlistItemRequest request)
         {
             var result = await wishlistServices.RemoveFromWishlistAsync(request);

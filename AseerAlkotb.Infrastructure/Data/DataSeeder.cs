@@ -110,8 +110,7 @@ namespace AseerAlkotb.Infrastructure.Data
             new { BookId = 3, CategoryId = 1 },
             new { BookId = 3, CategoryId = 3 }
 );
-
-
+            
         }
     }
 }
