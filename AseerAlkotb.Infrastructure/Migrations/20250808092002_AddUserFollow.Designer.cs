@@ -986,12 +986,20 @@ namespace AseerAlkotb.Infrastructure.Migrations
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Publisher", b =>
                 {
                     b.Navigation("Books");
+<<<<<<<< HEAD:AseerAlkotb.Infrastructure/Migrations/20250808092002_AddUserFollow.Designer.cs
+========
+
+                    b.Navigation("Followers");
+                });
+>>>>>>>> origin/master:AseerAlkotb.Infrastructure/Migrations/ApplicationDbContextModelSnapshot.cs
 
                     b.Navigation("Followers");
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.User", b =>
                 {
+                    b.Navigation("Following");
+
                     b.Navigation("Following");
 
                     b.Navigation("Orders");
