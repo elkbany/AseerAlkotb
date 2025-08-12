@@ -83,6 +83,7 @@ namespace AseerAlkotb.Infrastructure.Context
         public DbSet<Wishlist> Wishlists { get; set; }
         public DbSet<WishlistItem> WishlistItems { get; set; }
 
+        public DbSet<UserFollow> UserFollows { get; set; }
 
     }
 }

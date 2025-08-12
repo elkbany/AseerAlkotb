@@ -1,5 +1,6 @@
 ﻿using AseerAlkotb.Application.Features.Publishers.Requests;
 using AseerAlkotb.Application.Features.Publishers.Response;
+using AseerAlkotb.Application.Features.Publishers.Validators;
 using AseerAlkotb.Application.ResponseHandler;
 using System;
 using System.Collections.Generic;
@@ -20,5 +21,16 @@ namespace AseerAlkotb.Application.Contracts
 
         public Task<ApiResponse<AddPublisherResponse>> AddPublisherAsync(AddPublisherRequest request);
 
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        Task<ApiResponse<FollowPublisherResponse>> FollowPublisher(FollowPublisherRequest request);
+
+        Task<ApiResponse<UnFollowPublisherResponse>> UnFollowPublisher(UnFollowPublisherRequest request);
+
+        Task<ApiResponse<GetPublisherFollowerCountResponse>> GetPublisherFollowerCount(GetPublisherFollowerCountRequest request);
+
+        Task<ApiResponse<List<GetFollowedPublisherResponse>>> GetFollowedPublisher(GetFollowedPublisherRequest request);
+
+        Task<ApiResponse<List<GetFollowersPublisherResponse>>> GetFollowerPublisher(GetFollowersPublisherRequest request);
     }
 }

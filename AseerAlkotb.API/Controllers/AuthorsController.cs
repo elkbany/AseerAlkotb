@@ -47,5 +47,44 @@ namespace AseerAlkotb.API.Controllers
             return ApiResult(result);
         }
 
+        /////////////////////////////////follow///////////////////////////////////////////////////////
+        [HttpPost("FollowAuther")]
+        public async Task<IActionResult> FollowAuther(FollowAutherRequest request)
+        {
+            var result=await authorServices.FollowAuther(request);
+            return ApiResult(result);
+        }
+
+        [HttpDelete("UnFollowAuthor")]
+        public async Task<IActionResult> UnFollowAuthor(UnFollowAuthorRequest request)
+        {
+            var result = await authorServices.UnFollowAuthor(request);
+            return ApiResult(result);
+        }
+
+        [HttpGet("GetAutherFollowerCount")]
+        public async Task<IActionResult> GetAutherFollowerCount([FromQuery]GetAutherFollowerCountRequest request)
+        {
+            var result = await authorServices.GetAutherFollowerCount(request);
+            return ApiResult(result);
+        }
+
+        [HttpGet("GetFollowedAuther")]
+        public async Task<IActionResult> GetFollowedAuther([FromQuery] GetFollowedAuthorRequest request)
+        {
+            var result = await authorServices.GetFollowedAuther(request);
+            return ApiResult(result);
+        }
+
+
+        [HttpGet("GetFollowerAuther")]
+        public async Task<IActionResult> GetFollowerAuther([FromQuery] GetFollowersAuthorRequest request)
+        {
+            var result = await authorServices.GetFollowerAuther(request);
+            return ApiResult(result);
+        }
+
+
+
     }
 }

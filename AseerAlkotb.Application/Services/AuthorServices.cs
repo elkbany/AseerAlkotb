@@ -121,5 +121,70 @@ namespace AseerAlkotb.Application.Services
 
         }
 
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        public async Task<ApiResponse<FollowAutherResponse>>FollowAuther(FollowAutherRequest request)
+        {
+            await DoValidationAsync<FollowAuthorRequestValidation, FollowAutherRequest>(request);
+            if (await unitOfWork.Authors.IsFollowingAuther(request.UserId, request.UserId)) { 
+                return BadRequest<FollowAutherResponse>("You are already following this author");
+            }
+            else
+            {
+                var userFollow=await unitOfWork.Authors.FollowAuther(request.UserId, request.AuthorId);
+                await unitOfWork.CommitAsync();
+                var response=userFollow.Adapt<FollowAutherResponse>();
+                return Success(response);
+            }
+        }
+
+        public async Task<ApiResponse<UnFollowAuthorResponse>>UnFollowAuthor(UnFollowAuthorRequest request)
+        {
+            await DoValidationAsync<UnFollowAuthorRequestValidation, UnFollowAuthorRequest>(request);
+            if (await unitOfWork.Authors.IsFollowingAuther(request.userId,request.authorId))
+            {
+                var userFollow = await unitOfWork.Authors.UnFollowAuther(request.userId, request.authorId);
+                await unitOfWork.CommitAsync();
+                var response = userFollow.Adapt<UnFollowAuthorResponse>();
+                return Success(response);
+            }
+            else
+            {
+                return BadRequest<UnFollowAuthorResponse>("User is not following this author");
+            }
+        }
+
+        public async Task<ApiResponse<GetAutherFollowerCountResponse>> GetAutherFollowerCount(GetAutherFollowerCountRequest request)
+        {
+           await DoValidationAsync<GetAutherFollowerCountRequestValidation, GetAutherFollowerCountRequest>(request);
+            var count = await unitOfWork.Authors.GetAuthorFollowerCount(request.AuthorId);
+            var response = new GetAutherFollowerCountResponse()
+            {
+                AuthorId = request.AuthorId,
+                FollowerCount = count
+            };
+            return Success(response);
+        }
+
+        public async Task<ApiResponse<List<GetFollowedAuthorResponse>>> GetFollowedAuther(GetFollowedAuthorRequest request)
+        {
+            await DoValidationAsync<GetFollowedAuthorRequestValidatin, GetFollowedAuthorRequest>(request);
+            var Authors = unitOfWork.Authors.GetFollowedAuther(request.UserId).ToList();
+            var response = Authors.Adapt<List<GetFollowedAuthorResponse>>();
+            return Success(response);
+            
+        }
+
+        public async Task<ApiResponse<List<GetFollowersAuthorResponse>>> GetFollowerAuther(GetFollowersAuthorRequest request)
+        {
+            await DoValidationAsync<GetFollowersAuthorRequestValidation, GetFollowersAuthorRequest>(request);
+            var Authors = unitOfWork.Authors.GetFollowerAuther(request.AuthorId).ToList();
+            var response = Authors.Adapt<List<GetFollowersAuthorResponse>>();
+            return Success(response);
+
+        }
+
+
+
+
     }
 }
