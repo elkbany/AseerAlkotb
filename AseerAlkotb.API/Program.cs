@@ -39,6 +39,8 @@ namespace AseerAlkotb.API
 
             builder.Services.AddScoped<IPublisherRepository , PublisherRepository>();
             builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
+            builder.Services.AddScoped<IWishlistRepository, WishlistRepository>();
+
             #endregion
             #region Services Registerations
             builder.Services.AddScoped<IAuthorServices,AuthorServices>();
@@ -53,6 +55,8 @@ namespace AseerAlkotb.API
 
 
             builder.Services.AddScoped<IPublisherServices, PublisherService>();
+            builder.Services.AddScoped<IWishlistServices, WishlistServices>();
+
             #endregion
             #region AutoMapper 
             builder.Services.AddMapster();
