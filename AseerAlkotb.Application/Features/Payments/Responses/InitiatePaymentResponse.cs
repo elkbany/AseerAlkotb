@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace AseerAlkotb.Application.Features.Payments.Responses
 {
     public record InitiatePaymentResponse(
-        string RedirectUrl,
+        string? RedirectUrl,
         bool Success,
         string Message,
         string TransactionId
