@@ -10,19 +10,24 @@ namespace AseerAlkotb.Domain.Entites.Models
         public decimal ShippingCost { get; set; }
         public decimal TaxAmount { get; set; }
         public decimal DiscountAmount { get; set; }
-        public PaymentMethod PaymentMethod { get; set; }
-        public PaymentStatus PaymentStatus { get; set; }
+
+        public PaymentMethod PaymentMethod { get; set; } 
+        public PaymentStatus PaymentStatus { get; set; } = PaymentStatus.Pending; // Default status is Pending
+
         public string ShippingAddress { get; set; }
-        public OrderStatus Status { get; set; }
+        public OrderStatus Status { get; set; } 
         public string TrackingNumber { get; set; } // What i Added Assuming a tracking number for the order
+
         #region Navigation Properties
 
         public int UserId { get; set; }
-        public  virtual User User { get; set; } // Assuming a User entity exists
-        public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>(); 
+        public virtual User User { get; set; } // Assuming a User entity exists
+        public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+        public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
+
         #endregion
 
     }
-    
-    
+
+
 }

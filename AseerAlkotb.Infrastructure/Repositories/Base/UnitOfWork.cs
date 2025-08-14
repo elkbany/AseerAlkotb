@@ -15,6 +15,21 @@ namespace AseerAlkotb.Infrastructure.Repositories.Base
     {
         private readonly ApplicationDbContext dbContext;
 
+        //public IEntityrepository EntityRepository {get; private set;}
+        public IAuthorRepository Authors { get; private set; }
+
+        public ICategoryRepository Categories { get; private set; }
+
+        public IBookRepository Books { get; private set; }
+
+        public ICartRepository Carts { get; private set; }
+
+        public IReviewRepository Reviews { get; private set; }
+        public IWishlistRepository Wishlists { get; private set; }
+        public IPublisherRepository Publishers { get; private set; }
+        public IPaymentRepository Payments { get; private set; }
+
+
         public UnitOfWork(ApplicationDbContext dbContext)
         {
             this.dbContext = dbContext;
@@ -31,22 +46,10 @@ namespace AseerAlkotb.Infrastructure.Repositories.Base
 
             Reviews = new ReviewRepository(dbContext);
 
-
-
             Wishlists = new WishlistRepository(dbContext);
+            Payments = new PaymentRepository(dbContext);
+
         }
-        //public IEntityrepository EntityRepository {get; private set;}
-        public IAuthorRepository Authors { get; private set; }
-
-        public ICategoryRepository Categories { get; private set; }
-
-        public IBookRepository Books { get; private set; }
-
-        public ICartRepository Carts { get; private set; }
-
-        public IReviewRepository Reviews { get; private set; }
-        public IWishlistRepository Wishlists { get; private set; }
-        public IPublisherRepository Publishers { get; private set; }
 
 
         public async Task<int> CommitAsync()
