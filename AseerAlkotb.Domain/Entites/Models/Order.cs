@@ -11,11 +11,12 @@ namespace AseerAlkotb.Domain.Entites.Models
         public decimal TaxAmount { get; set; }
         public decimal DiscountAmount { get; set; }
 
-        public PaymentMethod PaymentMethod { get; set; } 
-        public PaymentStatus PaymentStatus { get; set; } = PaymentStatus.Pending; // Default status is Pending
 
-        public string ShippingAddress { get; set; }
-        public OrderStatus Status { get; set; } 
+
+        public PaymentMethod PaymentMethod { get; set; }
+        public PaymentStatus PaymentStatus { get; set; }
+        public EgyptGovernorates Governorate { get; set; }
+        public OrderStatus Status { get; set; }
         public string TrackingNumber { get; set; } // What i Added Assuming a tracking number for the order
 
         #region Navigation Properties

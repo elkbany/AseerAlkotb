@@ -8,10 +8,9 @@ using System.Threading.Tasks;
 
 namespace AseerAlkotb.Domain.Interfaces.Repositories
 {
-    public interface IBookRepository : IGenericRepository<Book,int>
+    public interface IOrderRepository : IGenericRepository<Order,int>
     {
-        public IQueryable<Book> GetQueryable();
-        public Task<List<Book>> GetByIdsAsync(IEnumerable<int> ids);
+        public IQueryable<Order> GetQueryable();
 
     }
 }

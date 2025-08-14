@@ -28,6 +28,7 @@ namespace AseerAlkotb.Domain.Interfaces.Base
 
         IWishlistRepository Wishlists { get; }
 
+        public IOrderRepository Orders { get; }
         public Task<int> CommitAsync();
     }
 }
