@@ -30,8 +30,7 @@ namespace AseerAlkotb.Infrastructure.Repositories.Base
         public IPublisherRepository Publishers { get; private set; }
         public IOrderRepository Orders { get; private set; }
         public IPaymentRepository Payments { get; private set; }
-
-
+        public IOrderRepository Orders { get; private set; }
         public UnitOfWork(ApplicationDbContext dbContext)
         {
             this.dbContext = dbContext;
@@ -53,7 +52,6 @@ namespace AseerAlkotb.Infrastructure.Repositories.Base
             Payments = new PaymentRepository(dbContext);
 
         }
-
 
         public async Task<int> CommitAsync()
         {
