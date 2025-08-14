@@ -29,8 +29,7 @@ namespace AseerAlkotb.Infrastructure.Repositories.Base
         public IWishlistRepository Wishlists { get; private set; }
         public IPublisherRepository Publishers { get; private set; }
         public IPaymentRepository Payments { get; private set; }
-
-
+        public IOrderRepository Orders { get; private set; }
         public UnitOfWork(ApplicationDbContext dbContext)
         {
             this.dbContext = dbContext;
@@ -52,10 +51,6 @@ namespace AseerAlkotb.Infrastructure.Repositories.Base
             Payments = new PaymentRepository(dbContext);
 
         }
-        public IReviewRepository Reviews { get; private set; }
-        public IWishlistRepository Wishlists { get; private set; }
-        public IPublisherRepository Publishers { get; private set; }
-        public IOrderRepository Orders { get; private set; }
 
         public async Task<int> CommitAsync()
         {
