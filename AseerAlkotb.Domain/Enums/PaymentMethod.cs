@@ -8,7 +8,8 @@ namespace AseerAlkotb.Domain.Enums
 {
     public enum PaymentMethod
     {
-        VodafoneCash,
-        CashOnDelivery
+        CashOnDelivery = 1,
+        MobileWallet = 2,
+        PayPal = 3
     }
 }

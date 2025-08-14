@@ -23,6 +23,8 @@ namespace AseerAlkotb.Domain.Interfaces.Base
 
 
         public IReviewRepository Reviews { get; }
+        
+        public IPaymentRepository Payments { get; }
 
         IWishlistRepository Wishlists { get; }
 

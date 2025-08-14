@@ -21,4 +21,8 @@
     <ProjectReference Include="..\AseerAlkotb.Domain\AseerAlkotb.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Features\Payments\Mapping\" />
+  </ItemGroup>
+
 </Project>
