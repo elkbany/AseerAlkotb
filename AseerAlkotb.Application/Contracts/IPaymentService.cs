@@ -11,7 +11,7 @@ namespace AseerAlkotb.Application.Contracts
 {
     public interface IPaymentService
     {
-{
+
     // بدء الدفع: يرجع Response مع URL إذا لزم
     Task<InitiatePaymentResponse> InitiatePaymentAsync(InitiatePaymentRequest request);
 
@@ -19,4 +19,4 @@ namespace AseerAlkotb.Application.Contracts
         Task ProcessCallbackAsync(PaymentCallbackRequest request); 
     }
 }
-}
+
