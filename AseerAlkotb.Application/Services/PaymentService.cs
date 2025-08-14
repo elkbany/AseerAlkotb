@@ -26,5 +26,22 @@ namespace AseerAlkotb.Application.Services
             _config = config;
             _httpClient = httpClient;
         }
+
+        //public async Task<InitiatePaymentResponse> InitiatePaymentAsync(InitiatePaymentRequest request)
+        //{
+        //    var Orders = await _unitOfWork.Orders.GetByIdAsync(request.OrderId);
+        //    if (Orders == null)
+        //    {
+        //        return new InitiatePaymentResponse("s",true, "Sucessf", "s");
+        //    }
+
+            
+
+        //}
+
+        public Task ProcessCallbackAsync(PaymentCallbackRequest request)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

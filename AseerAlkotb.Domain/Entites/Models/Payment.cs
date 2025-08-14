@@ -17,7 +17,6 @@ namespace AseerAlkotb.Domain.Entites.Models
         public PaymentStatus Status { get; set; }      // Pending, Completed, Failed, ...
         public DateTime PaymentDate { get; set;} 
         public decimal Amount { get; set; }
-        public string Provider { get; set; }           // "PayPal" | "Paymob" | "COD"
         public string TransactionId { get; set; }      // ID من مزود الدفع
         public string ProviderPayload { get; set; }    // JSON خام (اختياري للتتبع)
     }

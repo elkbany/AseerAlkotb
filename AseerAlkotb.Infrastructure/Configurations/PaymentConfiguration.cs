@@ -17,9 +17,12 @@ namespace AseerAlkotb.Infrastructure.Configurations
             builder.Property(p => p.Amount)
                 .HasPrecision(18, 2);
 
+            // one to one relationship with Order
             builder.HasOne(p => p.Order)
-                .WithMany(o => o.Payments)
-                .HasForeignKey(p => p.OrderId);
+                .WithOne(o => o.Payment)
+                .HasForeignKey<Payment>(p => p.OrderId);
+
+
         }
     }
 }
