@@ -12,16 +12,19 @@ namespace AseerAlkotb.Domain.Interfaces.Base
          where Key : struct
          where TEntity : class
     {
+        
         Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> criteria,
             CancellationToken cancellationToken = default,
             params Expression<Func<TEntity, object>>[] includes);
 
-        Task<List<TEntity>> GetAllAsync(CancellationToken cancellationToken = default,
-            params Expression<Func<TEntity, object>>[] includes);
+        public IQueryable<TEntity> GetAllAsyncByEx(Expression<Func<TEntity, bool>>? criteria,
+    int? skip, int? take,
+    CancellationToken cancellationToken = default,
+    params Expression<Func<TEntity, object>>[] includes);
 
-        Task<List<TEntity>> GetAllAsync(int skip, int take,
-            CancellationToken cancellationToken = default,
-            params Expression<Func<TEntity, object>>[] includes);
+        public IQueryable<TEntity> GetAllAsync(int skip, int take,
+           CancellationToken cancellationToken = default,
+           params Expression<Func<TEntity, object>>[] includes);
 
         Task<List<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>>? criteria,
             int? skip, int? take,

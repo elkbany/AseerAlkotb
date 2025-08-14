@@ -24,7 +24,7 @@ namespace AseerAlkotb.Domain.Interfaces.Base
 
         public IReviewRepository Reviews { get; }
 
-
+        public IOrderRepository Orders { get; }
         public Task<int> CommitAsync();
     }
 }

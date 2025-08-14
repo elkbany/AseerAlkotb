@@ -27,7 +27,7 @@ namespace AseerAlkotb.Infrastructure.Configurations
             builder.Property(o => o.DiscountAmount)
                 .HasColumnType("decimal(18,2)");
 
-            builder.Property(o => o.ShippingAddress)
+            builder.Property(o => o.Governorate)
                 .IsRequired()
                 .HasMaxLength(500);
 

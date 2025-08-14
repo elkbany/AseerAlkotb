@@ -12,7 +12,7 @@ namespace AseerAlkotb.Domain.Entites.Models
         public decimal DiscountAmount { get; set; }
         public PaymentMethod PaymentMethod { get; set; }
         public PaymentStatus PaymentStatus { get; set; }
-        public string ShippingAddress { get; set; }
+        public EgyptGovernorates Governorate { get; set; }
         public OrderStatus Status { get; set; }
         public string TrackingNumber { get; set; } // What i Added Assuming a tracking number for the order
         #region Navigation Properties
