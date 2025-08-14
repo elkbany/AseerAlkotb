@@ -1,6 +1,8 @@
 ﻿using AseerAlkotb.API.Bases;
 using AseerAlkotb.Application.Contracts;
+using AseerAlkotb.Application.Features.Authors.Requests;
 using AseerAlkotb.Application.Features.Publishers.Requests;
+using AseerAlkotb.Application.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -50,5 +52,43 @@ namespace AseerAlkotb.API.Controllers
             var response = await _publisherServices.DeletePublisherAsync(request);
             return ApiResult(response);
         }
+
+        /////////////////////////////////follow///////////////////////////////////////////////////////
+        [HttpPost("FollowPublisher")]
+        public async Task<IActionResult> FollowPublisher(FollowPublisherRequest request)
+        {
+            var result = await _publisherServices.FollowPublisher(request);
+            return ApiResult(result);
+        }
+
+        [HttpDelete("UnFollowPublisher")]
+        public async Task<IActionResult> UnFollowPublisher(UnFollowPublisherRequest request)
+        {
+            var result = await _publisherServices.UnFollowPublisher(request);
+            return ApiResult(result);
+        }
+
+        [HttpGet("GetPublisherFollowerCount")]
+        public async Task<IActionResult> GetPublisherFollowerCount([FromQuery] GetPublisherFollowerCountRequest request)
+        {
+            var result = await _publisherServices.GetPublisherFollowerCount(request);
+            return ApiResult(result);
+        }
+
+        [HttpGet("GetFollowedPublisher")]
+        public async Task<IActionResult> GetFollowedPublisher([FromQuery] GetFollowedPublisherRequest request)
+        {
+            var result = await _publisherServices.GetFollowedPublisher(request);
+            return ApiResult(result);
+        }
+
+
+        [HttpGet("GetFollowerPublisher")]
+        public async Task<IActionResult> GetFollowerPublisher([FromQuery] GetFollowersPublisherRequest request)
+        {
+            var result = await _publisherServices.GetFollowerPublisher(request);
+            return ApiResult(result);
+        }
+
     }
 }

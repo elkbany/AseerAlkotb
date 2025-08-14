@@ -1,4 +1,7 @@
 ﻿using AseerAlkotb.Application.Contracts;
+using AseerAlkotb.Application.Features.Authors.Requests;
+using AseerAlkotb.Application.Features.Authors.Responses;
+using AseerAlkotb.Application.Features.Authors.Validators;
 using AseerAlkotb.Application.Features.Publishers.Requests;
 using AseerAlkotb.Application.Features.Publishers.Response;
 using AseerAlkotb.Application.Features.Publishers.Validators;
@@ -105,6 +108,69 @@ namespace AseerAlkotb.Application.Services
             var response = publisher.Adapt<UpdatePublisherResponse>();
 
             return Success(response);
+        }
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        public async Task<ApiResponse<FollowPublisherResponse>> FollowPublisher(FollowPublisherRequest request)
+        {
+            await DoValidationAsync<FollowPublisherRequestValidation, FollowPublisherRequest>(request);
+            if (await unitOfWork.Publishers.IsFollowingPublisher(request.UserId, request.UserId))
+            {
+                return BadRequest<FollowPublisherResponse>("You are already following this publisher");
+            }
+            else
+            {
+                var userFollow = await unitOfWork.Publishers.FollowPublisher(request.UserId, request.PublisherId);
+                await unitOfWork.CommitAsync();
+                var response = userFollow.Adapt<FollowPublisherResponse>();
+                return Success(response);
+            }
+        }
+
+        public async Task<ApiResponse<UnFollowPublisherResponse>> UnFollowPublisher(UnFollowPublisherRequest request)
+        {
+            await DoValidationAsync<UnFollowPublisherRequestValidation, UnFollowPublisherRequest>(request);
+            if (await unitOfWork.Publishers.IsFollowingPublisher(request.UserId, request.PublisherId))
+            {
+                var userFollow = await unitOfWork.Publishers.UnFollowPublisher(request.UserId, request.PublisherId);
+                await unitOfWork.CommitAsync();
+                var response = userFollow.Adapt<UnFollowPublisherResponse>();
+                return Success(response);
+            }
+            else
+            {
+                return BadRequest<UnFollowPublisherResponse>("You are not following this Publisher");
+            }
+        }
+
+        public async Task<ApiResponse<GetPublisherFollowerCountResponse>> GetPublisherFollowerCount(GetPublisherFollowerCountRequest request)
+        {
+            await DoValidationAsync<GetPublisherFollowerCountRequestValidation, GetPublisherFollowerCountRequest>(request);
+            var count = await unitOfWork.Publishers.GetPublisherFollowerCount(request.PublisherId);
+            var response = new GetPublisherFollowerCountResponse()
+            {
+                PublisherId = request.PublisherId,
+                FollowerCount = count
+            };
+            return Success(response);
+        }
+
+        public async Task<ApiResponse<List<GetFollowedPublisherResponse>>> GetFollowedPublisher(GetFollowedPublisherRequest request)
+        {
+            await DoValidationAsync<GetFollowedPublisherRequestValidation, GetFollowedPublisherRequest>(request);
+            var Publishers = unitOfWork.Publishers.GetFollowedPublisher(request.UserId).ToList();
+            var response = Publishers.Adapt<List<GetFollowedPublisherResponse>>();
+            return Success(response);
+
+        }
+
+        public async Task<ApiResponse<List<GetFollowersPublisherResponse>>> GetFollowerPublisher(GetFollowersPublisherRequest request)
+        {
+            await DoValidationAsync<GetFollowersPublisherRequestValidation, GetFollowersPublisherRequest>(request);
+            var Publishers = unitOfWork.Publishers.GetFollowerPublisher(request.publisherId).ToList();
+            var response = Publishers.Adapt<List<GetFollowersPublisherResponse>>();
+            return Success(response);
+
         }
     }
 }

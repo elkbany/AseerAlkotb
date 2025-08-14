@@ -25,9 +25,8 @@ namespace AseerAlkotb.Domain.Entites.Models
 
         public virtual Wishlist Wishlist { get; set; }
         public virtual ICollection<LikeDisLike> LikeDisLikes { get; set; } = [];
+        public virtual ICollection<UserFollow> Following { get; set; } = [];
         #endregion
-
-
 
     }
 }
