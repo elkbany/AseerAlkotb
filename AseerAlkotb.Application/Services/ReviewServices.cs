@@ -41,7 +41,7 @@ namespace AseerAlkotb.Application.Services
                 }
             }     
             var review = request.Adapt<Review>();
-            review.ReviewFor = request.BookId.HasValue ? ReviewFor.Book : ReviewFor.Author;
+            review.ReviewType = request.BookId.HasValue ? ReviewFor.Book : ReviewFor.Author;
             await unitOfWork.Reviews.InsertAsync(review);
             await unitOfWork.CommitAsync();
             var revMap = review.Adapt<AddReviewResponse>();
@@ -105,7 +105,7 @@ namespace AseerAlkotb.Application.Services
             var reviews = await unitOfWork.Reviews
                 .GetAllAsync(
                     r => (request.BookId.HasValue && r.BookId == request.BookId.Value) ||
-                         (request.AuthorId.HasValue && r.AuthorId == request.AuthorId.Value),
+                         (request.AuthorId.HasValue && r.ReviewAuthorId == request.AuthorId.Value),
                          (request.PageNumber - 1) * request.PageSize, request.PageSize,
                     default,
                     r => r.Book,

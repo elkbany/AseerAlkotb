@@ -3,10 +3,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace AseerAlkotb.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class updateAutorsWithReview : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -119,13 +121,13 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Title = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
                     ISBN = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     DiscountPercentage = table.Column<decimal>(type: "decimal(5,2)", nullable: false),
                     PublishedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     PageCount = table.Column<int>(type: "int", nullable: false),
-                    Language = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Language = table.Column<int>(type: "int", maxLength: 50, nullable: false),
                     CoverImageUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     Format = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     StockQuantity = table.Column<int>(type: "int", nullable: false),
@@ -243,7 +245,9 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Comment = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
                     Rating = table.Column<int>(type: "int", nullable: false),
-                    BookId = table.Column<int>(type: "int", nullable: false),
+                    ReviewType = table.Column<int>(type: "int", nullable: false),
+                    BookId = table.Column<int>(type: "int", nullable: true),
+                    ReviewAuthorId = table.Column<int>(type: "int", nullable: true),
                     UserId = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
@@ -251,7 +255,14 @@ namespace AseerAlkotb.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Reviews", x => x.Id);
+                    table.CheckConstraint("CK_Review_OneTarget", "(BookId IS NOT NULL AND AuthorId IS NULL) OR (BookId IS NULL AND AuthorId IS NOT NULL)");
                     table.CheckConstraint("CK_Review_Rating", "Rating >= 1 AND Rating <= 5");
+                    table.ForeignKey(
+                        name: "FK_Reviews_Authors_ReviewAuthorId",
+                        column: x => x.ReviewAuthorId,
+                        principalTable: "Authors",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Reviews_Books_BookId",
                         column: x => x.BookId,
@@ -343,6 +354,68 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.InsertData(
+                table: "Authors",
+                columns: new[] { "Id", "Bio", "CreatedAt", "ImageUrl", "IsActive", "Name", "UpdatedAt" },
+                values: new object[,]
+                {
+                    { 1, "أديب مصري", new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, true, "نجيب محفوظ", new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 2, "كاتب مصري", new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, true, "أحمد خالد توفيق", new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 3, "كاتب مصري", new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, true, "يوسف إدريس", new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Cart",
+                columns: new[] { "Id", "CreatedAt", "UpdatedAt", "UserId" },
+                values: new object[] { 1, new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1 });
+
+            migrationBuilder.InsertData(
+                table: "Categories",
+                columns: new[] { "Id", "CreatedAt", "Description", "IsActive", "Name", "ParentCategoryId", "UpdatedAt" },
+                values: new object[,]
+                {
+                    { 1, new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "كتب روائية", true, "روايات", null, new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 2, new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "كتب تاريخية", true, "تاريخ", null, new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 3, new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "كتب علمية", true, "علوم", null, new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Publishers",
+                columns: new[] { "Id", "ContactEmail", "CreatedAt", "Description", "LogoUrl", "Name", "UpdatedAt" },
+                values: new object[,]
+                {
+                    { 1, "info@aseeralkotob.com", new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "دار نشر مصرية", null, "عصير الكتب", new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 2, "info2@aseeralkotob.com", new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "دار نشر عربية", null, "دار الشروق", new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 3, "info3@aseeralkotob.com", new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "دار نشر لبنانية", null, "دار الساقي", new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Books",
+                columns: new[] { "Id", "AuthorId", "CoverImageUrl", "CreatedAt", "Description", "DiscountPercentage", "Format", "ISBN", "IsActive", "Language", "PageCount", "Price", "PublishedDate", "PublisherId", "SalesCount", "StockQuantity", "Title", "UpdatedAt", "ViewCount" },
+                values: new object[,]
+                {
+                    { 1, 1, "cover.jpg", new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "رواية شهيرة لنجيب محفوظ", 10m, "ورقي", "1234567890123", true, 1, 240, 150m, new DateTime(1950, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, 0, 20, "زقاق المدق", new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 0 },
+                    { 2, 1, "new_cover.jpg", new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "وصف الكتاب الجديد", 15m, "ورقي", "9876543210123", true, 1, 350, 200m, new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, 0, 30, "كتاب جديد", new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 0 },
+                    { 3, 2, "another_cover.jpg", new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "وصف الكتاب الآخر", 5m, "ورقي", "1234567890124", true, 1, 300, 250m, new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 2, 0, 15, "كتاب آخر", new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 0 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "User",
+                columns: new[] { "Id", "CartId", "CreatedAt", "DateOfBirth", "FirstName", "Gender", "IsActive", "LastName", "UpdatedAt" },
+                values: new object[] { 1, 1, new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1990, 5, 15, 0, 0, 0, 0, DateTimeKind.Unspecified), "Ahmed", 0, true, "Hassan", new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
+
+            migrationBuilder.InsertData(
+                table: "BookCategories",
+                columns: new[] { "BookId", "CategoryId" },
+                values: new object[,]
+                {
+                    { 1, 1 },
+                    { 1, 2 },
+                    { 2, 2 },
+                    { 3, 1 },
+                    { 3, 3 }
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_BookCategories_CategoryId",
                 table: "BookCategories",
@@ -394,6 +467,11 @@ namespace AseerAlkotb.Infrastructure.Migrations
                 name: "IX_Reviews_BookId",
                 table: "Reviews",
                 column: "BookId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reviews_ReviewAuthorId",
+                table: "Reviews",
+                column: "ReviewAuthorId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Reviews_UserId",

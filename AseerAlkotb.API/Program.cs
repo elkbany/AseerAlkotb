@@ -66,16 +66,6 @@ namespace AseerAlkotb.API
 
             builder.Services.AddControllers();
 
-            #region CORS
-            builder.Services.AddCors(options =>
-            {
-                options.AddPolicy("AllowAllOrigins",
-                    builder => builder.AllowAnyOrigin()
-                                      .AllowAnyMethod()
-                                      .AllowAnyHeader());
-            });
-
-            #endregion
 
             #region Swagger
             builder.Services.AddEndpointsApiExplorer();
@@ -83,6 +73,7 @@ namespace AseerAlkotb.API
             #endregion
 
             var app = builder.Build();
+
             #region Access Images
             app.UseStaticFiles();
             app.UseStaticFiles(new StaticFileOptions

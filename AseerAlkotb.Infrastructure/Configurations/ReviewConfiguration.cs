@@ -36,7 +36,7 @@ namespace AseerAlkotb.Infrastructure.Configurations
 
             builder.HasOne(r => r.Author)
                 .WithMany(a => a.Reviews)
-                .HasForeignKey(r => r.AuthorId)
+                .HasForeignKey(r => r.ReviewAuthorId)
                 .OnDelete(DeleteBehavior.Cascade);
 
 

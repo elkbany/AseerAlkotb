@@ -520,9 +520,6 @@ namespace AseerAlkotb.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("AuthorId")
-                        .HasColumnType("int");
-
                     b.Property<int?>("BookId")
                         .HasColumnType("int");
 
@@ -537,7 +534,10 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.Property<int>("Rating")
                         .HasColumnType("int");
 
-                    b.Property<int>("ReviewFor")
+                    b.Property<int?>("ReviewAuthorId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ReviewType")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -548,9 +548,9 @@ namespace AseerAlkotb.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AuthorId");
-
                     b.HasIndex("BookId");
+
+                    b.HasIndex("ReviewAuthorId");
 
                     b.HasIndex("UserId");
 
@@ -784,14 +784,14 @@ namespace AseerAlkotb.Infrastructure.Migrations
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Review", b =>
                 {
-                    b.HasOne("AseerAlkotb.Domain.Entites.Models.Author", "Author")
-                        .WithMany("Reviews")
-                        .HasForeignKey("AuthorId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
                     b.HasOne("AseerAlkotb.Domain.Entites.Models.Book", "Book")
                         .WithMany("Reviews")
                         .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("AseerAlkotb.Domain.Entites.Models.Author", "Author")
+                        .WithMany("Reviews")
+                        .HasForeignKey("ReviewAuthorId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("AseerAlkotb.Domain.Entites.Models.User", "User")
