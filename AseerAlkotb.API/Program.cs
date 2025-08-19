@@ -88,7 +88,7 @@ namespace AseerAlkotb.API
             builder.Services.AddScoped<IReviewServices, ReviewServices>();
             builder.Services.AddScoped<IPublisherServices, PublisherService>();
             builder.Services.AddScoped<IPaymobService, PaymobService>();
-
+            builder.Services.AddScoped<IOrderServices, OrderServices>();
             builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {

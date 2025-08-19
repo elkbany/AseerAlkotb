@@ -12,13 +12,9 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AseerAlkotb.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-<<<<<<<< HEAD:AseerAlkotb.Infrastructure/Migrations/20250819073440_IdentityUser.Designer.cs
     [Migration("20250819073440_IdentityUser")]
     partial class IdentityUser
-========
-    [Migration("20250819031430_AddPayment")]
-    partial class AddPayment
->>>>>>>> 21391e2b3e1bc1b1b3e49dda5cc66f4c522bfbc9:AseerAlkotb.Infrastructure/Migrations/20250819031430_AddPayment.Designer.cs
+
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -550,16 +546,11 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
-<<<<<<<< HEAD:AseerAlkotb.Infrastructure/Migrations/20250819073440_IdentityUser.Designer.cs
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
-========
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
->>>>>>>> 21391e2b3e1bc1b1b3e49dda5cc66f4c522bfbc9:AseerAlkotb.Infrastructure/Migrations/20250819031430_AddPayment.Designer.cs
 
                     b.Property<string>("FirstName")
                         .IsRequired()
@@ -575,7 +566,6 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-<<<<<<<< HEAD:AseerAlkotb.Infrastructure/Migrations/20250819073440_IdentityUser.Designer.cs
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
@@ -612,12 +602,10 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
-========
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
->>>>>>>> 21391e2b3e1bc1b1b3e49dda5cc66f4c522bfbc9:AseerAlkotb.Infrastructure/Migrations/20250819031430_AddPayment.Designer.cs
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -635,9 +623,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
-<<<<<<<< HEAD:AseerAlkotb.Infrastructure/Migrations/20250819073440_IdentityUser.Designer.cs
                     b.ToTable("Users", (string)null);
-========
                     b.HasData(
                         new
                         {
@@ -653,7 +639,6 @@ namespace AseerAlkotb.Infrastructure.Migrations
                             PhoneNumber = "01034567890",
                             UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
->>>>>>>> 21391e2b3e1bc1b1b3e49dda5cc66f4c522bfbc9:AseerAlkotb.Infrastructure/Migrations/20250819031430_AddPayment.Designer.cs
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.UserFollow", b =>

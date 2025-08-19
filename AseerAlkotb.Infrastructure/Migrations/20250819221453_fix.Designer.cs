@@ -12,13 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AseerAlkotb.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-<<<<<<<< HEAD:AseerAlkotb.Infrastructure/Migrations/20250819073440_IdentityUser.Designer.cs
-    [Migration("20250819073440_IdentityUser")]
-    partial class IdentityUser
-========
-    [Migration("20250819031430_AddPayment")]
-    partial class AddPayment
->>>>>>>> 21391e2b3e1bc1b1b3e49dda5cc66f4c522bfbc9:AseerAlkotb.Infrastructure/Migrations/20250819031430_AddPayment.Designer.cs
+    [Migration("20250819221453_fix")]
+    partial class fix
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -376,42 +371,6 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Orders", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            DiscountAmount = 0m,
-                            Governorate = 0,
-                            OrderDate = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            PaymentMethod = 0,
-                            PaymentStatus = 0,
-                            ShippingCost = 0m,
-                            Status = 0,
-                            TaxAmount = 0m,
-                            TotalAmount = 50m,
-                            TrackingNumber = "TRK123456789",
-                            UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            UserId = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            DiscountAmount = 0m,
-                            Governorate = 0,
-                            OrderDate = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            PaymentMethod = 0,
-                            PaymentStatus = 0,
-                            ShippingCost = 0m,
-                            Status = 0,
-                            TaxAmount = 0m,
-                            TotalAmount = 100m,
-                            TrackingNumber = "TRK987654321",
-                            UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            UserId = 1
-                        });
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.OrderItem", b =>
@@ -550,16 +509,12 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
-<<<<<<<< HEAD:AseerAlkotb.Infrastructure/Migrations/20250819073440_IdentityUser.Designer.cs
+                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
-========
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
->>>>>>>> 21391e2b3e1bc1b1b3e49dda5cc66f4c522bfbc9:AseerAlkotb.Infrastructure/Migrations/20250819031430_AddPayment.Designer.cs
 
                     b.Property<string>("FirstName")
                         .IsRequired()
@@ -575,7 +530,6 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-<<<<<<<< HEAD:AseerAlkotb.Infrastructure/Migrations/20250819073440_IdentityUser.Designer.cs
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
@@ -597,6 +551,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("PhoneNumberConfirmed")
@@ -612,12 +567,6 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
-========
-                    b.Property<string>("PhoneNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
->>>>>>>> 21391e2b3e1bc1b1b3e49dda5cc66f4c522bfbc9:AseerAlkotb.Infrastructure/Migrations/20250819031430_AddPayment.Designer.cs
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -635,25 +584,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
-<<<<<<<< HEAD:AseerAlkotb.Infrastructure/Migrations/20250819073440_IdentityUser.Designer.cs
                     b.ToTable("Users", (string)null);
-========
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CartId = 1,
-                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            DateOfBirth = new DateTime(1990, 5, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "email@test.com",
-                            FirstName = "Ahmed",
-                            Gender = 0,
-                            IsActive = true,
-                            LastName = "Hassan",
-                            PhoneNumber = "01034567890",
-                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        });
->>>>>>>> 21391e2b3e1bc1b1b3e49dda5cc66f4c522bfbc9:AseerAlkotb.Infrastructure/Migrations/20250819031430_AddPayment.Designer.cs
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.UserFollow", b =>

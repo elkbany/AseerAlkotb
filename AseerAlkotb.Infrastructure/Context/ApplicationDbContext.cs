@@ -26,6 +26,7 @@ namespace AseerAlkotb.Infrastructure.Context
         {
             
             base.OnModelCreating(modelBuilder);
+            DataSeeder.SeedData(modelBuilder);
 
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 

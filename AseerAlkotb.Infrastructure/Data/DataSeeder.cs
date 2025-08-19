@@ -113,27 +113,40 @@ namespace AseerAlkotb.Infrastructure.Data
             new { BookId = 3, CategoryId = 3 }
             );
 
+            // Users
+        //    modelBuilder.Entity<User>().HasData(
+        //        new User
+        //        {
+        //            Id = 1,
+        //            FirstName = "أحمد",
+        //            LastName = "حسن",
+        //            DateOfBirth = new DateTime(1990, 5, 15),
 
-            modelBuilder.Entity<Order>().HasData(
-                new Order
-                {
-                    Id = 1,
-                    UserId = 1,
-                    OrderDate = new DateTime(2022, 1, 1),
-                    TotalAmount = 50,
-                    Status = OrderStatus.Pending,
-                    TrackingNumber = "TRK123456789",
-                },
-                new Order
-                {
-                    Id = 2,
-                    UserId = 1,
-                    OrderDate = new DateTime(2022, 1, 1),
-                    TotalAmount = 100,
-                    Status = OrderStatus.Pending,
-                    TrackingNumber = "TRK987654321",
-                }
-            );
+        //            CreatedAt = fixedDate,
+        //            UpdatedAt = fixedDate
+        //        }
+        //    );
+
+        //    modelBuilder.Entity<Order>().HasData(
+        //    new Order
+        //    {
+        //        Id = 1,
+        //        UserId = 1,
+        //        OrderDate = new DateTime(2022, 1, 1),
+        //        TotalAmount = 50,
+        //        Status = OrderStatus.Pending,
+        //        TrackingNumber = "TRK123456789",
+        //    },
+        //    new Order
+        //    {
+        //        Id = 2,
+        //        UserId = 1,
+        //        OrderDate = new DateTime(2022, 1, 1),
+        //        TotalAmount = 100,
+        //        Status = OrderStatus.Pending,
+        //        TrackingNumber = "TRK987654321",
+        //    }
+        //);
         }
     }
 }
