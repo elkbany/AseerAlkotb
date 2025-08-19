@@ -35,11 +35,6 @@ namespace AseerAlkotb.Infrastructure.Context
             modelBuilder.Entity<Review>().ToTable(r => r.HasCheckConstraint("CK_Review_OneTarget",
                       "(BookId IS NOT NULL AND AuthorId IS NULL) OR (BookId IS NULL AND AuthorId IS NOT NULL)"));
 
-            modelBuilder.Entity<Cart>()
-                .HasOne(c=>c.User)
-                .WithOne(u=>u.Cart).HasForeignKey<User>("CartId")
-                .OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<WishlistItem>().HasKey(wi => new { wi.BookId, wi.WishlistId });
             
             modelBuilder.Entity<Payment>()
             .HasOne(p => p.Order)
@@ -47,15 +42,21 @@ namespace AseerAlkotb.Infrastructure.Context
             .HasForeignKey<Payment>(p => p.OrderId)
             .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Cart>().HasData(
-              new Cart
-              {
-                  Id = 1,
-                  UserId = 1,
-                  CreatedAt = fixedDate,
-                  UpdatedAt = fixedDate
+            //modelBuilder.Entity<Cart>()
+            //    .HasOne(c => c.User)
+            //    .WithOne(u => u.Cart).HasForeignKey<User>("CartId")
+            //    .OnDelete(DeleteBehavior.Cascade);
+            //modelBuilder.Entity<WishlistItem>().HasKey(wi => new { wi.BookId, wi.WishlistId });
 
-            //  }
+            //modelBuilder.Entity<Cart>().HasData(
+            //  new Cart
+            //  {
+            //      Id = 1,
+            //      UserId = 1,
+            //      CreatedAt = fixedDate,
+            //      UpdatedAt = fixedDate
+
+            ////  }
             //);
 
             //modelBuilder.Entity<User>().HasData(
