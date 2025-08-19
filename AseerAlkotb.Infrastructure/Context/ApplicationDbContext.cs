@@ -1,4 +1,5 @@
-﻿using AseerAlkotb.Domain.Entites.Models;
+﻿using AseerAlkotb.Domain.Entites;
+using AseerAlkotb.Domain.Entites.Models;
 using AseerAlkotb.Domain.Enums;
 using AseerAlkotb.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
@@ -34,24 +35,25 @@ namespace AseerAlkotb.Infrastructure.Context
             modelBuilder.Entity<Review>().ToTable(r => r.HasCheckConstraint("CK_Review_OneTarget",
                       "(BookId IS NOT NULL AND AuthorId IS NULL) OR (BookId IS NULL AND AuthorId IS NOT NULL)"));
 
-            //var fixedDate = new DateTime(2024, 8, 1); // fixed date for consistency
-            //var dateOfBirth = new DateTime(1990, 5, 15); // Example date of birth for user
+            modelBuilder.Entity<Cart>()
+                .HasOne(c=>c.User)
+                .WithOne(u=>u.Cart).HasForeignKey<User>("CartId")
+                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<WishlistItem>().HasKey(wi => new { wi.BookId, wi.WishlistId });
+            
+            modelBuilder.Entity<Payment>()
+            .HasOne(p => p.Order)
+            .WithOne(o => o.Payment)
+            .HasForeignKey<Payment>(p => p.OrderId)
+            .OnDelete(DeleteBehavior.Restrict);
 
-            //DataSeeder.SeedData(modelBuilder);
-
-            //modelBuilder.Entity<Cart>()
-            //    .HasOne(c=>c.User)
-            //    .WithOne(u=>u.Cart).HasForeignKey<User>("CartId")
-            //    .OnDelete(DeleteBehavior.Cascade);
-            //modelBuilder.Entity<WishlistItem>().HasKey(wi => new { wi.BookId, wi.WishlistId });
-
-            //modelBuilder.Entity<Cart>().HasData(
-            //  new Cart
-            //  {
-            //      Id = 1,
-            //      UserId = 1,
-            //      CreatedAt = fixedDate,
-            //      UpdatedAt = fixedDate
+            modelBuilder.Entity<Cart>().HasData(
+              new Cart
+              {
+                  Id = 1,
+                  UserId = 1,
+                  CreatedAt = fixedDate,
+                  UpdatedAt = fixedDate
 
             //  }
             //);
@@ -84,9 +86,9 @@ namespace AseerAlkotb.Infrastructure.Context
         public DbSet<Review> Reviews { get; set; }
         public DbSet<Wishlist> Wishlists { get; set; }
         public DbSet<WishlistItem> WishlistItems { get; set; }
-
         public DbSet<UserFollow> UserFollows { get; set; }
         public DbSet<Payment> Payments { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
         public DbSet<LikeDisLike> LikeDisLikes { get; set; }
         public override DbSet<User> Users { get; set; }
     }

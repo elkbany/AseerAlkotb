@@ -32,6 +32,7 @@ namespace AseerAlkotb.Infrastructure.Repositories.Base
         public IPublisherRepository Publishers { get; private set; }
         public IOrderRepository Orders { get; private set; }
         public IPaymentRepository Payments { get; private set; }
+        public INotificationRepository Notifications { get; private set; }
 
         //public IUserStore<User> Users{ get; private set; }
         
@@ -56,6 +57,7 @@ namespace AseerAlkotb.Infrastructure.Repositories.Base
 
             Wishlists = new WishlistRepository(dbContext);
             Payments = new PaymentRepository(dbContext);
+            Notifications = new NotificationRepository(dbContext);
             //Users = new UserStore(dbContext);
 
         }
