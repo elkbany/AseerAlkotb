@@ -1,0 +1,161 @@
+<style>
+    /* Animation Keyframes */
+    @-webkit-keyframes dropdownFade {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes dropdownFade {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    :root {
+        --primary-color: #8e44ad;
+        --secondary-color: #2ecc71;
+        --accent-color: #3498db;
+        --success-color: #27ae60;
+        --warning-color: #f1c40f;
+        --danger-color: #e74c3c;
+        --light-purple: #a569bd;
+        --light-green: #82e0aa;
+        --light-blue: #85c1e9;
+    }
+
+    .main-header {
+        background: linear-gradient(to right, #fff, #f8f9fa) !important;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .main-sidebar {
+        background: linear-gradient(to bottom, #2c3e50, #34495e) !important;
+    }
+
+    .nav-link {
+        color: #455A64 !important;
+        transition: all 0.3s ease;
+    }
+
+    .nav-link:hover {
+        color: var(--primary-color) !important;
+        transform: translateX(5px);
+    }
+
+    .brand-link {
+        background: linear-gradient(to right, #1a2327, #2c3e50) !important;
+        border-bottom: 1px solid #37474F !important;
+    }
+
+    .brand-text {
+        color: #fff !important;
+        font-weight: 500 !important;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    }
+
+    .sidebar-dark-primary .nav-sidebar > .nav-item > .nav-link.active {
+        background: linear-gradient(to right, var(--primary-color), var(--light-purple)) !important;
+        color: #fff !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .btn-primary {
+        background: linear-gradient(to right, var(--primary-color), var(--light-purple));
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .card {
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+        border: none;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+
+    .main-footer {
+        background: linear-gradient(to right, #fff, #f8f9fa);
+        border-top: 1px solid #e9ecef;
+        color: #6c757d;
+        font-size: 0.875rem;
+    }
+
+    .form-control {
+        border-radius: 8px;
+        border: 1px solid #ced4da;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(142, 68, 173, 0.25);
+        transform: translateY(-2px);
+    }
+
+    .dropdown-menu {
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        border: none;
+        animation: dropdownFade 0.3s ease;
+    }
+
+    @keyframes dropdownFade {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Stat Cards Styling */
+    .small-box {
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .bg-info {
+        background: linear-gradient(135deg, #3498db, #2980b9) !important;
+    }
+
+    .bg-success {
+        background: linear-gradient(135deg, #2ecc71, #27ae60) !important;
+    }
+
+    .bg-warning {
+        background: linear-gradient(135deg, #f1c40f, #f39c12) !important;
+    }
+
+    .bg-danger {
+        background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
+    }
+
+    .small-box:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    }
+</style>
