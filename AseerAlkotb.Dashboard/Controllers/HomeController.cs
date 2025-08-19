@@ -15,6 +15,18 @@ namespace AseerAlkotb.Dashboard.Controllers
 
         public IActionResult Index()
         {
+            // Add dashboard statistics
+            ViewBag.TotalBooks = 0;    // Replace with actual count
+            ViewBag.TotalAuthors = 0;  // Replace with actual count
+            ViewBag.TotalOrders = 0;   // Replace with actual count
+            ViewBag.TotalReviews = 0;  // Replace with actual count
+
+            // Recent Orders - Replace with actual data
+            ViewBag.RecentOrders = new List<object>();
+
+            // Recent Books - Replace with actual data
+            ViewBag.RecentBooks = new List<object>();
+
             return View();
         }
 
