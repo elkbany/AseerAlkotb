@@ -416,6 +416,46 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.ToTable("LikeDisLike");
                 });
 
+            modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("NotificationType")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Notifications");
+                });
+
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Order", b =>
                 {
                     b.Property<int>("Id")
@@ -437,7 +477,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("PaymentId")
+                    b.Property<int?>("PaymentId")
                         .HasColumnType("int");
 
                     b.Property<int>("PaymentMethod")
@@ -477,6 +517,42 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Orders", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DiscountAmount = 0m,
+                            Governorate = 0,
+                            OrderDate = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PaymentMethod = 0,
+                            PaymentStatus = 0,
+                            ShippingCost = 0m,
+                            Status = 0,
+                            TaxAmount = 0m,
+                            TotalAmount = 50m,
+                            TrackingNumber = "TRK123456789",
+                            UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            UserId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DiscountAmount = 0m,
+                            Governorate = 0,
+                            OrderDate = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PaymentMethod = 0,
+                            PaymentStatus = 0,
+                            ShippingCost = 0m,
+                            Status = 0,
+                            TaxAmount = 0m,
+                            TotalAmount = 100m,
+                            TrackingNumber = "TRK987654321",
+                            UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            UserId = 1
+                        });
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.OrderItem", b =>
@@ -500,52 +576,6 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.HasIndex("BookId");
 
                     b.ToTable("OrderItems", (string)null);
-                });
-
-            modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Payment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("Amount")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Method")
-                        .HasColumnType("int");
-
-                    b.Property<int>("OrderId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("PaymentDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ProviderPayload")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<string>("TransactionId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrderId")
-                        .IsUnique();
-
-                    b.ToTable("Payments");
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Publisher", b =>
@@ -681,6 +711,10 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.Property<DateTime?>("DateOfBirth")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -692,6 +726,10 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -712,10 +750,12 @@ namespace AseerAlkotb.Infrastructure.Migrations
                             CartId = 1,
                             CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfBirth = new DateTime(1990, 5, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "email@test.com",
                             FirstName = "Ahmed",
                             Gender = 0,
                             IsActive = true,
                             LastName = "Hassan",
+                            PhoneNumber = "01034567890",
                             UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
                 });
@@ -803,6 +843,60 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.HasIndex("WishlistId");
 
                     b.ToTable("WishlistItems");
+                });
+
+            modelBuilder.Entity("AseerAlkotb.Domain.Entites.Payment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("PaymentDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PaymentMethod")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("PaymobOrderId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TransactionId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Payments", (string)null);
                 });
 
             modelBuilder.Entity("BookCategories", b =>
@@ -913,6 +1007,25 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Notification", b =>
+                {
+                    b.HasOne("AseerAlkotb.Domain.Entites.Models.Order", "Order")
+                        .WithMany()
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AseerAlkotb.Domain.Entites.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Order", b =>
                 {
                     b.HasOne("AseerAlkotb.Domain.Entites.Models.User", "User")
@@ -939,17 +1052,6 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Book");
-
-                    b.Navigation("Order");
-                });
-
-            modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Payment", b =>
-                {
-                    b.HasOne("AseerAlkotb.Domain.Entites.Models.Order", "Order")
-                        .WithOne("Payment")
-                        .HasForeignKey("AseerAlkotb.Domain.Entites.Models.Payment", "OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
 
                     b.Navigation("Order");
                 });
@@ -1049,6 +1151,25 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.Navigation("Wishlist");
                 });
 
+            modelBuilder.Entity("AseerAlkotb.Domain.Entites.Payment", b =>
+                {
+                    b.HasOne("AseerAlkotb.Domain.Entites.Models.Order", "Order")
+                        .WithOne("Payment")
+                        .HasForeignKey("AseerAlkotb.Domain.Entites.Payment", "OrderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AseerAlkotb.Domain.Entites.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("BookCategories", b =>
                 {
                     b.HasOne("AseerAlkotb.Domain.Entites.Models.Book", null)
@@ -1101,8 +1222,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
                 {
                     b.Navigation("OrderItems");
 
-                    b.Navigation("Payment")
-                        .IsRequired();
+                    b.Navigation("Payment");
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Publisher", b =>

@@ -1,17 +1,18 @@
 using AseerAlkotb.API.Extensions;
-using AseerAlkotb.Infrastructure.Context;
-using Microsoft.EntityFrameworkCore;
-using Mapster;
-using MapsterMapper;
-using System.Reflection;
 using AseerAlkotb.API.Middlewares;
-using AseerAlkotb.Infrastructure.Repositories.Implementations;
-using AseerAlkotb.Domain.Interfaces.Repositories;
 using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Services;
+using AseerAlkotb.Domain.Entites.Models;
 using AseerAlkotb.Domain.Interfaces.Base;
+using AseerAlkotb.Domain.Interfaces.Repositories;
+using AseerAlkotb.Infrastructure.Context;
 using AseerAlkotb.Infrastructure.Repositories.Base;
+using AseerAlkotb.Infrastructure.Repositories.Implementations;
+using Mapster;
+using MapsterMapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using System.Reflection;
 namespace AseerAlkotb.API
 {
     public class Program
@@ -42,20 +43,23 @@ namespace AseerAlkotb.API
             builder.Services.AddScoped<IWishlistRepository, WishlistRepository>();
 
             builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+            builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
             #endregion
             #region Services Registerations
             builder.Services.AddScoped<IAuthorServices,AuthorServices>();
             builder.Services.AddScoped<IBookServices, BookServices>();
             builder.Services.AddScoped<ICategoryServices, CategoryServices>();
-
             builder.Services.AddScoped<ICartServices, CartServices>();
-
-
-
             builder.Services.AddScoped<IReviewServices, ReviewServices>();
-
-
             builder.Services.AddScoped<IPublisherServices, PublisherService>();
+            builder.Services.AddScoped<IPaymobService, PaymobService>();
+
+            builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    });
+
             #endregion
             #region AutoMapper 
             builder.Services.AddMapster();
@@ -65,6 +69,9 @@ namespace AseerAlkotb.API
             builder.Services.AddFluentValidationValidators();
             #endregion
 
+            #region HttpClient Registeration
+            builder.Services.AddHttpClient<IPaymobService, PaymobService>();
+            #endregion
 
             #region Cors
             // Add CORS policy

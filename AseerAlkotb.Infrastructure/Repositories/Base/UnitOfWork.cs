@@ -30,7 +30,7 @@ namespace AseerAlkotb.Infrastructure.Repositories.Base
         public IPublisherRepository Publishers { get; private set; }
         public IOrderRepository Orders { get; private set; }
         public IPaymentRepository Payments { get; private set; }
-        public IOrderRepository Orders { get; private set; }
+        public INotificationRepository Notifications { get; private set; }
         public UnitOfWork(ApplicationDbContext dbContext)
         {
             this.dbContext = dbContext;
@@ -50,6 +50,7 @@ namespace AseerAlkotb.Infrastructure.Repositories.Base
 
             Wishlists = new WishlistRepository(dbContext);
             Payments = new PaymentRepository(dbContext);
+            Notifications = new NotificationRepository(dbContext);
 
         }
 

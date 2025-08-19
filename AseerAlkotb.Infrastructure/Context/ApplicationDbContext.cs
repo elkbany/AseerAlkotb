@@ -1,4 +1,5 @@
-﻿using AseerAlkotb.Domain.Entites.Models;
+﻿using AseerAlkotb.Domain.Entites;
+using AseerAlkotb.Domain.Entites.Models;
 using AseerAlkotb.Domain.Enums;
 using AseerAlkotb.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -40,7 +41,13 @@ namespace AseerAlkotb.Infrastructure.Context
                 .WithOne(u=>u.Cart).HasForeignKey<User>("CartId")
                 .OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<WishlistItem>().HasKey(wi => new { wi.BookId, wi.WishlistId });
-    
+            
+            modelBuilder.Entity<Payment>()
+            .HasOne(p => p.Order)
+            .WithOne(o => o.Payment)
+            .HasForeignKey<Payment>(p => p.OrderId)
+            .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<Cart>().HasData(
               new Cart
               {
@@ -60,6 +67,8 @@ namespace AseerAlkotb.Infrastructure.Context
         LastName = "Hassan",
         DateOfBirth = dateOfBirth,
         Gender = Gender.Male,
+        Email = "email@test.com",
+        PhoneNumber = "01034567890",
         IsActive = true,
         CartId = 1,
         CreatedAt = fixedDate,
@@ -80,8 +89,8 @@ namespace AseerAlkotb.Infrastructure.Context
         public DbSet<Review> Reviews { get; set; }
         public DbSet<Wishlist> Wishlists { get; set; }
         public DbSet<WishlistItem> WishlistItems { get; set; }
-
         public DbSet<UserFollow> UserFollows { get; set; }
         public DbSet<Payment> Payments { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
     }
 }

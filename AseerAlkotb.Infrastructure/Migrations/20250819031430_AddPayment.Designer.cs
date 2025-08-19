@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AseerAlkotb.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250814160128_editUserAddress")]
-    partial class editUserAddress
+    [Migration("20250819031430_AddPayment")]
+    partial class AddPayment
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -71,7 +71,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         new
                         {
                             Id = 1,
-                            Bio = "أديب مصري",
+                            Bio = "نجيب محفوظ عبد العزيز إبراهيم أحمد الباشا (11 ديسمبر 1911 – 30 أغسطس 2006) هو كاتب مصري. يُعد أول مصري وعربي حائز على جائزة نوبل في الأدب. كتب نجيب محفوظ منذ الثلاثينات واستمر حتى 2004. تدور أحداث جميع رواياته في مصر وتظهر فيها سمة متكررة، هي الحارة التي تعادل العالم. كتب نجيب محفوظ أكثر من ثلاثين رواية اشتهرت غالبيتها وتم إنتاجها سينمائيًا أو تلفزيونيًا وكانت أول رواياته هي عبث الأقدار (1939)، أما آخرها، فكانت قشتمر (1988)، كما كتب أكثر من عشرين قصة قصيرة وكان آخرها أحلام فترة النقاهة (2004). ومن أشهر أعماله: بداية ونهاية (1949)، والثلاثية (1956–1957)، وأولاد حارتنا (1959)، والتي مُنعت من النشر في مصر منذ صدورها وحتى وقتٍ قريب، واللص والكلاب (1961)، وثرثرة فوق النيل (1966)، والكرنك (1974)، والحرافيش (1977). بينما يُصنف أدب محفوظ باعتباره أدبًا واقعيًا، فإن مواضيعًا وجودية تظهر فيه. محفوظ أكثر أديب عربي نُقلت أعماله إلى السينما والتلفزيون.",
                             CountryCode = "EG",
                             CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ImageUrl = "/uploads/authors/8a48bbe0-f12a-4be4-b5bc-72d3a442dcae.jpg",
@@ -82,7 +82,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         new
                         {
                             Id = 2,
-                            Bio = "كاتب مصري",
+                            Bio = "أحمد خالد توفيق (10 يونيو 1962 – 2 أبريل 2018)، أستاذ جامعي، وطبيب، وكاتب، ومؤلف، ومترجم مصري. يُعد أول كاتب عربي في مجال أدب الرعب. والأشهر في مجال أدب الشباب، والفنتازيا، والخيال العلمي. لُقب بـ«العراب».\r\n\r\nبدأت رحلته الأدبية مع كتابة سلسلة ما وراء الطبيعة، ورغم أن أدب الرعب لم يكن سائدًا في ذلك الوقت، فإن السلسلة حققت نجاحًا كبيرًا، واستقبالًا جيدًا من الجمهور. ما شجعه على استكمالها، وأصدر بعدها سلسلة فانتازيا عام 1995، وسلسلة سفاري عام 1996. في عام 2006، سلسلة دبليو دبليو دبليو.",
                             CountryCode = "EG",
                             CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ImageUrl = "/uploads/authors/8a48bbe0-f12a-4be4-b5bc-72d3a442dcae.jpg",
@@ -99,6 +99,17 @@ namespace AseerAlkotb.Infrastructure.Migrations
                             ImageUrl = "/uploads/authors/8a48bbe0-f12a-4be4-b5bc-72d3a442dcae.jpg",
                             IsActive = true,
                             Name = "يوسف إدريس",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Bio = "كاتب وطبيب أسنان عراقي من مواليد بغداد في عام 1970، ينتمي إلى الأسرة العمرية في الموصل التي يعود نسبها إلى الخليفة عمر بن الخطاب، والده مؤرخ وقاض عراقي هو خيري العمري. تخرج طبيب أسنان من جامعة بغداد عام 1993، لكنه عُرِف ككاتب إسلامي عبر مؤلفات جمعت بين منحى تجديدي في طرح الموضوعات والأسلوب الأدبي. اختير عام 2010 ليكون الشخصية الفكرية التي تكرمها دار الفكر في تقليدها السنوي، والذي سبق أن كُرم فيه أعلام مثل عبد الوهاب المسيري والبوطي والزحيلي، وبذلك يكون العمري هو أصغر هؤلاء المكرمين سناً حيث تم اختياره قبل أن يبلغ الأربعين.",
+                            CountryCode = "IQ",
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ImageUrl = "/uploads/authors/Ahmed-2_(14896102021).jpg",
+                            IsActive = true,
+                            Name = "أحمد خيري العمري",
                             UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
                 });
@@ -408,6 +419,46 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.ToTable("LikeDisLike");
                 });
 
+            modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("NotificationType")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Notifications");
+                });
+
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Order", b =>
                 {
                     b.Property<int>("Id")
@@ -428,6 +479,9 @@ namespace AseerAlkotb.Infrastructure.Migrations
 
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<int?>("PaymentId")
+                        .HasColumnType("int");
 
                     b.Property<int>("PaymentMethod")
                         .HasColumnType("int");
@@ -466,6 +520,42 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Orders", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DiscountAmount = 0m,
+                            Governorate = 0,
+                            OrderDate = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PaymentMethod = 0,
+                            PaymentStatus = 0,
+                            ShippingCost = 0m,
+                            Status = 0,
+                            TaxAmount = 0m,
+                            TotalAmount = 50m,
+                            TrackingNumber = "TRK123456789",
+                            UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            UserId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DiscountAmount = 0m,
+                            Governorate = 0,
+                            OrderDate = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PaymentMethod = 0,
+                            PaymentStatus = 0,
+                            ShippingCost = 0m,
+                            Status = 0,
+                            TaxAmount = 0m,
+                            TotalAmount = 100m,
+                            TrackingNumber = "TRK987654321",
+                            UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            UserId = 1
+                        });
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.OrderItem", b =>
@@ -624,6 +714,10 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.Property<DateTime?>("DateOfBirth")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -635,6 +729,10 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -655,11 +753,53 @@ namespace AseerAlkotb.Infrastructure.Migrations
                             CartId = 1,
                             CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfBirth = new DateTime(1990, 5, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "email@test.com",
                             FirstName = "Ahmed",
                             Gender = 0,
                             IsActive = true,
                             LastName = "Hassan",
+                            PhoneNumber = "01034567890",
                             UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        });
+                });
+
+            modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.UserFollow", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AuthorId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FollowType")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PublisherId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorId");
+
+                    b.HasIndex("PublisherId");
+
+                    b.HasIndex("UserId", "AuthorId")
+                        .IsUnique()
+                        .HasFilter("[AuthorId] IS NOT NULL");
+
+                    b.HasIndex("UserId", "PublisherId")
+                        .IsUnique()
+                        .HasFilter("[PublisherId] IS NOT NULL");
+
+                    b.ToTable("UserFollows", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_UserFollow_SingleFollowType", "([AuthorId] IS NOT NULL AND [PublisherId] IS NULL) OR ([AuthorId] IS NULL AND [PublisherId] IS NOT NULL)");
                         });
                 });
 
@@ -705,7 +845,61 @@ namespace AseerAlkotb.Infrastructure.Migrations
 
                     b.HasIndex("WishlistId");
 
-                    b.ToTable("WishlistItem");
+                    b.ToTable("WishlistItems");
+                });
+
+            modelBuilder.Entity("AseerAlkotb.Domain.Entites.Payment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("PaymentDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PaymentMethod")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("PaymobOrderId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TransactionId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Payments", (string)null);
                 });
 
             modelBuilder.Entity("BookCategories", b =>
@@ -816,6 +1010,25 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Notification", b =>
+                {
+                    b.HasOne("AseerAlkotb.Domain.Entites.Models.Order", "Order")
+                        .WithMany()
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AseerAlkotb.Domain.Entites.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Order", b =>
                 {
                     b.HasOne("AseerAlkotb.Domain.Entites.Models.User", "User")
@@ -882,6 +1095,31 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.Navigation("Cart");
                 });
 
+            modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.UserFollow", b =>
+                {
+                    b.HasOne("AseerAlkotb.Domain.Entites.Models.Author", "Author")
+                        .WithMany("Followers")
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AseerAlkotb.Domain.Entites.Models.Publisher", "Publisher")
+                        .WithMany("Followers")
+                        .HasForeignKey("PublisherId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AseerAlkotb.Domain.Entites.Models.User", "User")
+                        .WithMany("Following")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Author");
+
+                    b.Navigation("Publisher");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Wishlist", b =>
                 {
                     b.HasOne("AseerAlkotb.Domain.Entites.Models.Book", null)
@@ -916,6 +1154,25 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.Navigation("Wishlist");
                 });
 
+            modelBuilder.Entity("AseerAlkotb.Domain.Entites.Payment", b =>
+                {
+                    b.HasOne("AseerAlkotb.Domain.Entites.Models.Order", "Order")
+                        .WithOne("Payment")
+                        .HasForeignKey("AseerAlkotb.Domain.Entites.Payment", "OrderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AseerAlkotb.Domain.Entites.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("BookCategories", b =>
                 {
                     b.HasOne("AseerAlkotb.Domain.Entites.Models.Book", null)
@@ -934,6 +1191,8 @@ namespace AseerAlkotb.Infrastructure.Migrations
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Author", b =>
                 {
                     b.Navigation("Books");
+
+                    b.Navigation("Followers");
 
                     b.Navigation("Reviews");
                 });
@@ -965,11 +1224,15 @@ namespace AseerAlkotb.Infrastructure.Migrations
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Order", b =>
                 {
                     b.Navigation("OrderItems");
+
+                    b.Navigation("Payment");
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Publisher", b =>
                 {
                     b.Navigation("Books");
+
+                    b.Navigation("Followers");
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Review", b =>
@@ -979,6 +1242,8 @@ namespace AseerAlkotb.Infrastructure.Migrations
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.User", b =>
                 {
+                    b.Navigation("Following");
+
                     b.Navigation("LikeDisLikes");
 
                     b.Navigation("Orders");

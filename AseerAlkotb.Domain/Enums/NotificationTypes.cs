@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 
 namespace AseerAlkotb.Domain.Enums
 {
-    public enum PaymentMethod
+    public enum NotificationTypes
     {
-        CashOnDelivery = 1,
-        Card = 2,
-        MobileWallet = 3
+        PaymentSuccess,
+        PaymentFailure,
+        OrderShipped,
+        OrderDelivered
     }
 }
