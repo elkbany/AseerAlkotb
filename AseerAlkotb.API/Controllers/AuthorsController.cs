@@ -1,6 +1,7 @@
 ﻿using AseerAlkotb.API.Bases;
 using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Features.Authors.Requests;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -34,6 +35,7 @@ namespace AseerAlkotb.API.Controllers
             var result = await authorServices.GetAuthorByIdAsync(request);
             return ApiResult(result);
         }
+        //[Authorize]/////////for test
         [HttpGet("GetAll")]
         public async Task<IActionResult> GetAll([FromQuery]GetAllAuthorsPaginatedRequest request)
         {

@@ -4,12 +4,14 @@ using AseerAlkotb.Domain.Interfaces.Base;
 using AseerAlkotb.Domain.Interfaces.Repositories;
 using AseerAlkotb.Infrastructure.Context;
 using AseerAlkotb.Infrastructure.Repositories.Implementations;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 namespace AseerAlkotb.Infrastructure.Repositories.Base
 {
     public class UnitOfWork : IUnitOfWork
@@ -30,7 +32,11 @@ namespace AseerAlkotb.Infrastructure.Repositories.Base
         public IPublisherRepository Publishers { get; private set; }
         public IOrderRepository Orders { get; private set; }
         public IPaymentRepository Payments { get; private set; }
-        public IOrderRepository Orders { get; private set; }
+
+        //public IUserStore<User> Users{ get; private set; }
+        
+       
+        //public IOrderRepository Orders { get; private set; }
         public UnitOfWork(ApplicationDbContext dbContext)
         {
             this.dbContext = dbContext;
@@ -50,6 +56,7 @@ namespace AseerAlkotb.Infrastructure.Repositories.Base
 
             Wishlists = new WishlistRepository(dbContext);
             Payments = new PaymentRepository(dbContext);
+            //Users = new UserStore(dbContext);
 
         }
 

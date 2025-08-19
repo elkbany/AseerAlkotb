@@ -12,6 +12,16 @@ using AseerAlkotb.Application.Services;
 using AseerAlkotb.Domain.Interfaces.Base;
 using AseerAlkotb.Infrastructure.Repositories.Base;
 using Microsoft.Extensions.FileProviders;
+using AseerAlkotb.Domain.Entites.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
+using AseerAlkotb.Application.Features.Account.Validator;
+using FluentValidation;
+using AseerAlkotb.Application.Features.Account.Requests;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+
 namespace AseerAlkotb.API
 {
     public class Program
@@ -26,6 +36,31 @@ namespace AseerAlkotb.API
                 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
                 options.UseSqlServer(connectionString).UseLazyLoadingProxies();
             });
+            #endregion
+            #region Identity Registration
+            builder.Services.AddIdentity<User, IdentityRole<int>>()
+                .AddEntityFrameworkStores<ApplicationDbContext>();
+            //.AddDefaultTokenProviders();
+
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                //options.DefaultScheme= JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(option =>
+            {
+                option.SaveToken=true;
+                option.RequireHttpsMetadata = true;//http=false
+                option.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidateIssuer = true,
+                    ValidIssuer = builder.Configuration["JWT:IssuerIP"],
+                    ValidateAudience = true,
+                    ValidAudience= builder.Configuration["JWT:AudienceIP"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:SecretKey"])),
+                };
+            });
+                
             #endregion
             #region Repositories Registerations
             builder.Services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
@@ -56,6 +91,7 @@ namespace AseerAlkotb.API
 
 
             builder.Services.AddScoped<IPublisherServices, PublisherService>();
+            builder.Services.AddScoped<IAccountServices,AccountService>();
             #endregion
             #region AutoMapper 
             builder.Services.AddMapster();
@@ -63,6 +99,7 @@ namespace AseerAlkotb.API
             #endregion
             #region Validation
             builder.Services.AddFluentValidationValidators();
+
             #endregion
 
 
@@ -125,7 +162,7 @@ namespace AseerAlkotb.API
             app.UseMiddleware<ExceptionHandlerMiddleware>();
             app.UseHttpsRedirection();
 
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
