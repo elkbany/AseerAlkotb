@@ -56,6 +56,8 @@ namespace AseerAlkotb.Application.Services
         public async Task<ApiResponse<LoginResponse>> Login(LoginRequest request)
         {
             await DoValidationAsync<LoginRequestValidator, LoginRequest>(request);
+            //var normalizedEmail = userManager.NormalizeEmail(request.Email);
+            //var existingUser = await userManager.FindByEmailAsync(normalizedEmail);
             var existingUser = await userManager.FindByEmailAsync(request.Email);
             if (existingUser != null)
             {
