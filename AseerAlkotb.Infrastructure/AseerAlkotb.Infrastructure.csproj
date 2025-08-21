@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AseerAlkotb.Application\AseerAlkotb.Application.csproj" />
     <ProjectReference Include="..\AseerAlkotb.Domain\AseerAlkotb.Domain.csproj" />
   </ItemGroup>
 
