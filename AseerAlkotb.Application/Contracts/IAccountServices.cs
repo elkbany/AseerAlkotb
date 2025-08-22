@@ -13,5 +13,7 @@ namespace AseerAlkotb.Application.Contracts
     {
         Task<ApiResponse<RegisterResponse>> CreateAccount(RegisterRequest request);
         Task<ApiResponse<LoginResponse>> Login(LoginRequest request);
+        Task<ApiResponse<UpdateProfileResponse>> UpdateProfile(int userId, UpdateProfileRequest request);
+        Task<ApiResponse<GetProfileResponse>> GetProfile(GetProfileRequest request);
     }
 }

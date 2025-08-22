@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using AseerAlkotb.Application.Features.Account.Requests;
 using AseerAlkotb.Application.Features.Account.Responses;
+using AseerAlkotb.Application.Features.Authors.Requests;
+using AseerAlkotb.Application.Features.Authors.Responses;
 using AseerAlkotb.Domain.Entites.Models;
 using Mapster;
 
@@ -21,8 +23,6 @@ namespace AseerAlkotb.Application.Features.Account.Mapping
                 .Map(dest => dest.FirstName, src => src.FirstName)
                 .Map(dest => dest.LastName, src => src.LastName)
                 .Map(dest => dest.IsActive, _ => true)
-                .Map(dest => dest.CreatedAt, _ => DateTime.UtcNow)
-                .Map(dest => dest.UpdatedAt, _ => DateTime.UtcNow)
                 .Ignore(dest => dest.Id)
                 .Ignore("ConfirmPassword")
                 .Ignore("Password")
@@ -39,6 +39,16 @@ namespace AseerAlkotb.Application.Features.Account.Mapping
             TypeAdapterConfig<User, RegisterResponse>
                 .NewConfig()
                 .Map(dest => dest.UserId, src => src.Id);
+
+            //config.NewConfig<UpdateProfileRequest, User>();
+            config.NewConfig<User, UpdateProfileResponse>();
+
+
+            TypeAdapterConfig<UpdateProfileRequest, User>
+                .NewConfig()
+                .IgnoreNullValues(true);
+
+           
         }
     }
 }

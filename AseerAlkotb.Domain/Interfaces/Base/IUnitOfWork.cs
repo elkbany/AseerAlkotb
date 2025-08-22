@@ -29,6 +29,7 @@ namespace AseerAlkotb.Domain.Interfaces.Base
         public IOrderRepository Orders { get; }
         public IPaymentRepository Payments { get; }
         public INotificationRepository Notifications { get; }
+        public IAccountRepository Account { get;}
         public Task<int> CommitAsync();
     }
 }

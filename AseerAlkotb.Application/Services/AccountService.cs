@@ -10,12 +10,17 @@ using AseerAlkotb.Application.Features.Account.Requests;
 using AseerAlkotb.Application.Features.Account.Responses;
 using AseerAlkotb.Application.Features.Account.Validator;
 using AseerAlkotb.Application.Features.CartItem.Requests;
+using AseerAlkotb.Application.Features.CartItem.Responses;
 using AseerAlkotb.Application.Features.CartItems.Validation;
 using AseerAlkotb.Application.ResponseHandler;
 using AseerAlkotb.Domain.Entites.Models;
+using AseerAlkotb.Domain.Interfaces.Base;
 using Mapster;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using static AseerAlkotb.Application.ResponseHandler.ApiResponseHandler;
@@ -26,10 +31,12 @@ namespace AseerAlkotb.Application.Services
     {
         private readonly UserManager<User> userManager;
         private readonly IConfiguration configuration;
-        public AccountService(UserManager<User> _userManager,IServiceProvider serviceProvider, IHostEnvironment environment,IConfiguration _configuration) : base(serviceProvider, environment)
+        private readonly IUnitOfWork unitOfWork;
+        public AccountService(UserManager<User> _userManager, IUnitOfWork _unitOfWork, IServiceProvider serviceProvider, IHostEnvironment environment,IConfiguration _configuration) : base(serviceProvider, environment)
         { 
             this.userManager = _userManager;
             this.configuration = _configuration;
+            this.unitOfWork = _unitOfWork;
         } 
 
         public async Task<ApiResponse<RegisterResponse>> CreateAccount(RegisterRequest request)
@@ -41,12 +48,22 @@ namespace AseerAlkotb.Application.Services
                 return BadRequest<RegisterResponse>("Username is already taken");
             }
             var newAccount = request.Adapt<User>();
+            newAccount.CreatedAt = DateTime.UtcNow;
+            newAccount.UpdatedAt = DateTime.UtcNow;
             var result= await userManager.CreateAsync(newAccount,request.Password);
             if (!result.Succeeded) {
                 var errors = result.Errors.Select(e => e.Description).ToList();
                 return BadRequest<RegisterResponse>("Try Again");
                 //return BadRequest<RegisterResponse>(errors);
             }
+
+            //add cart for the new user
+            var cart =new Cart()
+            {
+                UserId = newAccount.Id,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
             var response= newAccount.Adapt<RegisterResponse>();
             return Success(response);
 
@@ -56,8 +73,7 @@ namespace AseerAlkotb.Application.Services
         public async Task<ApiResponse<LoginResponse>> Login(LoginRequest request)
         {
             await DoValidationAsync<LoginRequestValidator, LoginRequest>(request);
-            //var normalizedEmail = userManager.NormalizeEmail(request.Email);
-            //var existingUser = await userManager.FindByEmailAsync(normalizedEmail);
+            
             var existingUser = await userManager.FindByEmailAsync(request.Email);
             if (existingUser != null)
             {
@@ -105,6 +121,56 @@ namespace AseerAlkotb.Application.Services
             {
                 return BadRequest<LoginResponse>("Email or Password Invalid");
             }
+
+        }
+
+        public async Task<ApiResponse<UpdateProfileResponse>> UpdateProfile( int userId,UpdateProfileRequest request)
+        {
+            await DoValidationAsync<UpdateProfileRequestValidator, UpdateProfileRequest>(request);
+            var existingUser = await userManager.FindByIdAsync(userId.ToString());
+            if (existingUser == null)
+            {
+                return NotFound<UpdateProfileResponse>("User not found");
+            }
+            existingUser = request.Adapt(existingUser);
+            var result = await userManager.UpdateAsync(existingUser);
+            if (!result.Succeeded)
+            {
+                return BadRequest<UpdateProfileResponse>("Try Again");
+            }
+            var response = existingUser.Adapt<UpdateProfileResponse>();
+            return Success(response);
+        }
+      
+        public async Task<ApiResponse<GetProfileResponse>>GetProfile(GetProfileRequest request)
+        {
+            await DoValidationAsync<GetProfileRequestValidator,GetProfileRequest>(request);
+
+            var existingUser = await unitOfWork.Account.GetUserWithRelatedData(request.UserId);
+            if (existingUser == null)
+            {
+                return NotFound<GetProfileResponse>("User not found");
+            }
+            var response = new GetProfileResponse()
+            {
+                Id = existingUser.Id,
+                FirstName = existingUser.FirstName,
+                LastName = existingUser.LastName,
+                ImageUrl=existingUser.ProfilePictureUrl,
+                RegistrationPeriod= DateTime.UtcNow-existingUser.CreatedAt,
+                Reviews=existingUser.Reviews?.Select(r => new ReviewDto
+                {
+                    Id = r.Id,
+                    ReviewFor = r.ReviewFor
+                }).ToList()??new List<ReviewDto>(),
+
+                Following = existingUser.Following?.Select(f => new UserFollowDto
+                {
+                    Id = f.Id,
+                    FollowType = f.FollowType
+                }).ToList() ?? new List<UserFollowDto>()
+            };
+            return Success(response);
 
         }
     }

@@ -79,7 +79,8 @@ namespace AseerAlkotb.API
 
             builder.Services.AddScoped<IOrderRepository, OrderRepository>();
             builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
-            builder.Services.AddScoped<IAccountServices, AccountService>();
+            builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+
             #endregion
             #region Services Registerations
             builder.Services.AddScoped<IAuthorServices,AuthorServices>();
@@ -90,6 +91,7 @@ namespace AseerAlkotb.API
             builder.Services.AddScoped<IPublisherServices, PublisherService>();
             builder.Services.AddScoped<IPaymobService, PaymobService>();
             builder.Services.AddScoped<IOrderServices, OrderServices>();
+            builder.Services.AddScoped<IAccountServices, AccountService>();
             builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
