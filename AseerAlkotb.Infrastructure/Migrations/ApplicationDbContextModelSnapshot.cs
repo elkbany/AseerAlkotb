@@ -38,6 +38,10 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         .HasMaxLength(2000)
                         .HasColumnType("nvarchar(2000)");
 
+                    b.Property<string>("CountryCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -65,7 +69,9 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         {
                             Id = 1,
                             Bio = "أديب مصري",
+                            CountryCode = "EG",
                             CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ImageUrl = "/uploads/authors/8a48bbe0-f12a-4be4-b5bc-72d3a442dcae.jpg",
                             IsActive = true,
                             Name = "نجيب محفوظ",
                             UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -74,7 +80,9 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         {
                             Id = 2,
                             Bio = "كاتب مصري",
+                            CountryCode = "EG",
                             CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ImageUrl = "/uploads/authors/8a48bbe0-f12a-4be4-b5bc-72d3a442dcae.jpg",
                             IsActive = true,
                             Name = "أحمد خالد توفيق",
                             UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -83,7 +91,9 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         {
                             Id = 3,
                             Bio = "كاتب مصري",
+                            CountryCode = "EG",
                             CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ImageUrl = "/uploads/authors/8a48bbe0-f12a-4be4-b5bc-72d3a442dcae.jpg",
                             IsActive = true,
                             Name = "يوسف إدريس",
                             UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -178,7 +188,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         {
                             Id = 1,
                             AuthorId = 1,
-                            CoverImageUrl = "cover.jpg",
+                            CoverImageUrl = "/uploads/Books/94147f51-d713-47a3-86dd-f88eef6198d4.webp",
                             CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "رواية شهيرة لنجيب محفوظ",
                             DiscountPercentage = 10m,
@@ -200,7 +210,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         {
                             Id = 2,
                             AuthorId = 1,
-                            CoverImageUrl = "new_cover.jpg",
+                            CoverImageUrl = "/uploads/Books/6fdbe335-1a34-4564-9564-e30dc38cf6ea.webp",
                             CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "وصف الكتاب الجديد",
                             DiscountPercentage = 15m,
@@ -222,7 +232,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         {
                             Id = 3,
                             AuthorId = 2,
-                            CoverImageUrl = "another_cover.jpg",
+                            CoverImageUrl = "/uploads/Books/6fdbe335-1a34-4564-9564-e30dc38cf6ea.webp",
                             CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "وصف الكتاب الآخر",
                             DiscountPercentage = 5m,
@@ -512,6 +522,48 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         });
                 });
 
+            modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Quote", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AuthorId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("BookId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("QuoteFor")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorId");
+
+                    b.HasIndex("BookId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Quotes", (string)null);
+                });
+
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Review", b =>
                 {
                     b.Property<int>("Id")
@@ -782,6 +834,31 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.Navigation("Order");
                 });
 
+            modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Quote", b =>
+                {
+                    b.HasOne("AseerAlkotb.Domain.Entites.Models.Author", "Author")
+                        .WithMany("Quotes")
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("AseerAlkotb.Domain.Entites.Models.Book", "Book")
+                        .WithMany("Quotes")
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("AseerAlkotb.Domain.Entites.Models.User", "User")
+                        .WithMany("Quotes")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Author");
+
+                    b.Navigation("Book");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Review", b =>
                 {
                     b.HasOne("AseerAlkotb.Domain.Entites.Models.Book", "Book")
@@ -871,6 +948,8 @@ namespace AseerAlkotb.Infrastructure.Migrations
                 {
                     b.Navigation("Books");
 
+                    b.Navigation("Quotes");
+
                     b.Navigation("Reviews");
                 });
 
@@ -879,6 +958,8 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.Navigation("CartItems");
 
                     b.Navigation("OrderItems");
+
+                    b.Navigation("Quotes");
 
                     b.Navigation("Reviews");
 
@@ -911,6 +992,8 @@ namespace AseerAlkotb.Infrastructure.Migrations
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.User", b =>
                 {
                     b.Navigation("Orders");
+
+                    b.Navigation("Quotes");
 
                     b.Navigation("Reviews");
 

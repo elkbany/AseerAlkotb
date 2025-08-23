@@ -112,6 +112,7 @@ namespace AseerAlkotb.Application.Services
                     r => r.Author,
                     r => r.User
                 );
+
             var totalCount =  reviews.Count;
             var revMap = reviews.Adapt<List<GetAllReviewsPaginatedResponse>>();
             return Success(revMap, totalCount, request.PageNumber, request.PageSize);

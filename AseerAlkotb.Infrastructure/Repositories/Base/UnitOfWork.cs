@@ -25,6 +25,7 @@ namespace AseerAlkotb.Infrastructure.Repositories.Base
             Publishers = new PublisherRepository(dbContext);
 
             Reviews = new ReviewRepository(dbContext);
+            Quotes = new QuoteRepository(dbContext);
 
         }
         //public IEntityrepository EntityRepository {get; private set;}
@@ -34,6 +35,8 @@ namespace AseerAlkotb.Infrastructure.Repositories.Base
 
         public IBookRepository Books { get; private set; }
         public IReviewRepository Reviews { get; private set; }
+
+        public IQuoteRepository Quotes { get; private set; }
 
         public IPublisherRepository Publishers { get; private set; }
 
