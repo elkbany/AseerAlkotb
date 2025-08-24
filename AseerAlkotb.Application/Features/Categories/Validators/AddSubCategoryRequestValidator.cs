@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AseerAlkotb.Application.Features.Categories.Requests;
+﻿using AseerAlkotb.Application.Features.Categories.Requests;
 using FluentValidation;
+using AseerAlkotb.Application.ResponseHandler; // للـ ValidationExtensions
+using AseerAlkotb.Domain.Resources;
+using Microsoft.Extensions.Localization;
 
 namespace AseerAlkotb.Application.Features.Categories.Validators
 {
@@ -13,20 +11,18 @@ namespace AseerAlkotb.Application.Features.Categories.Validators
         public AddSubCategoryRequestValidator()
         {
             RuleFor(x => x.Name)
-                .NotEmpty()
-                .Length(2, 100)
-                .Matches(@"^[a-zA-Z\u0600-\u06FF\s]+$");
+                .NotEmpty().L("SubCategory", "Name", "Required")
+                .Length(2, 100).L("SubCategory", "Name", "MustBeBetween", "2", "100")
+                .Matches(@"^[a-zA-Z\u0600-\u06FF\s]+$").L("SubCategory", "Name", "LettersOnly");
 
             RuleFor(x => x.ParentCategoryId)
-                .GreaterThan(0)
-                .WithMessage("ParentCategoryId is required and must be greater than 0");
+                .GreaterThan(0).L("ParentCategory", "Id", "MustBeGreaterThan" , "0");
+
             RuleFor(x => x.Description)
-                .MaximumLength(1000)
-                .WithMessage("Description must not exceed 1000 characters");
+                .MaximumLength(1000).L("Description", "MaxLength", "1000");
 
             RuleFor(x => x.IsActive)
-                .NotNull()
-                .WithMessage("IsActive status must be specified");
+                .NotNull().L("IsActive", "Required");
         }
     }
 }

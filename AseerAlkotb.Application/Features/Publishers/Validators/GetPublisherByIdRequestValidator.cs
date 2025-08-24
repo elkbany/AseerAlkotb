@@ -1,10 +1,8 @@
 ﻿using AseerAlkotb.Application.Features.Publishers.Requests;
 using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using AseerAlkotb.Application.ResponseHandler; // للـ Extension L
+using AseerAlkotb.Domain.Resources;
+using Microsoft.Extensions.Localization;
 
 namespace AseerAlkotb.Application.Features.Publishers.Validators
 {
@@ -15,8 +13,7 @@ namespace AseerAlkotb.Application.Features.Publishers.Validators
             RuleFor(x => x.Id)
                 .NotEmpty()
                 .GreaterThan(0)
-                .WithMessage("Publisher ID must be greater than 0");
+                .L("Publisher", "Id" ,"MustBeGreaterThan" , "0");
         }
-
     }
 }

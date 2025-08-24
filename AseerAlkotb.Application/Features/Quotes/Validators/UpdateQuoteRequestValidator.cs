@@ -1,10 +1,6 @@
 ﻿using AseerAlkotb.Application.Features.Quotes.Requests;
+using AseerAlkotb.Application.ResponseHandler;
 using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AseerAlkotb.Application.Features.Quotes.Validators
 {
@@ -12,11 +8,15 @@ namespace AseerAlkotb.Application.Features.Quotes.Validators
     {
         public UpdateQuoteRequestValidator()
         {
-            RuleFor(x => x.Id).NotNull().WithMessage("Quote Id can not be empty.");
+            RuleFor(x => x.Id)
+                .NotNull()
+                .L("Quote" , "Id", "NotEmpty");
 
             RuleFor(x => x.Comment)
-                .NotEmpty().WithMessage("Comment is required.")
-                .MaximumLength(1000).WithMessage("Comment must not exceed 1000 characters.");
+                .NotEmpty()
+                .L("Quote" , "Comment", "Required")
+                .MaximumLength(1000)
+                .L("Quote" , "Comment", "MaxLength", "1000");
         }
     }
 }

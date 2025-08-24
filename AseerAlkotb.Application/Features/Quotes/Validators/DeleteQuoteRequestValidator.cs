@@ -1,10 +1,6 @@
 ﻿using AseerAlkotb.Application.Features.Quotes.Requests;
+using AseerAlkotb.Application.ResponseHandler;
 using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AseerAlkotb.Application.Features.Quotes.Validators
 {
@@ -12,7 +8,9 @@ namespace AseerAlkotb.Application.Features.Quotes.Validators
     {
         public DeleteQuoteRequestValidator()
         {
-            RuleFor(x => x.Id).NotNull().WithMessage("Quote Id can not be empty");
+            RuleFor(x => x.Id)
+                .NotNull()
+                .L("Quote", "Required");
         }
     }
 }

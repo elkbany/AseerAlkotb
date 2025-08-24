@@ -1,23 +1,31 @@
 ﻿using AseerAlkotb.Domain.Entites.Models;
+using AseerAlkotb.Domain.Resources;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
 //using Microsoft.AspNetCore.Hosting;  // For IWebHostEnvironment
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Localization;
 namespace AseerAlkotb.Application.Services
 {
     public abstract class AppService
     {
         private readonly IServiceProvider serviceProvider;
         private readonly IHostEnvironment _environment;
-       
+
+        private IStringLocalizer<SharedResources>? _localizer;
+
+        protected IStringLocalizer<SharedResources> _stringLocalizer =>
+            _localizer ??= serviceProvider.GetRequiredService<IStringLocalizer<SharedResources>>();
+
+
 
         protected AppService(IServiceProvider serviceProvider, IHostEnvironment environment)
         {
             this.serviceProvider = serviceProvider;
             _environment = environment;
-          
+           
         }
         #region Validate Async
         protected async Task DoValidationAsync<TValidator, TRequest>(TRequest request, params object[] constructorParameters)

@@ -37,7 +37,7 @@ namespace AseerAlkotb.Application.Services
                 var book = await unitOfWork.Books.AnyAsync(b => b.Id == request.BookId.Value);
                 if (!book)
                 {
-                    return BadRequest<AddQuoteResponse>("Book not found");
+                    return BadRequest<AddQuoteResponse>($"{_stringLocalizer["Book"]} {_stringLocalizer["NotFound"]}");
                 }
             }
 
@@ -46,7 +46,7 @@ namespace AseerAlkotb.Application.Services
                 var author = await unitOfWork.Authors.AnyAsync(a => a.Id == request.AuthorId.Value);
                 if (!author)
                 {
-                    return BadRequest<AddQuoteResponse>("Author not found");
+                    return BadRequest<AddQuoteResponse>($"{_stringLocalizer["Author"]} {_stringLocalizer["NotFound"]}");
                 }
             }
             var quote = request.Adapt<Quote>();
@@ -67,7 +67,7 @@ namespace AseerAlkotb.Application.Services
             var quote = await unitOfWork.Quotes.FirstOrDefaultAsync(q => q.Id == request.Id);
             if (quote == null)
             {
-                return NotFound<UpdateQuoteResponse>("Quote not found");
+                return NotFound<UpdateQuoteResponse>($"{_stringLocalizer["Quote"]} {_stringLocalizer["NotFound"]}");
             }
             request.Adapt(quote);
             unitOfWork.Quotes.Update(quote);
@@ -82,7 +82,7 @@ namespace AseerAlkotb.Application.Services
             var quote = await unitOfWork.Quotes.FirstOrDefaultAsync(q => q.Id == request.Id);
             if (quote == null)
             {
-                return NotFound<DeleteQuoteResponse>("Quote not found");
+                return NotFound<DeleteQuoteResponse>($"{_stringLocalizer["Quote"]} {_stringLocalizer["NotFound"]}");
             }
             unitOfWork.Quotes.Delete(quote);
             await unitOfWork.CommitAsync();
@@ -95,7 +95,7 @@ namespace AseerAlkotb.Application.Services
             var quote = await unitOfWork.Quotes.FirstOrDefaultAsync(q => q.Id == request.Id , default , r => r.Book, r => r.Author , r => r.User);
             if (quote == null)
             {
-                return NotFound<GetQuoteByIdResponse>("Quote not found");
+                return NotFound<GetQuoteByIdResponse>($"{_stringLocalizer["Quote"]} {_stringLocalizer["NotFound"]}");
             }
             var response = quote.Adapt<GetQuoteByIdResponse>();
             return Success(response);

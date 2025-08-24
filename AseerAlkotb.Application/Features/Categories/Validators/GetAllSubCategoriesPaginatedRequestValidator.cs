@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using AseerAlkotb.Application.Features.Categories.Requests;
+﻿using AseerAlkotb.Application.Features.Categories.Requests;
 using FluentValidation;
+using AseerAlkotb.Application.ResponseHandler; // عشان الـ Extension L
+using AseerAlkotb.Domain.Resources;
+using Microsoft.Extensions.Localization;
+using System.Text.RegularExpressions;
 
 namespace AseerAlkotb.Application.Features.Categories.Validators
 {
@@ -15,24 +13,24 @@ namespace AseerAlkotb.Application.Features.Categories.Validators
         {
             RuleFor(x => x.ParentCategoryId)
                 .GreaterThan(0)
-                .WithMessage("ParentCategoryId must be greater than 0");
+                .L("ParentCategoryId", "MustBeGreaterThanZero");
 
             RuleFor(x => x.PageNumber)
                 .GreaterThan(0)
-                .WithMessage("Page number must be greater than 0");
+                .L("PageNumber", "MustBeGreaterThan" , "0");
 
             RuleFor(x => x.PageSize)
                 .GreaterThan(0)
-                .WithMessage("Page size must be greater than 0")
+                .L("PageSize", "MustBeGreaterThan" , "0")
                 .LessThanOrEqualTo(100)
-                .WithMessage("Page size cannot exceed 100 records");
+                .L("PageSize", "CannotExceed", "100");
 
             RuleFor(x => x.Search)
                 .MaximumLength(100)
-                .WithMessage("Search term cannot exceed 100 characters")
+                .L("Search", "MaxLength", "100")
                 .Must(BeValidSearchTerm)
                 .When(x => !string.IsNullOrWhiteSpace(x.Search))
-                .WithMessage("Search term contains invalid characters");
+                .L("Search", "Invalid" , "Characters");
         }
 
         private bool BeValidSearchTerm(string search)
