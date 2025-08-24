@@ -25,6 +25,12 @@ namespace AseerAlkotb.Infrastructure.Repositories.Implementations
         {
             return _context.Books.AsQueryable();
         }
+        public async Task<List<Book>> GetByIdsAsync(IEnumerable<int> ids)
+        {
+            return await _dbContext.Books
+                .Where(b => ids.Contains(b.Id))
+                .ToListAsync();
+        }
 
     }
 }

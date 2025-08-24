@@ -38,22 +38,69 @@ namespace AseerAlkotb.Infrastructure.Repositories.Base
             return await query.FirstOrDefaultAsync(cancellationToken);
         }
 
-        public async Task<List<TEntity>> GetAllAsync(CancellationToken cancellationToken = default,
-            params Expression<Func<TEntity, object>>[] includes)
+        public IQueryable<TEntity> GetAllAsyncByEx(Expression<Func<TEntity, bool>>? criteria,
+           int? skip, int? take,
+           CancellationToken cancellationToken = default,
+           params Expression<Func<TEntity, object>>[] includes)
         {
-            var query = Includes(_table, includes);
-            return await query.ToListAsync(cancellationToken);
+            IQueryable<TEntity> query = _table;
+
+            if (criteria != null)
+                query = query.Where(criteria);
+
+            query = Includes(query, includes);
+
+            if (skip.HasValue)
+                query = query.Skip(skip.Value);
+
+            if (take.HasValue)
+                query = query.Take(take.Value);
+
+            return  query;
         }
 
         // 🔥 Fixed: Correct pagination implementation
-        public async Task<List<TEntity>> GetAllAsync(int skip, int take,
+        public IQueryable<TEntity> GetAllAsync(int skip, int take,
             CancellationToken cancellationToken = default,
             params Expression<Func<TEntity, object>>[] includes)
         {
             var query = Includes(_table, includes);
-            return await query.Skip(skip).Take(take).ToListAsync(cancellationToken);
+            return query.Skip(skip).Take(take);
         }
+        //public IQueryable<TEntity> GetAllQuerable(
+        //          int? skip, int? take,
+        //          CancellationToken cancellationToken = default,
+        //          params Expression<Func<TEntity, object>>[] includes)
+        //{
+        //    IQueryable<TEntity> query = _table;
 
+        //    query = Includes(query, includes);
+
+        //    if (skip.HasValue)
+        //        query = query.Skip(skip.Value);
+
+        //    if (take.HasValue)
+        //        query = query.Take(take.Value);
+
+        //    return query;
+        //}
+        //public IQueryable<TEntity> GetAllQuerableByUser(
+        //        int? skip, int? take,
+        //        CancellationToken cancellationToken = default,
+        //        params Expression<Func<TEntity, object>>[] includes)
+        //{
+        //    IQueryable<TEntity> query = _table;
+
+        //    query = Includes(query, includes);
+
+        //    if (skip.HasValue)
+        //        query = query.Skip(skip.Value);
+
+        //    if (take.HasValue)
+        //        query = query.Take(take.Value);
+
+        //    return query;
+        //}
         public async Task<List<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>>? criteria,
             int? skip, int? take,
             CancellationToken cancellationToken = default,

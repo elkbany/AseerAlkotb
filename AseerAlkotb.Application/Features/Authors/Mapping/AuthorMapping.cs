@@ -53,6 +53,35 @@ namespace AseerAlkotb.Application.Features.Authors.Mapping
             config.NewConfig<Author, DeleteAuthorResponse>();
             config.NewConfig<UpdateAuthorRequest, Author>();
             config.NewConfig<Author, UpdateAuthorResponse>();
+
+
+            ////////////////////////////////////////Following///////////////////////////////////////////
+            config.NewConfig<UserFollow, FollowAutherResponse>();
+            config.NewConfig<UserFollow, UnFollowAuthorResponse>();
+
+            TypeAdapterConfig<Author, GetFollowedAuthorResponse>
+            .NewConfig()
+            .Map(dest => dest.AuthorId, src => src.Id)
+            .Map(dest => dest.Name, src => src.Name)
+            .Map(dest => dest.ImageUrl, src => src.ImageUrl);
+
+            TypeAdapterConfig<User, GetFollowersAuthorResponse> // what need return
+            .NewConfig()
+            .Map(dest => dest.UserId, src => src.Id);
+            
+
+
+            //TypeAdapterConfig<UserFollow,GetAutherFollowerCountResponse>
+            //.NewConfig()
+            //.Map(dest => dest.AuthorId, src => src.AuthorId)
+            //.Map(dest => dest.FollowerCount, src => src.Author.Followers.Count());
+
+            ////TypeAdapterConfig<IGrouping<int, UserFollow>, GetAutherFollowerCountResponse>
+            ////.NewConfig()
+            ////.Map(dest => dest.AuthorId, src => src.Key)
+            ////.Map(dest => dest.FollowerCount, src => src.Count());
+
+
         }
     }
 }

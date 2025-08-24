@@ -1,4 +1,5 @@
-﻿using AseerAlkotb.Application.Features.Publishers.Requests;
+﻿using AseerAlkotb.Application.Features.Authors.Responses;
+using AseerAlkotb.Application.Features.Publishers.Requests;
 using AseerAlkotb.Application.Features.Publishers.Response;
 using AseerAlkotb.Domain.Entites.Models;
 using Mapster;
@@ -27,6 +28,20 @@ namespace AseerAlkotb.Application.Features.Publishers.Mapping
             config.NewConfig<Publisher, UpdatePublisherResponse>();
             config.NewConfig<Publisher, DeletePublisherResponse>();
             config.NewConfig<Publisher, GetAllPublisherPaginatedResponse>();
+
+            ////////////////////////////////////////Following///////////////////////////////////////////
+            config.NewConfig<UserFollow, FollowPublisherResponse>();
+            config.NewConfig<UserFollow, UnFollowPublisherResponse>();
+
+            TypeAdapterConfig<Publisher, GetFollowedPublisherResponse>
+            .NewConfig()
+            .Map(dest => dest.PublisherId, src => src.Id)
+            .Map(dest => dest.Name, src => src.Name)
+            .Map(dest => dest.LogoUrl, src => src.LogoUrl);
+
+            TypeAdapterConfig<User, GetFollowersPublisherResponse> // what need return
+            .NewConfig()
+            .Map(dest => dest.UserId, src => src.Id);
 
         }
     }
