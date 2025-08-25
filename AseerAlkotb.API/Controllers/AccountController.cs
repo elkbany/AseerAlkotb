@@ -55,5 +55,6 @@ namespace AseerAlkotb.API.Controllers
             var result = await accountServices.GetProfile(request);
             return Ok(result);
         }
+
     }
 }

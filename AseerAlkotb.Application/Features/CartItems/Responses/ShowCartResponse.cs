@@ -12,7 +12,10 @@ namespace AseerAlkotb.Application.Features.CartItem.Responses
         int Id,
         int UserId,
         IEnumerable<CartItemResponse> Items,
-        decimal SumTotalPrice
+        decimal SumTotalPrice,
+        decimal SumDiscountedPrice,
+        int TotalItemsCount 
+
     );
     
 }

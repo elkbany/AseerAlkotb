@@ -33,7 +33,7 @@ namespace AseerAlkotb.Application.Features.Account.Validator
             RuleFor(x => x.Email)
                 .NotEmpty().WithMessage("Email is required")
                 .EmailAddress().WithMessage("A valid email is required")
-                .MaximumLength(100).WithMessage("Email cannot exceed 100 characters")
+                .MaximumLength(100).WithMessage("Email cannot exceed 100 characters");
                 //.Matches(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").WithMessage("Email format is invalid");
 
             RuleFor(x => x.Password)

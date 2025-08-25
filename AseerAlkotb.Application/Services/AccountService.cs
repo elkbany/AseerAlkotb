@@ -57,6 +57,14 @@ namespace AseerAlkotb.Application.Services
                 //return BadRequest<RegisterResponse>(errors);
             }
 
+            //add role to the new user
+            var addRole = await userManager.AddToRoleAsync(newAccount, "Client");
+            if (!addRole.Succeeded)
+            {
+                return BadRequest<RegisterResponse>("Failed to assign role to user");
+                //return BadRequest<RegisterResponse>(addRole.Errors.Select(e => e.Description).ToList());
+            }
+
             //add cart for the new user
             var cart =new Cart()
             {
@@ -64,6 +72,8 @@ namespace AseerAlkotb.Application.Services
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
+            await unitOfWork.Carts.InsertAsync(cart);
+            await unitOfWork.CommitAsync();
             var response= newAccount.Adapt<RegisterResponse>();
             return Success(response);
 
@@ -173,5 +183,7 @@ namespace AseerAlkotb.Application.Services
             return Success(response);
 
         }
+
+       
     }
 }
