@@ -270,4 +270,16 @@
   <data name="range" xml:space="preserve">
     <value>range</value>
   </data>
+  <data name="Comment" xml:space="preserve">
+    <value>Comment</value>
+  </data>
+  <data name="Required" xml:space="preserve">
+    <value>Required</value>
+  </data>
+  <data name="CannotExceed" xml:space="preserve">
+    <value>Cannot exceed</value>
+  </data>
+  <data name="Characters" xml:space="preserve">
+    <value>characters</value>
+  </data>
 </root>

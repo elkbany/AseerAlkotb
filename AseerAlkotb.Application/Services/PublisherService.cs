@@ -8,7 +8,7 @@ using AseerAlkotb.Application.Features.Publishers.Validators;
 using AseerAlkotb.Application.ResponseHandler;
 using AseerAlkotb.Domain.Entites.Models;
 using AseerAlkotb.Domain.Interfaces.Base;
-using AseerAlkotb.Domain.Resources;
+using AseerAlkotb.Localization.Resources;
 using Mapster;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Localization;

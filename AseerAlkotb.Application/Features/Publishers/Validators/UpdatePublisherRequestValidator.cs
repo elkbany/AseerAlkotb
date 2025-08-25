@@ -1,7 +1,7 @@
 ﻿using AseerAlkotb.Application.Features.Publishers.Requests;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
-using AseerAlkotb.Domain.Resources;
+using AseerAlkotb.Localization.Resources;
 using Microsoft.Extensions.Localization;
 using AseerAlkotb.Application.ResponseHandler;
 

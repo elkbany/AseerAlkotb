@@ -87,17 +87,15 @@ namespace AseerAlkotb.Infrastructure.Context
         public DbSet<Publisher> Publishers { get; set; }
         public DbSet<Review> Reviews { get; set; }
         public DbSet<Wishlist> Wishlists { get; set; }
-<<<<<<< HEAD
+
         public DbSet<Quote> Quotes { get; set; }
 
 
-=======
         public DbSet<WishlistItem> WishlistItems { get; set; }
         public DbSet<UserFollow> UserFollows { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<LikeDisLike> LikeDisLikes { get; set; }
         public override DbSet<User> Users { get; set; }
->>>>>>> 44eb7d1b58575d970a9903428ade810eb1c279d2
     }
 }

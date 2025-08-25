@@ -1,7 +1,7 @@
 ﻿using AseerAlkotb.Application.Features.Categories.Requests;
 using FluentValidation;
 using AseerAlkotb.Application.ResponseHandler; // للـ ValidationExtensions
-using AseerAlkotb.Domain.Resources;
+using AseerAlkotb.Localization.Resources;
 using Microsoft.Extensions.Localization;
 
 namespace AseerAlkotb.Application.Features.Categories.Validators

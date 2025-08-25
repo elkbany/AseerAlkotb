@@ -1,7 +1,7 @@
 ﻿using AseerAlkotb.Application.Features.Categories.Requests;
 using FluentValidation;
 using AseerAlkotb.Application.ResponseHandler; // عشان الـ Extension L
-using AseerAlkotb.Domain.Resources;
+using AseerAlkotb.Localization.Resources;
 using Microsoft.Extensions.Localization;
 using System.Text.RegularExpressions;
 

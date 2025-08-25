@@ -1,5 +1,5 @@
 ﻿using AseerAlkotb.Domain.Entites.Models;
-using AseerAlkotb.Domain.Resources;
+using AseerAlkotb.Localization.Resources;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 //using Microsoft.AspNetCore.Hosting;  // For IWebHostEnvironment
@@ -7,6 +7,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Localization;
+using AseerAlkotb.Application.ResponseHandler;
+
 namespace AseerAlkotb.Application.Services
 {
     public abstract class AppService
@@ -19,26 +21,16 @@ namespace AseerAlkotb.Application.Services
         protected IStringLocalizer<SharedResources> _stringLocalizer =>
             _localizer ??= serviceProvider.GetRequiredService<IStringLocalizer<SharedResources>>();
 
-
-
         protected AppService(IServiceProvider serviceProvider, IHostEnvironment environment)
         {
             this.serviceProvider = serviceProvider;
             _environment = environment;
-           
         }
+
         #region Validate Async
         protected async Task DoValidationAsync<TValidator, TRequest>(TRequest request, params object[] constructorParameters)
         where TValidator : AbstractValidator<TRequest>
         {
-            //var validator = serviceProvider.GetRequiredService<TValidator>();
-            //var result = await validator.ValidateAsync(request);
-
-            //if (!result.IsValid)
-            //{
-            //    throw new ValidationException(result.Errors);
-            //}
-
             var instance = (TValidator)Activator.CreateInstance(typeof(TValidator), constructorParameters)!;
 
             var validateResult = await instance.ValidateAsync(request);
@@ -47,8 +39,8 @@ namespace AseerAlkotb.Application.Services
                 throw new ValidationException(validateResult.Errors);
             }
         }
-
         #endregion
+
         #region Uploading Files
         public async Task<string> UploadImageAsync(IFormFile imageFile, string folder)
         {
@@ -109,7 +101,6 @@ namespace AseerAlkotb.Application.Services
             return false;
         }
 
-
         public async Task<string> UpdateImageAsync(IFormFile newImage, string oldImageUrl, string folder)
         {
             // Upload new image
@@ -124,28 +115,6 @@ namespace AseerAlkotb.Application.Services
             return newImageUrl;
         }
 
-        //public bool IsValidImage(IFormFile file)
-        //{
-        //    if (file == null || file.Length == 0)
-        //        return false;
-
-        //    // Check file size
-        //    if (file.Length > )
-        //        return false;
-
-        //    // Check extension
-        //    var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-        //    if (!_allowedExtensions.Contains(extension))
-        //        return false;
-
-        //    // Check content type
-        //    var allowedContentTypes = new[] { "image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp" };
-        //    if (!allowedContentTypes.Contains(file.ContentType.ToLowerInvariant()))
-        //        return false;
-
-        //    return true;
-        //}
-
         private string GenerateUniqueFileName(string originalFileName)
         {
             var extension = Path.GetExtension(originalFileName);
@@ -154,7 +123,6 @@ namespace AseerAlkotb.Application.Services
         }
         #endregion
     }
-
 }
 
   

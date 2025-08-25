@@ -111,8 +111,8 @@ namespace AseerAlkotb.Infrastructure.Data
             new { BookId = 2, CategoryId = 2 },
             new { BookId = 3, CategoryId = 1 },
             new { BookId = 3, CategoryId = 3 }
-<<<<<<< HEAD
-);
+
+
 
             //modelBuilder.Entity<Quote>().HasData(
             //    new Quote
@@ -147,7 +147,7 @@ namespace AseerAlkotb.Infrastructure.Data
             //    }
 
             //);
-=======
+
             );
 
             // Users
@@ -184,7 +184,6 @@ namespace AseerAlkotb.Infrastructure.Data
         //        TrackingNumber = "TRK987654321",
         //    }
         //);
->>>>>>> 44eb7d1b58575d970a9903428ade810eb1c279d2
         }
     }
 }

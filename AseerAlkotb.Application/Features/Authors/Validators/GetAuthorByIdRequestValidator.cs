@@ -1,6 +1,6 @@
 ﻿using AseerAlkotb.Application.Features.Authors.Requests;
 using AseerAlkotb.Application.ResponseHandler;
-using AseerAlkotb.Domain.Resources;
+using AseerAlkotb.Localization.Resources;
 using FluentValidation;
 
 namespace AseerAlkotb.Application.Features.Authors.Validators

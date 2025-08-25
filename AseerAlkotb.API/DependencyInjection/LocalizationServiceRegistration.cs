@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Localization;
 using System.Globalization;
+using AseerAlkotb.Localization.Resources;
 
 namespace AseerAlkotb.API.DependencyInjection
 {
@@ -8,14 +9,13 @@ namespace AseerAlkotb.API.DependencyInjection
     {
         public static IServiceCollection AddLocalizationServices(this IServiceCollection services)
         {
-            // 1- Add Localization
-            services.AddLocalization(options => options.ResourcesPath = "Resources");
+            // 1- Add Localization without specifying ResourcesPath since SharedResources is in a different project
+            services.AddLocalization();
 
             // 2- Add Controllers with Localization
             services.AddControllers()
                     .AddDataAnnotationsLocalization()
                     .AddViewLocalization();
-
 
 
             return services;

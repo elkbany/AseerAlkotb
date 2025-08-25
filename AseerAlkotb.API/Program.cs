@@ -7,21 +7,17 @@ using AseerAlkotb.Application.Services;
 using AseerAlkotb.Domain.Entites.Models;
 using AseerAlkotb.Domain.Interfaces.Base;
 using AseerAlkotb.Domain.Interfaces.Repositories;
-<<<<<<< HEAD
-using AseerAlkotb.Domain.Resources;
-=======
->>>>>>> 44eb7d1b58575d970a9903428ade810eb1c279d2
+using AseerAlkotb.Localization.Resources;
+
 using AseerAlkotb.Infrastructure.Context;
 using AseerAlkotb.Infrastructure.Repositories.Base;
 using AseerAlkotb.Infrastructure.Repositories.Implementations;
 using Mapster;
-<<<<<<< HEAD
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Localization;
 
-=======
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
@@ -36,7 +32,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 using System.Reflection;
->>>>>>> 44eb7d1b58575d970a9903428ade810eb1c279d2
 namespace AseerAlkotb.API
 {
     public class Program
@@ -52,14 +47,13 @@ namespace AseerAlkotb.API
                 options.UseSqlServer(connectionString).UseLazyLoadingProxies();
             });
             #endregion
-<<<<<<< HEAD
 
             #region Localization
             builder.Services.AddLocalizationServices();
+            builder.Services.AddHttpContextAccessor();
             #endregion
 
-            #region Repositories
-=======
+        
             #region Identity Registration
             builder.Services.AddIdentity<User, IdentityRole<int>>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
@@ -86,16 +80,14 @@ namespace AseerAlkotb.API
                 
             #endregion
             #region Repositories Registerations
->>>>>>> 44eb7d1b58575d970a9903428ade810eb1c279d2
             builder.Services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IAuthorRepository, AuthorRepository>();
             builder.Services.AddScoped<IBookRepository, BookRepository>();
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-<<<<<<< HEAD
             builder.Services.AddScoped<IPublisherRepository, PublisherRepository>();
             builder.Services.AddScoped<IQuoteRepository, QuoteRepository>();
-=======
+
 
             builder.Services.AddScoped<ICartRepository, CartRepository>();
 
@@ -106,7 +98,6 @@ namespace AseerAlkotb.API
             builder.Services.AddScoped<IOrderRepository, OrderRepository>();
             builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
             builder.Services.AddScoped<IAccountServices, AccountService>();
->>>>>>> 44eb7d1b58575d970a9903428ade810eb1c279d2
             #endregion
 
             #region Services
@@ -116,9 +107,7 @@ namespace AseerAlkotb.API
             builder.Services.AddScoped<ICartServices, CartServices>();
             builder.Services.AddScoped<IReviewServices, ReviewServices>();
             builder.Services.AddScoped<IPublisherServices, PublisherService>();
-<<<<<<< HEAD
             builder.Services.AddScoped<IQuoteService, QuoteService>();
-=======
             builder.Services.AddScoped<IPaymobService, PaymobService>();
             builder.Services.AddScoped<IOrderServices, OrderServices>();
             builder.Services.AddControllers()
@@ -127,7 +116,6 @@ namespace AseerAlkotb.API
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
     });
 
->>>>>>> 44eb7d1b58575d970a9903428ade810eb1c279d2
             #endregion
 
             #region AutoMapper 
@@ -138,7 +126,6 @@ namespace AseerAlkotb.API
             #region Validation
             builder.Services.AddFluentValidationValidators();
 
-<<<<<<< HEAD
             builder.Services.Configure<ApiBehaviorOptions>(options =>
             {
                 options.SuppressModelStateInvalidFilter = true;
@@ -148,12 +135,11 @@ namespace AseerAlkotb.API
             {
                 options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
             });
-=======
+
             #endregion
 
             #region HttpClient Registeration
             builder.Services.AddHttpClient<IPaymobService, PaymobService>();
->>>>>>> 44eb7d1b58575d970a9903428ade810eb1c279d2
             #endregion
 
             #region Cors
@@ -202,19 +188,18 @@ namespace AseerAlkotb.API
             app.UseLocalizationConfiguration();
             #endregion
 
-            // ? Initialize LocalizerProvider correctly
+            // Initialize LocalizerProvider correctly
             using (var scope = app.Services.CreateScope())
             {
                 var localizer = scope.ServiceProvider.GetRequiredService<IStringLocalizer<SharedResources>>();
-                LocalizerProvider.Init(localizer);
+                var httpContextAccessor = scope.ServiceProvider.GetRequiredService<IHttpContextAccessor>();
+                LocalizerProvider.Init(localizer, httpContextAccessor);
             }
 
             app.UseHttpsRedirection();
-<<<<<<< HEAD
-=======
+
 
             app.UseAuthentication();
->>>>>>> 44eb7d1b58575d970a9903428ade810eb1c279d2
             app.UseAuthorization();
             app.MapControllers();
 

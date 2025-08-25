@@ -270,4 +270,16 @@
   <data name="range" xml:space="preserve">
     <value>ما بين</value>
   </data>
+  <data name="Comment" xml:space="preserve">
+    <value>التعليق</value>
+  </data>
+  <data name="Required" xml:space="preserve">
+    <value>مطلوب</value>
+  </data>
+  <data name="CannotExceed" xml:space="preserve">
+    <value>لا يمكن أن يتجاوز</value>
+  </data>
+  <data name="Characters" xml:space="preserve">
+    <value>أحرف</value>
+  </data>
 </root>
