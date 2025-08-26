@@ -157,7 +157,8 @@ namespace AseerAlkotb.Application.Services
                 query = query.Where(b => b.Categories.Any(c => request.CategoryIds.Contains(c.Id)));
 
             // فلتر الناشرين
-            query = query.Where(b => b.PublisherId.HasValue && request.PublisherIds.Contains(b.PublisherId.Value));
+            if (request.PublisherIds is not null && request.PublisherIds.Any())
+                query = query.Where(b => b.PublisherId.HasValue && request.PublisherIds.Contains(b.PublisherId.Value));
 
 
             // الترتيب
