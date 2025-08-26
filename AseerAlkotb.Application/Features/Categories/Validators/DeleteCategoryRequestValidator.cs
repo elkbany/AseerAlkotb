@@ -1,10 +1,8 @@
 ﻿using AseerAlkotb.Application.Features.Categories.Requests;
 using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using AseerAlkotb.Application.ResponseHandler; // للـ ValidationExtensions
+using AseerAlkotb.Localization.Resources;
+using Microsoft.Extensions.Localization;
 
 namespace AseerAlkotb.Application.Features.Categories.Validators
 {
@@ -13,9 +11,8 @@ namespace AseerAlkotb.Application.Features.Categories.Validators
         public DeleteCategoryRequestValidator()
         {
             RuleFor(x => x.Id)
-                .NotEmpty()
-                .GreaterThan(0)
-                .WithMessage("Category ID must be greater than 0");
+                .NotEmpty().L("Category", "Id", "Required")
+                .GreaterThan(0).L("Category", "Id", "MustBeGreaterThan" , "0");
         }
     }
 }

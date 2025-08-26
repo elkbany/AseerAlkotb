@@ -12,6 +12,9 @@ namespace AseerAlkotb.Domain.Entites.Models
         public bool IsActive { get; set; }
         public virtual ICollection<Book> Books { get; set; } = [];
         public virtual ICollection<Review> Reviews { get; set; } = [];
+
+        public virtual ICollection<Quote> Quotes { get; set; } = [];
+
         public virtual ICollection<UserFollow> Followers { get; set; } = [];
     }
 }

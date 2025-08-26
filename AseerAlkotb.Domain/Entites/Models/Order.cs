@@ -10,12 +10,11 @@ namespace AseerAlkotb.Domain.Entites.Models
         public decimal ShippingCost { get; set; }
         public decimal TaxAmount { get; set; }
         public decimal DiscountAmount { get; set; }
-
-
-
+        public decimal FinalAmount { get; set; } 
         public PaymentMethod PaymentMethod { get; set; }
         public PaymentStatus PaymentStatus { get; set; }
         public EgyptGovernorates Governorate { get; set; }
+        public EgyptCities City { get; set; }
         public OrderStatus Status { get; set; }
         public string TrackingNumber { get; set; } // What i Added Assuming a tracking number for the order
 
@@ -24,7 +23,7 @@ namespace AseerAlkotb.Domain.Entites.Models
         public int UserId { get; set; }
         public virtual User User { get; set; } // Assuming a User entity exists
         public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
-        public int? PaymentId { get; set; } // Assuming a Payment entity exists
+        public int? PaymentId { get; set; } = null; // Assuming a Payment entity exists
         public virtual Payment? Payment { get; set; } 
         #endregion
 

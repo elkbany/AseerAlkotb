@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 
@@ -8,6 +8,7 @@
 
     <title>@ViewData["Title"] - AseerAlkotb Dashboard</title>
 
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
@@ -16,7 +17,9 @@
 
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 
-   
+    <link href="~/lib/select2/css/select2.min.css" rel="stylesheet" />
+
+
 
         <style>
 
@@ -195,6 +198,8 @@
             }
         </style>
 
+
+        @RenderSection("Styles", required: false)
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
@@ -214,7 +219,8 @@
             <!-- SEARCH FORM -->
             <form class="form-inline ml-3">
                 <div class="input-group">
-                    <input class="form-control" type="search" placeholder="Search for books, authors..." aria-label="Search">
+                    <input class="form-control" type="search" placeholder="Search for 
+                                                                           , authors..." aria-label="Search">
                     <div class="input-group-append">
                         <button class="btn btn-primary" type="submit">
                             <i class="fas fa-search"></i>
@@ -287,13 +293,13 @@
                             </a>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="/Books" class="nav-link">
+                                    <a asp-controller="Books" asp-action="Index" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Books List</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="/Books/Create" class="nav-link">
+                                    <a asp-controller="Books" asp-action="Create" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Add New Book</p>
                                     </a>
@@ -302,6 +308,55 @@
                         </li>
                         <li class="nav-item">
                             <a href="#" class="nav-link">
+                                <i class="nav-icon fas fa-users"></i>
+                                <p>
+                                    Authors
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="/Authors" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Authors List</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/Authors/Create" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Add New Author</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="nav-icon fas fa-building"></i>
+                                <p>
+                                    Publishers
+
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="/Publishers" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Publishers List</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/Publishers/Create" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Add New Publisher</p>
+
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+
                                 <i class="nav-icon fas fa-users"></i>
                                 <p>
                                     Authors
