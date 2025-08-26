@@ -16,7 +16,7 @@ namespace AseerAlkotb.Infrastructure.Repositories.Base
     public class UnitOfWork : IUnitOfWork
     {
         private readonly ApplicationDbContext dbContext;
-        private readonly UserManager<User> userManager;
+        //private readonly UserManager<User> userManager;
 
         // Properties - كل property مرة واحدة بس
         public IAuthorRepository Authors { get; private set; }

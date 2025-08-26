@@ -21,19 +21,6 @@ namespace AseerAlkotb.API.Controllers
            _configuration = configuration;
         }
 
-        //[HttpPost("Register")]
-        //public async Task<IActionResult> Register(RegisterRequest request)
-        //{
-        //    var result = await _accountServices.CreateAccount(request);
-        //    //return Ok(result);
-        //    return Ok(new
-        //    {
-        //        Message = "Account created successfully",
-        //        Data = result
-        //    });
-
-        //}
-
         [HttpPost("Register")]
         public async Task<IActionResult> Register(RegisterRequest request)
         {
@@ -71,15 +58,6 @@ namespace AseerAlkotb.API.Controllers
             return Redirect($"{frontendBase}/confirm-email-success");
         }
 
-        //[HttpPost("Login")]
-        //public async Task<IActionResult> Login(LoginRequest request)
-        //{
-        //    var result =await _accountServices.Login(request);
-
-        //    return Ok(result);
-
-
-        //}
 
         [HttpPost("Login")]
         public async Task<IActionResult> Login(LoginRequest request)
@@ -160,9 +138,16 @@ namespace AseerAlkotb.API.Controllers
         [HttpGet("GetProfile")]
         public async Task<IActionResult> GetProfile([FromQuery]GetProfileRequest request)
         {
-            var result = await accountServices.GetProfile(request);
+            var result = await _accountServices.GetProfile(request);
             return Ok(result);
         }
+        [HttpGet("UpdateProfile")]
+        public async Task<IActionResult> UpdateProfile(int userId, UpdateProfileRequest request)
+        {
+            var result = await _accountServices.UpdateProfile(userId, request);
+            return Ok(result);
+        }
+       
 
     }
 }
