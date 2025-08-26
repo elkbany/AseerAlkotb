@@ -15,7 +15,6 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-
 namespace AseerAlkotb.Dashboard
 {
     public class Program
