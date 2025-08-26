@@ -16,6 +16,7 @@ namespace AseerAlkotb.Infrastructure.Repositories.Base
     public class UnitOfWork : IUnitOfWork
     {
         private readonly ApplicationDbContext dbContext;
+        //private readonly UserManager<User> userManager;
 
         // Properties - كل property مرة واحدة بس
         public IAuthorRepository Authors { get; private set; }
@@ -29,6 +30,7 @@ namespace AseerAlkotb.Infrastructure.Repositories.Base
         public IOrderRepository Orders { get; private set; }
         public IPaymentRepository Payments { get; private set; }
         public INotificationRepository Notifications { get; private set; }
+        public IAccountRepository Account { get; private set; }
 
         public UnitOfWork(ApplicationDbContext dbContext)
         {
@@ -46,6 +48,9 @@ namespace AseerAlkotb.Infrastructure.Repositories.Base
             Wishlists = new WishlistRepository(dbContext);
             Payments = new PaymentRepository(dbContext);
             Notifications = new NotificationRepository(dbContext);
+            Account = new AccountRepository(dbContext);
+            //Users = new UserStore(dbContext);
+
         }
 
         public async Task<int> CommitAsync()
