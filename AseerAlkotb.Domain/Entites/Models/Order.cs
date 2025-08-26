@@ -23,7 +23,7 @@ namespace AseerAlkotb.Domain.Entites.Models
         public int UserId { get; set; }
         public virtual User User { get; set; } // Assuming a User entity exists
         public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
-        public int? PaymentId { get; set; } = null; // Assuming a Payment entity exists
+        public int? PayId { get; set; }
         public virtual Payment? Payment { get; set; } 
         #endregion
 
