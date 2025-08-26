@@ -1,28 +1,22 @@
 using AseerAlkotb.API.Extensions;
 using AseerAlkotb.API.Middlewares;
 using AseerAlkotb.Application.Contracts;
+using AseerAlkotb.Application.Contracts.External;
 using AseerAlkotb.Application.Services;
 using AseerAlkotb.Domain.Entites.Models;
 using AseerAlkotb.Domain.Interfaces.Base;
 using AseerAlkotb.Domain.Interfaces.Repositories;
 using AseerAlkotb.Infrastructure.Context;
+using AseerAlkotb.Infrastructure.ExternalServices;
 using AseerAlkotb.Infrastructure.Repositories.Base;
 using AseerAlkotb.Infrastructure.Repositories.Implementations;
 using Mapster;
-using MapsterMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
-using AseerAlkotb.Domain.Entites.Models;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection;
-using AseerAlkotb.Application.Features.Account.Validator;
-using FluentValidation;
-using AseerAlkotb.Application.Features.Account.Requests;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-
-using System.Reflection;
 namespace AseerAlkotb.API
 {
     public class Program
@@ -40,8 +34,15 @@ namespace AseerAlkotb.API
             #endregion
             #region Identity Registration
             builder.Services.AddIdentity<User, IdentityRole<int>>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
-            //.AddDefaultTokenProviders();
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                // Gnerates the default token providers for password reset, email confirmation, etc.
+                .AddDefaultTokenProviders();
+
+            builder.Services.Configure<IdentityOptions>(options =>
+            {
+                // User Cannot Login without confirming email
+                options.SignIn.RequireConfirmedEmail = true;
+            });
 
             builder.Services.AddAuthentication(options =>
             {
@@ -90,6 +91,8 @@ namespace AseerAlkotb.API
             builder.Services.AddScoped<IPublisherServices, PublisherService>();
             builder.Services.AddScoped<IPaymobService, PaymobService>();
             builder.Services.AddScoped<IOrderServices, OrderServices>();
+            builder.Services.AddScoped<IEmailService, EmailService>();
+
             builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
