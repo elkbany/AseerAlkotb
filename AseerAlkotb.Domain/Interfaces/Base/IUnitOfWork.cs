@@ -26,6 +26,11 @@ namespace AseerAlkotb.Domain.Interfaces.Base
         
         IWishlistRepository Wishlists { get; }
 
+
+        public IQuoteRepository Quotes { get; }
+
+
+
         public IOrderRepository Orders { get; }
         public IPaymentRepository Payments { get; }
         public INotificationRepository Notifications { get; }

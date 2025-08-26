@@ -1,0 +1,278 @@
+﻿@model AseerAlkotb.Application.Features.Books.Responses.UpdateBookResponse
+@{
+    ViewData["Title"] = "Edit Book";
+}
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">Edit Book</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a asp-action="Index">Books</a></li>
+                    <li class="breadcrumb-item active">Edit</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <form asp-action="Edit" enctype="multipart/form-data">
+                    <input type="hidden" asp-for="Id" />
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="row">
+                        <!-- Left Column -->
+                        <div class="col-md-8">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Book Information</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-group">
+                                        <label asp-for="Title" class="control-label"></label>
+                                        <input asp-for="Title" class="form-control" />
+                                        <span asp-validation-for="Title" class="text-danger"></span>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label asp-for="Description" class="control-label"></label>
+                                        <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                                        <span asp-validation-for="Description" class="text-danger"></span>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label asp-for="ISBN" class="control-label">ISBN</label>
+                                                <input asp-for="ISBN" class="form-control" />
+                                                <span asp-validation-for="ISBN" class="text-danger"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label asp-for="Language" class="control-label"></label>
+                                                <select asp-for="Language" class="form-control select2" asp-items="Html.GetEnumSelectList<AseerAlkotb.Domain.Enums.BookLanguage>()"></select>
+                                                <span asp-validation-for="Language" class="text-danger"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label asp-for="Price" class="control-label"></label>
+                                                <div class="input-group">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text">$</span>
+                                                    </div>
+                                                    <input asp-for="Price" class="form-control" />
+                                                </div>
+                                                <span asp-validation-for="Price" class="text-danger"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label asp-for="StockQuantity" class="control-label"></label>
+                                                <input asp-for="StockQuantity" class="form-control" type="number" min="0" />
+                                                <span asp-validation-for="StockQuantity" class="text-danger"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card mt-4">
+                                <div class="card-header">
+                                    <h3 class="card-title">Additional Details</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <!-- Replace the Author dropdown -->
+                                            <div class="form-group">
+                                                <label asp-for="AuthorId" class="control-label">Author</label>
+                                                <select id="authorSelect" class="form-control select2-ajax" data-url="/Books/SearchAuthors">
+                                                </select>
+                                                <input type="hidden" asp-for="AuthorId" id="selectedAuthorId" />
+                                                <span asp-validation-for="AuthorId" class="text-danger"></span>
+                                            </div>
+                                            
+                                            <!-- Replace the Publisher dropdown -->
+                                            <div class="form-group">
+                                                <label asp-for="PublisherId" class="control-label">Publisher</label>
+                                                <select id="publisherSelect" class="form-control select2-ajax" data-url="/Books/SearchPublishers">
+                                                </select>
+                                                <input type="hidden" asp-for="PublisherId" id="selectedPublisherId" />
+                                                <span asp-validation-for="PublisherId" class="text-danger"></span>
+                                            </div>
+                                            
+                                            <!-- Replace the Categories dropdown -->
+                                            <div class="form-group">
+                                                <label asp-for="CategoryIds" class="control-label">Categories</label>
+                                                <select id="categorySelect" class="form-control select2-ajax" multiple data-url="/Books/SearchCategories">
+                                                </select>
+                                                <input type="hidden" name="CategoryIds" id="selectedCategoryIds" />
+                                                <span asp-validation-for="CategoryIds" class="text-danger"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label asp-for="AuthorId" class="control-label">Author</label>
+                                                <select asp-for="AuthorId" class="form-control select2" asp-items="ViewBag.Authors"></select>
+                                                <span asp-validation-for="AuthorId" class="text-danger"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label asp-for="CategoryIds" class="control-label">Categories</label>
+                                        <select asp-for="CategoryIds" class="form-control select2" multiple asp-items="ViewBag.Categories"></select>
+                                        <span asp-validation-for="CategoryIds" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column -->
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Cover Image</h3>
+                                </div>
+                                <div class="card-body">
+                                    @* <img src =""/> *@
+                                    <input type="file" class="custom-file-input" id="CoverImage" name="CoverImage" accept="image/*" onchange="previewImage(this)" />
+
+                                    <div class="form-group">
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" id="CoverImage" name="CoverImage" accept="image/*" onchange="previewImage(this)" />
+                                            <label class="custom-file-label" for="CoverImage">Choose new image</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card mt-4">
+                                <div class="card-header">
+                                    <h3 class="card-title">Publishing Settings</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-group">
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input" asp-for="IsActive" id="isActive">
+                                            <label class="custom-control-label" for="isActive">Active</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="DiscountPercentage" class="control-label"></label>
+                                        <div class="input-group">
+                                            <input asp-for="DiscountPercentage" class="form-control" type="number" min="0" max="100" />
+                                            <div class="input-group-append">
+                                                <span class="input-group-text">%</span>
+                                            </div>
+                                        </div>
+                                        <span asp-validation-for="DiscountPercentage" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mt-4 text-right">
+                        <a asp-action="Index" class="btn btn-secondary mr-2">Cancel</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save mr-1"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Add this to the Scripts section -->
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+    $(document).ready(function() {
+        // Initialize Select2 with AJAX for Authors
+        $('#authorSelect').select2({
+            ajax: {
+                url: function() { return $(this).data('url'); },
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        term: params.term
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 2,
+            placeholder: 'Search for an author...'
+        });
+
+        // Initialize Select2 with AJAX for Publishers
+        $('#publisherSelect').select2({
+            ajax: {
+                url: function() { return $(this).data('url'); },
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        term: params.term
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 2,
+            placeholder: 'Search for a publisher...'
+        });
+
+        // Initialize Select2 with AJAX for Categories
+        $('#categorySelect').select2({
+            ajax: {
+                url: function() { return $(this).data('url'); },
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        term: params.term
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 2,
+            placeholder: 'Search for categories...',
+            multiple: true
+        });
+
+    
+    });
+    </script>
+}
+

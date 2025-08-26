@@ -1,8 +1,147 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@{
+    ViewData["Title"] = "Dashboard";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">Dashboard</h1>
+            </div>
+        </div>
+    </div>
 </div>
+
+<div class="content">
+    <div class="container-fluid">
+        <!-- Statistics Cards -->
+        <div class="row">
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-info">
+                    <div class="inner">
+                        <h3>@ViewBag.TotalBooks</h3>
+                        <p>Total Books</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <a href="/Books" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-success">
+                    <div class="inner">
+                        <h3>@ViewBag.TotalAuthors</h3>
+                        <p>Authors</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <a href="/Authors" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-warning">
+                    <div class="inner">
+                        <h3>@ViewBag.TotalOrders</h3>
+                        <p>New Orders</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <a href="/Orders" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-danger">
+                    <div class="inner">
+                        <h3>@ViewBag.TotalReviews</h3>
+
+                        <p>Categories</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-tags"></i>
+                    </div>
+                    <a href="/Categories" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity and Charts -->
+        <div class="row">
+            <!-- Recent Orders -->
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header border-transparent">
+                        <h3 class="card-title">Recent Orders</h3>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table m-0">
+                                <thead>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Book</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (ViewBag.RecentOrders != null)
+                                    {
+                                        @foreach (var order in ViewBag.RecentOrders)
+                                        {
+                                            <tr>
+                                                <td>@order.Id</td>
+                                                <td>@order.BookTitle</td>
+                                                <td><span class="badge badge-success">@order.Status</span></td>
+                                                <td>@order.OrderDate.ToShortDateString()</td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer clearfix">
+                        <a href="/Orders" class="btn btn-sm btn-info float-right">View All Orders</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recently Added Books -->
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Recently Added Books</h3>
+                    </div>
+                    <div class="card-body p-0">
+                        <ul class="products-list product-list-in-card pl-2 pr-2">
+                            @if (ViewBag.RecentBooks != null)
+                            {
+                                @foreach (var book in ViewBag.RecentBooks)
+                                {
+                                    <li class="item">
+                                        <div class="product-info">
+                                            <a href="/Books/Details/@book.Id" class="product-title">
+                                                @book.Title
+                                                <span class="badge badge-info float-right">@book.Price.ToString("C")</span>
+                                            </a>
+                                            <span class="product-description">
+                                                By @book.Author
+                                            </span>
+                                        </div>
+                                    </li>
+                                }
+                            }
+                        </ul>
+                    </div>
+                    <div class="card-footer text-center">
+                        <a href="/Books" class="uppercase">View All Books</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

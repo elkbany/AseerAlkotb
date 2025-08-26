@@ -3,6 +3,7 @@ using AseerAlkotb.Domain.Entites.Models;
 using AseerAlkotb.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace AseerAlkotb.Infrastructure.Data
 {
@@ -28,12 +29,110 @@ namespace AseerAlkotb.Infrastructure.Data
                 new Publisher { Id = 3, Name = "دار الساقي", Description = "دار نشر لبنانية", ContactEmail = "info3@aseeralkotob.com", CreatedAt = fixedDate, UpdatedAt = fixedDate }
             );
 
+
             // Categories
             modelBuilder.Entity<Category>().HasData(
-                new Category { Id = 1, Name = "روايات", Description = "كتب روائية", IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
-                new Category { Id = 2, Name = "تاريخ", Description = "كتب تاريخية", IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
-                new Category { Id = 3, Name = "علوم", Description = "كتب علمية", IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate }
+                new Category { Id = 1, Name = "روايات", Description = "كتب روائية تشمل الأدب العربي والعالمي", IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Category { Id = 2, Name = "تاريخ", Description = "كتب تاريخية عن الحضارات والشعوب", IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Category { Id = 3, Name = "علوم", Description = "كتب علمية في مجالات متنوعة", IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Category { Id = 4, Name = "تنمية بشرية", Description = "كتب لتطوير الذات والمهارات", IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Category { Id = 5, Name = "كتب دينية", Description = "كتب دينية وفكر إسلامي", IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Category { Id = 6, Name = "أدب", Description = "كتب أدبية تشمل الشعر والنثر", IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Category { Id = 7, Name = "كتب أطفال", Description = "كتب مخصصة للأطفال والناشئة", IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Category { Id = 8, Name = "سياسة", Description = "كتب عن السياسة والعلاقات الدولية", IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Category { Id = 9, Name = "اقتصاد", Description = "كتب اقتصادية ومالية", IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Category { Id = 10, Name = "فلسفة", Description = "كتب فلسفية وفكرية", IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Category { Id = 11, Name = "طبخ", Description = "كتب عن الطبخ والوصفات", IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Category { Id = 12, Name = "سير ذاتية", Description = "سير ذاتية ومذكرات", IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Category { Id = 13, Name = "فنون", Description = "كتب عن الفنون والإبداع", IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Category { Id = 14, Name = "تكنولوجيا", Description = "كتب عن التكنولوجيا والابتكار", IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Category { Id = 15, Name = "طب", Description = "كتب طبية وصحية", IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Category { Id = 16, Name = "رياضة", Description = "كتب عن الرياضة واللياقة البدنية", IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Category { Id = 17, Name = "سفر", Description = "كتب عن السفر والرحلات", IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Category { Id = 18, Name = "إدارة", Description = "كتب عن الإدارة والقيادة", IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Category { Id = 19, Name = "قانون", Description = "كتب قانونية وتشريعات", IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Category { Id = 20, Name = "تعليم", Description = "كتب تعليمية وتربوية", IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate }
             );
+
+            // SubCategories
+            modelBuilder.Entity<Category>().HasData(
+                // فئات فرعية تحت الروايات
+                new Category { Id = 21, Name = "روايات عربية", Description = "روايات مكتوبة باللغة العربية", ParentCategoryId = 1, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Category { Id = 22, Name = "روايات مترجمة", Description = "روايات مترجمة من لغات أخرى", ParentCategoryId = 1, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Category { Id = 23, Name = "روايات بوليسية", Description = "روايات الجريمة والغموض", ParentCategoryId = 1, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Category { Id = 24, Name = "روايات خيال علمي", Description = "روايات في عالم الخيال العلمي", ParentCategoryId = 1, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+
+                // فئات فرعية تحت التاريخ
+                new Category { Id = 25, Name = "تاريخ العالم", Description = "كتب عن تاريخ الحضارات العالمية", ParentCategoryId = 2, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Category { Id = 26, Name = "تاريخ العرب", Description = "كتب عن تاريخ العرب والإسلام", ParentCategoryId = 2, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Category { Id = 27, Name = "تاريخ الحروب", Description = "كتب عن الحروب والصراعات", ParentCategoryId = 2, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+
+                // فئات فرعية تحت العلوم
+                new Category { Id = 28, Name = "علوم طبيعية", Description = "كتب في الفيزياء والكيمياء", ParentCategoryId = 3, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Category { Id = 29, Name = "علوم حيوية", Description = "كتب في البيولوجيا والطب", ParentCategoryId = 3, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Category { Id = 30, Name = "علوم الفلك", Description = "كتب عن الفضاء والكون", ParentCategoryId = 3, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+
+                // فئات فرعية تحت التنمية البشرية
+                new Category { Id = 31, Name = "تطوير الذات", Description = "كتب لتحسين المهارات الشخصية", ParentCategoryId = 4, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Category { Id = 32, Name = "القيادة", Description = "كتب عن مهارات القيادة", ParentCategoryId = 4, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Category { Id = 33, Name = "إدارة الوقت", Description = "كتب عن تنظيم الوقت", ParentCategoryId = 4, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+
+                // فئات فرعية تحت الكتب الدينية
+                new Category { Id = 34, Name = "فكر إسلامي", Description = "كتب عن الفكر والفقه الإسلامي", ParentCategoryId = 5, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Category { Id = 35, Name = "تفسير القرآن", Description = "كتب تفسير القرآن الكريم", ParentCategoryId = 5, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+
+                // فئات فرعية تحت الأدب
+                new Category { Id = 36, Name = "شعر عربي", Description = "دواوين الشعر العربي", ParentCategoryId = 6, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Category { Id = 37, Name = "نثر أدبي", Description = "كتب النثر الأدبي والمقالات", ParentCategoryId = 6, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+
+                // فئات فرعية تحت كتب الأطفال
+                new Category { Id = 38, Name = "قصص أطفال", Description = "قصص مصورة للأطفال", ParentCategoryId = 7, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Category { Id = 39, Name = "كتب تعليمية للأطفال", Description = "كتب تعليمية للناشئة", ParentCategoryId = 7, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+
+                // فئات فرعية تحت السياسة
+                new Category { Id = 40, Name = "علاقات دولية", Description = "كتب عن السياسة العالمية", ParentCategoryId = 8, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Category { Id = 41, Name = "سياسة محلية", Description = "كتب عن السياسة العربية", ParentCategoryId = 8, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+
+                // فئات فرعية تحت الاقتصاد
+                new Category { Id = 42, Name = "اقتصاد كلي", Description = "كتب عن الاقتصاد العام", ParentCategoryId = 9, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Category { Id = 43, Name = "مالية شخصية", Description = "كتب عن إدارة الأموال الشخصية", ParentCategoryId = 9, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+
+                // فئات فرعية تحت الفلسفة
+                new Category { Id = 44, Name = "فلسفة غربية", Description = "كتب عن الفلسفة الغربية", ParentCategoryId = 10, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Category { Id = 45, Name = "فلسفة شرقية", Description = "كتب عن الفلسفة الشرقية", ParentCategoryId = 10, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+
+                // فئات فرعية تحت الطبخ
+                new Category { Id = 46, Name = "مطبخ عربي", Description = "وصفات الطعام العربي", ParentCategoryId = 11, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Category { Id = 47, Name = "مطبخ عالمي", Description = "وصفات من مطابخ العالم", ParentCategoryId = 11, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+
+                // فئات فرعية تحت السير الذاتية
+                new Category { Id = 48, Name = "سير سياسيين", Description = "سير ذاتية لشخصيات سياسية", ParentCategoryId = 12, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Category { Id = 49, Name = "سير فنانين", Description = "سير ذاتية لفنانين ومبدعين", ParentCategoryId = 12, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+
+                // فئات فرعية تحت الفنون
+                new Category { Id = 50, Name = "فنون تشكيلية", Description = "كتب عن الرسم والنحت", ParentCategoryId = 13, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Category { Id = 51, Name = "موسيقى", Description = "كتب عن الموسيقى والآلات", ParentCategoryId = 13, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+
+                // فئات فرعية تحت التكنولوجيا
+                new Category { Id = 52, Name = "برمجة", Description = "كتب عن البرمجة وتطوير البرمجيات", ParentCategoryId = 14, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Category { Id = 53, Name = "ذكاء اصطناعي", Description = "كتب عن الذكاء الاصطناعي", ParentCategoryId = 14, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+
+                // فئات فرعية تحت الطب
+                new Category { Id = 54, Name = "طب عام", Description = "كتب عن الطب العام والصحة", ParentCategoryId = 15, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Category { Id = 55, Name = "تغذية", Description = "كتب عن التغذية والصحة", ParentCategoryId = 15, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+
+                // فئات فرعية تحت الرياضة
+                new Category { Id = 56, Name = "لياقة بدنية", Description = "كتب عن التمارين الرياضية", ParentCategoryId = 16, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Category { Id = 57, Name = "رياضات جماعية", Description = "كتب عن كرة القدم وغيرها", ParentCategoryId = 16, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+
+                // فئات فرعية تحت السفر
+                new Category { Id = 58, Name = "رحلات مغامرة", Description = "كتب عن السفر والمغامرات", ParentCategoryId = 17, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Category { Id = 59, Name = "أدلة سياحية", Description = "أدلة للسفر والسياحة", ParentCategoryId = 17, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+
+                // فئات فرعية تحت الإدارة
+                new Category { Id = 60, Name = "إدارة الأعمال", Description = "كتب عن إدارة الشركات", ParentCategoryId = 18, IsActive = true, CreatedAt = fixedDate, UpdatedAt = fixedDate }
+            );
+
 
             // Books
             modelBuilder.Entity<Book>().HasData(
@@ -111,42 +210,82 @@ namespace AseerAlkotb.Infrastructure.Data
             new { BookId = 2, CategoryId = 2 },
             new { BookId = 3, CategoryId = 1 },
             new { BookId = 3, CategoryId = 3 }
+
+
+
+            //modelBuilder.Entity<Quote>().HasData(
+            //    new Quote
+            //    {
+            //        Id = 1,
+            //        Comment = "الحياة ليست مشكلة يجب حلها، بل هي واقع يجب تجربته.",
+            //        AuthorId = 1,
+            //        BookId = 1,
+            //        QuoteFor = QuoteFor.Book,
+            //        CreatedAt = fixedDate,
+            //        UpdatedAt = fixedDate
+            //    },
+            //    new Quote
+            //    {
+            //        Id = 2,
+            //        Comment = "الكتابة هي الوسيلة التي تجعلنا نعيش أكثر من حياة واحدة.",
+            //        AuthorId = 2,
+            //        BookId = 2,
+            //        QuoteFor = QuoteFor.Author,
+            //        CreatedAt = fixedDate,
+            //        UpdatedAt = fixedDate
+            //    },
+            //    new Quote
+            //    {
+            //        Id = 3,
+            //        Comment = "الكتب هي الأصدقاء الذين لا يخونون.",
+            //        AuthorId = 3,
+            //        BookId = 3,
+            //        QuoteFor = QuoteFor.Book,
+            //        CreatedAt = fixedDate,
+            //        UpdatedAt = fixedDate
+            //    }
+
+            //);
+
             );
 
-            // Users
-        //    modelBuilder.Entity<User>().HasData(
-        //        new User
-        //        {
-        //            Id = 1,
-        //            FirstName = "أحمد",
-        //            LastName = "حسن",
-        //            DateOfBirth = new DateTime(1990, 5, 15),
+            //Users
+            //modelBuilder.Entity<User>().HasData(
+            //    new User
+            //    {
+            //        Id = 1,
+            //        FirstName = "أحمد",
+            //        LastName = "محمد",
+            //        UserName = "ahmed.mohamed",
+            //        Email = "Ahmed@dasdsa.com",
+            //        NormalizedEmail = "Ahmed@dasdsa.com".ToUpper(),
+            //        PhoneNumber = "01234567890",
 
-        //            CreatedAt = fixedDate,
-        //            UpdatedAt = fixedDate
-        //        }
-        //    );
+            //        CreatedAt = fixedDate,
+            //        UpdatedAt = fixedDate
+            //    }
+            //);
 
-        //    modelBuilder.Entity<Order>().HasData(
-        //    new Order
-        //    {
-        //        Id = 1,
-        //        UserId = 1,
-        //        OrderDate = new DateTime(2022, 1, 1),
-        //        TotalAmount = 50,
-        //        Status = OrderStatus.Pending,
-        //        TrackingNumber = "TRK123456789",
-        //    },
-        //    new Order
-        //    {
-        //        Id = 2,
-        //        UserId = 1,
-        //        OrderDate = new DateTime(2022, 1, 1),
-        //        TotalAmount = 100,
-        //        Status = OrderStatus.Pending,
-        //        TrackingNumber = "TRK987654321",
-        //    }
-        //);
+            //    modelBuilder.Entity<Order>().HasData(
+            //    new Order
+            //    {
+            //        Id = 1,
+            //        UserId = 1,
+            //        OrderDate = new DateTime(2022, 1, 1),
+            //        TotalAmount = 50,
+            //        Status = OrderStatus.Pending,
+            //        TrackingNumber = "TRK123456789",
+            //    },
+            //    new Order
+            //    {
+            //        Id = 2,
+            //        UserId = 1,
+            //        OrderDate = new DateTime(2022, 1, 1),
+            //        TotalAmount = 100,
+            //        Status = OrderStatus.Pending,
+            //        TrackingNumber = "TRK987654321",
+            //    }
+            //);
         }
     }
 }

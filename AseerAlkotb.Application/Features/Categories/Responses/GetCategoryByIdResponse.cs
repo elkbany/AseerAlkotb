@@ -6,6 +6,12 @@ using System.Threading.Tasks;
 
 namespace AseerAlkotb.Application.Features.Categories.Responses
 {
-    public record GetCategoryByIdResponse(int Id, string Name, string? Description, bool IsActive);
-
+    public record GetCategoryByIdResponse(
+        int Id, 
+        string Name, 
+        string? Description, 
+        bool IsActive,
+        DateTime CreatedAt = default,
+        DateTime UpdatedAt = default
+    );
 }

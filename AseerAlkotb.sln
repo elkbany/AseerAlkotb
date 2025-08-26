@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36202.13 d17.14
+VisualStudioVersion = 17.14.36202.13
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AseerAlkotb.API", "AseerAlkotb.API\AseerAlkotb.API.csproj", "{ADD31CF6-1CE2-4B2E-B51F-64D795BA4C14}"
 EndProject
@@ -12,6 +12,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AseerAlkotb.Application", "AseerAlkotb.Application\AseerAlkotb.Application.csproj", "{AC1744EE-217D-49EB-B28F-F618E60FEB68}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AseerAlkotb.Dashboard", "AseerAlkotb.Dashboard\AseerAlkotb.Dashboard.csproj", "{C4FA6FCC-5A55-43D0-8C3A-D3EF66740D61}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AseerAlkotb.Localization", "AseerAlkotb.Localization\AseerAlkotb.Localization.csproj", "{67BC9754-7C56-402D-94D2-6B02E1EE9346}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{C4FA6FCC-5A55-43D0-8C3A-D3EF66740D61}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C4FA6FCC-5A55-43D0-8C3A-D3EF66740D61}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C4FA6FCC-5A55-43D0-8C3A-D3EF66740D61}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67BC9754-7C56-402D-94D2-6B02E1EE9346}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67BC9754-7C56-402D-94D2-6B02E1EE9346}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67BC9754-7C56-402D-94D2-6B02E1EE9346}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67BC9754-7C56-402D-94D2-6B02E1EE9346}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

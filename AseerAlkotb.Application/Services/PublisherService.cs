@@ -8,8 +8,10 @@ using AseerAlkotb.Application.Features.Publishers.Validators;
 using AseerAlkotb.Application.ResponseHandler;
 using AseerAlkotb.Domain.Entites.Models;
 using AseerAlkotb.Domain.Interfaces.Base;
+using AseerAlkotb.Localization.Resources;
 using Mapster;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +24,7 @@ namespace AseerAlkotb.Application.Services
     public class PublisherService : AppService , IPublisherServices
     {
         private readonly IUnitOfWork unitOfWork;
-        public PublisherService(IUnitOfWork unitOfWork, IServiceProvider serviceProvider, IHostEnvironment environment) : base(serviceProvider, environment)
+        public PublisherService(IUnitOfWork unitOfWork, IServiceProvider serviceProvider, IHostEnvironment environment ) : base(serviceProvider, environment)
         {
             this.unitOfWork = unitOfWork;
         }
@@ -49,7 +51,7 @@ namespace AseerAlkotb.Application.Services
             var publisher = await unitOfWork.Publishers.FirstOrDefaultAsync(p => p.Id == request.Id);
             if (publisher == null)
             {
-                return NotFound<DeletePublisherResponse>("Publisher not found");
+                return NotFound<DeletePublisherResponse>($"{_stringLocalizer["Publisher"]} {_stringLocalizer["NotFound"]}");
             }
             if (publisher.LogoUrl != null)
             {
@@ -83,7 +85,7 @@ namespace AseerAlkotb.Application.Services
             var publisher = await unitOfWork.Publishers.FirstOrDefaultAsync(p => p.Id == request.Id);
             if (publisher == null)
             {
-                return NotFound<GetPublisherByIdResponse>("Publisher not found");
+                return NotFound<GetPublisherByIdResponse>($"{_stringLocalizer["Publisher"]} {_stringLocalizer["NotFound"]}");
             }
             var response = publisher.Adapt<GetPublisherByIdResponse>();
             return Success(response);
@@ -96,7 +98,7 @@ namespace AseerAlkotb.Application.Services
             var publisher = await unitOfWork.Publishers.FirstOrDefaultAsync(p => p.Id == request.Id);
             if (publisher == null)
             {
-                return NotFound<UpdatePublisherResponse>("Publisher not found");
+                return NotFound<UpdatePublisherResponse>($"{_stringLocalizer["Publisher"]} {_stringLocalizer["NotFound"]}");
             }
             request.Adapt(publisher);
             if (request.LogoUrl != null)

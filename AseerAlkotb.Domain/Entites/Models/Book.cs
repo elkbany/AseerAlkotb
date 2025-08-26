@@ -30,6 +30,9 @@ namespace AseerAlkotb.Domain.Entites.Models
         public virtual Publisher Publisher { get; set; }
         public virtual ICollection<Category> Categories { get; set; } = [];
         public virtual ICollection<Review> Reviews { get; set; } = [];
+
+        public virtual ICollection<Quote> Quotes { get; set; } = [];
+
         public virtual ICollection<OrderItem> OrderItems { get; set; } = [];
         public virtual ICollection<CartItem> CartItems { get; set; } = []; 
         public virtual ICollection<Wishlist> Wishlists { get; set; } = [];

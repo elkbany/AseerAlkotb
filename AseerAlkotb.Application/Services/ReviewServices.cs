@@ -29,7 +29,7 @@ namespace AseerAlkotb.Application.Services
                 var bookExists = await unitOfWork.Books.AnyAsync(b => b.Id == request.BookId.Value);
                 if (!bookExists)
                 {
-                    return BadRequest<AddReviewResponse>("Book not found.");
+                    return BadRequest<AddReviewResponse>($"{_stringLocalizer["Book"]} {_stringLocalizer["NotFound"]}");
                 }   
             }
             else if (request.AuthorId.HasValue)
@@ -37,7 +37,7 @@ namespace AseerAlkotb.Application.Services
                 var authorExists = await unitOfWork.Authors.AnyAsync(a => a.Id == request.AuthorId.Value);
                 if (!authorExists)
                 {
-                    return BadRequest<AddReviewResponse>("Author not found.");
+                    return BadRequest<AddReviewResponse>($"{_stringLocalizer["Author"]} {_stringLocalizer["NotFound"]}");
                 }
             }     
             var review = request.Adapt<Review>();
@@ -56,7 +56,7 @@ namespace AseerAlkotb.Application.Services
 
             if (review == null)
             {
-                return NotFound<UpdateReviewResponse>("Review not found.");
+                return NotFound<UpdateReviewResponse>($"{_stringLocalizer["Review"]} {_stringLocalizer["NotFound"]}");
             }
             request.Adapt(review);
             unitOfWork.Reviews.Update(review);
@@ -72,7 +72,7 @@ namespace AseerAlkotb.Application.Services
 
             if (review == null)
             {
-                return NotFound<DeleteReviewResponse>("Review not found.");
+                return NotFound<DeleteReviewResponse>($"{_stringLocalizer["Review"]} {_stringLocalizer["NotFound"]}");
             }
 
              unitOfWork.Reviews.Delete(review);
@@ -94,7 +94,7 @@ namespace AseerAlkotb.Application.Services
 
             if (review == null)
             {
-                return NotFound<GetReviewByIdResponse>("Review not found.");
+                return NotFound<GetReviewByIdResponse>($"{_stringLocalizer["Review"]} {_stringLocalizer["NotFound"]}");
             }
 
             var revMap = review.Adapt<GetReviewByIdResponse>();
@@ -112,6 +112,7 @@ namespace AseerAlkotb.Application.Services
                     r => r.Author,
                     r => r.User
                 );
+
             var totalCount =  reviews.Count;
             var revMap = reviews.Adapt<List<GetAllReviewsPaginatedResponse>>();
             return Success(revMap, totalCount, request.PageNumber, request.PageSize);
