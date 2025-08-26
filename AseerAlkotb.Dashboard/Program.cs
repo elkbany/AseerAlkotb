@@ -2,9 +2,15 @@ using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Services;
 using AseerAlkotb.Domain.Interfaces.Base;
 using AseerAlkotb.Infrastructure.Context;
-using AseerAlkotb.Infrastructure.Repositories.Base;
-using Microsoft.EntityFrameworkCore;
+using AseerAlkotb.Infrastructure.Repositzories.Base;
+using AseerAlkotb.Infrastructure.Repositories.Implementations;
 using Mapster;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace AseerAlkotb.Dashboard
 {
