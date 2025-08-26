@@ -9,11 +9,12 @@ namespace AseerAlkotb.Domain.Entites.Models
         public string? Comment { get; set; }
         public int Rating { get; set; } // Assuming rating is an integer value
 
+
         #region Navigation Properties
-        public ReviewFor ReviewFor { get; set; }
+        public ReviewFor ReviewType { get; set; }
         public int? BookId { get; set; }
         public virtual Book Book { get; set; }
-        public int? AuthorId { get; set; }
+        public int? ReviewAuthorId { get; set; }
         public virtual Author Author { get; set; }
         public int UserId { get; set; }
         public virtual User User { get; set; }

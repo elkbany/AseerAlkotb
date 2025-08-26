@@ -9,8 +9,10 @@ using AseerAlkotb.Application.Features.Reviews.Responses;
 using AseerAlkotb.Application.ResponseHandler;
 using AseerAlkotb.Domain.Entites.Models;
 using AseerAlkotb.Domain.Interfaces.Base;
+using AseerAlkotb.Localization.Resources;
 using Mapster;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Localization;
 using static AseerAlkotb.Application.ResponseHandler.ApiResponseHandler;
 
 namespace AseerAlkotb.Application.Services
@@ -19,7 +21,7 @@ namespace AseerAlkotb.Application.Services
     {
         private readonly IUnitOfWork unitOfWork;
 
-        public AuthorServices(IUnitOfWork unitOfWork , IServiceProvider serviceProvider,IHostEnvironment environment) : base(serviceProvider,environment) 
+        public AuthorServices(IUnitOfWork unitOfWork , IServiceProvider serviceProvider,IHostEnvironment environment ) : base(serviceProvider,environment) 
         {
             this.unitOfWork = unitOfWork;
         }
@@ -44,7 +46,7 @@ namespace AseerAlkotb.Application.Services
             var author = await unitOfWork.Authors.FirstOrDefaultAsync(a=>a.Id==request.Id);
             if (author==null)
             {
-                return NotFound<DeleteAuthorResponse>("Author not found");
+                return NotFound<DeleteAuthorResponse>($"{_stringLocalizer["Author"]} {_stringLocalizer["NotFound"]}");
             }
             if (!string.IsNullOrEmpty(author.ImageUrl))
             {
@@ -62,7 +64,7 @@ namespace AseerAlkotb.Application.Services
             var author = await unitOfWork.Authors.FirstOrDefaultAsync(a => a.Id == request.Id);
             if (author == null)
             {
-                return NotFound<UpdateAuthorResponse>("Auhtor not found");
+                return NotFound<UpdateAuthorResponse>($"{_stringLocalizer["Author"]} {_stringLocalizer["NotFound"]}");
             }
             request.Adapt(author); 
             if (request.Image != null)
@@ -85,7 +87,7 @@ namespace AseerAlkotb.Application.Services
 
             if (author == null)
             {
-                return NotFound<GetAuthorByIdResponse>("Auhtor not found");
+                return NotFound<GetAuthorByIdResponse>($"{_stringLocalizer["Author"]} {_stringLocalizer["NotFound"]}");
             }
             var authMap = author.Adapt<GetAuthorByIdResponse>();
             authMap.Rating=author.Reviews?.Any() == true ? (decimal)author.Reviews.Average(r => r.Rating) : 0;

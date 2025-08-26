@@ -5,9 +5,14 @@ using AseerAlkotb.Application.Features.Categories.Validators;
 using AseerAlkotb.Application.ResponseHandler;
 using AseerAlkotb.Domain.Entites.Models;
 using AseerAlkotb.Domain.Interfaces.Base;
+using AseerAlkotb.Localization.Resources;
 using Mapster;
 using Microsoft.Extensions.Hosting;
+
+using Microsoft.Extensions.Localization;
+
 using System.Linq;
+
 using static AseerAlkotb.Application.ResponseHandler.ApiResponseHandler;
 
 namespace AseerAlkotb.Application.Services
@@ -16,7 +21,7 @@ namespace AseerAlkotb.Application.Services
     {
         private readonly IUnitOfWork unitOfWork;
 
-        public CategoryServices(IUnitOfWork unitOfWork, IServiceProvider serviceProvider, IHostEnvironment environment) : base(serviceProvider, environment)
+        public CategoryServices(IUnitOfWork unitOfWork, IServiceProvider serviceProvider, IHostEnvironment environment) : base(serviceProvider, environment )
         {
             this.unitOfWork = unitOfWork;
         }
@@ -38,7 +43,7 @@ namespace AseerAlkotb.Application.Services
             var category = await unitOfWork.Categories.FirstOrDefaultAsync(a => a.Id == request.Id);
             if (category == null)
             {
-                return NotFound<DeleteCategoryResponse>("Category not found");
+                return NotFound<DeleteCategoryResponse>($"{_stringLocalizer["Category"]} {_stringLocalizer["NotFound"]}");
             }
 
             // Prevent deleting a parent category that still has subcategories
@@ -59,7 +64,7 @@ namespace AseerAlkotb.Application.Services
             var category = await unitOfWork.Categories.FirstOrDefaultAsync(a => a.Id == request.Id);
             if (category == null)
             {
-                return NotFound<UpdateCategoryResponse>("Category not found");
+                return NotFound<UpdateCategoryResponse>($"{_stringLocalizer["Category"]} {_stringLocalizer["NotFound"]}");
             }
             request.Adapt(category);
             unitOfWork.Categories.Update(category);
@@ -74,7 +79,7 @@ namespace AseerAlkotb.Application.Services
             var category = await unitOfWork.Categories.FirstOrDefaultAsync(a => a.Id == request.Id);
             if (category == null)
             {
-                return NotFound<GetCategoryByIdResponse>("Category not found");
+                return NotFound<GetCategoryByIdResponse>($"{_stringLocalizer["Category"]} {_stringLocalizer["NotFound"]}");
             }
 
             var categoryMap = new GetCategoryByIdResponse(
@@ -126,7 +131,7 @@ namespace AseerAlkotb.Application.Services
             var parentCategory = await unitOfWork.Categories.FirstOrDefaultAsync(c => c.Id == request.ParentCategoryId);
             if (parentCategory == null)
             {
-                return NotFound<AddSubCategoryResponse>("Parent category not found");
+                return NotFound<AddSubCategoryResponse>($"{_stringLocalizer["ParentCategory"]} {_stringLocalizer["NotFound"]}");
             }
 
             var subCategory = request.Adapt<Category>();
@@ -144,7 +149,7 @@ namespace AseerAlkotb.Application.Services
             var subCategory = await unitOfWork.Categories.FirstOrDefaultAsync(c => c.Id == request.Id && c.ParentCategoryId == request.ParentCategoryId);
             if (subCategory == null)
             {
-                return NotFound<DeleteSubCategoryResponse>("Subcategory not found under the specified parent");
+                return NotFound<DeleteSubCategoryResponse>($"{_stringLocalizer["SubCategory"]} {_stringLocalizer["NotFound"]}");
             }
 
             unitOfWork.Categories.Delete(subCategory);

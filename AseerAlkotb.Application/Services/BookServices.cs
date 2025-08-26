@@ -7,9 +7,11 @@ using AseerAlkotb.Application.ResponseHandler;
 using AseerAlkotb.Domain.Entites.Models;
 using AseerAlkotb.Domain.Enums;
 using AseerAlkotb.Domain.Interfaces.Base;
+using AseerAlkotb.Localization.Resources;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Localization;
 using System.Linq.Expressions;
 using static AseerAlkotb.Application.ResponseHandler.ApiResponseHandler;
 using static System.Reflection.Metadata.BlobBuilder;
@@ -22,7 +24,7 @@ namespace AseerAlkotb.Application.Services
     {
         private readonly IUnitOfWork _uniteOfWork;
 
-        public BookServices(IUnitOfWork uniteOfWork, IServiceProvider serviceProvider, IHostEnvironment hostEnvironment) : base(serviceProvider, hostEnvironment)
+        public BookServices(IUnitOfWork uniteOfWork, IServiceProvider serviceProvider, IHostEnvironment hostEnvironment ) : base(serviceProvider, hostEnvironment)
         {
             _uniteOfWork = uniteOfWork;
         }
@@ -53,7 +55,7 @@ namespace AseerAlkotb.Application.Services
 
             if (book == null)
             {
-                return NotFound<UpdateBookResponse>("Book not found");
+                return NotFound<UpdateBookResponse>($"{_stringLocalizer["Book"]} {_stringLocalizer["NotFound"]}");
             }
 
             request.Adapt(book);
@@ -80,7 +82,7 @@ namespace AseerAlkotb.Application.Services
             var book = await _uniteOfWork.Books.FirstOrDefaultAsync(b => b.Id == request.Id);
             if (book == null)
             {
-                return NotFound<DeleteBookResponse>("Book not found");
+                return NotFound<DeleteBookResponse>($"{_stringLocalizer["Book"]} {_stringLocalizer["NotFound"]}");
             }
             if (!string.IsNullOrEmpty(book.CoverImageUrl))
             {
@@ -99,7 +101,7 @@ namespace AseerAlkotb.Application.Services
             var book = await _uniteOfWork.Books.FirstOrDefaultAsync(b=>b.Id==request.Id,default,b=>b.Categories,b=>b.Reviews);
             if (book == null)
             {
-                return NotFound<GetBookByIdResponse>("Book not found");
+                return NotFound<GetBookByIdResponse>($"{_stringLocalizer["Book"]} {_stringLocalizer["NotFound"]}");
             }
             var bookMap = book.Adapt<GetBookByIdResponse>();
 

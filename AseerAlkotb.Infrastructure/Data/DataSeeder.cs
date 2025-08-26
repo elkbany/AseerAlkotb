@@ -210,6 +210,43 @@ namespace AseerAlkotb.Infrastructure.Data
             new { BookId = 2, CategoryId = 2 },
             new { BookId = 3, CategoryId = 1 },
             new { BookId = 3, CategoryId = 3 }
+
+
+
+            //modelBuilder.Entity<Quote>().HasData(
+            //    new Quote
+            //    {
+            //        Id = 1,
+            //        Comment = "الحياة ليست مشكلة يجب حلها، بل هي واقع يجب تجربته.",
+            //        AuthorId = 1,
+            //        BookId = 1,
+            //        QuoteFor = QuoteFor.Book,
+            //        CreatedAt = fixedDate,
+            //        UpdatedAt = fixedDate
+            //    },
+            //    new Quote
+            //    {
+            //        Id = 2,
+            //        Comment = "الكتابة هي الوسيلة التي تجعلنا نعيش أكثر من حياة واحدة.",
+            //        AuthorId = 2,
+            //        BookId = 2,
+            //        QuoteFor = QuoteFor.Author,
+            //        CreatedAt = fixedDate,
+            //        UpdatedAt = fixedDate
+            //    },
+            //    new Quote
+            //    {
+            //        Id = 3,
+            //        Comment = "الكتب هي الأصدقاء الذين لا يخونون.",
+            //        AuthorId = 3,
+            //        BookId = 3,
+            //        QuoteFor = QuoteFor.Book,
+            //        CreatedAt = fixedDate,
+            //        UpdatedAt = fixedDate
+            //    }
+
+            //);
+
             );
 
             //Users

@@ -1,10 +1,8 @@
 ﻿using AseerAlkotb.Application.Features.Authors.Requests;
+using AseerAlkotb.Application.ResponseHandler;
+using AseerAlkotb.Localization.Resources;
 using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace AseerAlkotb.Application.Features.Authors.Validators
 {
@@ -14,20 +12,20 @@ namespace AseerAlkotb.Application.Features.Authors.Validators
         {
             RuleFor(x => x.PageNumber)
                 .GreaterThan(0)
-                .WithMessage("Page number must be greater than 0");
+                .L("PageNumber", "MustBeGreaterThan", "0");
 
             RuleFor(x => x.PageSize)
                 .GreaterThan(0)
-                .WithMessage("Page size must be greater than 0")
+                .L("PageSize", "MustBeGreaterThan", "0")
                 .LessThanOrEqualTo(100)
-                .WithMessage("Page size cannot exceed 100 records");
+                .L("PageSize", "CannotExceed", "100", "Records");
 
             RuleFor(x => x.Search)
                 .MaximumLength(100)
-                .WithMessage("Search term cannot exceed 100 characters")
+                .L("SearchTerm", "CannotExceed", "100", "Characters")
                 .Must(BeValidSearchTerm)
                 .When(x => !string.IsNullOrEmpty(x.Search))
-                .WithMessage("Search term contains invalid characters");
+                .L("SearchTerm", "ContainsInvalidCharacters");
         }
 
         private bool BeValidSearchTerm(string search)
@@ -35,7 +33,7 @@ namespace AseerAlkotb.Application.Features.Authors.Validators
             if (string.IsNullOrEmpty(search)) return true;
 
             // Allow letters, numbers, spaces, and common punctuation
-            return System.Text.RegularExpressions.Regex.IsMatch(search, @"^[a-zA-Z\u0600-\u06FF0-9\s\-_.]+$");
+            return Regex.IsMatch(search, @"^[a-zA-Z\u0600-\u06FF0-9\s\-_.]+$");
         }
     }
-    }
+}
