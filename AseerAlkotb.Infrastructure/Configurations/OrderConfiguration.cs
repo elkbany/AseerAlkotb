@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Reflection.Emit;
 
 namespace AseerAlkotb.Infrastructure.Configurations
 {
@@ -47,6 +48,9 @@ namespace AseerAlkotb.Infrastructure.Configurations
                 .WithMany(u => u.Orders)
                 .HasForeignKey(o => o.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
+            builder
+           .Property(e => e.PaymentId)
+        .IsRequired(false); // This makes it nullable
 
         }
     }

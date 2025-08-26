@@ -4,6 +4,7 @@ using AseerAlkotb.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AseerAlkotb.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250821203700_SeedingCategoriesAndSubCategores")]
+    partial class SeedingCategoriesAndSubCategores
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1011,16 +1014,10 @@ namespace AseerAlkotb.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("City")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("DiscountAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("FinalAmount")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("Governorate")
@@ -1162,7 +1159,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         });
                 });
 
-            modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Quote", b =>
+            modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Review", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -1177,14 +1174,16 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Comment")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("QuoteFor")
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ReviewFor")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -1198,50 +1197,6 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.HasIndex("AuthorId");
 
                     b.HasIndex("BookId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Quotes", (string)null);
-                });
-
-            modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Review", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("BookId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Comment")
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Rating")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ReviewAuthorId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ReviewType")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BookId");
-
-                    b.HasIndex("ReviewAuthorId");
 
                     b.HasIndex("UserId");
 
@@ -1795,41 +1750,16 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.Navigation("Order");
                 });
 
-            modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Quote", b =>
+            modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Review", b =>
                 {
                     b.HasOne("AseerAlkotb.Domain.Entites.Models.Author", "Author")
-                        .WithMany("Quotes")
+                        .WithMany("Reviews")
                         .HasForeignKey("AuthorId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("AseerAlkotb.Domain.Entites.Models.Book", "Book")
-                        .WithMany("Quotes")
-                        .HasForeignKey("BookId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("AseerAlkotb.Domain.Entites.Models.User", "User")
-                        .WithMany("Quotes")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Author");
-
-                    b.Navigation("Book");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Review", b =>
-                {
-                    b.HasOne("AseerAlkotb.Domain.Entites.Models.Book", "Book")
                         .WithMany("Reviews")
                         .HasForeignKey("BookId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("AseerAlkotb.Domain.Entites.Models.Author", "Author")
-                        .WithMany("Reviews")
-                        .HasForeignKey("ReviewAuthorId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("AseerAlkotb.Domain.Entites.Models.User", "User")
@@ -1995,8 +1925,6 @@ namespace AseerAlkotb.Infrastructure.Migrations
 
                     b.Navigation("Followers");
 
-                    b.Navigation("Quotes");
-
                     b.Navigation("Reviews");
                 });
 
@@ -2005,8 +1933,6 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.Navigation("CartItems");
 
                     b.Navigation("OrderItems");
-
-                    b.Navigation("Quotes");
 
                     b.Navigation("Reviews");
 
@@ -2052,8 +1978,6 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.Navigation("LikeDisLikes");
 
                     b.Navigation("Orders");
-
-                    b.Navigation("Quotes");
 
                     b.Navigation("Reviews");
 

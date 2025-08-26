@@ -6,14 +6,15 @@ namespace AseerAlkotb.Application.Features.Orders.Responses
 {
     public record GetAllOrdersPaginatedResponse
     (
-       int OrderId,
+       int Id,
        string UserName,
        PaymentMethod PaymentMethod,
        PaymentStatus PaymentStatus,
        EgyptGovernorates Governorate,
+         EgyptCities City,
        OrderStatus OrderStatus,
        string TrackingNumber,
-       decimal TotalAmount,
+       decimal FinalAmount,
        DateTime OrderDate,
        List<BookDTO> Books     
     );

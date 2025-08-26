@@ -1,9 +1,8 @@
-﻿using AseerAlkotb.Domain.Entites.Models;
-using AseerAlkotb.Domain.Enums;
-using AseerAlkotb.Domain.Interfaces.Base;
+﻿using AseerAlkotb.Domain.Interfaces.Base;
 using AseerAlkotb.Domain.Interfaces.Repositories;
 using AseerAlkotb.Infrastructure.Context;
 using AseerAlkotb.Infrastructure.Repositories.Implementations;
+
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using System;

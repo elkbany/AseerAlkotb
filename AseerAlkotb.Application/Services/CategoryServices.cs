@@ -8,7 +8,11 @@ using AseerAlkotb.Domain.Interfaces.Base;
 using AseerAlkotb.Localization.Resources;
 using Mapster;
 using Microsoft.Extensions.Hosting;
+
 using Microsoft.Extensions.Localization;
+
+using System.Linq;
+
 using static AseerAlkotb.Application.ResponseHandler.ApiResponseHandler;
 
 namespace AseerAlkotb.Application.Services
@@ -32,7 +36,7 @@ namespace AseerAlkotb.Application.Services
             return Success(categoryMap);
         }
 
-        public async Task<ApiResponse<DeleteCategoryResponse>>DeleteCategoryAsync(DeleteCategoryRequest request)
+        public async Task<ApiResponse<DeleteCategoryResponse>> DeleteCategoryAsync(DeleteCategoryRequest request)
 
         {
             await DoValidationAsync<DeleteCategoryRequestValidator, DeleteCategoryRequest>(request);
@@ -40,6 +44,13 @@ namespace AseerAlkotb.Application.Services
             if (category == null)
             {
                 return NotFound<DeleteCategoryResponse>($"{_stringLocalizer["Category"]} {_stringLocalizer["NotFound"]}");
+            }
+
+            // Prevent deleting a parent category that still has subcategories
+            var hasSubCategories = await unitOfWork.Categories.AnyAsync(c => c.ParentCategoryId == category.Id);
+            if (hasSubCategories)
+            {
+                return BadRequest<DeleteCategoryResponse>("Cannot delete a category that has subcategories. Delete or reassign them first.");
             }
 
             unitOfWork.Categories.Delete(category);
@@ -70,7 +81,16 @@ namespace AseerAlkotb.Application.Services
             {
                 return NotFound<GetCategoryByIdResponse>($"{_stringLocalizer["Category"]} {_stringLocalizer["NotFound"]}");
             }
-            var categoryMap = category.Adapt<GetCategoryByIdResponse>();
+
+            var categoryMap = new GetCategoryByIdResponse(
+                category.Id,
+                category.Name,
+                category.Description,
+                category.IsActive,
+                category.CreatedAt,
+                category.UpdatedAt
+            );
+
             return Success(categoryMap);
         }
 
@@ -81,10 +101,27 @@ namespace AseerAlkotb.Application.Services
                 .GetAllAsync(s => s.Name.Contains(request.Search),
                 (request.PageNumber - 1) * request.PageSize, request.PageSize);
             var totalCount = await unitOfWork.Categories.CountAsync((s => s.Name.Contains(request.Search)));
-            var authsMap = categories.Adapt<List<GetAllCategoriesPaginatedResponse>>();
 
-            return Success(authsMap, totalCount, request.PageNumber, request.PageSize);
+            // Compute subcategory counts from DB per category id (acceptable for small page sizes)
+            var categoryIds = categories.Select(c => c.Id).ToList();
+            var subCounts = new Dictionary<int, int>();
+            foreach (var categoryId in categoryIds)
+            {
+                var count = await unitOfWork.Categories.CountAsync(sc => sc.ParentCategoryId == categoryId);
+                subCounts[categoryId] = count;
+            }
 
+            var categoriesMap = categories.Select(c => new GetAllCategoriesPaginatedResponse(
+                c.Id,
+                c.Name,
+                c.Description,
+                c.IsActive,
+                c.ParentCategoryId,
+                subCounts.TryGetValue(c.Id, out var cnt) ? cnt : 0,
+                c.CreatedAt
+            )).ToList();
+
+            return Success(categoriesMap, totalCount, request.PageNumber, request.PageSize);
         }
 
         public async Task<ApiResponse<AddSubCategoryResponse>> AddSubCategoryAsync(AddSubCategoryRequest request)
@@ -134,7 +171,14 @@ namespace AseerAlkotb.Application.Services
 
             var totalCount = await unitOfWork.Categories.CountAsync(c => c.ParentCategoryId == request.ParentCategoryId && c.Name.Contains(request.Search));
 
-            var result = query.Adapt<List<GetAllSubCategoriesPaginatedResponse>>();
+            var result = query.Select(c => new GetAllSubCategoriesPaginatedResponse(
+                c.Id,
+                c.Name,
+                c.Description,
+                c.IsActive,
+                c.ParentCategoryId.Value,
+                c.CreatedAt
+            )).ToList();
 
             return Success(result, totalCount, request.PageNumber, request.PageSize);
         }

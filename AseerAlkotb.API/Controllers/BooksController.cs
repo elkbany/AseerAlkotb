@@ -41,8 +41,8 @@ namespace AseerAlkotb.API.Controllers
             return ApiResult(result);
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById([FromRoute] GetBookByIdRequest request)
+        [HttpGet]
+        public async Task<IActionResult> GetById([FromQuery] GetBookByIdRequest request)
         {
             var result = await _bookServices.GetBookByIdAsync(request);
             return ApiResult(result);

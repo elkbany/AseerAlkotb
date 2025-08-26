@@ -98,7 +98,7 @@ namespace AseerAlkotb.Application.Services
         public async Task<ApiResponse<GetBookByIdResponse>> GetBookByIdAsync(GetBookByIdRequest request)
         {
             await DoValidationAsync<GetBookByIdRequestValidator, GetBookByIdRequest>(request);
-            var book = await _uniteOfWork.Books.FirstOrDefaultAsync(b => b.Id == request.Id,default,b=>b.Reviews);
+            var book = await _uniteOfWork.Books.FirstOrDefaultAsync(b=>b.Id==request.Id,default,b=>b.Categories,b=>b.Reviews);
             if (book == null)
             {
                 return NotFound<GetBookByIdResponse>($"{_stringLocalizer["Book"]} {_stringLocalizer["NotFound"]}");
@@ -106,6 +106,9 @@ namespace AseerAlkotb.Application.Services
             var bookMap = book.Adapt<GetBookByIdResponse>();
 
             bookMap.Rating = book.Reviews?.Any() == true ? (decimal)book.Reviews.Average(r => r.Rating) : 0;
+            //manual
+            bookMap.CategoryIds = book.Categories?.Select(c => c.Id).ToList() ?? new List<int>();
+            bookMap.CategoryNames = book.Categories?.Select(c => c.Name).ToList() ?? new List<string>();
 
 
             return Success(bookMap);
@@ -115,15 +118,18 @@ namespace AseerAlkotb.Application.Services
     public async Task<ApiResponsePaginated<List<GetAllBooksPaginatedResponse>>> GetAllBooksPaginatedAsync(GetAllBooksPaginatedRequest request)
     {
         await DoValidationAsync<GetAllBooksPaginatedValidator, GetAllBooksPaginatedRequest>(request);
-        var books = await _uniteOfWork.Books
-                .GetAllAsync(s => s.Title.Contains(request.Search),
-            (request.PageNumber - 1) * request.PageSize, request.PageSize,default,b=>b.Reviews);
-
+            var books = await _uniteOfWork.Books
+                    .GetAllAsync(s => s.Title.Contains(request.Search),
+                (request.PageNumber - 1) * request.PageSize, request.PageSize, default, b => b.Reviews, b => b.Categories);
             var totalCount = await _uniteOfWork.Books.CountAsync(s => s.Title.Contains(request.Search));
             var bookMap = books.Select(book =>
             {
                 var bookDto = book.Adapt<GetAllBooksPaginatedResponse>();
+                //manual
+                bookDto.CategoryIds = book.Categories?.Select(c => c.Id).ToList() ?? new List<int>();
+                bookDto.CategoryNames = book.Categories?.Select(c => c.Name).ToList() ?? new List<string>();
                 bookDto.Rating = book.Reviews?.Any() == true ? (decimal)book.Reviews.Average(r => r.Rating) : 0;
+
                 return bookDto;
             }).ToList();
             return Success(bookMap, totalCount, request.PageNumber, request.PageSize);
