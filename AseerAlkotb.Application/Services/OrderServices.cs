@@ -181,11 +181,12 @@ namespace AseerAlkotb.Application.Services
             // Calculate tax (14%)
             order.TaxAmount = order.TotalAmount * 0.14m;
 
-            // Calculate discount
-            CalculateDiscountAmount(order);
+            // Final Amount and Calculate discount
+            order.FinalAmount=
+                CalculateDiscountAmount(order)+order.TaxAmount+order.ShippingCost+order.TotalAmount;
         }
 
-        private static void CalculateDiscountAmount(Order order)
+        private static decimal CalculateDiscountAmount(Order order)
         {
             var discountedTotal = order.OrderItems.Sum(oi => oi.TotalPrice);
             order.DiscountAmount = order.TotalAmount - discountedTotal;
@@ -195,6 +196,7 @@ namespace AseerAlkotb.Application.Services
             {
                 order.DiscountAmount = 0;
             }
+            return order.DiscountAmount;
         }
 
         private async Task ProcessCheckoutTransactionAsync(Order order, Cart cart)

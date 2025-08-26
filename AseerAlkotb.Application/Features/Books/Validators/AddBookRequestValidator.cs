@@ -1,11 +1,10 @@
 ﻿using AseerAlkotb.Application.Features.Books.Mapping;
+using AseerAlkotb.Application.ResponseHandler;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AseerAlkotb.Application.Features.Books.Validators
 {
@@ -14,77 +13,84 @@ namespace AseerAlkotb.Application.Features.Books.Validators
         public AddBookRequestValidator()
         {
             RuleFor(x => x.Title)
-                .NotEmpty().WithMessage("Title is required")
-                .MaximumLength(200).WithMessage("Title must be less than 200 characters");
+                .NotEmpty()
+                .L("Book", "Title", "Required")
+                .MaximumLength(200)
+                .L("Book", "Title", "MustBeLessThan", "200");
 
             RuleFor(x => x.Description)
-                .NotEmpty().WithMessage("Description is required");
+                .NotEmpty()
+                .L("Book", "Description", "Required");
 
             RuleFor(x => x.ISBN)
-                .NotEmpty().WithMessage("ISBN is required")
-                .Matches(@"^\d{10}(\d{3})?$").WithMessage("ISBN must be 10 or 13 digits");
+                .NotEmpty()
+                .L("Book", "ISBN", "Required")
+                .Matches(@"^\d{10}(\d{3})?$")
+                .L("Book", "ISBN", "MustBeDigits", "10", "13");
 
             RuleFor(x => x.Price)
-                .GreaterThan(0).WithMessage("Price must be greater than 0");
+                .GreaterThan(0)
+                .L("Book", "Price", "MustBeGreaterThan", "0");
 
             RuleFor(x => x.DiscountPercentage)
-                .InclusiveBetween(0, 100).WithMessage("Discount must be between 0 and 100");
+                .InclusiveBetween(0, 100)
+                .L("Book", "Discount", "MustBeBetween", "0", "100");
 
             RuleFor(x => x.PublishedDate)
-                .LessThanOrEqualTo(DateTime.Today).WithMessage("Published date cannot be in the future");
+                .LessThanOrEqualTo(DateTime.Today)
+                .L("Book", "PublishedDate", "CannotBeInFuture");
 
             RuleFor(x => x.PageCount)
-                .GreaterThan(0).WithMessage("Page count must be positive");
+                .GreaterThan(0)
+                .L("Book", "PageCount", "MustBePositive");
 
             RuleFor(x => x.Language)
-                .NotEmpty().WithMessage("Language is required");
+                .NotEmpty()
+                .L("Book", "Language", "Required");
 
             RuleFor(x => x.CoverImageUrl)
                 .Must(BeValidImage)
                 .When(x => x.CoverImageUrl != null)
-                .WithMessage("Image must be a valid image file (jpg, jpeg, png, gif) and less than 5MB");
+                .L("Book", "Image", "InvalidImage");
 
             RuleFor(x => x.Format)
-            .NotEmpty().WithMessage("Format is required");
+                .NotEmpty()
+                .L("Book", "Format", "Required");
 
             RuleFor(x => x.StockQuantity)
-                .GreaterThanOrEqualTo(0).WithMessage("Stock must be >= 0");
+                .GreaterThanOrEqualTo(0)
+                .L("Book", "Stock", "MustBeGreaterOrEqual", "0");
 
             RuleFor(x => x.AuthorId)
-                .GreaterThan(0).WithMessage("Author is required");
+                .GreaterThan(0)
+                .L("Author", "Id", "Required");
 
             RuleFor(x => x.PublisherId)
-                .GreaterThan(0).WithMessage("Publisher is required");
+                .GreaterThan(0)
+                .L("Publisher", "Id", "Required");
 
             RuleFor(x => x.CategoryIds)
-                .NotEmpty().WithMessage("At least one category must be selected");
-        
+                .NotEmpty()
+                .L("Category", "Id", "Required");
         }
-        
+
         private bool BeValidImage(IFormFile? image)
         {
-            if (image == null) return true; // Optional image
+            if (image == null) return true;
 
-            // Check file size (5MB max)
             if (image.Length > 5 * 1024 * 1024)
                 return false;
 
-            // Check file extension
             var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
             var extension = Path.GetExtension(image.FileName).ToLowerInvariant();
             if (!allowedExtensions.Contains(extension))
                 return false;
 
-            // Check content type
             var allowedContentTypes = new[] { "image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp" };
             if (!allowedContentTypes.Contains(image.ContentType.ToLowerInvariant()))
                 return false;
 
             return true;
         }
-
-
-
     }
-    
 }

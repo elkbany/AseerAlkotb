@@ -1,12 +1,11 @@
 using Mapster;
-
 using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Services;
 using AseerAlkotb.Domain.Entites.Models;
 using AseerAlkotb.Domain.Interfaces.Base;
 using AseerAlkotb.Domain.Interfaces.Repositories;
 using AseerAlkotb.Infrastructure.Context;
-using AseerAlkotb.Infrastructure.Repositories.Base;
+using AseerAlkotb.Infrastructure.Repositzories.Base;
 using AseerAlkotb.Infrastructure.Repositories.Implementations;
 using Mapster;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -15,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+
 
 namespace AseerAlkotb.Dashboard
 {
@@ -28,41 +28,15 @@ namespace AseerAlkotb.Dashboard
             builder.Services.AddControllersWithViews();
 
             #region  Context Registeration
+
+            // Add DbContext
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             {
                 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-                options.UseSqlServer(connectionString).UseLazyLoadingProxies();
-            });
-            #endregion
-            #region Identity Registration
-            builder.Services.AddIdentity<User, IdentityRole<int>>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
-            //.AddDefaultTokenProviders();
-
-            builder.Services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                //options.DefaultScheme= JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(option =>
-            {
-                option.SaveToken = true;
-                option.RequireHttpsMetadata = true;//http=false
-                option.TokenValidationParameters = new TokenValidationParameters()
-                {
-                    ValidateIssuer = true,
-                    ValidIssuer = builder.Configuration["JWT:IssuerIP"],
-                    ValidateAudience = true,
-                    ValidAudience = builder.Configuration["JWT:AudienceIP"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:SecretKey"])),
-                };
+                options.UseSqlServer(connectionString);
             });
 
-            #endregion
-            #region Repositories Registerations
-            builder.Services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
-            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-            builder.Services.AddScoped<IAuthorRepository, AuthorRepository>();
+
 
             builder.Services.AddScoped<IBookRepository, BookRepository>();
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
@@ -92,7 +66,7 @@ namespace AseerAlkotb.Dashboard
 
             #endregion
             #region AutoMapper 
-            //builder.Services.AddMapster();
+            builder.Services.AddMapster();
             TypeAdapterConfig.GlobalSettings.Compile();
             #endregion
             //#region Validation

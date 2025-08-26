@@ -1,25 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AseerAlkotb.Application.Features.Categories.Requests;
+﻿using AseerAlkotb.Application.Features.Categories.Requests;
 using FluentValidation;
+using AseerAlkotb.Application.ResponseHandler; // للـ ValidationExtensions
+using AseerAlkotb.Localization.Resources;
+using Microsoft.Extensions.Localization;
 
 namespace AseerAlkotb.Application.Features.Categories.Validators
 {
-    public class DeleteSubCategoryRequestValidator: AbstractValidator<DeleteSubCategoryRequest>
+    public class DeleteSubCategoryRequestValidator : AbstractValidator<DeleteSubCategoryRequest>
     {
         public DeleteSubCategoryRequestValidator()
         {
             RuleFor(x => x.Id)
-                .NotEmpty()
-                .GreaterThan(0)
-                .WithMessage("Category ID must be greater than 0");
+                .NotEmpty().L("SubCategory", "Id", "Required")
+                .GreaterThan(0).L("SubCategory", "Id", "MustBeGreaterThan" , "0");
+
             RuleFor(x => x.ParentCategoryId)
-                .NotEmpty()
-                .GreaterThan(0)
-                .WithMessage("ParentCategoryId is required for subcategories.");
+                .NotEmpty().L("ParentCategory", "Id", "Required")
+                .GreaterThan(0).L("ParentCategory", "Id", "MustBeGreaterThan" , "0");
         }
     }
 }

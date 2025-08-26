@@ -1,28 +1,32 @@
+using AseerAlkotb.API.DependencyInjection;
 using AseerAlkotb.API.Extensions;
 using AseerAlkotb.API.Middlewares;
 using AseerAlkotb.Application.Contracts;
+using AseerAlkotb.Application.ResponseHandler;
+using AseerAlkotb.Application.Contracts.External;
 using AseerAlkotb.Application.Services;
 using AseerAlkotb.Domain.Entites.Models;
 using AseerAlkotb.Domain.Interfaces.Base;
 using AseerAlkotb.Domain.Interfaces.Repositories;
+using AseerAlkotb.Localization.Resources;
+
 using AseerAlkotb.Infrastructure.Context;
+using AseerAlkotb.Infrastructure.ExternalServices;
 using AseerAlkotb.Infrastructure.Repositories.Base;
 using AseerAlkotb.Infrastructure.Repositories.Implementations;
 using Mapster;
-using MapsterMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
-using AseerAlkotb.Domain.Entites.Models;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection;
-using AseerAlkotb.Application.Features.Account.Validator;
-using FluentValidation;
-using AseerAlkotb.Application.Features.Account.Requests;
+using Microsoft.Extensions.Localization;
+
+using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-
-using System.Reflection;
 namespace AseerAlkotb.API
 {
     public class Program
@@ -31,17 +35,31 @@ namespace AseerAlkotb.API
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            #region  Context Registeration
+            #region Context Registeration
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             {
                 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
                 options.UseSqlServer(connectionString).UseLazyLoadingProxies();
             });
             #endregion
+
+            #region Localization
+            builder.Services.AddLocalizationServices();
+            builder.Services.AddHttpContextAccessor();
+            #endregion
+
+        
             #region Identity Registration
             builder.Services.AddIdentity<User, IdentityRole<int>>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
-            //.AddDefaultTokenProviders();
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                // Gnerates the default token providers for password reset, email confirmation, etc.
+                .AddDefaultTokenProviders();
+
+            builder.Services.Configure<IdentityOptions>(options =>
+            {
+                // User Cannot Login without confirming email
+                options.SignIn.RequireConfirmedEmail = true;
+            });
 
             builder.Services.AddAuthentication(options =>
             {
@@ -67,9 +85,11 @@ namespace AseerAlkotb.API
             builder.Services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IAuthorRepository, AuthorRepository>();
-
             builder.Services.AddScoped<IBookRepository, BookRepository>();
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+            builder.Services.AddScoped<IPublisherRepository, PublisherRepository>();
+            builder.Services.AddScoped<IQuoteRepository, QuoteRepository>();
+
 
             builder.Services.AddScoped<ICartRepository, CartRepository>();
 
@@ -81,15 +101,19 @@ namespace AseerAlkotb.API
             builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
             builder.Services.AddScoped<IAccountServices, AccountService>();
             #endregion
-            #region Services Registerations
-            builder.Services.AddScoped<IAuthorServices,AuthorServices>();
+
+            #region Services
+            builder.Services.AddScoped<IAuthorServices, AuthorServices>();
             builder.Services.AddScoped<IBookServices, BookServices>();
             builder.Services.AddScoped<ICategoryServices, CategoryServices>();
             builder.Services.AddScoped<ICartServices, CartServices>();
             builder.Services.AddScoped<IReviewServices, ReviewServices>();
             builder.Services.AddScoped<IPublisherServices, PublisherService>();
+            builder.Services.AddScoped<IQuoteService, QuoteService>();
             builder.Services.AddScoped<IPaymobService, PaymobService>();
             builder.Services.AddScoped<IOrderServices, OrderServices>();
+            builder.Services.AddScoped<IEmailService, EmailService>();
+
             builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -97,12 +121,24 @@ namespace AseerAlkotb.API
     });
 
             #endregion
+
             #region AutoMapper 
             builder.Services.AddMapster();
             TypeAdapterConfig.GlobalSettings.Compile();
             #endregion
+
             #region Validation
             builder.Services.AddFluentValidationValidators();
+
+            builder.Services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true;
+            });
+
+            builder.Services.Configure<MvcOptions>(options =>
+            {
+                options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
+            });
 
             #endregion
 
@@ -111,7 +147,6 @@ namespace AseerAlkotb.API
             #endregion
 
             #region Cors
-            // Add CORS policy
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowLocalhost4200",
@@ -121,58 +156,55 @@ namespace AseerAlkotb.API
             });
             #endregion
 
-            builder.Services.AddControllers();
-
-            #region CORS
-            builder.Services.AddCors(options =>
-            {
-                options.AddPolicy("AllowAllOrigins",
-                    builder => builder.AllowAnyOrigin()
-                                      .AllowAnyMethod()
-                                      .AllowAnyHeader());
-            });
-
-            #endregion
-
             #region Swagger
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             #endregion
 
             var app = builder.Build();
+
             #region Access Images
             app.UseStaticFiles();
             app.UseStaticFiles(new StaticFileOptions
             {
                 FileProvider = new PhysicalFileProvider(
-        Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads")),
+                    Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads")),
                 RequestPath = "/uploads"
             });
             #endregion
-            // Use CORS
+
             app.UseCors("AllowLocalhost4200");
 
-            // Configure the HTTP request pipeline.
+            #region Swagger
             if (app.Environment.IsDevelopment())
             {
-                #region Swagger
                 app.UseSwagger();
                 app.UseSwaggerUI(options =>
                 {
                     options.SwaggerEndpoint("/swagger/v1/swagger.json", "AseerAlktob API V1");
-                    //// Add these for better CORS handling
-                    //options.EnableTryItOutByDefault();
-                    //options.DisplayRequestDuration();
                 });
-                #endregion
             }
+            #endregion
+
             app.UseMiddleware<ExceptionHandlerMiddleware>();
+
+            #region Localization
+            app.UseLocalizationConfiguration();
+            #endregion
+
+            // Initialize LocalizerProvider correctly
+            using (var scope = app.Services.CreateScope())
+            {
+                var localizer = scope.ServiceProvider.GetRequiredService<IStringLocalizer<SharedResources>>();
+                var httpContextAccessor = scope.ServiceProvider.GetRequiredService<IHttpContextAccessor>();
+                LocalizerProvider.Init(localizer, httpContextAccessor);
+            }
+
             app.UseHttpsRedirection();
+
 
             app.UseAuthentication();
             app.UseAuthorization();
-
-
             app.MapControllers();
 
             app.Run();
