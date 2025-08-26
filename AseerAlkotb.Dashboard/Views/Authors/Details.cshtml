@@ -1,0 +1,60 @@
+@model AseerAlkotb.Application.Features.Authors.Responses.GetAuthorByIdResponse
+
+@{
+    ViewData["Title"] = "Author Details";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title">Author Details</h3>
+                    <a asp-action="Index" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back to Authors</a>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <img src="@Model.ImageUrl" alt="@Model.Name" class="img-fluid rounded border" />
+                        </div>
+                        <div class="col-md-9">
+                            <dl class="row">
+                                <dt class="col-sm-3">Name</dt>
+                                <dd class="col-sm-9">@Model.Name</dd>
+                                <dt class="col-sm-3">Bio</dt>
+                                <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Bio) ? "-" : Model.Bio)</dd>
+                                <dt class="col-sm-3">Country</dt>
+                                <dd class="col-sm-9">@Model.CountryCode</dd>
+                                <dt class="col-sm-3">Rating</dt>
+                                <dd class="col-sm-9">@Model.Rating</dd>
+                            </dl>
+
+                            <h5 class="mt-4">Books (@(Model.Books?.Count ?? 0))</h5>
+                            <div class="row row-cols-1 row-cols-md-3 g-3">
+                                @if (Model.Books != null && Model.Books.Any())
+                                {
+                                    @foreach (var b in Model.Books)
+                                    {
+                                        <div class="col">
+                                            <div class="card h-100">
+                                                <img src="@b.CoverImageUrl" class="card-img-top" alt="@b.Title" />
+                                                <div class="card-body">
+                                                    <h6 class="card-title">@b.Title</h6>
+                                                    <p class="card-text text-muted">@b.AuthorName</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="col-12 text-muted">No books to display.</div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
