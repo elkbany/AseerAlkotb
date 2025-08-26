@@ -6,29 +6,24 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace AseerAlkotb.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class updated : Migration
+    public partial class fixmigrations : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Reviews_Authors_AuthorId",
-                table: "Reviews");
+            migrationBuilder.AddColumn<int>(
+                name: "City",
+                table: "Orders",
+                type: "int",
+                nullable: false,
+                defaultValue: 0);
 
-            migrationBuilder.RenameColumn(
-                name: "ReviewFor",
-                table: "Reviews",
-                newName: "ReviewType");
-
-            migrationBuilder.RenameColumn(
-                name: "AuthorId",
-                table: "Reviews",
-                newName: "ReviewAuthorId");
-
-            migrationBuilder.RenameIndex(
-                name: "IX_Reviews_AuthorId",
-                table: "Reviews",
-                newName: "IX_Reviews_ReviewAuthorId");
+            migrationBuilder.AddColumn<decimal>(
+                name: "FinalAmount",
+                table: "Orders",
+                type: "decimal(18,2)",
+                nullable: false,
+                defaultValue: 0m);
 
             migrationBuilder.CreateTable(
                 name: "Quotes",
@@ -81,48 +76,21 @@ namespace AseerAlkotb.Infrastructure.Migrations
                 name: "IX_Quotes_UserId",
                 table: "Quotes",
                 column: "UserId");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Reviews_Authors_ReviewAuthorId",
-                table: "Reviews",
-                column: "ReviewAuthorId",
-                principalTable: "Authors",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Reviews_Authors_ReviewAuthorId",
-                table: "Reviews");
-
             migrationBuilder.DropTable(
                 name: "Quotes");
 
-            migrationBuilder.RenameColumn(
-                name: "ReviewType",
-                table: "Reviews",
-                newName: "ReviewFor");
+            migrationBuilder.DropColumn(
+                name: "City",
+                table: "Orders");
 
-            migrationBuilder.RenameColumn(
-                name: "ReviewAuthorId",
-                table: "Reviews",
-                newName: "AuthorId");
-
-            migrationBuilder.RenameIndex(
-                name: "IX_Reviews_ReviewAuthorId",
-                table: "Reviews",
-                newName: "IX_Reviews_AuthorId");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Reviews_Authors_AuthorId",
-                table: "Reviews",
-                column: "AuthorId",
-                principalTable: "Authors",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+            migrationBuilder.DropColumn(
+                name: "FinalAmount",
+                table: "Orders");
         }
     }
 }
