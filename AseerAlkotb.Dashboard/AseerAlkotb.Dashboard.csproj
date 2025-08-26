@@ -10,4 +10,19 @@
     <Folder Include="wwwroot\images\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Mapster" Version="7.4.0" />
+    <PackageReference Include="Mapster.DependencyInjection" Version="1.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.8">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AseerAlkotb.Application\AseerAlkotb.Application.csproj" />
+    <ProjectReference Include="..\AseerAlkotb.Infrastructure\AseerAlkotb.Infrastructure.csproj" />
+    <ProjectReference Include="..\AseerAlkotb.Domain\AseerAlkotb.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

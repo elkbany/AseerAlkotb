@@ -7,6 +7,13 @@ using System.Threading.Tasks;
 
 namespace AseerAlkotb.Application.Features.Categories.Responses
 {
-    public record GetAllCategoriesPaginatedResponse(int Id,string Name, string? Description, bool IsActive);
-
+    public record GetAllCategoriesPaginatedResponse(
+        int Id, 
+        string Name, 
+        string? Description, 
+        bool IsActive,
+        int? ParentCategoryId = null,
+        int SubCategoryCount = 0,
+        DateTime CreatedAt = default
+    );
 }
