@@ -15,7 +15,7 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-3">
-                            <img src="@Model.ImageUrl" alt="@Model.Name" class="img-fluid rounded border" />
+                            <img src="@($"http://localhost:5234{Model.ImageUrl}")" alt="@Model.Name" class="img-fluid rounded border" />
                         </div>
                         <div class="col-md-9">
                             <dl class="row">
@@ -37,7 +37,7 @@
                                     {
                                         <div class="col">
                                             <div class="card h-100">
-                                                <img src="@b.CoverImageUrl" class="card-img-top" alt="@b.Title" />
+                                                <img src="@($"http://localhost:5234{b.CoverImageUrl}")" class="card-img-top" alt="@b.Title" />
                                                 <div class="card-body">
                                                     <h6 class="card-title">@b.Title</h6>
                                                     <p class="card-text text-muted">@b.AuthorName</p>
