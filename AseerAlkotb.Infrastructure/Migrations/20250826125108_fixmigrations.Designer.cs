@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AseerAlkotb.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250824042310_updated")]
-    partial class updated
+    [Migration("20250826125108_fixmigrations")]
+    partial class fixmigrations
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -66,6 +66,52 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Authors", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Bio = "نجيب محفوظ عبد العزيز إبراهيم أحمد الباشا (11 ديسمبر 1911 – 30 أغسطس 2006) هو كاتب مصري. يُعد أول مصري وعربي حائز على جائزة نوبل في الأدب. كتب نجيب محفوظ منذ الثلاثينات واستمر حتى 2004. تدور أحداث جميع رواياته في مصر وتظهر فيها سمة متكررة، هي الحارة التي تعادل العالم. كتب نجيب محفوظ أكثر من ثلاثين رواية اشتهرت غالبيتها وتم إنتاجها سينمائيًا أو تلفزيونيًا وكانت أول رواياته هي عبث الأقدار (1939)، أما آخرها، فكانت قشتمر (1988)، كما كتب أكثر من عشرين قصة قصيرة وكان آخرها أحلام فترة النقاهة (2004). ومن أشهر أعماله: بداية ونهاية (1949)، والثلاثية (1956–1957)، وأولاد حارتنا (1959)، والتي مُنعت من النشر في مصر منذ صدورها وحتى وقتٍ قريب، واللص والكلاب (1961)، وثرثرة فوق النيل (1966)، والكرنك (1974)، والحرافيش (1977). بينما يُصنف أدب محفوظ باعتباره أدبًا واقعيًا، فإن مواضيعًا وجودية تظهر فيه. محفوظ أكثر أديب عربي نُقلت أعماله إلى السينما والتلفزيون.",
+                            CountryCode = "EG",
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ImageUrl = "/uploads/authors/8a48bbe0-f12a-4be4-b5bc-72d3a442dcae.jpg",
+                            IsActive = true,
+                            Name = "نجيب محفوظ",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Bio = "أحمد خالد توفيق (10 يونيو 1962 – 2 أبريل 2018)، أستاذ جامعي، وطبيب، وكاتب، ومؤلف، ومترجم مصري. يُعد أول كاتب عربي في مجال أدب الرعب. والأشهر في مجال أدب الشباب، والفنتازيا، والخيال العلمي. لُقب بـ«العراب».\r\n\r\nبدأت رحلته الأدبية مع كتابة سلسلة ما وراء الطبيعة، ورغم أن أدب الرعب لم يكن سائدًا في ذلك الوقت، فإن السلسلة حققت نجاحًا كبيرًا، واستقبالًا جيدًا من الجمهور. ما شجعه على استكمالها، وأصدر بعدها سلسلة فانتازيا عام 1995، وسلسلة سفاري عام 1996. في عام 2006، سلسلة دبليو دبليو دبليو.",
+                            CountryCode = "EG",
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ImageUrl = "/uploads/authors/8a48bbe0-f12a-4be4-b5bc-72d3a442dcae.jpg",
+                            IsActive = true,
+                            Name = "أحمد خالد توفيق",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Bio = "كاتب مصري",
+                            CountryCode = "EG",
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ImageUrl = "/uploads/authors/8a48bbe0-f12a-4be4-b5bc-72d3a442dcae.jpg",
+                            IsActive = true,
+                            Name = "يوسف إدريس",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Bio = "كاتب وطبيب أسنان عراقي من مواليد بغداد في عام 1970، ينتمي إلى الأسرة العمرية في الموصل التي يعود نسبها إلى الخليفة عمر بن الخطاب، والده مؤرخ وقاض عراقي هو خيري العمري. تخرج طبيب أسنان من جامعة بغداد عام 1993، لكنه عُرِف ككاتب إسلامي عبر مؤلفات جمعت بين منحى تجديدي في طرح الموضوعات والأسلوب الأدبي. اختير عام 2010 ليكون الشخصية الفكرية التي تكرمها دار الفكر في تقليدها السنوي، والذي سبق أن كُرم فيه أعلام مثل عبد الوهاب المسيري والبوطي والزحيلي، وبذلك يكون العمري هو أصغر هؤلاء المكرمين سناً حيث تم اختياره قبل أن يبلغ الأربعين.",
+                            CountryCode = "IQ",
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ImageUrl = "/uploads/authors/Ahmed-2_(14896102021).jpg",
+                            IsActive = true,
+                            Name = "أحمد خيري العمري",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        });
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Book", b =>
@@ -150,6 +196,74 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.HasIndex("PublisherId");
 
                     b.ToTable("Books", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            AuthorId = 1,
+                            CoverImageUrl = "/uploads/Books/94147f51-d713-47a3-86dd-f88eef6198d4.webp",
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "رواية شهيرة لنجيب محفوظ",
+                            DiscountPercentage = 10m,
+                            Format = "ورقي",
+                            ISBN = "1234567890123",
+                            IsActive = true,
+                            Language = 1,
+                            PageCount = 240,
+                            Price = 150m,
+                            PublishedDate = new DateTime(1950, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PublisherId = 1,
+                            SalesCount = 0,
+                            StockQuantity = 20,
+                            Title = "زقاق المدق",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ViewCount = 0
+                        },
+                        new
+                        {
+                            Id = 2,
+                            AuthorId = 1,
+                            CoverImageUrl = "/uploads/Books/6fdbe335-1a34-4564-9564-e30dc38cf6ea.webp",
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "وصف الكتاب الجديد",
+                            DiscountPercentage = 15m,
+                            Format = "ورقي",
+                            ISBN = "9876543210123",
+                            IsActive = true,
+                            Language = 1,
+                            PageCount = 350,
+                            Price = 200m,
+                            PublishedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PublisherId = 1,
+                            SalesCount = 0,
+                            StockQuantity = 30,
+                            Title = "كتاب جديد",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ViewCount = 0
+                        },
+                        new
+                        {
+                            Id = 3,
+                            AuthorId = 2,
+                            CoverImageUrl = "/uploads/Books/6fdbe335-1a34-4564-9564-e30dc38cf6ea.webp",
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "وصف الكتاب الآخر",
+                            DiscountPercentage = 5m,
+                            Format = "ورقي",
+                            ISBN = "1234567890124",
+                            IsActive = true,
+                            Language = 1,
+                            PageCount = 300,
+                            Price = 250m,
+                            PublishedDate = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PublisherId = 2,
+                            SalesCount = 0,
+                            StockQuantity = 15,
+                            Title = "كتاب آخر",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ViewCount = 0
+                        });
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Cart", b =>
@@ -234,6 +348,588 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.HasIndex("ParentCategoryId");
 
                     b.ToTable("Categories", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب روائية تشمل الأدب العربي والعالمي",
+                            IsActive = true,
+                            Name = "روايات",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب تاريخية عن الحضارات والشعوب",
+                            IsActive = true,
+                            Name = "تاريخ",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب علمية في مجالات متنوعة",
+                            IsActive = true,
+                            Name = "علوم",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب لتطوير الذات والمهارات",
+                            IsActive = true,
+                            Name = "تنمية بشرية",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 5,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب دينية وفكر إسلامي",
+                            IsActive = true,
+                            Name = "كتب دينية",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 6,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب أدبية تشمل الشعر والنثر",
+                            IsActive = true,
+                            Name = "أدب",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 7,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب مخصصة للأطفال والناشئة",
+                            IsActive = true,
+                            Name = "كتب أطفال",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 8,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب عن السياسة والعلاقات الدولية",
+                            IsActive = true,
+                            Name = "سياسة",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 9,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب اقتصادية ومالية",
+                            IsActive = true,
+                            Name = "اقتصاد",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 10,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب فلسفية وفكرية",
+                            IsActive = true,
+                            Name = "فلسفة",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 11,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب عن الطبخ والوصفات",
+                            IsActive = true,
+                            Name = "طبخ",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 12,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "سير ذاتية ومذكرات",
+                            IsActive = true,
+                            Name = "سير ذاتية",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 13,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب عن الفنون والإبداع",
+                            IsActive = true,
+                            Name = "فنون",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 14,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب عن التكنولوجيا والابتكار",
+                            IsActive = true,
+                            Name = "تكنولوجيا",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 15,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب طبية وصحية",
+                            IsActive = true,
+                            Name = "طب",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 16,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب عن الرياضة واللياقة البدنية",
+                            IsActive = true,
+                            Name = "رياضة",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 17,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب عن السفر والرحلات",
+                            IsActive = true,
+                            Name = "سفر",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 18,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب عن الإدارة والقيادة",
+                            IsActive = true,
+                            Name = "إدارة",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 19,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب قانونية وتشريعات",
+                            IsActive = true,
+                            Name = "قانون",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 20,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب تعليمية وتربوية",
+                            IsActive = true,
+                            Name = "تعليم",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 21,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "روايات مكتوبة باللغة العربية",
+                            IsActive = true,
+                            Name = "روايات عربية",
+                            ParentCategoryId = 1,
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 22,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "روايات مترجمة من لغات أخرى",
+                            IsActive = true,
+                            Name = "روايات مترجمة",
+                            ParentCategoryId = 1,
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 23,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "روايات الجريمة والغموض",
+                            IsActive = true,
+                            Name = "روايات بوليسية",
+                            ParentCategoryId = 1,
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 24,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "روايات في عالم الخيال العلمي",
+                            IsActive = true,
+                            Name = "روايات خيال علمي",
+                            ParentCategoryId = 1,
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 25,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب عن تاريخ الحضارات العالمية",
+                            IsActive = true,
+                            Name = "تاريخ العالم",
+                            ParentCategoryId = 2,
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 26,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب عن تاريخ العرب والإسلام",
+                            IsActive = true,
+                            Name = "تاريخ العرب",
+                            ParentCategoryId = 2,
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 27,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب عن الحروب والصراعات",
+                            IsActive = true,
+                            Name = "تاريخ الحروب",
+                            ParentCategoryId = 2,
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 28,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب في الفيزياء والكيمياء",
+                            IsActive = true,
+                            Name = "علوم طبيعية",
+                            ParentCategoryId = 3,
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 29,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب في البيولوجيا والطب",
+                            IsActive = true,
+                            Name = "علوم حيوية",
+                            ParentCategoryId = 3,
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 30,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب عن الفضاء والكون",
+                            IsActive = true,
+                            Name = "علوم الفلك",
+                            ParentCategoryId = 3,
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 31,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب لتحسين المهارات الشخصية",
+                            IsActive = true,
+                            Name = "تطوير الذات",
+                            ParentCategoryId = 4,
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 32,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب عن مهارات القيادة",
+                            IsActive = true,
+                            Name = "القيادة",
+                            ParentCategoryId = 4,
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 33,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب عن تنظيم الوقت",
+                            IsActive = true,
+                            Name = "إدارة الوقت",
+                            ParentCategoryId = 4,
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 34,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب عن الفكر والفقه الإسلامي",
+                            IsActive = true,
+                            Name = "فكر إسلامي",
+                            ParentCategoryId = 5,
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 35,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب تفسير القرآن الكريم",
+                            IsActive = true,
+                            Name = "تفسير القرآن",
+                            ParentCategoryId = 5,
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 36,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "دواوين الشعر العربي",
+                            IsActive = true,
+                            Name = "شعر عربي",
+                            ParentCategoryId = 6,
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 37,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب النثر الأدبي والمقالات",
+                            IsActive = true,
+                            Name = "نثر أدبي",
+                            ParentCategoryId = 6,
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 38,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "قصص مصورة للأطفال",
+                            IsActive = true,
+                            Name = "قصص أطفال",
+                            ParentCategoryId = 7,
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 39,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب تعليمية للناشئة",
+                            IsActive = true,
+                            Name = "كتب تعليمية للأطفال",
+                            ParentCategoryId = 7,
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 40,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب عن السياسة العالمية",
+                            IsActive = true,
+                            Name = "علاقات دولية",
+                            ParentCategoryId = 8,
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 41,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب عن السياسة العربية",
+                            IsActive = true,
+                            Name = "سياسة محلية",
+                            ParentCategoryId = 8,
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 42,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب عن الاقتصاد العام",
+                            IsActive = true,
+                            Name = "اقتصاد كلي",
+                            ParentCategoryId = 9,
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 43,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب عن إدارة الأموال الشخصية",
+                            IsActive = true,
+                            Name = "مالية شخصية",
+                            ParentCategoryId = 9,
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 44,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب عن الفلسفة الغربية",
+                            IsActive = true,
+                            Name = "فلسفة غربية",
+                            ParentCategoryId = 10,
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 45,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب عن الفلسفة الشرقية",
+                            IsActive = true,
+                            Name = "فلسفة شرقية",
+                            ParentCategoryId = 10,
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 46,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "وصفات الطعام العربي",
+                            IsActive = true,
+                            Name = "مطبخ عربي",
+                            ParentCategoryId = 11,
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 47,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "وصفات من مطابخ العالم",
+                            IsActive = true,
+                            Name = "مطبخ عالمي",
+                            ParentCategoryId = 11,
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 48,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "سير ذاتية لشخصيات سياسية",
+                            IsActive = true,
+                            Name = "سير سياسيين",
+                            ParentCategoryId = 12,
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 49,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "سير ذاتية لفنانين ومبدعين",
+                            IsActive = true,
+                            Name = "سير فنانين",
+                            ParentCategoryId = 12,
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 50,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب عن الرسم والنحت",
+                            IsActive = true,
+                            Name = "فنون تشكيلية",
+                            ParentCategoryId = 13,
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 51,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب عن الموسيقى والآلات",
+                            IsActive = true,
+                            Name = "موسيقى",
+                            ParentCategoryId = 13,
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 52,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب عن البرمجة وتطوير البرمجيات",
+                            IsActive = true,
+                            Name = "برمجة",
+                            ParentCategoryId = 14,
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 53,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب عن الذكاء الاصطناعي",
+                            IsActive = true,
+                            Name = "ذكاء اصطناعي",
+                            ParentCategoryId = 14,
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 54,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب عن الطب العام والصحة",
+                            IsActive = true,
+                            Name = "طب عام",
+                            ParentCategoryId = 15,
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 55,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب عن التغذية والصحة",
+                            IsActive = true,
+                            Name = "تغذية",
+                            ParentCategoryId = 15,
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 56,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب عن التمارين الرياضية",
+                            IsActive = true,
+                            Name = "لياقة بدنية",
+                            ParentCategoryId = 16,
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 57,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب عن كرة القدم وغيرها",
+                            IsActive = true,
+                            Name = "رياضات جماعية",
+                            ParentCategoryId = 16,
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 58,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب عن السفر والمغامرات",
+                            IsActive = true,
+                            Name = "رحلات مغامرة",
+                            ParentCategoryId = 17,
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 59,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "أدلة للسفر والسياحة",
+                            IsActive = true,
+                            Name = "أدلة سياحية",
+                            ParentCategoryId = 17,
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 60,
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "كتب عن إدارة الشركات",
+                            IsActive = true,
+                            Name = "إدارة الأعمال",
+                            ParentCategoryId = 18,
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        });
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.LikeDisLike", b =>
@@ -318,10 +1014,16 @@ namespace AseerAlkotb.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("City")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("DiscountAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("FinalAmount")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("Governorate")
@@ -432,6 +1134,35 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Publishers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            ContactEmail = "info@aseeralkotob.com",
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "دار نشر مصرية",
+                            Name = "عصير الكتب",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 2,
+                            ContactEmail = "info2@aseeralkotob.com",
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "دار نشر عربية",
+                            Name = "دار الشروق",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 3,
+                            ContactEmail = "info3@aseeralkotob.com",
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "دار نشر لبنانية",
+                            Name = "دار الساقي",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        });
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Quote", b =>
@@ -484,6 +1215,9 @@ namespace AseerAlkotb.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("AuthorId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("BookId")
                         .HasColumnType("int");
 
@@ -497,10 +1231,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.Property<int>("Rating")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ReviewAuthorId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ReviewType")
+                    b.Property<int>("ReviewFor")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -511,9 +1242,9 @@ namespace AseerAlkotb.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BookId");
+                    b.HasIndex("AuthorId");
 
-                    b.HasIndex("ReviewAuthorId");
+                    b.HasIndex("BookId");
 
                     b.HasIndex("UserId");
 
@@ -779,6 +1510,33 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.HasIndex("CategoryId");
 
                     b.ToTable("BookCategories");
+
+                    b.HasData(
+                        new
+                        {
+                            BookId = 1,
+                            CategoryId = 1
+                        },
+                        new
+                        {
+                            BookId = 1,
+                            CategoryId = 2
+                        },
+                        new
+                        {
+                            BookId = 2,
+                            CategoryId = 2
+                        },
+                        new
+                        {
+                            BookId = 3,
+                            CategoryId = 1
+                        },
+                        new
+                        {
+                            BookId = 3,
+                            CategoryId = 3
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<int>", b =>
@@ -1067,14 +1825,14 @@ namespace AseerAlkotb.Infrastructure.Migrations
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Review", b =>
                 {
+                    b.HasOne("AseerAlkotb.Domain.Entites.Models.Author", "Author")
+                        .WithMany("Reviews")
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("AseerAlkotb.Domain.Entites.Models.Book", "Book")
                         .WithMany("Reviews")
                         .HasForeignKey("BookId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("AseerAlkotb.Domain.Entites.Models.Author", "Author")
-                        .WithMany("Reviews")
-                        .HasForeignKey("ReviewAuthorId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("AseerAlkotb.Domain.Entites.Models.User", "User")

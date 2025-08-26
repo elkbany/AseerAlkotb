@@ -11,10 +11,10 @@ namespace AseerAlkotb.Domain.Entites.Models
 
 
         #region Navigation Properties
-        public ReviewFor ReviewType { get; set; }
+        public ReviewFor ReviewFor { get; set; }
         public int? BookId { get; set; }
         public virtual Book Book { get; set; }
-        public int? ReviewAuthorId { get; set; }
+        public int? AuthorId { get; set; }
         public virtual Author Author { get; set; }
         public int UserId { get; set; }
         public virtual User User { get; set; }
