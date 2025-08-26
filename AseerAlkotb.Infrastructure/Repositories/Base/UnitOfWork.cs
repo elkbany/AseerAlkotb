@@ -1,17 +1,7 @@
-﻿using AseerAlkotb.Domain.Entites.Models;
-using AseerAlkotb.Domain.Enums;
-using AseerAlkotb.Domain.Interfaces.Base;
+﻿using AseerAlkotb.Domain.Interfaces.Base;
 using AseerAlkotb.Domain.Interfaces.Repositories;
 using AseerAlkotb.Infrastructure.Context;
 using AseerAlkotb.Infrastructure.Repositories.Implementations;
-using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 namespace AseerAlkotb.Infrastructure.Repositories.Base
 {
     public class UnitOfWork : IUnitOfWork

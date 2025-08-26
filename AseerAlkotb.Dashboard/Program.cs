@@ -1,3 +1,11 @@
+using AseerAlkotb.Application.Contracts;
+using AseerAlkotb.Application.Services;
+using AseerAlkotb.Domain.Interfaces.Base;
+using AseerAlkotb.Infrastructure.Context;
+using AseerAlkotb.Infrastructure.Repositories.Base;
+using Microsoft.EntityFrameworkCore;
+using Mapster;
+
 namespace AseerAlkotb.Dashboard
 {
     public class Program
@@ -8,6 +16,24 @@ namespace AseerAlkotb.Dashboard
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            // Add DbContext
+            builder.Services.AddDbContext<ApplicationDbContext>(options =>
+            {
+                var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+                options.UseSqlServer(connectionString);
+            });
+
+            // Add Repositories
+            builder.Services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            // Add Services
+            builder.Services.AddScoped<ICategoryServices, CategoryServices>();
+
+            // Configure Mapster
+            builder.Services.AddMapster();
+            TypeAdapterConfig.GlobalSettings.Compile();
 
             var app = builder.Build();
 
