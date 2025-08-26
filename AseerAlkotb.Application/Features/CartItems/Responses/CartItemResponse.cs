@@ -11,9 +11,14 @@ namespace AseerAlkotb.Application.Features.CartItem.Responses
         //int Id,
         int BookId,
         string BookTitle,
+        string CoverImageUrl,
         decimal UnitPrice,
+        decimal DiscountPercentage,
+        decimal DiscountedPrice,
         int Quantity,
-        decimal TotalPrice
+        decimal TotalPrice,
+        decimal TotalDiscountedPrice 
+
     );
     
 }

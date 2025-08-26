@@ -15,6 +15,7 @@ using AseerAlkotb.Application.ResponseHandler;
 using AseerAlkotb.Domain.Entites.Models;
 using AseerAlkotb.Domain.Interfaces.Base;
 using Mapster;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Hosting;
 using static AseerAlkotb.Application.ResponseHandler.ApiResponseHandler;
@@ -41,11 +42,18 @@ namespace AseerAlkotb.Application.Services
             Items: cart.CartItems.Select(ci => new CartItemResponse(
                 BookId: ci.BookId,
                 BookTitle: ci.Book.Title,
+                CoverImageUrl: ci.Book.CoverImageUrl,
                 UnitPrice: ci.UnitPrice,
                 Quantity: ci.Quantity,
-                TotalPrice: ci.TotalPrice
+                DiscountPercentage: ci.Book.DiscountPercentage,
+                DiscountedPrice: ci.UnitPrice - (ci.UnitPrice * ci.Book.DiscountPercentage / 100),
+                TotalPrice: ci.TotalPrice,
+                TotalDiscountedPrice: ci.Quantity * (ci.UnitPrice - (ci.UnitPrice * ci.Book.DiscountPercentage / 100))
             )) ,
-            SumTotalPrice: cart.CartItems.Sum(ci => ci.TotalPrice) 
+            SumTotalPrice: cart.CartItems.Sum(ci => ci.TotalPrice),
+            SumDiscountedPrice: cart.CartItems.Sum(ci => ci.Quantity * (ci.UnitPrice - (ci.UnitPrice * ci.Book.DiscountPercentage / 100))),
+            TotalItemsCount: cart.CartItems.Sum(ci => ci.Quantity)
+
             );
 
             return Success(response);

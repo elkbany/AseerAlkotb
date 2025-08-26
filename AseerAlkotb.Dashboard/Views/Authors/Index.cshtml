@@ -1,0 +1,112 @@
+@model IEnumerable<AseerAlkotb.Application.Features.Authors.Responses.GetAllAuthorsPaginatedResponse>
+
+@{
+    ViewData["Title"] = "Authors";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title">Authors</h3>
+                    <form method="get" class="d-flex" role="search">
+                        <input type="text" name="search" class="form-control me-2" placeholder="Search authors..." value="@ViewBag.SearchTerm" />
+                        <button type="submit" class="btn btn-outline-secondary"><i class="fas fa-search"></i> Search</button>
+                    </form>
+                </div>
+                <div class="card-body">
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            @TempData["Success"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            @TempData["Error"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Name</th>
+                                    <th>Bio</th>
+                                    <th>Country</th>
+                                    <th>Rating</th>
+                                    <th>Books</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.Any())
+                                {
+                                    @foreach (var a in Model)
+                                    {
+                                        <tr>
+                                            <td>@a.Id</td>
+                                            <td>@a.Name</td>
+                                            <td>@(string.IsNullOrWhiteSpace(a.Bio) ? "-" : (a.Bio.Length > 80 ? a.Bio.Substring(0, 80) + "..." : a.Bio))</td>
+                                            <td>@a.CountryCode</td>
+                                            <td>@a.Rating</td>
+                                            <td>@(a.Books?.Count ?? 0)</td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <a asp-action="Details" asp-route-id="@a.Id" class="btn btn-sm btn-outline-secondary"><i class="fas fa-eye"></i> Details</a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="7" class="text-center text-muted">No authors to display</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    @if (ViewBag.TotalPages > 1)
+                    {
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination justify-content-center">
+                                @if (ViewBag.CurrentPage > 1)
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" asp-action="Index" asp-route-pageNumber="@(ViewBag.CurrentPage - 1)" asp-route-search="@ViewBag.SearchTerm">Previous</a>
+                                    </li>
+                                }
+                                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                                {
+                                    <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                        <a class="page-link" asp-action="Index" asp-route-pageNumber="@i" asp-route-search="@ViewBag.SearchTerm">@i</a>
+                                    </li>
+                                }
+                                @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" asp-action="Index" asp-route-pageNumber="@(ViewBag.CurrentPage + 1)" asp-route-search="@ViewBag.SearchTerm">Next</a>
+                                    </li>
+                                }
+                            </ul>
+                        </nav>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        setTimeout(function () { $('.alert').fadeOut('slow'); }, 5000);
+    </script>
+}
