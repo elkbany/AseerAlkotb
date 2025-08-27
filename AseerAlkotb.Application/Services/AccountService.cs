@@ -4,15 +4,19 @@ using AseerAlkotb.Application.Features.Account.Requests;
 using AseerAlkotb.Application.Features.Account.Responses;
 using AseerAlkotb.Application.Features.Account.Validator;
 using AseerAlkotb.Application.Features.CartItem.Requests;
+using AseerAlkotb.Application.Features.CartItem.Responses;
 using AseerAlkotb.Application.Features.CartItems.Validation;
 using AseerAlkotb.Application.ResponseHandler;
 using AseerAlkotb.Domain.Entites.Models;
+using AseerAlkotb.Domain.Interfaces.Base;
 using Mapster;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -31,35 +35,18 @@ namespace AseerAlkotb.Application.Services
         private readonly UserManager<User> _userManager;
         private readonly IConfiguration _configuration;
         private readonly IEmailService _emailService;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public AccountService(UserManager<User> userManager, IServiceProvider serviceProvider, IHostEnvironment environment, IConfiguration configuration, IEmailService emailService) : base(serviceProvider, environment)
+
+        public AccountService(UserManager<User> userManager, IUnitOfWork unitOfWork, IServiceProvider serviceProvider, IHostEnvironment environment, IConfiguration configuration, IEmailService emailService) : base(serviceProvider, environment)
         {
             _userManager = userManager;
             _configuration = configuration;
+            _unitOfWork = unitOfWork;
             _emailService = emailService;
         }
 
-        public async Task<ApiResponse<RegisterResponse>> CreateAccount(RegisterRequest request)
-        {
-            await DoValidationAsync<RegisterRequestValidator, RegisterRequest>(request);
-            var existingUserName = await _userManager.FindByNameAsync(request.UserName);
-            if (existingUserName != null)
-            {
-                return BadRequest<RegisterResponse>("Username is already taken");
-            }
-            var newAccount = request.Adapt<User>();
-            var result = await _userManager.CreateAsync(newAccount, request.Password);
-            if (!result.Succeeded)
-            {
-                var errors = result.Errors.Select(e => e.Description).ToList();
-                return BadRequest<RegisterResponse>("Try Again");
-                //return BadRequest<RegisterResponse>(errors);
-            }
-            var response = newAccount.Adapt<RegisterResponse>();
-            return Success(response);
-
-        }
-
+        
         public async Task<ApiResponse<RegisterResponse>> Register(RegisterRequest request)
         {
             try
@@ -77,6 +64,8 @@ namespace AseerAlkotb.Application.Services
 
                 // 4- Map request to User entity
                 var newAccount = request.Adapt<User>();
+                newAccount.CreatedAt = DateTime.UtcNow;
+                newAccount.UpdatedAt = DateTime.UtcNow;
 
                 // 5- Create user
                 var result = await _userManager.CreateAsync(newAccount, request.Password);
@@ -84,6 +73,24 @@ namespace AseerAlkotb.Application.Services
                     return BadRequest<RegisterResponse>(
                         string.Join(", ", result.Errors.Select(e => e.Description))
                     );
+
+                //add role to the new user
+                var addRole = await _userManager.AddToRoleAsync(newAccount, "Client");
+                if (!addRole.Succeeded)
+                {
+                    return BadRequest<RegisterResponse>("Failed to assign role to user");
+                    //return BadRequest<RegisterResponse>(addRole.Errors.Select(e => e.Description).ToList());
+                }
+
+                //add cart for the new user
+                var cart = new Cart()
+                {
+                    UserId = newAccount.Id,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+                await _unitOfWork.Carts.InsertAsync(cart);
+                await _unitOfWork.CommitAsync();
 
                 // 6- Generate email confirmation token
                 var token = await _userManager.GenerateEmailConfirmationTokenAsync(newAccount);
@@ -109,10 +116,10 @@ namespace AseerAlkotb.Application.Services
                 // 9- Send email
                 var subject = "Confirm your email";
                 var body = $@"
-            <p>Hello {newAccount.UserName},</p>
-            <p>Please confirm your email by clicking the link below:</p>
-            <p><a href=""{confirmUrl}"">Confirm Email</a></p>
-        ";
+                    <p>Hello {newAccount.UserName},</p>
+                    <p>Please confirm your email by clicking the link below:</p>
+                    <p><a href=""{confirmUrl}"">Confirm Email</a></p>
+                ";
 
                 try
                 {
@@ -177,12 +184,12 @@ namespace AseerAlkotb.Application.Services
             var resetUrl = $"{BackendBase}/api/Account/reset-password?userId={user.Id}&token={tokenEncoded}";
 
             var subject = "Reset Your Password";
-            var body = $@"
-        <p>Hello {user.UserName},</p>
-        <p>Click the link below to reset your password:</p>
-        <p><a href=""{resetUrl}"">Reset Password</a></p>
-        <p>If you didn't request this, you can ignore this email.</p>
-    ";
+                var body = $@"
+                    <p>Hello {user.UserName},</p>
+                    <p>Click the link below to reset your password:</p>
+                    <p><a href=""{resetUrl}"">Reset Password</a></p>
+                    <p>If you didn't request this, you can ignore this email.</p>
+                ";
 
             try
             {
@@ -228,63 +235,6 @@ namespace AseerAlkotb.Application.Services
             return Success("Password reset successfully.");
         }
 
-
-
-        //    public async Task<ApiResponse<LoginResponse>> Login(LoginRequest request)
-        //    {
-        //        await DoValidationAsync<LoginRequestValidator, LoginRequest>(request);
-        //        //var normalizedEmail = userManager.NormalizeEmail(request.Email);
-        //        //var existingUser = await userManager.FindByEmailAsync(normalizedEmail);
-        //        var existingUser = await _userManager.FindByEmailAsync(request.Email);
-        //        if (existingUser != null)
-        //        {
-
-        //            bool foundPassword = await _userManager.CheckPasswordAsync(existingUser, request.Password);
-        //            if (foundPassword == true)
-        //            {
-        //                List<Claim>userClaims = new List<Claim>();
-        //                userClaims.Add(new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()));
-        //                userClaims.Add(new Claim(ClaimTypes.NameIdentifier, existingUser.Id.ToString()));
-        //                userClaims.Add(new Claim(ClaimTypes.Name, existingUser.UserName));
-        //                var userRole=(await _userManager.GetRolesAsync(existingUser)).ToList();
-        //                foreach (var role in userRole) { 
-        //                    userClaims.Add(new Claim(ClaimTypes.Role,role.ToString()));
-        //                }
-
-        //                var signKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:SecretKey"]));
-        //                SigningCredentials signingCredentials=new SigningCredentials(signKey, SecurityAlgorithms.HmacSha256);
-
-        //                //designToken
-        //                JwtSecurityToken token = new JwtSecurityToken(
-
-        //                    issuer: _configuration["JWT:IssuerIP"],
-        //                    audience: _configuration["JWT:AudienceIP"],
-        //                    expires: DateTime.UtcNow.AddDays(7),
-        //                    claims:userClaims,
-        //                    signingCredentials: signingCredentials
-
-        //                );
-
-        //                var response = new LoginResponse()
-        //                {
-        //                    Id= existingUser.Id,
-        //                    Token =new JwtSecurityTokenHandler().WriteToken(token),
-        //                    Expiration= DateTime.UtcNow.AddDays(7),
-        //                };
-        //                return Success(response);
-        //            }
-        //            else
-        //            {
-        //                return BadRequest<LoginResponse>("Email or Password Invalid");
-        //            }
-        //        }
-        //        else
-        //        {
-        //            return BadRequest<LoginResponse>("Email or Password Invalid");
-        //        }
-
-        //    }
-        //}
         public async Task<ApiResponse<LoginResponse>> Login(LoginRequest request)
         {
             try
@@ -305,14 +255,18 @@ namespace AseerAlkotb.Application.Services
 
                 // Create user claims
                 var userClaims = new List<Claim>
-        {
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(ClaimTypes.NameIdentifier, existingUser.Id.ToString()),
-            new Claim(ClaimTypes.Name, existingUser.UserName)
-        };
-
-                var roles = await _userManager.GetRolesAsync(existingUser);
-                userClaims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+                {
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    new Claim(ClaimTypes.NameIdentifier, existingUser.Id.ToString()),
+                    new Claim(ClaimTypes.Name, existingUser.UserName)
+                };
+                var userRole = (await _userManager.GetRolesAsync(existingUser)).ToList();
+                foreach (var role in userRole)
+                {
+                    userClaims.Add(new Claim(ClaimTypes.Role, role.ToString()));
+                }
+                //var roles = await _userManager.GetRolesAsync(existingUser);
+                //userClaims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
                 // JWT Token
                 var signKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:SecretKey"]));
@@ -330,7 +284,8 @@ namespace AseerAlkotb.Application.Services
                 {
                     Id = existingUser.Id,
                     Token = new JwtSecurityTokenHandler().WriteToken(token),
-                    Expiration = token.ValidTo
+                    Expiration= DateTime.UtcNow.AddDays(7),
+                    //Expiration = token.ValidTo
                 };
 
                 return Success(response);
@@ -341,6 +296,8 @@ namespace AseerAlkotb.Application.Services
                 return BadRequest<LoginResponse>("An unexpected error occurred. Try again.");
             }
         }
+
+
 
         // ResendEmailConfirmation with email
         public async Task<ApiResponse<string>> ResendEmailConfirmation(string email)
@@ -367,9 +324,9 @@ namespace AseerAlkotb.Application.Services
                 // Send confirmation email
                 var subject = "Confirm your email";
                 var body = $@"
-            <p>Hello {user.UserName},</p>
-            <p>Please confirm your email by clicking the link below:</p>
-            <p><a href=""{confirmUrl}"">Confirm Email</a></p>";
+                <p>Hello {user.UserName},</p>
+                <p>Please confirm your email by clicking the link below:</p>
+                <p><a href=""{confirmUrl}"">Confirm Email</a></p>";
                 try
                 {
                     await _emailService.SendEmailAsync(user.Email!, subject, body);
@@ -388,6 +345,62 @@ namespace AseerAlkotb.Application.Services
 
 
             }
+
+        }
+
+        public async Task<ApiResponse<UpdateProfileResponse>> UpdateProfile( int userId,UpdateProfileRequest request)
+        {
+            await DoValidationAsync<UpdateProfileRequestValidator, UpdateProfileRequest>(request);
+            var existingUser = await _userManager.FindByIdAsync(userId.ToString());
+            if (existingUser == null)
+            {
+                return NotFound<UpdateProfileResponse>("User not found");
+            }
+            existingUser = request.Adapt(existingUser);
+            var result = await _userManager.UpdateAsync(existingUser);
+            if (!result.Succeeded)
+            {
+                return BadRequest<UpdateProfileResponse>("Try Again");
+            }
+            var response = existingUser.Adapt<UpdateProfileResponse>();
+            return Success(response);
+        }
+      
+        public async Task<ApiResponse<GetProfileResponse>>GetProfile(GetProfileRequest request)
+        {
+            await DoValidationAsync<GetProfileRequestValidator,GetProfileRequest>(request);
+
+            var existingUser = await _unitOfWork.Account.GetUserWithRelatedData(request.UserId);
+            if (existingUser == null)
+            {
+                return NotFound<GetProfileResponse>("User not found");
+            }
+            var response = new GetProfileResponse()
+            {
+                Id = existingUser.Id,
+                FirstName = existingUser.FirstName,
+                LastName = existingUser.LastName,
+                ImageUrl=existingUser.ProfilePictureUrl,
+                RegistrationPeriod= DateTime.UtcNow-existingUser.CreatedAt,
+                Reviews=existingUser.Reviews?.Select(r => new ReviewDto
+                {
+                    Id = r.Id,
+                    ReviewFor = r.ReviewFor
+                }).ToList()??new List<ReviewDto>(),
+
+                Following = existingUser.Following?.Select(f => new UserFollowDto
+                {
+                    Id = f.Id,
+                    FollowType = f.FollowType
+                }).ToList() ?? new List<UserFollowDto>()
+            };
+            return Success(response);
+           
+
+       
         }
     }
 }
+        
+    
+

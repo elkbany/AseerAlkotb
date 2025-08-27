@@ -5,35 +5,23 @@
 namespace AseerAlkotb.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class addCityandFinalamountToOrder : Migration
+    public partial class editPaymentColumn : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<int>(
-                name: "City",
+                name: "PayId",
                 table: "Orders",
                 type: "int",
-                nullable: false,
-                defaultValue: 0);
-
-            migrationBuilder.AddColumn<decimal>(
-                name: "FinalAmount",
-                table: "Orders",
-                type: "decimal(18,2)",
-                nullable: false,
-                defaultValue: 0m);
+                nullable: true);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "City",
-                table: "Orders");
-
-            migrationBuilder.DropColumn(
-                name: "FinalAmount",
+                name: "PayId",
                 table: "Orders");
         }
     }

@@ -48,9 +48,7 @@ namespace AseerAlkotb.Infrastructure.Configurations
                 .WithMany(u => u.Orders)
                 .HasForeignKey(o => o.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
-            builder
-           .Property(e => e.PaymentId)
-        .IsRequired(false); // This makes it nullable
+          
 
         }
     }

@@ -27,11 +27,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+
+using System.Reflection;
+using AseerAlkotb.Infrastructure.Data;
 namespace AseerAlkotb.API
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -99,7 +102,8 @@ namespace AseerAlkotb.API
 
             builder.Services.AddScoped<IOrderRepository, OrderRepository>();
             builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
-            builder.Services.AddScoped<IAccountServices, AccountService>();
+            builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+
             #endregion
 
             #region Services
@@ -114,6 +118,8 @@ namespace AseerAlkotb.API
             builder.Services.AddScoped<IOrderServices, OrderServices>();
             builder.Services.AddScoped<IEmailService, EmailService>();
 
+            builder.Services.AddScoped<IAccountServices, AccountService>();
+            builder.Services.AddScoped<IAdminServices, AdminServices>();
             builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -172,7 +178,14 @@ namespace AseerAlkotb.API
                 RequestPath = "/uploads"
             });
             #endregion
-
+            #region seed roles
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                await RoleSeeder.SeedRolesAsync(services);
+            }
+            #endregion
+            // Use CORS
             app.UseCors("AllowLocalhost4200");
 
             #region Swagger
@@ -207,7 +220,8 @@ namespace AseerAlkotb.API
             app.UseAuthorization();
             app.MapControllers();
 
-            app.Run();
+            //app.Run();
+            await app.RunAsync();
         }
     }
 }

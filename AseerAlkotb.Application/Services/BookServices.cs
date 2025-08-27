@@ -157,7 +157,8 @@ namespace AseerAlkotb.Application.Services
                 query = query.Where(b => b.Categories.Any(c => request.CategoryIds.Contains(c.Id)));
 
             // فلتر الناشرين
-            query = query.Where(b => b.PublisherId.HasValue && request.PublisherIds.Contains(b.PublisherId.Value));
+            if (request.PublisherIds is not null && request.PublisherIds.Any())
+                query = query.Where(b => b.PublisherId.HasValue && request.PublisherIds.Contains(b.PublisherId.Value));
 
 
             // الترتيب
@@ -181,7 +182,11 @@ namespace AseerAlkotb.Application.Services
             var bookMap = paginatedBooks.Select(book =>
             {
                 var bookDto = book.Adapt<GetAllBooksPaginatedResponse>();
-                bookDto.Rating = book.Reviews?.Any() == true ? (int)Math.Round(book.Reviews.Average(r => r.Rating)) : 0;
+                //manual
+                bookDto.CategoryIds = book.Categories?.Select(c => c.Id).ToList() ?? new List<int>();
+                bookDto.CategoryNames = book.Categories?.Select(c => c.Name).ToList() ?? new List<string>();
+                bookDto.Rating = book.Reviews?.Any() == true ? (decimal)book.Reviews.Average(r => r.Rating) : 0;
+
                 return bookDto;
             }).ToList();
 
