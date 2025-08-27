@@ -6,6 +6,7 @@ using AseerAlkotb.Application.Features.Books.Responses;
 using AseerAlkotb.Application.Features.Categories.Requests;
 using AseerAlkotb.Application.Features.Publishers.Requests;
 using AseerAlkotb.Application.Features.Reviews.Requests;
+using AseerAlkotb.Domain.Entites.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AseerAlkotb.Dashboard.Controllers
@@ -49,7 +50,6 @@ namespace AseerAlkotb.Dashboard.Controllers
                 ViewBag.CurrentPage = pageNumber;
                 ViewBag.SearchTerm = Search;
             }
-
             return View(result);
         }
 
@@ -140,6 +140,7 @@ namespace AseerAlkotb.Dashboard.Controllers
             if (!response.Succeeded || response.Data == null)
                 return NotFound();
 
+
             var model = new UpdateBookResponse(
                 response.Data.Id,
                 response.Data.Title,
@@ -166,6 +167,7 @@ namespace AseerAlkotb.Dashboard.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(UpdateBookRequest request)
         {
+           
             if (ModelState.IsValid)
             {
                 await _bookServices.UpdateBookAsync(request);
@@ -203,6 +205,12 @@ namespace AseerAlkotb.Dashboard.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var book = await _bookServices.GetBookByIdAsync(new GetBookByIdRequest(id));
+            var author = await _authorServices.GetAuthorByIdAsync(new GetAuthorByIdRequest(book.Data.AuthorId));
+            var publisher = await _publisherServices.GetPublisherByIdAsync(new GetPublisherByIdRequest(book.Data.PublisherId));
+            ViewBag.Author = author.Data;
+            ViewBag.Publisher = publisher.Data;
+
+
             return View("DeleteBook", book.Data);
         }
 

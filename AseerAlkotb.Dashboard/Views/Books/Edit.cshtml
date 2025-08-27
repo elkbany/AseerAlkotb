@@ -193,6 +193,7 @@
                                     <!-- Categories: Parent + Subcategories (search style) -->
                                     <div class="form-group">
                                         <label for="parentCategorySearch">Parent Category</label>
+                                        <input asp-for="@Model.CategoryIds" type="text" />
                                         <div class="input-group">
                                             @Html.TextBox("parentCategorySearch", null, new
                                                 {
@@ -210,6 +211,10 @@
                                         <div class="small mt-2">
                                             Selected: <span id="parentCategorySelected"
                                                             class="font-weight-bold text-primary">None</span>
+                                                            <p>@Model.CategoryIds.Count</p>
+                                                                @foreach(var category in Model.CategoryIds){
+                                                                    <h1>@category</h1>
+                                                                }
                                         </div>
                                         <ul id="parentCategoryResults" class="list-group mt-2"></ul>
                                     </div>
