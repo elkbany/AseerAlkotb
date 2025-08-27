@@ -1,14 +1,7 @@
-﻿using AseerAlkotb.Application.Features.Authors.Requests;
-using AseerAlkotb.Application.Features.Authors.Responses;
-using AseerAlkotb.Application.Features.Categories.Requests;
+﻿using AseerAlkotb.Application.Features.Categories.Requests;
 using AseerAlkotb.Application.Features.Categories.Responses;
 using AseerAlkotb.Domain.Entites.Models;
 using Mapster;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AseerAlkotb.Application.Features.Categories.Mapping
 {
@@ -16,26 +9,44 @@ namespace AseerAlkotb.Application.Features.Categories.Mapping
     {
         public void Register(TypeAdapterConfig config)
         {
-
-            TypeAdapterConfig<AddCategoryRequest, Category>.NewConfig();
+            // Basic mappings
             config.NewConfig<AddCategoryRequest, Category>()
-                .Ignore(a => a.SubCategory)
-                .Ignore(a => a.ParentCategory);
+                .Ignore(dest => dest.SubCategory)
+                .Ignore(dest => dest.ParentCategory)
+                .Ignore(dest => dest.Id)
+                .Ignore(dest => dest.CreatedAt)
+                .Ignore(dest => dest.UpdatedAt);
 
-            config.NewConfig<Category, AddCategoryResponse>();
-            config.NewConfig<Category, GetCategoryByIdResponse>();
-            config.NewConfig<Category, GetAllCategoriesPaginatedResponse>();
-            config.NewConfig<Category, DeleteCategoryResponse>();
-            config.NewConfig<UpdateCategoryRequest, Category>();
-            config.NewConfig<Category, UpdateCategoryResponse>();
+            config.NewConfig<UpdateCategoryRequest, Category>()
+                .Ignore(dest => dest.SubCategory)
+                .Ignore(dest => dest.ParentCategory)
+                .Ignore(dest => dest.CreatedAt)
+                .Ignore(dest => dest.UpdatedAt);
 
             config.NewConfig<AddSubCategoryRequest, Category>()
-               .Ignore(dest => dest.SubCategory)
-               .Ignore(dest => dest.ParentCategory);
+                .Ignore(dest => dest.SubCategory)
+                .Ignore(dest => dest.ParentCategory)
+                .Ignore(dest => dest.Id)
+                .Ignore(dest => dest.CreatedAt)
+                .Ignore(dest => dest.UpdatedAt);
 
+            // Response mappings
+            config.NewConfig<Category, AddCategoryResponse>();
+            config.NewConfig<Category, UpdateCategoryResponse>();
+            config.NewConfig<Category, DeleteCategoryResponse>();
+            config.NewConfig<Category, GetCategoryByIdResponse>();
             config.NewConfig<Category, AddSubCategoryResponse>();
             config.NewConfig<Category, DeleteSubCategoryResponse>();
-            config.NewConfig<Category, GetAllSubCategoriesPaginatedResponse>();
+
+            // Complex mappings for Dashboard - simplified
+            config.NewConfig<Category, GetAllCategoriesPaginatedResponse>()
+                .Map(dest => dest.ParentCategoryId, src => src.ParentCategoryId)
+                .Map(dest => dest.SubCategoryCount, src => src.SubCategory != null ? src.SubCategory.Count : 0)
+                .Map(dest => dest.CreatedAt, src => src.CreatedAt);
+
+            config.NewConfig<Category, GetAllSubCategoriesPaginatedResponse>()
+                .Map(dest => dest.ParentCategoryId, src => src.ParentCategoryId ?? 0)
+                .Map(dest => dest.CreatedAt, src => src.CreatedAt);
         }
     }
 }

@@ -1,10 +1,8 @@
 ﻿using AseerAlkotb.Application.Features.Categories.Requests;
 using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using AseerAlkotb.Application.ResponseHandler; // عشان الـ Extension L
+using AseerAlkotb.Localization.Resources;
+using Microsoft.Extensions.Localization;
 
 namespace AseerAlkotb.Application.Features.Categories.Validators
 {
@@ -13,9 +11,8 @@ namespace AseerAlkotb.Application.Features.Categories.Validators
         public GetCategoryByIdRequestValidator()
         {
             RuleFor(x => x.Id)
-                .NotEmpty()
                 .GreaterThan(0)
-                .WithMessage("Category ID must be greater than 0");
+                .L("CategoryId", "MustBeGreaterThan" , "0");
         }
     }
 }

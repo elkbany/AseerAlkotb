@@ -1,11 +1,9 @@
 ﻿using AseerAlkotb.Application.Features.Publishers.Requests;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using AseerAlkotb.Application.ResponseHandler; // للـ Extension L
+using AseerAlkotb.Localization.Resources;
+using Microsoft.Extensions.Localization;
 
 namespace AseerAlkotb.Application.Features.Publishers.Validators
 {
@@ -13,24 +11,28 @@ namespace AseerAlkotb.Application.Features.Publishers.Validators
     {
         public AddPublisherRequestValidator()
         {
-
             RuleFor(x => x.Name)
-                .NotEmpty().WithMessage("Publisher name is required.")
-                .Length(2, 100).WithMessage("Publisher name must be between 2 and 100 characters.")
-                .Matches(@"^[a-zA-Z\u0600-\u06FF\s]+$").WithMessage("Publisher name can only contain letters and spaces.");
+                .NotEmpty()
+                .L("Publisher", "name", "Required")
+                .Length(2, 100)
+                .L("Publisher", "name", "MustBeBetween", "2" , "100")
+                .Matches(@"^[a-zA-Z\u0600-\u06FF\s]+$")
+                .L("Publisher", "name", "LettersOnly");
 
             RuleFor(x => x.Description)
-                .MaximumLength(1000).WithMessage("Description must not exceed 1000 characters.");
+                .MaximumLength(1000)
+                .L("Description", "MaxLength", "1000");
 
             RuleFor(x => x.LogoUrl)
                 .Must(BeValidImage)
                 .When(x => x.LogoUrl != null)
-                .WithMessage("Logo must be a valid image file (jpg, jpeg, png, gif) and less than 5MB.");
+                .L("image", "Invalid");
 
             RuleFor(x => x.ContactEmail)
-                .NotEmpty().WithMessage("Contact email is required.")
-                .EmailAddress().WithMessage("A valid email address is required.");
-
+                .NotEmpty()
+                .L("email", "Required")
+                .EmailAddress()
+                .L("email", "Invalid");
         }
 
         private bool BeValidImage(IFormFile? image)
@@ -49,7 +51,7 @@ namespace AseerAlkotb.Application.Features.Publishers.Validators
             if (!allowedContentTypes.Contains(image.ContentType.ToLowerInvariant()))
                 return false;
 
-            return true; 
+            return true;
         }
     }
 }

@@ -1,6 +1,5 @@
-﻿
-
-using AseerAlkotb.Application.Features.Reviews.Requests;
+﻿using AseerAlkotb.Application.Features.Reviews.Requests;
+using AseerAlkotb.Application.ResponseHandler;
 using FluentValidation;
 
 namespace AseerAlkotb.Application.Features.Reviews.Validators
@@ -10,15 +9,17 @@ namespace AseerAlkotb.Application.Features.Reviews.Validators
         public GetAllReviewsPaginatedRequestValidator()
         {
             RuleFor(x => x)
-                 .Must(x => (x.BookId.HasValue && !x.AuthorId.HasValue) ||
-                      (!x.BookId.HasValue && x.AuthorId.HasValue))
-                 .WithMessage("Either BookId or AuthorId must be provided, but not both.");
+                .Must(x => (x.BookId.HasValue && !x.AuthorId.HasValue) ||
+                           (!x.BookId.HasValue && x.AuthorId.HasValue))
+                .L("BookOrAuthor", "EitherProvided"); // Localized message
+
             RuleFor(x => x.PageNumber)
                 .GreaterThan(0)
-                .WithMessage("Page number must be greater than 0.");
+                .L("PageNumber", "MustBeGreaterThan" , "0");
+
             RuleFor(x => x.PageSize)
                 .InclusiveBetween(1, 100)
-                .WithMessage("Page size must be between 1 and 100.");
+                .L("PageSize", "MustBeBetween" , "1" , "100");
         }
     }
 }

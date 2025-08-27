@@ -1,10 +1,7 @@
 ﻿using AseerAlkotb.Application.Features.Authors.Requests;
+using AseerAlkotb.Application.ResponseHandler;
+using AseerAlkotb.Localization.Resources;
 using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AseerAlkotb.Application.Features.Authors.Validators
 {
@@ -14,8 +11,9 @@ namespace AseerAlkotb.Application.Features.Authors.Validators
         {
             RuleFor(x => x.Id)
                 .NotEmpty()
+                .L("Author", "Id", "Required")
                 .GreaterThan(0)
-                .WithMessage("Author ID must be greater than 0");
+                .L("Author", "Id", "MustBeGreaterThan", "0");
         }
     }
 }

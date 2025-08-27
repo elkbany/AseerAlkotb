@@ -1,46 +1,45 @@
 ﻿using AseerAlkotb.Application.Features.Publishers.Requests;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using AseerAlkotb.Localization.Resources;
+using Microsoft.Extensions.Localization;
+using AseerAlkotb.Application.ResponseHandler;
 
 namespace AseerAlkotb.Application.Features.Publishers.Validators
 {
     public class UpdatePublisherRequestValidator : AbstractValidator<UpdatePublisherRequest>
     {
-        public UpdatePublisherRequestValidator() 
+        public UpdatePublisherRequestValidator()
         {
             RuleFor(x => x.Id)
-                .NotEmpty()
                 .GreaterThan(0)
-                .WithMessage("Publisher ID must be greater than 0");
+                .L("Publisher", "Id" , "GreaterThanZero");
 
             RuleFor(x => x.Name)
                 .NotEmpty()
-                .WithMessage("Publisher name is required")
+                .L("Publisher", "Name" , "Required")
                 .Length(2, 200)
-                .WithMessage("Publisher name must be between 2 and 200 characters")
+                .L("Publisher", "Name" , "Length")
                 .Matches(@"^[a-zA-Z\u0600-\u06FF\s]+$")
-                .WithMessage("Publisher name can only contain letters and spaces");
+                .L("Publisher", "Name" , "LettersOnly");
 
             RuleFor(x => x.Description)
                 .MaximumLength(1000)
-                .WithMessage("Description must not exceed 1000 characters");
+                .L("Description", "MaxLength1000");
 
             RuleFor(x => x.LogoUrl)
                 .NotEmpty()
-                .WithMessage("Logo URL is required")
+                .L("Publisher", "image", "Required")
                 .Must(BeValidImage)
-                .WithMessage("Logo must be a valid image file (jpg, jpeg, png, gif) and less than 5MB");
+                .L("Publisher", "image", "invalid");
+
+
 
             RuleFor(x => x.ContactEmail)
                 .NotEmpty()
-                .WithMessage("Contact email is required")
+                .L("Publisher", "EmailRequired")
                 .EmailAddress()
-                .WithMessage("A valid email address is required");
+                .L("Publisher", "EmailInvalid");
         }
 
         private bool BeValidImage(IFormFile? image)

@@ -1,10 +1,6 @@
 ﻿using AseerAlkotb.Application.Features.Reviews.Requests;
+using AseerAlkotb.Application.ResponseHandler;
 using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AseerAlkotb.Application.Features.Reviews.Validators
 {
@@ -14,15 +10,15 @@ namespace AseerAlkotb.Application.Features.Reviews.Validators
         {
             RuleFor(x => x.Id)
                 .NotEmpty()
-                .WithMessage("Review ID cannot be empty.");
+                .L("ReviewId", "CannotBeEmpty");
+
             RuleFor(x => x.Rating)
                 .InclusiveBetween(1, 5)
-                .WithMessage("Rating must be between 1 and 5.");
+                .L("Rating", "MustBeBetween1And5");
+
             RuleFor(x => x.Comment)
-                .NotEmpty()
-                .WithMessage("Comment cannot be empty.")
-                .MaximumLength(2000)
-                .WithMessage("Comment cannot exceed 2000 characters.");
+                .NotEmpty().L("Comment", "CannotBeEmpty")
+                .MaximumLength(2000).L("Comment", "MaxLength2000");
         }
     }
 }

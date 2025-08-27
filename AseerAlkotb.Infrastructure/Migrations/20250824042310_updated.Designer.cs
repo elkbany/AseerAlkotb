@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AseerAlkotb.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250802221454_AddBookLanguageEnum")]
-    partial class AddBookLanguageEnum
+    [Migration("20250824042310_updated")]
+    partial class updated
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -40,6 +40,10 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(2000)
                         .HasColumnType("nvarchar(2000)");
+
+                    b.Property<string>("CountryCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -167,6 +171,9 @@ namespace AseerAlkotb.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
                     b.ToTable("Cart");
                 });
 
@@ -229,6 +236,80 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.ToTable("Categories", (string)null);
                 });
 
+            modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.LikeDisLike", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsLike")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("ReviewId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReviewId");
+
+                    b.HasIndex("UserId", "ReviewId")
+                        .IsUnique()
+                        .HasFilter("[ReviewId] IS NOT NULL");
+
+                    b.ToTable("LikeDisLikes");
+                });
+
+            modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("NotificationType")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Notifications");
+                });
+
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Order", b =>
                 {
                     b.Property<int>("Id")
@@ -243,19 +324,21 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.Property<decimal>("DiscountAmount")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int>("Governorate")
+                        .HasMaxLength(500)
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<int?>("PaymentId")
+                        .HasColumnType("int");
 
                     b.Property<int>("PaymentMethod")
                         .HasColumnType("int");
 
                     b.Property<int>("PaymentStatus")
                         .HasColumnType("int");
-
-                    b.Property<string>("ShippingAddress")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
 
                     b.Property<decimal>("ShippingCost")
                         .HasColumnType("decimal(18,2)");
@@ -351,6 +434,48 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.ToTable("Publishers", (string)null);
                 });
 
+            modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Quote", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AuthorId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("BookId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("QuoteFor")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorId");
+
+                    b.HasIndex("BookId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Quotes", (string)null);
+                });
+
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Review", b =>
                 {
                     b.Property<int>("Id")
@@ -359,11 +484,10 @@ namespace AseerAlkotb.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("BookId")
+                    b.Property<int?>("BookId")
                         .HasColumnType("int");
 
                     b.Property<string>("Comment")
-                        .IsRequired()
                         .HasMaxLength(2000)
                         .HasColumnType("nvarchar(2000)");
 
@@ -371,6 +495,12 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<int>("Rating")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ReviewAuthorId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ReviewType")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -383,10 +513,14 @@ namespace AseerAlkotb.Infrastructure.Migrations
 
                     b.HasIndex("BookId");
 
+                    b.HasIndex("ReviewAuthorId");
+
                     b.HasIndex("UserId");
 
                     b.ToTable("Reviews", null, t =>
                         {
+                            t.HasCheckConstraint("CK_Review_OneTarget", "(BookId IS NOT NULL AND AuthorId IS NULL) OR (BookId IS NULL AND AuthorId IS NOT NULL)");
+
                             t.HasCheckConstraint("CK_Review_Rating", "Rating >= 1 AND Rating <= 5");
                         });
                 });
@@ -399,14 +533,29 @@ namespace AseerAlkotb.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CartId")
+                    b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
+
+                    b.Property<string>("Bio")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("DateOfBirth")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
@@ -422,15 +571,100 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Nationality")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ProfilePictureUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("CartId")
-                        .IsUnique();
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
 
-                    b.ToTable("User");
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex")
+                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.ToTable("Users", (string)null);
+                });
+
+            modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.UserFollow", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AuthorId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FollowType")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PublisherId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorId");
+
+                    b.HasIndex("PublisherId");
+
+                    b.HasIndex("UserId", "AuthorId")
+                        .IsUnique()
+                        .HasFilter("[AuthorId] IS NOT NULL");
+
+                    b.HasIndex("UserId", "PublisherId")
+                        .IsUnique()
+                        .HasFilter("[PublisherId] IS NOT NULL");
+
+                    b.ToTable("UserFollows", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_UserFollow_SingleFollowType", "([AuthorId] IS NOT NULL AND [PublisherId] IS NULL) OR ([AuthorId] IS NULL AND [PublisherId] IS NOT NULL)");
+                        });
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Wishlist", b =>
@@ -475,7 +709,61 @@ namespace AseerAlkotb.Infrastructure.Migrations
 
                     b.HasIndex("WishlistId");
 
-                    b.ToTable("WishlistItem");
+                    b.ToTable("WishlistItems");
+                });
+
+            modelBuilder.Entity("AseerAlkotb.Domain.Entites.Payment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("PaymentDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PaymentMethod")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("PaymobOrderId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TransactionId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Payments", (string)null);
                 });
 
             modelBuilder.Entity("BookCategories", b =>
@@ -491,6 +779,139 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.HasIndex("CategoryId");
 
                     b.ToTable("BookCategories");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<int>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("RoleNameIndex")
+                        .HasFilter("[NormalizedName] IS NOT NULL");
+
+                    b.ToTable("AspNetRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetRoleClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
+                {
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ProviderKey")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ProviderDisplayName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("LoginProvider", "ProviderKey");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserLogins", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<int>", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetUserRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("UserId", "LoginProvider", "Name");
+
+                    b.ToTable("AspNetUserTokens", (string)null);
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Book", b =>
@@ -509,6 +930,17 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.Navigation("Author");
 
                     b.Navigation("Publisher");
+                });
+
+            modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Cart", b =>
+                {
+                    b.HasOne("AseerAlkotb.Domain.Entites.Models.User", "User")
+                        .WithOne("Cart")
+                        .HasForeignKey("AseerAlkotb.Domain.Entites.Models.Cart", "UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.CartItem", b =>
@@ -538,6 +970,44 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("ParentCategory");
+                });
+
+            modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.LikeDisLike", b =>
+                {
+                    b.HasOne("AseerAlkotb.Domain.Entites.Models.Review", "Review")
+                        .WithMany("LikeDisLikes")
+                        .HasForeignKey("ReviewId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AseerAlkotb.Domain.Entites.Models.User", "User")
+                        .WithMany("LikeDisLikes")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Review");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Notification", b =>
+                {
+                    b.HasOne("AseerAlkotb.Domain.Entites.Models.Order", "Order")
+                        .WithMany()
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AseerAlkotb.Domain.Entites.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Order", b =>
@@ -570,13 +1040,42 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.Navigation("Order");
                 });
 
+            modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Quote", b =>
+                {
+                    b.HasOne("AseerAlkotb.Domain.Entites.Models.Author", "Author")
+                        .WithMany("Quotes")
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("AseerAlkotb.Domain.Entites.Models.Book", "Book")
+                        .WithMany("Quotes")
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("AseerAlkotb.Domain.Entites.Models.User", "User")
+                        .WithMany("Quotes")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Author");
+
+                    b.Navigation("Book");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Review", b =>
                 {
                     b.HasOne("AseerAlkotb.Domain.Entites.Models.Book", "Book")
                         .WithMany("Reviews")
                         .HasForeignKey("BookId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("AseerAlkotb.Domain.Entites.Models.Author", "Author")
+                        .WithMany("Reviews")
+                        .HasForeignKey("ReviewAuthorId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("AseerAlkotb.Domain.Entites.Models.User", "User")
                         .WithMany("Reviews")
@@ -584,20 +1083,36 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Author");
+
                     b.Navigation("Book");
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.User", b =>
+            modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.UserFollow", b =>
                 {
-                    b.HasOne("AseerAlkotb.Domain.Entites.Models.Cart", "Cart")
-                        .WithOne("User")
-                        .HasForeignKey("AseerAlkotb.Domain.Entites.Models.User", "CartId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                    b.HasOne("AseerAlkotb.Domain.Entites.Models.Author", "Author")
+                        .WithMany("Followers")
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AseerAlkotb.Domain.Entites.Models.Publisher", "Publisher")
+                        .WithMany("Followers")
+                        .HasForeignKey("PublisherId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AseerAlkotb.Domain.Entites.Models.User", "User")
+                        .WithMany("Following")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Cart");
+                    b.Navigation("Author");
+
+                    b.Navigation("Publisher");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Wishlist", b =>
@@ -634,6 +1149,25 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.Navigation("Wishlist");
                 });
 
+            modelBuilder.Entity("AseerAlkotb.Domain.Entites.Payment", b =>
+                {
+                    b.HasOne("AseerAlkotb.Domain.Entites.Models.Order", "Order")
+                        .WithOne("Payment")
+                        .HasForeignKey("AseerAlkotb.Domain.Entites.Payment", "OrderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AseerAlkotb.Domain.Entites.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("BookCategories", b =>
                 {
                     b.HasOne("AseerAlkotb.Domain.Entites.Models.Book", null)
@@ -649,9 +1183,66 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<int>", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
+                {
+                    b.HasOne("AseerAlkotb.Domain.Entites.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
+                {
+                    b.HasOne("AseerAlkotb.Domain.Entites.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<int>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<int>", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AseerAlkotb.Domain.Entites.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
+                {
+                    b.HasOne("AseerAlkotb.Domain.Entites.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Author", b =>
                 {
                     b.Navigation("Books");
+
+                    b.Navigation("Followers");
+
+                    b.Navigation("Quotes");
+
+                    b.Navigation("Reviews");
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Book", b =>
@@ -659,6 +1250,8 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.Navigation("CartItems");
 
                     b.Navigation("OrderItems");
+
+                    b.Navigation("Quotes");
 
                     b.Navigation("Reviews");
 
@@ -668,9 +1261,6 @@ namespace AseerAlkotb.Infrastructure.Migrations
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Cart", b =>
                 {
                     b.Navigation("CartItems");
-
-                    b.Navigation("User")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Category", b =>
@@ -681,16 +1271,34 @@ namespace AseerAlkotb.Infrastructure.Migrations
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Order", b =>
                 {
                     b.Navigation("OrderItems");
+
+                    b.Navigation("Payment");
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Publisher", b =>
                 {
                     b.Navigation("Books");
+
+                    b.Navigation("Followers");
+                });
+
+            modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Review", b =>
+                {
+                    b.Navigation("LikeDisLikes");
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.User", b =>
                 {
+                    b.Navigation("Cart")
+                        .IsRequired();
+
+                    b.Navigation("Following");
+
+                    b.Navigation("LikeDisLikes");
+
                     b.Navigation("Orders");
+
+                    b.Navigation("Quotes");
 
                     b.Navigation("Reviews");
 
