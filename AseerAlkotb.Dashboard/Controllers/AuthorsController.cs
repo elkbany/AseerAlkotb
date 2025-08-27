@@ -1,6 +1,8 @@
 using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Features.Authors.Requests;
 using AseerAlkotb.Application.Features.Authors.Responses;
+using AseerAlkotb.Application.Features.Authors.Mapping;
+using AseerAlkotb.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AseerAlkotb.Dashboard.Controllers
@@ -14,6 +16,7 @@ namespace AseerAlkotb.Dashboard.Controllers
             _authorServices = authorServices;
         }
 
+        // GET: Authors
         public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 10, string search = "")
         {
             var request = new GetAllAuthorsPaginatedRequest(pageNumber, pageSize, search);
@@ -31,6 +34,7 @@ namespace AseerAlkotb.Dashboard.Controllers
             return View(result.Data);
         }
 
+        // GET: Authors/Details/5
         public async Task<IActionResult> Details(int id)
         {
             var request = new GetAuthorByIdRequest(id);
@@ -41,6 +45,94 @@ namespace AseerAlkotb.Dashboard.Controllers
                 return RedirectToAction(nameof(Index));
             }
             return View(result.Data);
+        }
+
+        // GET: Authors/Create
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        // POST: Authors/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(AddAuthorRequest request)
+        {
+            if (ModelState.IsValid)
+            {
+                await _authorServices.AddAuthorAsync(request);
+                return RedirectToAction(nameof(Index));
+            }
+            return View(request);
+        }
+
+        // GET: Authors/Edit/5
+        public async Task<IActionResult> Edit(int id)
+        {
+            var response = await _authorServices.GetAuthorByIdAsync(new GetAuthorByIdRequest(id));
+
+            if (!response.Succeeded || response.Data == null)
+                return NotFound();
+
+            // استخدام Mapster للتعيين من GetAuthorByIdResponse إلى UpdateAuthorRequest
+            // تحويل CountryCode من string إلى enum
+            var countryCode = Enum.Parse<CountryCode>(response.Data.CountryCode);
+            
+            var request = new UpdateAuthorResponse(
+                response.Data.Id,
+                response.Data.Name,
+                response.Data.Bio,
+                response.Data.ImageUrl,
+                countryCode
+            );
+
+            return View(request);
+        }
+
+        // POST: Authors/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, UpdateAuthorRequest request)
+        {
+            // إضافة الـ Id إلى الـ Request
+            request = request with { Id = id };
+            
+            if (ModelState.IsValid)
+            {
+                await _authorServices.UpdateAuthorAsync(request);
+                return RedirectToAction(nameof(Index));
+            }
+            return View(request);
+        }
+
+        // GET: Authors/Delete/5
+        public async Task<IActionResult> Delete(int id)
+        {
+            var author = await _authorServices.GetAuthorByIdAsync(new GetAuthorByIdRequest(id));
+            if (!author.Succeeded || author.Data == null)
+                return NotFound();
+                
+            return View(author.Data);
+        }
+
+        // POST: Authors/Delete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            await _authorServices.DeleteAuthorAsync(new DeleteAuthorRequest(id));
+            return RedirectToAction(nameof(Index));
+        }
+        
+        // ==================== AJAX ENDPOINTS ====================
+        
+        [HttpGet]
+        public async Task<IActionResult> SearchAuthors(string term)
+        {
+            var authors = await _authorServices.GetAllAuthorsPaginatedAsync(
+                new GetAllAuthorsPaginatedRequest { Search = term, PageSize = 10 });
+
+            return Json(authors.Data.Select(a => new { id = a.Id, text = a.Name }));
         }
     }
 }
