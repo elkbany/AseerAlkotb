@@ -201,7 +201,381 @@ namespace AseerAlkotb.Infrastructure.Data
                     PublisherId = 2,
                     CreatedAt = fixedDate,
                     UpdatedAt = fixedDate
-                }
+                },
+                 new Book
+                 {
+                     Id = 4,
+                     Title = "الكرنك",
+                     Description = "رواية سياسية لنجيب محفوظ",
+                     ISBN = "1234567890126",
+                     Price = 170,
+                     DiscountPercentage = 10,
+                     PublishedDate = new DateTime(1974, 1, 1),
+                     PageCount = 250,
+                     Language = BookLanguage.Arabic,
+                     CoverImageUrl = "/uploads/Books/94147f51-d713-47a3-86dd-f88eef6198d4.webp",
+                     Format = "ورقي",
+                     StockQuantity = 18,
+                     IsActive = true,
+                     ViewCount = 0,
+                     SalesCount = 0,
+                     AuthorId = 1,
+                     PublisherId = 1,
+                     CreatedAt = fixedDate,
+                     UpdatedAt = fixedDate
+                 },
+                 new Book
+                 {
+                     Id = 5,
+                     Title = "أولاد حارتنا",
+                     Description = "رواية مثيرة للجدل لنجيب محفوظ",
+                     ISBN = "1234567890127",
+                     Price = 200,
+                     DiscountPercentage = 20,
+                     PublishedDate = new DateTime(1959, 1, 1),
+                     PageCount = 300,
+                     Language = BookLanguage.Arabic,
+                     CoverImageUrl = "/uploads/Books/94147f51-d713-47a3-86dd-f88eef6198d4.webp",
+                     Format = "ورقي",
+                     StockQuantity = 30,
+                     IsActive = true,
+                     ViewCount = 0,
+                     SalesCount = 0,
+                     AuthorId = 1,
+                     PublisherId = 1,
+                     CreatedAt = fixedDate,
+                     UpdatedAt = fixedDate
+                 },
+                 new Book
+                 {
+                     Id = 6,
+                     Title = "الحرافيش",
+                     Description = "ملحمة أدبية لنجيب محفوظ",
+                     ISBN = "1234567890128",
+                     Price = 180,
+                     DiscountPercentage = 12,
+                     PublishedDate = new DateTime(1977, 1, 1),
+                     PageCount = 350,
+                     Language = BookLanguage.Arabic,
+                     CoverImageUrl = "/uploads/Books/94147f51-d713-47a3-86dd-f88eef6198d4.webp",
+                     Format = "ورقي",
+                     StockQuantity = 20,
+                     IsActive = true,
+                     ViewCount = 0,
+                     SalesCount = 0,
+                     AuthorId = 1,
+                     PublisherId = 1,
+                     CreatedAt = fixedDate,
+                     UpdatedAt = fixedDate
+                 },
+                 new Book
+                 {
+                     Id = 7,
+                     Title = "بين القصرين",
+                     Description = "الجزء الأول من ثلاثية نجيب محفوظ",
+                     ISBN = "1234567890129",
+                     Price = 150,
+                     DiscountPercentage = 8,
+                     PublishedDate = new DateTime(1956, 1, 1),
+                     PageCount = 270,
+                     Language = BookLanguage.Arabic,
+                     CoverImageUrl = "/uploads/Books/94147f51-d713-47a3-86dd-f88eef6198d4.webp",
+                     Format = "ورقي",
+                     StockQuantity = 22,
+                     IsActive = true,
+                     ViewCount = 0,
+                     SalesCount = 0,
+                     AuthorId = 1,
+                     PublisherId = 1,
+                     CreatedAt = fixedDate,
+                     UpdatedAt = fixedDate
+                 },
+                 new Book
+                 {
+                     Id = 8,
+                     Title = "قصر الشوق",
+                     Description = "الجزء الثاني من ثلاثية نجيب محفوظ",
+                     ISBN = "1234567890130",
+                     Price = 160,
+                     DiscountPercentage = 6,
+                     PublishedDate = new DateTime(1957, 1, 1),
+                     PageCount = 280,
+                     Language = BookLanguage.Arabic,
+                     CoverImageUrl = "/uploads/Books/94147f51-d713-47a3-86dd-f88eef6198d4.webp",
+                     Format = "ورقي",
+                     StockQuantity = 20,
+                     IsActive = true,
+                     ViewCount = 0,
+                     SalesCount = 0,
+                     AuthorId = 1,
+                     PublisherId = 1,
+                     CreatedAt = fixedDate,
+                     UpdatedAt = fixedDate
+                 },
+                 new Book
+                 {
+                     Id = 9,
+                     Title = "السكرية",
+                     Description = "الجزء الثالث من ثلاثية نجيب محفوظ",
+                     ISBN = "1234567890131",
+                     Price = 170,
+                     DiscountPercentage = 7,
+                     PublishedDate = new DateTime(1957, 1, 1),
+                     PageCount = 290,
+                     Language = BookLanguage.Arabic,
+                     CoverImageUrl = "/uploads/Books/94147f51-d713-47a3-86dd-f88eef6198d4.webp",
+                     Format = "ورقي",
+                     StockQuantity = 18,
+                     IsActive = true,
+                     ViewCount = 0,
+                     SalesCount = 0,
+                     AuthorId = 1,
+                     PublisherId = 1,
+                     CreatedAt = fixedDate,
+                     UpdatedAt = fixedDate
+                 },
+                 new Book
+                 {
+                     Id = 10,
+                     Title = "خان الخليلي",
+                     Description = "رواية اجتماعية لنجيب محفوظ",
+                     ISBN = "1234567890132",
+                     Price = 140,
+                     DiscountPercentage = 5,
+                     PublishedDate = new DateTime(1946, 1, 1),
+                     PageCount = 210,
+                     Language = BookLanguage.Arabic,
+                     CoverImageUrl = "/uploads/Books/94147f51-d713-47a3-86dd-f88eef6198d4.webp",
+                     Format = "ورقي",
+                     StockQuantity = 20,
+                     IsActive = true,
+                     ViewCount = 0,
+                     SalesCount = 0,
+                     AuthorId = 1,
+                     PublisherId = 1,
+                     CreatedAt = fixedDate,
+                     UpdatedAt = fixedDate
+                 },
+                 new Book
+                 {
+                     Id = 11,
+                     Title = "كتاب جديد",
+                     Description = "وصف الكتاب الجديد",
+                     ISBN = "9876543210178",
+                     Price = 200,
+                     DiscountPercentage = 15,
+                     PublishedDate = new DateTime(2023, 1, 1),
+                     PageCount = 350,
+                     Language = BookLanguage.Arabic,
+                     CoverImageUrl = "/uploads/Books/6fdbe335-1a34-4564-9564-e30dc38cf6ea.webp",
+                     Format = "ورقي",
+                     StockQuantity = 30,
+                     IsActive = true,
+                     ViewCount = 0,
+                     SalesCount = 0,
+                     AuthorId = 1,
+                     PublisherId = 1,
+                     CreatedAt = fixedDate,
+                     UpdatedAt = fixedDate
+                 },
+                 new Book
+                 {
+                     Id = 12,
+                     Title = "كتاب آخر",
+                     Description = "وصف الكتاب الآخر",
+                     ISBN = "1234567890177",
+                     Price = 250,
+                     DiscountPercentage = 5,
+                     PublishedDate = new DateTime(2022, 1, 1),
+                     PageCount = 300,
+                     Language = BookLanguage.Arabic,
+                     CoverImageUrl = "/uploads/Books/6fdbe335-1a34-4564-9564-e30dc38cf6ea.webp",
+                     Format = "ورقي",
+                     StockQuantity = 15,
+                     IsActive = true,
+                     ViewCount = 0,
+                     SalesCount = 0,
+                     AuthorId = 2,
+                     PublisherId = 2,
+                     CreatedAt = fixedDate,
+                     UpdatedAt = fixedDate
+                 },
+                 new Book
+                 {
+                     Id = 13,
+                     Title = "الطوق والأسورة",
+                     Description = "رواية شهيرة ليحيى الطاهر عبدالله",
+                     ISBN = "1234567890133",
+                     Price = 120,
+                     DiscountPercentage = 0,
+                     PublishedDate = new DateTime(1975, 1, 1),
+                     PageCount = 190,
+                     Language = BookLanguage.Arabic,
+                     CoverImageUrl = "/uploads/Books/94147f51-d713-47a3-86dd-f88eef6198d4.webp",
+                     Format = "ورقي",
+                     StockQuantity = 20,
+                     IsActive = true,
+                     ViewCount = 0,
+                     SalesCount = 0,
+                     AuthorId = 1,
+                     PublisherId = 1,
+                     CreatedAt = fixedDate,
+                     UpdatedAt = fixedDate
+                 },
+                 new Book
+                 {
+                     Id = 14,
+                     Title = "رجال في الشمس",
+                     Description = "رواية غسان كنفاني الشهيرة",
+                     ISBN = "1234567890134",
+                     Price = 130,
+                     DiscountPercentage = 10,
+                     PublishedDate = new DateTime(1963, 1, 1),
+                     PageCount = 160,
+                     Language = BookLanguage.Arabic,
+                     CoverImageUrl = "/uploads/Books/94147f51-d713-47a3-86dd-f88eef6198d4.webp",
+                     Format = "ورقي",
+                     StockQuantity = 20,
+                     IsActive = true,
+                     ViewCount = 0,
+                     SalesCount = 0,
+                     AuthorId = 1,
+                     PublisherId = 1,
+                     CreatedAt = fixedDate,
+                     UpdatedAt = fixedDate
+                 },
+                 new Book
+                 {
+                     Id = 15,
+                     Title = "موسم الهجرة إلى الشمال",
+                     Description = "رواية الطيب صالح الأشهر",
+                     ISBN = "1234567890135",
+                     Price = 150,
+                     DiscountPercentage = 15,
+                     PublishedDate = new DateTime(1966, 1, 1),
+                     PageCount = 220,
+                     Language = BookLanguage.Arabic,
+                     CoverImageUrl = "/uploads/Books/94147f51-d713-47a3-86dd-f88eef6198d4.webp",
+                     Format = "ورقي",
+                     StockQuantity = 20,
+                     IsActive = true,
+                     ViewCount = 0,
+                     SalesCount = 0,
+                     AuthorId = 1,
+                     PublisherId = 1,
+                     CreatedAt = fixedDate,
+                     UpdatedAt = fixedDate
+                 },
+                 new Book
+                 {
+                     Id = 16,
+                     Title = "الخبز الحافي",
+                     Description = "رواية محمد شكري الذاتية",
+                     ISBN = "1234567890136",
+                     Price = 140,
+                     DiscountPercentage = 5,
+                     PublishedDate = new DateTime(1973, 1, 1),
+                     PageCount = 200,
+                     Language = BookLanguage.Arabic,
+                     CoverImageUrl = "/uploads/Books/94147f51-d713-47a3-86dd-f88eef6198d4.webp",
+                     Format = "ورقي",
+                     StockQuantity = 20,
+                     IsActive = true,
+                     ViewCount = 0,
+                     SalesCount = 0,
+                     AuthorId = 1,
+                     PublisherId = 1,
+                     CreatedAt = fixedDate,
+                     UpdatedAt = fixedDate
+                 },
+                 new Book
+                 {
+                     Id = 17,
+                     Title = "عزازيل",
+                     Description = "رواية يوسف زيدان التاريخية",
+                     ISBN = "1234567890137",
+                     Price = 160,
+                     DiscountPercentage = 10,
+                     PublishedDate = new DateTime(2008, 1, 1),
+                     PageCount = 350,
+                     Language = BookLanguage.Arabic,
+                     CoverImageUrl = "/uploads/Books/94147f51-d713-47a3-86dd-f88eef6198d4.webp",
+                     Format = "ورقي",
+                     StockQuantity = 20,
+                     IsActive = true,
+                     ViewCount = 0,
+                     SalesCount = 0,
+                     AuthorId = 1,
+                     PublisherId = 1,
+                     CreatedAt = fixedDate,
+                     UpdatedAt = fixedDate
+                 },
+                 new Book
+                 {
+                     Id = 18,
+                     Title = "عائد إلى حيفا",
+                     Description = "رواية قصيرة لغسان كنفاني",
+                     ISBN = "1234567890138",
+                     Price = 110,
+                     DiscountPercentage = 0,
+                     PublishedDate = new DateTime(1970, 1, 1),
+                     PageCount = 100,
+                     Language = BookLanguage.Arabic,
+                     CoverImageUrl = "/uploads/Books/94147f51-d713-47a3-86dd-f88eef6198d4.webp",
+                     Format = "ورقي",
+                     StockQuantity = 20,
+                     IsActive = true,
+                     ViewCount = 0,
+                     SalesCount = 0,
+                     AuthorId = 1,
+                     PublisherId = 1,
+                     CreatedAt = fixedDate,
+                     UpdatedAt = fixedDate
+                 },
+                 new Book
+                 {
+                     Id = 19,
+                     Title = "الحب في زمن الكوليرا",
+                     Description = "رواية غابرييل غارسيا ماركيز المترجمة للعربية",
+                     ISBN = "1234567890139",
+                     Price = 170,
+                     DiscountPercentage = 20,
+                     PublishedDate = new DateTime(1985, 1, 1),
+                     PageCount = 420,
+                     Language = BookLanguage.Arabic,
+                     CoverImageUrl = "/uploads/Books/94147f51-d713-47a3-86dd-f88eef6198d4.webp",
+                     Format = "ورقي",
+                     StockQuantity = 20,
+                     IsActive = true,
+                     ViewCount = 0,
+                     SalesCount = 0,
+                     AuthorId = 1,
+                     PublisherId = 1,
+                     CreatedAt = fixedDate,
+                     UpdatedAt = fixedDate
+                 },
+                 new Book
+                 {
+                     Id = 20,
+                     Title = "مدن الملح",
+                     Description = "رواية عبد الرحمن منيف الشهيرة",
+                     ISBN = "1234567890140",
+                     Price = 180,
+                     DiscountPercentage = 10,
+                     PublishedDate = new DateTime(1984, 1, 1),
+                     PageCount = 500,
+                     Language = BookLanguage.Arabic,
+                     CoverImageUrl = "/uploads/Books/94147f51-d713-47a3-86dd-f88eef6198d4.webp",
+                     Format = "ورقي",
+                     StockQuantity = 20,
+                     IsActive = true,
+                     ViewCount = 0,
+                     SalesCount = 0,
+                     AuthorId = 1,
+                     PublisherId = 1,
+                     CreatedAt = fixedDate,
+                     UpdatedAt = fixedDate
+                 }
             );
 
             modelBuilder.Entity("BookCategories").HasData(
@@ -209,8 +583,49 @@ namespace AseerAlkotb.Infrastructure.Data
             new { BookId = 1, CategoryId = 2 },
             new { BookId = 2, CategoryId = 2 },
             new { BookId = 3, CategoryId = 1 },
-            new { BookId = 3, CategoryId = 3 }
-
+            new { BookId = 3, CategoryId = 3 },
+            new { BookId = 4, CategoryId = 2 }, // الكرنك - أدب عربي
+            new { BookId = 4, CategoryId = 3 }, // الكرنك - روايات سياسية
+            new { BookId = 5, CategoryId = 1 }, // أولاد حارتنا - روايات اجتماعية
+            new { BookId = 5, CategoryId = 2 }, // أولاد حارتنا - أدب عربي
+            new { BookId = 5, CategoryId = 4 }, // أولاد حارتنا - روايات دينية (لأنها مثيرة للجدل بموضوع ديني)
+            new { BookId = 6, CategoryId = 1 }, // الحرافيش - روايات اجتماعية
+            new { BookId = 6, CategoryId = 2 }, // الحرافيش - أدب عربي
+            new { BookId = 6, CategoryId = 5 }, // الحرافيش - ملحمة أدبية
+            new { BookId = 7, CategoryId = 1 }, // بين القصرين - روايات اجتماعية
+            new { BookId = 7, CategoryId = 2 }, // بين القصرين - أدب عربي
+            new { BookId = 7, CategoryId = 6 }, // بين القصرين - ثلاثيات أدبية
+            new { BookId = 8, CategoryId = 1 }, // قصر الشوق - روايات اجتماعية
+            new { BookId = 8, CategoryId = 2 }, // قصر الشوق - أدب عربي
+            new { BookId = 8, CategoryId = 6 }, // قصر الشوق - ثلاثيات أدبية
+            new { BookId = 9, CategoryId = 1 }, // السكرية - روايات اجتماعية
+            new { BookId = 9, CategoryId = 2 }, // السكرية - أدب عربي
+            new { BookId = 9, CategoryId = 6 }, // السكرية - ثلاثيات أدبية
+            new { BookId = 10, CategoryId = 1 }, // خان الخليلي - روايات اجتماعية
+            new { BookId = 10, CategoryId = 2 }, // خان الخليلي - أدب عربي
+            new { BookId = 11, CategoryId = 2 }, // كتاب جديد - أدب عربي
+            new { BookId = 11, CategoryId = 7 }, // كتاب جديد - روايات معاصرة
+            new { BookId = 12, CategoryId = 1 }, // كتاب آخر - روايات اجتماعية
+            new { BookId = 12, CategoryId = 3 }, // كتاب آخر - روايات سياسية
+            new { BookId = 13, CategoryId = 1 }, // الطوق والأسورة - روايات اجتماعية
+            new { BookId = 13, CategoryId = 2 }, // الطوق والأسورة - أدب عربي
+            new { BookId = 14, CategoryId = 2 }, // رجال في الشمس - أدب عربي
+            new { BookId = 14, CategoryId = 3 }, // رجال في الشمس - روايات سياسية
+            new { BookId = 15, CategoryId = 1 }, // موسم الهجرة إلى الشمال - روايات اجتماعية
+            new { BookId = 15, CategoryId = 2 }, // موسم الهجرة إلى الشمال - أدب عربي
+            new { BookId = 15, CategoryId = 8 }, // موسم الهجرة إلى الشمال - روايات ثقافية
+            new { BookId = 16, CategoryId = 1 }, // الخبز الحافي - روايات اجتماعية
+            new { BookId = 16, CategoryId = 2 }, // الخبز الحافي - أدب عربي
+            new { BookId = 16, CategoryId = 9 }, // الخبز الحافي - سيرة ذاتية
+            new { BookId = 17, CategoryId = 2 }, // عزازيل - أدب عربي
+            new { BookId = 17, CategoryId = 10 }, // عزازيل - روايات تاريخية
+            new { BookId = 18, CategoryId = 2 }, // عائد إلى حيفا - أدب عربي
+            new { BookId = 18, CategoryId = 3 }, // عائد إلى حيفا - روايات سياسية
+            new { BookId = 19, CategoryId = 11 }, // الحب في زمن الكوليرا - روايات مترجمة
+            new { BookId = 19, CategoryId = 12 }, // الحب في زمن الكوليرا - روايات رومانسية
+            new { BookId = 20, CategoryId = 1 }, // مدن الملح - روايات اجتماعية
+            new { BookId = 20, CategoryId = 2 }, // مدن الملح - أدب عربي
+            new { BookId = 20, CategoryId = 3 } // 
 
 
             //modelBuilder.Entity<Quote>().HasData(

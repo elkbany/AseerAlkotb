@@ -260,6 +260,380 @@ namespace AseerAlkotb.Infrastructure.Migrations
                             Title = "كتاب آخر",
                             UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ViewCount = 0
+                        },
+                        new
+                        {
+                            Id = 4,
+                            AuthorId = 1,
+                            CoverImageUrl = "/uploads/Books/94147f51-d713-47a3-86dd-f88eef6198d4.webp",
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "رواية سياسية لنجيب محفوظ",
+                            DiscountPercentage = 10m,
+                            Format = "ورقي",
+                            ISBN = "1234567890126",
+                            IsActive = true,
+                            Language = 1,
+                            PageCount = 250,
+                            Price = 170m,
+                            PublishedDate = new DateTime(1974, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PublisherId = 1,
+                            SalesCount = 0,
+                            StockQuantity = 18,
+                            Title = "الكرنك",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ViewCount = 0
+                        },
+                        new
+                        {
+                            Id = 5,
+                            AuthorId = 1,
+                            CoverImageUrl = "/uploads/Books/94147f51-d713-47a3-86dd-f88eef6198d4.webp",
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "رواية مثيرة للجدل لنجيب محفوظ",
+                            DiscountPercentage = 20m,
+                            Format = "ورقي",
+                            ISBN = "1234567890127",
+                            IsActive = true,
+                            Language = 1,
+                            PageCount = 300,
+                            Price = 200m,
+                            PublishedDate = new DateTime(1959, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PublisherId = 1,
+                            SalesCount = 0,
+                            StockQuantity = 30,
+                            Title = "أولاد حارتنا",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ViewCount = 0
+                        },
+                        new
+                        {
+                            Id = 6,
+                            AuthorId = 1,
+                            CoverImageUrl = "/uploads/Books/94147f51-d713-47a3-86dd-f88eef6198d4.webp",
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "ملحمة أدبية لنجيب محفوظ",
+                            DiscountPercentage = 12m,
+                            Format = "ورقي",
+                            ISBN = "1234567890128",
+                            IsActive = true,
+                            Language = 1,
+                            PageCount = 350,
+                            Price = 180m,
+                            PublishedDate = new DateTime(1977, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PublisherId = 1,
+                            SalesCount = 0,
+                            StockQuantity = 20,
+                            Title = "الحرافيش",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ViewCount = 0
+                        },
+                        new
+                        {
+                            Id = 7,
+                            AuthorId = 1,
+                            CoverImageUrl = "/uploads/Books/94147f51-d713-47a3-86dd-f88eef6198d4.webp",
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "الجزء الأول من ثلاثية نجيب محفوظ",
+                            DiscountPercentage = 8m,
+                            Format = "ورقي",
+                            ISBN = "1234567890129",
+                            IsActive = true,
+                            Language = 1,
+                            PageCount = 270,
+                            Price = 150m,
+                            PublishedDate = new DateTime(1956, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PublisherId = 1,
+                            SalesCount = 0,
+                            StockQuantity = 22,
+                            Title = "بين القصرين",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ViewCount = 0
+                        },
+                        new
+                        {
+                            Id = 8,
+                            AuthorId = 1,
+                            CoverImageUrl = "/uploads/Books/94147f51-d713-47a3-86dd-f88eef6198d4.webp",
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "الجزء الثاني من ثلاثية نجيب محفوظ",
+                            DiscountPercentage = 6m,
+                            Format = "ورقي",
+                            ISBN = "1234567890130",
+                            IsActive = true,
+                            Language = 1,
+                            PageCount = 280,
+                            Price = 160m,
+                            PublishedDate = new DateTime(1957, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PublisherId = 1,
+                            SalesCount = 0,
+                            StockQuantity = 20,
+                            Title = "قصر الشوق",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ViewCount = 0
+                        },
+                        new
+                        {
+                            Id = 9,
+                            AuthorId = 1,
+                            CoverImageUrl = "/uploads/Books/94147f51-d713-47a3-86dd-f88eef6198d4.webp",
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "الجزء الثالث من ثلاثية نجيب محفوظ",
+                            DiscountPercentage = 7m,
+                            Format = "ورقي",
+                            ISBN = "1234567890131",
+                            IsActive = true,
+                            Language = 1,
+                            PageCount = 290,
+                            Price = 170m,
+                            PublishedDate = new DateTime(1957, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PublisherId = 1,
+                            SalesCount = 0,
+                            StockQuantity = 18,
+                            Title = "السكرية",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ViewCount = 0
+                        },
+                        new
+                        {
+                            Id = 10,
+                            AuthorId = 1,
+                            CoverImageUrl = "/uploads/Books/94147f51-d713-47a3-86dd-f88eef6198d4.webp",
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "رواية اجتماعية لنجيب محفوظ",
+                            DiscountPercentage = 5m,
+                            Format = "ورقي",
+                            ISBN = "1234567890132",
+                            IsActive = true,
+                            Language = 1,
+                            PageCount = 210,
+                            Price = 140m,
+                            PublishedDate = new DateTime(1946, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PublisherId = 1,
+                            SalesCount = 0,
+                            StockQuantity = 20,
+                            Title = "خان الخليلي",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ViewCount = 0
+                        },
+                        new
+                        {
+                            Id = 11,
+                            AuthorId = 1,
+                            CoverImageUrl = "/uploads/Books/6fdbe335-1a34-4564-9564-e30dc38cf6ea.webp",
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "وصف الكتاب الجديد",
+                            DiscountPercentage = 15m,
+                            Format = "ورقي",
+                            ISBN = "9876543210178",
+                            IsActive = true,
+                            Language = 1,
+                            PageCount = 350,
+                            Price = 200m,
+                            PublishedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PublisherId = 1,
+                            SalesCount = 0,
+                            StockQuantity = 30,
+                            Title = "كتاب جديد",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ViewCount = 0
+                        },
+                        new
+                        {
+                            Id = 12,
+                            AuthorId = 2,
+                            CoverImageUrl = "/uploads/Books/6fdbe335-1a34-4564-9564-e30dc38cf6ea.webp",
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "وصف الكتاب الآخر",
+                            DiscountPercentage = 5m,
+                            Format = "ورقي",
+                            ISBN = "1234567890177",
+                            IsActive = true,
+                            Language = 1,
+                            PageCount = 300,
+                            Price = 250m,
+                            PublishedDate = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PublisherId = 2,
+                            SalesCount = 0,
+                            StockQuantity = 15,
+                            Title = "كتاب آخر",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ViewCount = 0
+                        },
+                        new
+                        {
+                            Id = 13,
+                            AuthorId = 1,
+                            CoverImageUrl = "/uploads/Books/94147f51-d713-47a3-86dd-f88eef6198d4.webp",
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "رواية شهيرة ليحيى الطاهر عبدالله",
+                            DiscountPercentage = 0m,
+                            Format = "ورقي",
+                            ISBN = "1234567890133",
+                            IsActive = true,
+                            Language = 1,
+                            PageCount = 190,
+                            Price = 120m,
+                            PublishedDate = new DateTime(1975, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PublisherId = 1,
+                            SalesCount = 0,
+                            StockQuantity = 20,
+                            Title = "الطوق والأسورة",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ViewCount = 0
+                        },
+                        new
+                        {
+                            Id = 14,
+                            AuthorId = 1,
+                            CoverImageUrl = "/uploads/Books/94147f51-d713-47a3-86dd-f88eef6198d4.webp",
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "رواية غسان كنفاني الشهيرة",
+                            DiscountPercentage = 10m,
+                            Format = "ورقي",
+                            ISBN = "1234567890134",
+                            IsActive = true,
+                            Language = 1,
+                            PageCount = 160,
+                            Price = 130m,
+                            PublishedDate = new DateTime(1963, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PublisherId = 1,
+                            SalesCount = 0,
+                            StockQuantity = 20,
+                            Title = "رجال في الشمس",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ViewCount = 0
+                        },
+                        new
+                        {
+                            Id = 15,
+                            AuthorId = 1,
+                            CoverImageUrl = "/uploads/Books/94147f51-d713-47a3-86dd-f88eef6198d4.webp",
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "رواية الطيب صالح الأشهر",
+                            DiscountPercentage = 15m,
+                            Format = "ورقي",
+                            ISBN = "1234567890135",
+                            IsActive = true,
+                            Language = 1,
+                            PageCount = 220,
+                            Price = 150m,
+                            PublishedDate = new DateTime(1966, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PublisherId = 1,
+                            SalesCount = 0,
+                            StockQuantity = 20,
+                            Title = "موسم الهجرة إلى الشمال",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ViewCount = 0
+                        },
+                        new
+                        {
+                            Id = 16,
+                            AuthorId = 1,
+                            CoverImageUrl = "/uploads/Books/94147f51-d713-47a3-86dd-f88eef6198d4.webp",
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "رواية محمد شكري الذاتية",
+                            DiscountPercentage = 5m,
+                            Format = "ورقي",
+                            ISBN = "1234567890136",
+                            IsActive = true,
+                            Language = 1,
+                            PageCount = 200,
+                            Price = 140m,
+                            PublishedDate = new DateTime(1973, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PublisherId = 1,
+                            SalesCount = 0,
+                            StockQuantity = 20,
+                            Title = "الخبز الحافي",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ViewCount = 0
+                        },
+                        new
+                        {
+                            Id = 17,
+                            AuthorId = 1,
+                            CoverImageUrl = "/uploads/Books/94147f51-d713-47a3-86dd-f88eef6198d4.webp",
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "رواية يوسف زيدان التاريخية",
+                            DiscountPercentage = 10m,
+                            Format = "ورقي",
+                            ISBN = "1234567890137",
+                            IsActive = true,
+                            Language = 1,
+                            PageCount = 350,
+                            Price = 160m,
+                            PublishedDate = new DateTime(2008, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PublisherId = 1,
+                            SalesCount = 0,
+                            StockQuantity = 20,
+                            Title = "عزازيل",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ViewCount = 0
+                        },
+                        new
+                        {
+                            Id = 18,
+                            AuthorId = 1,
+                            CoverImageUrl = "/uploads/Books/94147f51-d713-47a3-86dd-f88eef6198d4.webp",
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "رواية قصيرة لغسان كنفاني",
+                            DiscountPercentage = 0m,
+                            Format = "ورقي",
+                            ISBN = "1234567890138",
+                            IsActive = true,
+                            Language = 1,
+                            PageCount = 100,
+                            Price = 110m,
+                            PublishedDate = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PublisherId = 1,
+                            SalesCount = 0,
+                            StockQuantity = 20,
+                            Title = "عائد إلى حيفا",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ViewCount = 0
+                        },
+                        new
+                        {
+                            Id = 19,
+                            AuthorId = 1,
+                            CoverImageUrl = "/uploads/Books/94147f51-d713-47a3-86dd-f88eef6198d4.webp",
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "رواية غابرييل غارسيا ماركيز المترجمة للعربية",
+                            DiscountPercentage = 20m,
+                            Format = "ورقي",
+                            ISBN = "1234567890139",
+                            IsActive = true,
+                            Language = 1,
+                            PageCount = 420,
+                            Price = 170m,
+                            PublishedDate = new DateTime(1985, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PublisherId = 1,
+                            SalesCount = 0,
+                            StockQuantity = 20,
+                            Title = "الحب في زمن الكوليرا",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ViewCount = 0
+                        },
+                        new
+                        {
+                            Id = 20,
+                            AuthorId = 1,
+                            CoverImageUrl = "/uploads/Books/94147f51-d713-47a3-86dd-f88eef6198d4.webp",
+                            CreatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "رواية عبد الرحمن منيف الشهيرة",
+                            DiscountPercentage = 10m,
+                            Format = "ورقي",
+                            ISBN = "1234567890140",
+                            IsActive = true,
+                            Language = 1,
+                            PageCount = 500,
+                            Price = 180m,
+                            PublishedDate = new DateTime(1984, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PublisherId = 1,
+                            SalesCount = 0,
+                            StockQuantity = 20,
+                            Title = "مدن الملح",
+                            UpdatedAt = new DateTime(2024, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ViewCount = 0
                         });
                 });
 
@@ -1532,6 +1906,216 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         new
                         {
                             BookId = 3,
+                            CategoryId = 3
+                        },
+                        new
+                        {
+                            BookId = 4,
+                            CategoryId = 2
+                        },
+                        new
+                        {
+                            BookId = 4,
+                            CategoryId = 3
+                        },
+                        new
+                        {
+                            BookId = 5,
+                            CategoryId = 1
+                        },
+                        new
+                        {
+                            BookId = 5,
+                            CategoryId = 2
+                        },
+                        new
+                        {
+                            BookId = 5,
+                            CategoryId = 4
+                        },
+                        new
+                        {
+                            BookId = 6,
+                            CategoryId = 1
+                        },
+                        new
+                        {
+                            BookId = 6,
+                            CategoryId = 2
+                        },
+                        new
+                        {
+                            BookId = 6,
+                            CategoryId = 5
+                        },
+                        new
+                        {
+                            BookId = 7,
+                            CategoryId = 1
+                        },
+                        new
+                        {
+                            BookId = 7,
+                            CategoryId = 2
+                        },
+                        new
+                        {
+                            BookId = 7,
+                            CategoryId = 6
+                        },
+                        new
+                        {
+                            BookId = 8,
+                            CategoryId = 1
+                        },
+                        new
+                        {
+                            BookId = 8,
+                            CategoryId = 2
+                        },
+                        new
+                        {
+                            BookId = 8,
+                            CategoryId = 6
+                        },
+                        new
+                        {
+                            BookId = 9,
+                            CategoryId = 1
+                        },
+                        new
+                        {
+                            BookId = 9,
+                            CategoryId = 2
+                        },
+                        new
+                        {
+                            BookId = 9,
+                            CategoryId = 6
+                        },
+                        new
+                        {
+                            BookId = 10,
+                            CategoryId = 1
+                        },
+                        new
+                        {
+                            BookId = 10,
+                            CategoryId = 2
+                        },
+                        new
+                        {
+                            BookId = 11,
+                            CategoryId = 2
+                        },
+                        new
+                        {
+                            BookId = 11,
+                            CategoryId = 7
+                        },
+                        new
+                        {
+                            BookId = 12,
+                            CategoryId = 1
+                        },
+                        new
+                        {
+                            BookId = 12,
+                            CategoryId = 3
+                        },
+                        new
+                        {
+                            BookId = 13,
+                            CategoryId = 1
+                        },
+                        new
+                        {
+                            BookId = 13,
+                            CategoryId = 2
+                        },
+                        new
+                        {
+                            BookId = 14,
+                            CategoryId = 2
+                        },
+                        new
+                        {
+                            BookId = 14,
+                            CategoryId = 3
+                        },
+                        new
+                        {
+                            BookId = 15,
+                            CategoryId = 1
+                        },
+                        new
+                        {
+                            BookId = 15,
+                            CategoryId = 2
+                        },
+                        new
+                        {
+                            BookId = 15,
+                            CategoryId = 8
+                        },
+                        new
+                        {
+                            BookId = 16,
+                            CategoryId = 1
+                        },
+                        new
+                        {
+                            BookId = 16,
+                            CategoryId = 2
+                        },
+                        new
+                        {
+                            BookId = 16,
+                            CategoryId = 9
+                        },
+                        new
+                        {
+                            BookId = 17,
+                            CategoryId = 2
+                        },
+                        new
+                        {
+                            BookId = 17,
+                            CategoryId = 10
+                        },
+                        new
+                        {
+                            BookId = 18,
+                            CategoryId = 2
+                        },
+                        new
+                        {
+                            BookId = 18,
+                            CategoryId = 3
+                        },
+                        new
+                        {
+                            BookId = 19,
+                            CategoryId = 11
+                        },
+                        new
+                        {
+                            BookId = 19,
+                            CategoryId = 12
+                        },
+                        new
+                        {
+                            BookId = 20,
+                            CategoryId = 1
+                        },
+                        new
+                        {
+                            BookId = 20,
+                            CategoryId = 2
+                        },
+                        new
+                        {
+                            BookId = 20,
                             CategoryId = 3
                         });
                 });

@@ -28,8 +28,8 @@ namespace AseerAlkotb.API.Controllers
             var result = await categoryServices.DeleteCategoryAsync(request);
             return ApiResult(result);
         }
-        [HttpGet]
-        public async Task<IActionResult> GetById([FromQuery] GetCategoryByIdRequest request)
+        [HttpGet("GetById/{Id}")]
+        public async Task<IActionResult> GetById([FromRoute] GetCategoryByIdRequest request)
         {
             var result = await categoryServices.GetCategoryByIdAsync(request);
             return ApiResult(result);
