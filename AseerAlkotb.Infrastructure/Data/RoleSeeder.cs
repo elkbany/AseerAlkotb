@@ -35,6 +35,10 @@ namespace AseerAlkotb.Infrastructure.Data
                 {
                     var newAdmin = new User
                     {
+                        // username:admin
+                        // Email:admin@test.com
+                        // password:Admin@123
+
                         UserName = "admin",
                         Email = adminEmail,
                         EmailConfirmed = true,
@@ -63,6 +67,10 @@ namespace AseerAlkotb.Infrastructure.Data
                 // seed Client
                 var clientEmail = "user@user.com";
                 var client = await userManager.FindByEmailAsync(clientEmail);
+
+                // username:user
+                // Email:user@user.com
+                // password:User@123
                 if (client == null) {
                     var newUser= new User {
                         UserName = "user",
