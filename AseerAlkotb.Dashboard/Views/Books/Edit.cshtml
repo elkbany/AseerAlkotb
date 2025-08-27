@@ -59,7 +59,8 @@
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label asp-for="Language" class="control-label"></label>
-                                                <select asp-for="Language" class="form-control select2" asp-items="Html.GetEnumSelectList<AseerAlkotb.Domain.Enums.BookLanguage>()"></select>
+                                                <select asp-for="Language" class="form-control select2"
+                                                        asp-items="Html.GetEnumSelectList<AseerAlkotb.Domain.Enums.BookLanguage>()"></select>
                                                 <span asp-validation-for="Language" class="text-danger"></span>
                                             </div>
                                         </div>
@@ -81,8 +82,37 @@
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label asp-for="StockQuantity" class="control-label"></label>
-                                                <input asp-for="StockQuantity" class="form-control" type="number" min="0" />
+                                                <input asp-for="StockQuantity" class="form-control" type="number"
+                                                       min="0" />
                                                 <span asp-validation-for="StockQuantity" class="text-danger"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label asp-for="PublishedDate" class="control-label"></label>
+                                                <input asp-for="PublishedDate" type="date" class="form-control" />
+                                                <span asp-validation-for="PublishedDate" class="text-danger"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label asp-for="PageCount" class="control-label"></label>
+                                                <input asp-for="PageCount" type="number" min="1" class="form-control" />
+                                                <span asp-validation-for="PageCount" class="text-danger"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label asp-for="Format" class="control-label"></label>
+                                                <input asp-for="Format" class="form-control"
+                                                       placeholder="Paperback, Hardcover, eBook..." />
+                                                <span asp-validation-for="Format" class="text-danger"></span>
                                             </div>
                                         </div>
                                     </div>
@@ -95,46 +125,124 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="row">
+                                        <!-- Author (search style) -->
                                         <div class="col-md-6">
-                                            <!-- Replace the Author dropdown -->
                                             <div class="form-group">
-                                                <label asp-for="AuthorId" class="control-label">Author</label>
-                                                <select id="authorSelect" class="form-control select2-ajax" data-url="/Books/SearchAuthors">
-                                                </select>
-                                                <input type="hidden" asp-for="AuthorId" id="selectedAuthorId" />
+                                                <label for="authorSearch">Author</label>
+                                                <div class="input-group">
+                                                    @Html.TextBox("authorSearch", null, new
+                                                        {
+                                                            @class = "form-control",
+                                                            placeholder = "Type author name...",
+                                                            id = "authorSearch"
+                                                        })
+                                                    <div class="input-group-append">
+                                                        <button class="btn btn-outline-secondary" type="button"
+                                                                id="authorSearchBtn">
+                                                            Search
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <input type="hidden" asp-for="AuthorId" id="AuthorId" />
+                                                <div class="small mt-2">
+                                                    Selected: <span id="authorSelected"
+                                                                    class="font-weight-bold text-primary">
+                                                        @(Model.AuthorId > 0 ?
+                                                            Model.AuthorId.ToString() : "None")
+                                                    </span>
+                                                </div>
+                                                <ul id="authorResults" class="list-group mt-2"></ul>
                                                 <span asp-validation-for="AuthorId" class="text-danger"></span>
-                                            </div>
-                                            
-                                            <!-- Replace the Publisher dropdown -->
-                                            <div class="form-group">
-                                                <label asp-for="PublisherId" class="control-label">Publisher</label>
-                                                <select id="publisherSelect" class="form-control select2-ajax" data-url="/Books/SearchPublishers">
-                                                </select>
-                                                <input type="hidden" asp-for="PublisherId" id="selectedPublisherId" />
-                                                <span asp-validation-for="PublisherId" class="text-danger"></span>
-                                            </div>
-                                            
-                                            <!-- Replace the Categories dropdown -->
-                                            <div class="form-group">
-                                                <label asp-for="CategoryIds" class="control-label">Categories</label>
-                                                <select id="categorySelect" class="form-control select2-ajax" multiple data-url="/Books/SearchCategories">
-                                                </select>
-                                                <input type="hidden" name="CategoryIds" id="selectedCategoryIds" />
-                                                <span asp-validation-for="CategoryIds" class="text-danger"></span>
                                             </div>
                                         </div>
+
+                                        <!-- Publisher (search style) -->
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label asp-for="AuthorId" class="control-label">Author</label>
-                                                <select asp-for="AuthorId" class="form-control select2" asp-items="ViewBag.Authors"></select>
-                                                <span asp-validation-for="AuthorId" class="text-danger"></span>
+                                                <label for="publisherSearch">Publisher</label>
+                                                <div class="input-group">
+                                                    @Html.TextBox("publisherSearch", null, new
+                                                        {
+                                                            @class =
+                                                             "form-control",
+                                                            placeholder = "Type publisher name...",
+                                                            id =
+                                                             "publisherSearch"
+                                                        })
+                                                    <div class="input-group-append">
+                                                        <button class="btn btn-outline-secondary" type="button"
+                                                                id="publisherSearchBtn">
+                                                            Search
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <input type="hidden" asp-for="PublisherId" id="PublisherId" />
+                                                <div class="small mt-2">
+                                                    Selected: <span id="publisherSelected"
+                                                                    class="font-weight-bold text-primary">
+                                                        @(Model.PublisherId > 0 ?
+                                                            Model.PublisherId.ToString() : "None")
+                                                    </span>
+                                                </div>
+                                                <ul id="publisherResults" class="list-group mt-2"></ul>
+                                                <span asp-validation-for="PublisherId" class="text-danger"></span>
                                             </div>
                                         </div>
                                     </div>
 
+                                    <!-- Categories: Parent + Subcategories (search style) -->
                                     <div class="form-group">
+                                        <label for="parentCategorySearch">Parent Category</label>
+                                        <div class="input-group">
+                                            @Html.TextBox("parentCategorySearch", null, new
+                                                {
+                                                    @class = "form-control",
+                                                    placeholder = "Type category name...",
+                                                    id = "parentCategorySearch"
+                                                })
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button"
+                                                        id="parentCategorySearchBtn">
+                                                    Search
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="small mt-2">
+                                            Selected: <span id="parentCategorySelected"
+                                                            class="font-weight-bold text-primary">None</span>
+                                        </div>
+                                        <ul id="parentCategoryResults" class="list-group mt-2"></ul>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="subCategorySearch">Subcategories</label>
+                                        <div class="input-group">
+                                            @Html.TextBox("subCategorySearch", null, new
+                                                {
+                                                    @class = "form-control",
+                                                    placeholder = "Type to search subcategories...",
+                                                    id = "subCategorySearch",
+                                                    disabled = "disabled"
+                                                })
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button"
+                                                        id="subCategorySearchBtn" disabled>
+                                                    Search
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="small mt-2">
+                                            Selected:
+                                            <span id="subCategoriesSelected" class="d-inline-block"></span>
+                                        </div>
+                                        <ul id="subCategoryResults" class="list-group mt-2"></ul>
+                                    </div>
+
+                                    <!-- Hidden storage to bind CategoryIds -->
+                                    <div class="form-group" style="display:none;">
                                         <label asp-for="CategoryIds" class="control-label">Categories</label>
-                                        <select asp-for="CategoryIds" class="form-control select2" multiple asp-items="ViewBag.Categories"></select>
+                                        <select asp-for="CategoryIds" id="categorySelect" class="form-control"
+                                                multiple></select>
                                         <span asp-validation-for="CategoryIds" class="text-danger"></span>
                                     </div>
                                 </div>
@@ -148,12 +256,14 @@
                                     <h3 class="card-title">Cover Image</h3>
                                 </div>
                                 <div class="card-body">
-                                    @* <img src =""/> *@
-                                    <input type="file" class="custom-file-input" id="CoverImage" name="CoverImage" accept="image/*" onchange="previewImage(this)" />
-
+                                    <div class="text-center mb-3">
+                                        <img id="coverPreview" src="@($"http://localhost:5234{Model.CoverImageUrl}")"
+                                             class="img-fluid img-thumbnail" style="max-height:300px;" />
+                                    </div>
                                     <div class="form-group">
                                         <div class="custom-file">
-                                            <input type="file" class="custom-file-input" id="CoverImage" name="CoverImage" accept="image/*" onchange="previewImage(this)" />
+                                            <input type="file" class="custom-file-input" id="CoverImage"
+                                                   name="CoverImage" accept="image/*" />
                                             <label class="custom-file-label" for="CoverImage">Choose new image</label>
                                         </div>
                                     </div>
@@ -167,14 +277,16 @@
                                 <div class="card-body">
                                     <div class="form-group">
                                         <div class="custom-control custom-switch">
-                                            <input type="checkbox" class="custom-control-input" asp-for="IsActive" id="isActive">
+                                            <input type="checkbox" class="custom-control-input" asp-for="IsActive"
+                                                   id="isActive">
                                             <label class="custom-control-label" for="isActive">Active</label>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="DiscountPercentage" class="control-label"></label>
                                         <div class="input-group">
-                                            <input asp-for="DiscountPercentage" class="form-control" type="number" min="0" max="100" />
+                                            <input asp-for="DiscountPercentage" class="form-control" type="number"
+                                                   min="0" max="100" />
                                             <div class="input-group-append">
                                                 <span class="input-group-text">%</span>
                                             </div>
@@ -198,81 +310,148 @@
     </div>
 </section>
 
-<!-- Add this to the Scripts section -->
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
     <script>
-    $(document).ready(function() {
-        // Initialize Select2 with AJAX for Authors
-        $('#authorSelect').select2({
-            ajax: {
-                url: function() { return $(this).data('url'); },
-                dataType: 'json',
-                delay: 250,
-                data: function(params) {
-                    return {
-                        term: params.term
-                    };
-                },
-                processResults: function(data) {
-                    return {
-                        results: data
-                    };
-                },
-                cache: true
-            },
-            minimumInputLength: 2,
-            placeholder: 'Search for an author...'
+        $(function () {
+            function renderResults($list, data, onClick) {
+                $list.empty();
+                if (!data || !data.length) {
+                    $list.append('<li class="list-group-item text-muted">No results</li>');
+                    return;
+                }
+                data.forEach(item => {
+                    const $li = $('<li class="list-group-item list-group-item-action" role="button"></li>');
+                    $li.text(item.text);
+                    $li.data('item', item);
+                    $li.on('click', function () { onClick($(this).data('item')); });
+                    $list.append($li);
+                });
+            }
+
+            function doSearch(url, term, extra, done) {
+                const payload = Object.assign({ term: term || '' }, extra || {});
+                $.getJSON(url, payload, done);
+            }
+
+            // Prefill selected chips from existing model values if needed (optional)
+
+            // Author
+            $('#authorSearchBtn').on('click', function () {
+                const term = $('#authorSearch').val();
+                doSearch('@Url.Action("SearchAuthors", "Books")', term, {}, function (data) {
+                    renderResults($('#authorResults'), data, function (item) {
+                        $('#AuthorId').val(item.id);
+                        $('#authorSelected').text(item.text);
+                        $('#authorResults').empty();
+                    });
+                });
+            });
+
+            // Publisher
+            $('#publisherSearchBtn').on('click', function () {
+                const term = $('#publisherSearch').val();
+                doSearch('@Url.Action("SearchPublishers", "Books")', term, {}, function (data) {
+                    renderResults($('#publisherResults'), data, function (item) {
+                        $('#PublisherId').val(item.id);
+                        $('#publisherSelected').text(item.text);
+                        $('#publisherResults').empty();
+                    });
+                });
+            });
+
+            // Categories: parent + subs
+            let parentCategoryId = null;
+            $('#parentCategorySearchBtn').on('click', function () {
+                const term = $('#parentCategorySearch').val();
+                doSearch('@Url.Action("SearchCategories", "Books")', term, {}, function (data) {
+                    renderResults($('#parentCategoryResults'), data, function (item) {
+                        parentCategoryId = item.id;
+                        $('#parentCategorySelected').text(item.text);
+                        $('#parentCategoryResults').empty();
+
+                        // Update hidden CategoryIds store parent
+                        const $store = $('#categorySelect');
+                        $store.find('option[data-role="parent"]').remove();
+                        const opt = new Option(item.text, item.id, true, true);
+                        $(opt).attr('data-role', 'parent');
+                        $store.append(opt).trigger('change');
+
+                        // Enable subcategory search
+                        $('#subCategorySearch').prop('disabled', false);
+                        $('#subCategorySearchBtn').prop('disabled', false);
+                        // Clear previous subcategory chips
+                        $('#subCategoriesSelected').empty();
+                        // Also remove previous subcategory options from store
+                        $store.find('option').each(function () {
+                            if (!$(this).is('[data-role="parent"]')) {
+                                $(this).remove();
+                            }
+                        });
+                    });
+                });
+            });
+
+            $('#subCategorySearchBtn').on('click', function () {
+                const term = $('#subCategorySearch').val();
+                if (!parentCategoryId) { return; }
+                $.getJSON('@Url.Action("SearchSubCategories", "Books")', { categoryId: parentCategoryId, term: term || '' }, function (data) {
+                    renderResults($('#subCategoryResults'), data, function (item) {
+                        const chipId = 'subchip-' + item.id;
+                        if ($('#' + chipId).length) { return; }
+                        const $chip = $('<span class="badge badge-info mr-1 mb-1" id="' + chipId + '"></span>');
+                        $chip.text(item.text + ' ×');
+                        $chip.css('cursor', 'pointer');
+                        $chip.on('click', function () {
+                            $(this).remove();
+                            $('#categorySelect option[value="' + item.id + '"]').remove();
+                        });
+                        $('#subCategoriesSelected').append($chip);
+
+                        const $store = $('#categorySelect');
+                        if ($store.find('option[value="' + item.id + '"]').length === 0) {
+                            const opt = new Option(item.text, item.id, true, true);
+                            $store.append(opt);
+                            $store.trigger('change');
+                        }
+
+                        $('#subCategoryResults').empty();
+                    });
+                });
+            });
+
+            function bindEnter(selector, buttonSelector) {
+                $(selector).on('keypress', function (e) {
+                    if (e.which === 13) {
+                        e.preventDefault();
+                        $(buttonSelector).click();
+                    }
+                });
+            }
+            bindEnter('#authorSearch', '#authorSearchBtn');
+            bindEnter('#publisherSearch', '#publisherSearchBtn');
+            bindEnter('#parentCategorySearch', '#parentCategorySearchBtn');
+            bindEnter('#subCategorySearch', '#subCategorySearchBtn');
         });
 
-        // Initialize Select2 with AJAX for Publishers
-        $('#publisherSelect').select2({
-            ajax: {
-                url: function() { return $(this).data('url'); },
-                dataType: 'json',
-                delay: 250,
-                data: function(params) {
-                    return {
-                        term: params.term
+         $('#CoverImage').on('change', function () {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        $('#coverPreview').attr('src', e.target.result);
                     };
-                },
-                processResults: function(data) {
-                    return {
-                        results: data
-                    };
-                },
-                cache: true
-            },
-            minimumInputLength: 2,
-            placeholder: 'Search for a publisher...'
-        });
+                    reader.readAsDataURL(file);
 
-        // Initialize Select2 with AJAX for Categories
-        $('#categorySelect').select2({
-            ajax: {
-                url: function() { return $(this).data('url'); },
-                dataType: 'json',
-                delay: 250,
-                data: function(params) {
-                    return {
-                        term: params.term
-                    };
-                },
-                processResults: function(data) {
-                    return {
-                        results: data
-                    };
-                },
-                cache: true
-            },
-            minimumInputLength: 2,
-            placeholder: 'Search for categories...',
-            multiple: true
-        });
-
-    
-    });
+                    const fileName = $(this).val().split('\\').pop();
+                    $(this).next('.custom-file-label').text(fileName);
+                } else {
+                    const oldImageUrl = '@Model.CoverImageUrl';
+                    $('#coverPreview').attr('src', oldImageUrl);
+                    $(this).next('.custom-file-label').text('Choose new image');
+                }
+            });
     </script>
 }
-
