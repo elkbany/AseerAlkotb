@@ -30,6 +30,22 @@ namespace AseerAlkotb.Application.Services
         }
 
 
+        //public async Task<ApiResponse<AddBookResponse>> AddBookAsync(AddBookRequest request)
+        //{
+        //    await DoValidationAsync<AddBookRequestValidator, AddBookRequest>(request);
+
+        //    var book = request.Adapt<Book>();
+        //    if (request.CoverImageUrl != null)
+        //    {
+        //        book.CoverImageUrl = await UploadImageAsync(request.CoverImageUrl, "Books");
+        //    }
+
+        //    await _uniteOfWork.Books.InsertAsync(book);
+        //    await _uniteOfWork.CommitAsync();
+
+        //    var bookMap = book.Adapt<AddBookResponse>();
+        //    return Success(bookMap);
+        //}
         public async Task<ApiResponse<AddBookResponse>> AddBookAsync(AddBookRequest request)
         {
             await DoValidationAsync<AddBookRequestValidator, AddBookRequest>(request);
@@ -40,6 +56,18 @@ namespace AseerAlkotb.Application.Services
                 book.CoverImageUrl = await UploadImageAsync(request.CoverImageUrl, "Books");
             }
 
+           
+            if (request.CategoryIds != null && request.CategoryIds.Any())
+            {
+                var categories = await _uniteOfWork.Categories
+                    .GetAllAsync(c => request.CategoryIds.Contains(c.Id));
+
+                foreach (var category in categories)
+                {
+                    book.Categories.Add(category);
+                }
+            }
+
             await _uniteOfWork.Books.InsertAsync(book);
             await _uniteOfWork.CommitAsync();
 
@@ -47,19 +75,51 @@ namespace AseerAlkotb.Application.Services
             return Success(bookMap);
         }
 
+        //public async Task<ApiResponse<UpdateBookResponse>> UpdateBookAsync(UpdateBookRequest request)
+        //{
+        //    await DoValidationAsync<UpdateBookRequestValidator, UpdateBookRequest>(request);
+
+        //    var book = await _uniteOfWork.Books.FirstOrDefaultAsync(b => b.Id == request.Id);
+
+        //    if (book == null)
+        //    {
+        //        return NotFound<UpdateBookResponse>($"{_stringLocalizer["Book"]} {_stringLocalizer["NotFound"]}");
+        //    }
+
+        //    request.Adapt(book);
+
+        //    if (request.CoverImageUrl != null)
+        //    {
+        //        if (!string.IsNullOrEmpty(book.CoverImageUrl))
+        //        {
+        //            await DeleteImageAsync(book.CoverImageUrl);
+        //        }
+        //        book.CoverImageUrl = await UploadImageAsync(request.CoverImageUrl, "Books");
+        //    }
+
+        //    _uniteOfWork.Books.Update(book);
+
+        //    await _uniteOfWork.CommitAsync();
+
+        //    var bookMap = book.Adapt<UpdateBookResponse>();
+        //    return Success(bookMap);
+        //}
         public async Task<ApiResponse<UpdateBookResponse>> UpdateBookAsync(UpdateBookRequest request)
         {
             await DoValidationAsync<UpdateBookRequestValidator, UpdateBookRequest>(request);
 
-            var book = await _uniteOfWork.Books.FirstOrDefaultAsync(b => b.Id == request.Id);
+            var book = await _uniteOfWork.Books
+                .FirstOrDefaultAsync(b => b.Id == request.Id,default,b=>b.Categories);
 
             if (book == null)
             {
                 return NotFound<UpdateBookResponse>($"{_stringLocalizer["Book"]} {_stringLocalizer["NotFound"]}");
             }
 
+            // update basic fields
             request.Adapt(book);
 
+            // update cover image if provided
             if (request.CoverImageUrl != null)
             {
                 if (!string.IsNullOrEmpty(book.CoverImageUrl))
@@ -69,13 +129,29 @@ namespace AseerAlkotb.Application.Services
                 book.CoverImageUrl = await UploadImageAsync(request.CoverImageUrl, "Books");
             }
 
-            _uniteOfWork.Books.Update(book);
+            // sync categories if provided
+            if (request.CategoryIds != null && request.CategoryIds.Any())
+            {
+                // clear old categories
+                book.Categories.Clear();
 
+                // fetch new categories from DB
+                var categories = await _uniteOfWork.Categories
+                    .GetAllAsync(c => request.CategoryIds.Contains(c.Id));
+
+                foreach (var category in categories)
+                {
+                    book.Categories.Add(category);
+                }
+            }
+
+            _uniteOfWork.Books.Update(book);
             await _uniteOfWork.CommitAsync();
 
             var bookMap = book.Adapt<UpdateBookResponse>();
             return Success(bookMap);
         }
+
         public async Task<ApiResponse<DeleteBookResponse>> DeleteBookAsync(DeleteBookRequest request)
         {
             await DoValidationAsync<DeleteBookRequestValidator, DeleteBookRequest>(request);
