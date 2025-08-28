@@ -122,6 +122,24 @@ namespace AseerAlkotb.Application.Services
             return uniqueName;
         }
         #endregion
+
+        #region Localization Helpers
+        protected string LocalizeOr(string key, string fallback)
+        {
+            var localized = _stringLocalizer[key];
+            if (localized.ResourceNotFound || string.IsNullOrWhiteSpace(localized.Value))
+            {
+                return fallback;
+            }
+            return localized.Value;
+        }
+
+        protected string LocalizeEntity(string entityType, int id, string field, string fallback)
+        {
+            var key = $"{entityType}_{id}_{field}";
+            return LocalizeOr(key, fallback);
+        }
+        #endregion
     }
 }
 
