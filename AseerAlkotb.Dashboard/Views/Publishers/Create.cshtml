@@ -1,0 +1,114 @@
+﻿@model AseerAlkotb.Application.Features.Publishers.Requests.AddPublisherRequest
+
+@{
+    ViewData["Title"] = "Add New Publisher";
+}
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">Add New Publisher</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a asp-action="Index">Publishers</a></li>
+                    <li class="breadcrumb-item active">Add New</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <form asp-action="Create" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h3 class="card-title">Publisher Information</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-group">
+                                        <label asp-for="Name" class="control-label"></label>
+                                        <input asp-for="Name" class="form-control" placeholder="Enter publisher name" />
+                                        <span asp-validation-for="Name" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="Description" class="control-label"></label>
+                                        <textarea asp-for="Description" class="form-control" rows="4" placeholder="Enter a brief description"></textarea>
+                                        <span asp-validation-for="Description" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="ContactEmail" class="control-label"></label>
+                                        <input asp-for="ContactEmail" type="email" class="form-control" placeholder="Enter contact email" />
+                                        <span asp-validation-for="ContactEmail" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Logo</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="text-center mb-3">
+                                        <img id="logoPreview" src="/images/default-logo.png"
+                                             class="img-fluid img-thumbnail" style="max-height:200px;" />
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" id="LogoUrl"
+                                                   name="LogoUrl" accept="image/*" />
+                                            <label class="custom-file-label" for="LogoUrl">Choose logo image</label>
+                                        </div>
+                                        <span asp-validation-for="LogoUrl" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mt-4 text-right">
+                        <a asp-action="Index" class="btn btn-secondary mr-2">Cancel</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save mr-1"></i> Create Publisher
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $('#LogoUrl').on('change', function () {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#logoPreview').attr('src', e.target.result);
+                };
+                reader.readAsDataURL(file);
+
+                const fileName = $(this).val().split('\\').pop();
+                $(this).next('.custom-file-label').text(fileName);
+            } else {
+                $('#logoPreview').attr('src', '/images/default-logo.png');
+                $(this).next('.custom-file-label').text('Choose logo image');
+            }
+        });
+    </script>
+}

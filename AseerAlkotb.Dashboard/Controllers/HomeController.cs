@@ -1,22 +1,100 @@
 using AseerAlkotb.Dashboard.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using System.Threading.Tasks;
+using AseerAlkotb.Application.Contracts;
+using AseerAlkotb.Application.Features.Publishers.Requests;
+using AseerAlkotb.Application.Features.Books.Requests;
+using AseerAlkotb.Application.Features.Authors.Requests;
+using AseerAlkotb.Application.Features.Orders.Requests;
+using AseerAlkotb.Application.Features.Categories.Requests;
+using Microsoft.AspNetCore.Identity; // Add this namespace
+using AseerAlkotb.Domain.Entites.Models;
+using Microsoft.EntityFrameworkCore; // Add this namespace
 
 namespace AseerAlkotb.Dashboard.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IBookServices _bookServices;
+        private readonly IAuthorServices _authorServices;
+        private readonly IOrderServices _orderServices;
+        private readonly ICategoryServices _categoryServices;
+        private readonly IPublisherServices _publisherServices;
+        // Inject UserManager directly
+        private readonly UserManager<User> _userManager;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(
+            ILogger<HomeController> logger,
+            IBookServices bookServices,
+            IAuthorServices authorServices,
+            IOrderServices orderServices,
+            ICategoryServices categoryServices,
+            IPublisherServices publisherServices,
+            UserManager<User> userManager) // Add the new dependency
         {
             _logger = logger;
+            _bookServices = bookServices;
+            _authorServices = authorServices;
+            _orderServices = orderServices;
+            _categoryServices = categoryServices;
+            _publisherServices = publisherServices;
+            _userManager = userManager; // Initialize it
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            try
+            {
+                //Fetch total counts for all entities.
+
+                //Publishers
+   
+               var publishersRequest = new GetAllPublishersPaginatedRequest();
+                var publishersResult = await _publisherServices.GetAllPublishersPaginatedAsync(publishersRequest);
+                ViewBag.TotalPublishers = publishersResult.TotalCount;
+
+                // Books
+                var booksRequest = new GetAllBooksPaginatedRequest();
+                var booksResult = await _bookServices.GetAllBooksPaginatedAsync(booksRequest);
+                ViewBag.TotalBooks = booksResult.TotalCount;
+
+                // Authors
+                var authorsRequest = new GetAllAuthorsPaginatedRequest();
+                var authorsResult = await _authorServices.GetAllAuthorsPaginatedAsync(authorsRequest);
+                ViewBag.TotalAuthors = authorsResult.TotalCount;
+
+                // Categories
+                var categoriesRequest = new GetAllCategoriesPaginatedRequest();
+                var categoriesResult = await _categoryServices.GetAllCategoriesPaginatedAsync(categoriesRequest);
+                ViewBag.TotalCategories = categoriesResult.TotalCount;
+
+                // Orders
+                var ordersRequest = new GetAllOrdersPaginatedRequest(null, null);
+                var ordersResult = await _orderServices.GetAllOrdersPaginatedByAdminAsync(ordersRequest);
+                ViewBag.TotalOrders = ordersResult.TotalCount;
+
+                // Users - Get the total count directly from UserManager
+                ViewBag.TotalUsers = await _userManager.Users.CountAsync();
+
+                return View();
         }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while fetching dashboard data.");
+
+                // Fallback to default values
+                ViewBag.TotalBooks = 0;
+                ViewBag.TotalAuthors = 0;
+                ViewBag.TotalOrders = 0;
+                ViewBag.TotalCategories = 0;
+                ViewBag.TotalPublishers = 0;
+                ViewBag.TotalUsers = 0;
+
+                return View();
+    }
+}
 
         public IActionResult Privacy()
         {
