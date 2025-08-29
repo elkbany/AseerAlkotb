@@ -130,25 +130,15 @@
                                             <div class="form-group">
                                                 <label for="authorSearch">Author</label>
                                                 <div class="input-group">
-                                                    @Html.TextBox("authorSearch", null, new
-                                                        {
-                                                            @class = "form-control",
-                                                            placeholder = "Type author name...",
-                                                            id = "authorSearch"
-                                                        })
+                                                    @Html.TextBox("authorSearch", null, new { @class = "form-control", placeholder = "Type author name...", id = "authorSearch" })
                                                     <div class="input-group-append">
-                                                        <button class="btn btn-outline-secondary" type="button"
-                                                                id="authorSearchBtn">
-                                                            Search
-                                                        </button>
+                                                        <button class="btn btn-outline-secondary" type="button" id="authorSearchBtn">Search</button>
                                                     </div>
                                                 </div>
                                                 <input type="hidden" asp-for="AuthorId" id="AuthorId" />
                                                 <div class="small mt-2">
-                                                    Selected: <span id="authorSelected"
-                                                                    class="font-weight-bold text-primary">
-                                                        @(Model.AuthorId > 0 ?
-                                                            Model.AuthorId.ToString() : "None")
+                                                    Selected: <span id="authorSelected" class="font-weight-bold text-primary">
+                                                        @(Model.AuthorId > 0 ? Model.AuthorId.ToString() : "None")
                                                     </span>
                                                 </div>
                                                 <ul id="authorResults" class="list-group mt-2"></ul>
@@ -161,27 +151,15 @@
                                             <div class="form-group">
                                                 <label for="publisherSearch">Publisher</label>
                                                 <div class="input-group">
-                                                    @Html.TextBox("publisherSearch", null, new
-                                                        {
-                                                            @class =
-                                                             "form-control",
-                                                            placeholder = "Type publisher name...",
-                                                            id =
-                                                             "publisherSearch"
-                                                        })
+                                                    @Html.TextBox("publisherSearch", null, new { @class = "form-control", placeholder = "Type publisher name...", id = "publisherSearch" })
                                                     <div class="input-group-append">
-                                                        <button class="btn btn-outline-secondary" type="button"
-                                                                id="publisherSearchBtn">
-                                                            Search
-                                                        </button>
+                                                        <button class="btn btn-outline-secondary" type="button" id="publisherSearchBtn">Search</button>
                                                     </div>
                                                 </div>
                                                 <input type="hidden" asp-for="PublisherId" id="PublisherId" />
                                                 <div class="small mt-2">
-                                                    Selected: <span id="publisherSelected"
-                                                                    class="font-weight-bold text-primary">
-                                                        @(Model.PublisherId > 0 ?
-                                                            Model.PublisherId.ToString() : "None")
+                                                    Selected: <span id="publisherSelected" class="font-weight-bold text-primary">
+                                                        @(Model.PublisherId > 0 ? Model.PublisherId.ToString() : "None")
                                                     </span>
                                                 </div>
                                                 <ul id="publisherResults" class="list-group mt-2"></ul>
@@ -190,62 +168,28 @@
                                         </div>
                                     </div>
 
-                                    <!-- Categories: Parent + Subcategories (search style) -->
+                                    <!-- Categories -->
                                     <div class="form-group">
-                                        <label for="parentCategorySearch">Parent Category</label>
+                                        <label for="categorySearch">Categories</label>
                                         <div class="input-group">
-                                            @Html.TextBox("parentCategorySearch", null, new
-                                                {
-                                                    @class = "form-control",
-                                                    placeholder = "Type category name...",
-                                                    id = "parentCategorySearch"
-                                                })
+                                            @Html.TextBox("categorySearch", null, new { @class = "form-control", placeholder = "Type to search categories...", id = "categorySearch" })
                                             <div class="input-group-append">
-                                                <button class="btn btn-outline-secondary" type="button"
-                                                        id="parentCategorySearchBtn">
-                                                    Search
-                                                </button>
+                                                <button class="btn btn-outline-secondary" type="button" id="categorySearchBtn">Search</button>
                                             </div>
                                         </div>
                                         <div class="small mt-2">
-                                            Selected: <span id="parentCategorySelected"
-                                                            class="font-weight-bold text-primary">None</span>
-                                                         
+                                            Selected: <span id="categoriesSelected" class="d-inline-block"></span>
                                         </div>
-                                        <ul id="parentCategoryResults" class="list-group mt-2"></ul>
+                                        <ul id="categoryResults" class="list-group mt-2"></ul>
                                     </div>
 
-                                    <div class="form-group">
-                                        <label for="subCategorySearch">Subcategories</label>
-                                        <div class="input-group">
-                                            @Html.TextBox("subCategorySearch", null, new
-                                                {
-                                                    @class = "form-control",
-                                                    placeholder = "Type to search subcategories...",
-                                                    id = "subCategorySearch",
-                                                    disabled = "disabled"
-                                                })
-                                            <div class="input-group-append">
-                                                <button class="btn btn-outline-secondary" type="button"
-                                                        id="subCategorySearchBtn" disabled>
-                                                    Search
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div class="small mt-2">
-                                            Selected:
-                                            <span id="subCategoriesSelected" class="d-inline-block"></span>
-                                        </div>
-                                        <ul id="subCategoryResults" class="list-group mt-2"></ul>
-                                    </div>
-
-                                    <!-- Hidden storage to bind CategoryIds -->
+                                    <!-- Hidden select for binding CategoryIds -->
                                     <div class="form-group" style="display:none;">
-                                        <label asp-for="CategoryIds" class="control-label">Categories</label>
-                                        <select asp-for="CategoryIds" id="categorySelect" class="form-control"
-                                                multiple></select>
+                                        <label asp-for="CategoryIds" class="control-label"></label>
+                                        <select asp-for="CategoryIds" id="categorySelect" class="form-control" multiple></select>
                                         <span asp-validation-for="CategoryIds" class="text-danger"></span>
                                     </div>
+
                                 </div>
                             </div>
                         </div>
@@ -258,9 +202,12 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="text-center mb-3">
-                                        <img id="coverPreview" src="@($"http://localhost:5234{Model.CoverImageUrl}")"
+                                        <img id="coverPreview" src="@(string.IsNullOrEmpty(Model.CoverImageUrl) ? "/images/default-book.png" : Model.CoverImageUrl)"
                                              class="img-fluid img-thumbnail" style="max-height:300px;" />
                                     </div>
+
+                                    <input type="hidden" name="OldCoverImageUrl" value="@Model.CoverImageUrl" />
+
                                     <div class="form-group">
                                         <div class="custom-file">
                                             <input type="file" class="custom-file-input" id="CoverImage"
@@ -332,17 +279,14 @@
                 });
             }
 
-            function doSearch(url, term, extra, done) {
-                const payload = Object.assign({ term: term || '' }, extra || {});
-                $.getJSON(url, payload, done);
+            function doSearch(url, term, done) {
+                $.getJSON(url, { term: term || '' }, done);
             }
 
-            // Prefill selected chips from existing model values if needed (optional)
-
-            // Author
+            // -------- Authors --------
             $('#authorSearchBtn').on('click', function () {
                 const term = $('#authorSearch').val();
-                doSearch('@Url.Action("SearchAuthors", "Books")', term, {}, function (data) {
+                doSearch('@Url.Action("SearchAuthors", "Books")', term, function (data) {
                     renderResults($('#authorResults'), data, function (item) {
                         $('#AuthorId').val(item.id);
                         $('#authorSelected').text(item.text);
@@ -351,10 +295,10 @@
                 });
             });
 
-            // Publisher
+            // -------- Publishers --------
             $('#publisherSearchBtn').on('click', function () {
                 const term = $('#publisherSearch').val();
-                doSearch('@Url.Action("SearchPublishers", "Books")', term, {}, function (data) {
+                doSearch('@Url.Action("SearchPublishers", "Books")', term, function (data) {
                     renderResults($('#publisherResults'), data, function (item) {
                         $('#PublisherId').val(item.id);
                         $('#publisherSelected').text(item.text);
@@ -363,68 +307,45 @@
                 });
             });
 
-            // Categories: parent + subs
-            let parentCategoryId = null;
-            $('#parentCategorySearchBtn').on('click', function () {
-                const term = $('#parentCategorySearch').val();
-                doSearch('@Url.Action("SearchCategories", "Books")', term, {}, function (data) {
-                    renderResults($('#parentCategoryResults'), data, function (item) {
-                        parentCategoryId = item.id;
-                        $('#parentCategorySelected').text(item.text);
-                        $('#parentCategoryResults').empty();
+            // -------- Categories --------
+            function addCategoryChip(id, name) {
+                const chipId = 'chip-' + id;
+                if ($('#' + chipId).length) return;
+                const $chip = $('<span class="badge badge-info mr-1 mb-1" id="' + chipId + '"></span>');
+                $chip.text(name + ' ×');
+                $chip.css('cursor', 'pointer');
+                $chip.on('click', function () {
+                    $(this).remove();
+                    $('#categorySelect option[value="' + id + '"]').remove();
+                });
+                $('#categoriesSelected').append($chip);
+                if ($('#categorySelect option[value="' + id + '"]').length === 0) {
+                    const opt = new Option(name, id, true, true);
+                    $('#categorySelect').append(opt);
+                }
+            }
 
-                        // Update hidden CategoryIds store parent
-                        const $store = $('#categorySelect');
-                        $store.find('option[data-role="parent"]').remove();
-                        const opt = new Option(item.text, item.id, true, true);
-                        $(opt).attr('data-role', 'parent');
-                        $store.append(opt).trigger('change');
+            const existingCategoryIds = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.CategoryIds ?? new List<int>()));
+            const existingCategoryNames = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.CategoryNames ?? new List<string>()));
+            if (existingCategoryIds && existingCategoryIds.length > 0) {
+                for (let i = 0; i < existingCategoryIds.length; i++) {
+                    addCategoryChip(existingCategoryIds[i], existingCategoryNames[i]);
+                }
+            }
 
-                        // Enable subcategory search
-                        $('#subCategorySearch').prop('disabled', false);
-                        $('#subCategorySearchBtn').prop('disabled', false);
-                        // Clear previous subcategory chips
-                        $('#subCategoriesSelected').empty();
-                        // Also remove previous subcategory options from store
-                        $store.find('option').each(function () {
-                            if (!$(this).is('[data-role="parent"]')) {
-                                $(this).remove();
-                            }
-                        });
+            $('#categorySearchBtn').on('click', function () {
+                const term = $('#categorySearch').val();
+                doSearch('@Url.Action("SearchCategories", "Books")', term, function (data) {
+                    renderResults($('#categoryResults'), data, function (item) {
+                        addCategoryChip(item.id, item.text);
+                        $('#categoryResults').empty();
                     });
                 });
             });
 
-            $('#subCategorySearchBtn').on('click', function () {
-                const term = $('#subCategorySearch').val();
-                if (!parentCategoryId) { return; }
-                $.getJSON('@Url.Action("SearchSubCategories", "Books")', { categoryId: parentCategoryId, term: term || '' }, function (data) {
-                    renderResults($('#subCategoryResults'), data, function (item) {
-                        const chipId = 'subchip-' + item.id;
-                        if ($('#' + chipId).length) { return; }
-                        const $chip = $('<span class="badge badge-info mr-1 mb-1" id="' + chipId + '"></span>');
-                        $chip.text(item.text + ' ×');
-                        $chip.css('cursor', 'pointer');
-                        $chip.on('click', function () {
-                            $(this).remove();
-                            $('#categorySelect option[value="' + item.id + '"]').remove();
-                        });
-                        $('#subCategoriesSelected').append($chip);
-
-                        const $store = $('#categorySelect');
-                        if ($store.find('option[value="' + item.id + '"]').length === 0) {
-                            const opt = new Option(item.text, item.id, true, true);
-                            $store.append(opt);
-                            $store.trigger('change');
-                        }
-
-                        $('#subCategoryResults').empty();
-                    });
-                });
-            });
-
-            function bindEnter(selector, buttonSelector) {
-                $(selector).on('keypress', function (e) {
+            // Helpers
+            function bindEnter(inputSelector, buttonSelector) {
+                $(inputSelector).on('keypress', function (e) {
                     if (e.which === 13) {
                         e.preventDefault();
                         $(buttonSelector).click();
@@ -433,11 +354,10 @@
             }
             bindEnter('#authorSearch', '#authorSearchBtn');
             bindEnter('#publisherSearch', '#publisherSearchBtn');
-            bindEnter('#parentCategorySearch', '#parentCategorySearchBtn');
-            bindEnter('#subCategorySearch', '#subCategorySearchBtn');
-        });
+            bindEnter('#categorySearch', '#categorySearchBtn');
 
-         $('#CoverImage').on('change', function () {
+            // Cover image preview
+            $('#CoverImage').on('change', function () {
                 const file = this.files[0];
                 if (file) {
                     const reader = new FileReader();
@@ -445,7 +365,6 @@
                         $('#coverPreview').attr('src', e.target.result);
                     };
                     reader.readAsDataURL(file);
-
                     const fileName = $(this).val().split('\\').pop();
                     $(this).next('.custom-file-label').text(fileName);
                 } else {
@@ -454,5 +373,6 @@
                     $(this).next('.custom-file-label').text('Choose new image');
                 }
             });
+        });
     </script>
 }

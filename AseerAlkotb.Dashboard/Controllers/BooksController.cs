@@ -162,6 +162,10 @@ namespace AseerAlkotb.Dashboard.Controllers
                 response.Data.IsActive
             );
 
+            ViewBag.CategoryIds = response.Data.CategoryIds;
+            ViewBag.CategoryNames = response.Data.CategoryNames;
+
+
             return View(model);
         }
 
@@ -212,25 +216,9 @@ namespace AseerAlkotb.Dashboard.Controllers
             var categories = await _categoryServices.GetAllCategoriesPaginatedAsync(
                 new GetAllCategoriesPaginatedRequest { Search = term, PageSize = 10 });
 
-            var parents = categories.Data
-                   .Where(c => c.ParentCategoryId == null)
-                   .Select(c => new { id = c.Id, text = c.Name });
+            var parents = categories.Data.Select(c => new { id = c.Id, text = c.Name });
 
             return Json(parents);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> SearchSubCategories(int categoryId, string? term)
-        {
-            var categories = await _categoryServices.GetAllCategoriesPaginatedAsync(
-               new GetAllCategoriesPaginatedRequest { Search = term, PageSize = 10 });
-
-            var subCategories = await _categoryServices.GetAllSubCategoriesPaginatedAsync(
-                new GetAllSubCategoriesPaginatedRequest(categoryId, 1, 10, term));
-
-            var subs = subCategories.Data.Select(sc => new { id = sc.Id, text = sc.Name });
-
-            return Json(subs);
         }
 
         [HttpGet]
