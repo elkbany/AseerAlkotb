@@ -74,7 +74,17 @@ namespace AseerAlkotb.Application.Services
 
             var totalCount = await unitOfWork.Publishers.CountAsync((search => search.Name.Contains(request.Search)));
 
-            var response = publishers.Adapt<List<GetAllPublisherPaginatedResponse>>();
+            var response = publishers
+                .Select(p =>
+                {
+                    var dto = p.Adapt<GetAllPublisherPaginatedResponse>();
+                    return dto with
+                    {
+                        Name = LocalizeEntity("Publisher", dto.Id, "Name", dto.Name),
+                        Description = LocalizeEntity("Publisher", dto.Id, "Description", dto.Description)
+                    };
+                })
+                .ToList();
 
             return Success(response , totalCount, request.PageNumber, request.PageSize);
         }
@@ -88,7 +98,12 @@ namespace AseerAlkotb.Application.Services
                 return NotFound<GetPublisherByIdResponse>($"{_stringLocalizer["Publisher"]} {_stringLocalizer["NotFound"]}");
             }
             var response = publisher.Adapt<GetPublisherByIdResponse>();
-            return Success(response);
+            var localized = response with
+            {
+                Name = LocalizeEntity("Publisher", publisher.Id, "Name", response.Name),
+                Description = LocalizeEntity("Publisher", publisher.Id, "Description", response.Description)
+            };
+            return Success(localized);
         }
 
         public async Task<ApiResponse<UpdatePublisherResponse>> UpdatePublisherAsync(UpdatePublisherRequest request)
