@@ -84,8 +84,8 @@ namespace AseerAlkotb.Application.Services
 
             var categoryMap = new GetCategoryByIdResponse(
                 category.Id,
-                category.Name,
-                category.Description,
+                LocalizeEntity("Category", category.Id, "Name", category.Name),
+                LocalizeEntity("Category", category.Id, "Description", category.Description),
                 category.IsActive,
                 category.CreatedAt,
                 category.UpdatedAt
@@ -113,8 +113,8 @@ namespace AseerAlkotb.Application.Services
 
             var categoriesMap = categories.Select(c => new GetAllCategoriesPaginatedResponse(
                 c.Id,
-                c.Name,
-                c.Description,
+                LocalizeEntity("Category", c.Id, "Name", c.Name),
+                LocalizeEntity("Category", c.Id, "Description", c.Description),
                 c.IsActive,
                 c.ParentCategoryId,
                 subCounts.TryGetValue(c.Id, out var cnt) ? cnt : 0,
@@ -173,8 +173,8 @@ namespace AseerAlkotb.Application.Services
 
             var result = query.Select(c => new GetAllSubCategoriesPaginatedResponse(
                 c.Id,
-                c.Name,
-                c.Description,
+                LocalizeEntity("Category", c.Id, "Name", c.Name),
+                LocalizeEntity("Category", c.Id, "Description", c.Description),
                 c.IsActive,
                 c.ParentCategoryId.Value,
                 c.CreatedAt
