@@ -180,11 +180,13 @@ namespace AseerAlkotb.Application.Services
                 return NotFound<GetBookByIdResponse>($"{_stringLocalizer["Book"]} {_stringLocalizer["NotFound"]}");
             }
             var bookMap = book.Adapt<GetBookByIdResponse>();
+            bookMap.Title = LocalizeEntity("Book", book.Id, "Title", bookMap.Title);
+            bookMap.Description = LocalizeEntity("Book", book.Id, "Description", bookMap.Description);
 
             bookMap.Rating = book.Reviews?.Any() == true ? (decimal)book.Reviews.Average(r => r.Rating) : 0;
             //manual
             bookMap.CategoryIds = book.Categories?.Select(c => c.Id).ToList() ?? new List<int>();
-            bookMap.CategoryNames = book.Categories?.Select(c => c.Name).ToList() ?? new List<string>();
+            bookMap.CategoryNames = book.Categories?.Select(c => LocalizeEntity("Category", c.Id, "Name", c.Name)).ToList() ?? new List<string>();
 
 
             return Success(bookMap);
@@ -201,9 +203,10 @@ namespace AseerAlkotb.Application.Services
             var bookMap = books.Select(book =>
             {
                 var bookDto = book.Adapt<GetAllBooksPaginatedResponse>();
+                bookDto.Title = LocalizeEntity("Book", book.Id, "Title", bookDto.Title);
                 //manual
                 bookDto.CategoryIds = book.Categories?.Select(c => c.Id).ToList() ?? new List<int>();
-                bookDto.CategoryNames = book.Categories?.Select(c => c.Name).ToList() ?? new List<string>();
+                bookDto.CategoryNames = book.Categories?.Select(c => LocalizeEntity("Category", c.Id, "Name", c.Name)).ToList() ?? new List<string>();
                 bookDto.Rating = book.Reviews?.Any() == true ? (decimal)book.Reviews.Average(r => r.Rating) : 0;
 
                 return bookDto;
