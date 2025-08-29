@@ -1,4 +1,4 @@
-﻿using AseerAlkotb.Application.Contracts;
+﻿﻿using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Features.Orders.Filters;
 using AseerAlkotb.Application.Features.Orders.Requests;
 using AseerAlkotb.Application.Features.Orders.Responses;
@@ -261,7 +261,7 @@ namespace AseerAlkotb.Application.Services
         public async Task<ApiResponsePaginated<List<GetAllOrdersPaginatedResponse>>> GetAllOrdersPaginatedByAdminAsync(GetAllOrdersPaginatedRequest request)
         {
             await DoValidationAsync<GetAllOrdersPaginatedRequestValidator, GetAllOrdersPaginatedRequest>(request);
-            var orders = unitOfWork.Orders.GetAllAsync((request.PageNumber - 1) * request.PageSize, request.PageSize, default, o => o.OrderItems).Filter(request);
+            var orders = await unitOfWork.Orders.GetAllAsync((request.PageNumber - 1) * request.PageSize, request.PageSize, default, o => o.OrderItems).Filter(request).ToListAsync();
             var totalCount = await unitOfWork.Orders.CountAsync();
 
             var ordsMap = orders.Adapt<List<GetAllOrdersPaginatedResponse>>();
@@ -304,6 +304,43 @@ namespace AseerAlkotb.Application.Services
             var ordMap = order.Adapt<GetUserOrderByTrackingNumberResponse>();
             return Success(ordMap);
 
+        }
+
+        public async Task<ApiResponse<UpdateOrderStatusResponse>> UpdateOrderStatusAsync(UpdateOrderStatusRequest request)
+        {
+            await DoValidationAsync<UpdateOrderStatusRequestValidator, UpdateOrderStatusRequest>(request);
+            
+            var order = await unitOfWork.Orders.FirstOrDefaultAsync(o => o.Id == request.OrderId);
+            if (order == null)
+            {
+                return NotFound<UpdateOrderStatusResponse>("Order not found");
+            }
+
+            // Validate status transition
+            if (!IsValidStatusTransition(order.Status, request.NewStatus))
+            {
+                return BadRequest<UpdateOrderStatusResponse>($"Cannot change status from {order.Status} to {request.NewStatus}");
+            }
+
+            order.Status = request.NewStatus;
+            unitOfWork.Orders.Update(order);
+            await unitOfWork.CommitAsync();
+
+            var response = new UpdateOrderStatusResponse(
+                order.Id,
+                order.Status,
+                order.TrackingNumber,
+                DateTime.UtcNow
+            );
+
+            return Success(response);
+        }
+
+        private static bool IsValidStatusTransition(OrderStatus currentStatus, OrderStatus newStatus)
+        {
+            // Allow any status change for admin flexibility, but log invalid transitions
+            // You can implement more restrictive rules here if needed
+            return true;
         }
     }
 }

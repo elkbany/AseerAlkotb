@@ -1,4 +1,4 @@
-﻿
+﻿﻿﻿
 
 using AseerAlkotb.Application.Features.Books.DTOs;
 using AseerAlkotb.Application.Features.OrderItems.DTOs;
@@ -51,6 +51,11 @@ namespace AseerAlkotb.Application.Features.Orders.Mapping
                 config.NewConfig<Order, GetOrderByAdminByTrackingNumberResponse>()
                     .Map(dest => dest.UserName, src => src.User.FirstName)
                     .Map(dest => dest.OrderStatus, src => src.Status)
+                    .Map(dest => dest.TotalAmount, src => src.TotalAmount)
+                    .Map(dest => dest.ShippingCost, src => src.ShippingCost)
+                    .Map(dest => dest.TaxAmount, src => src.TaxAmount)
+                    .Map(dest => dest.DiscountAmount, src => src.DiscountAmount)
+                    .Map(dest => dest.FinalAmount, src => src.FinalAmount)
                     .Map(dest => dest.Books, src => src.OrderItems
                         .Select(oi => new BookDTO(oi.Book.Title, (int)oi.UnitPrice))
                         .ToList());
@@ -70,6 +75,13 @@ namespace AseerAlkotb.Application.Features.Orders.Mapping
                     .Map(dest => dest.Books, src => src.OrderItems
                         .Select(oi => new BookDTO(oi.Book.Title, (int)oi.UnitPrice))
                         .ToList());
+
+                // Update Order Status Mapping
+                config.NewConfig<Order, UpdateOrderStatusResponse>()
+                    .Map(dest => dest.Id, src => src.Id)
+                    .Map(dest => dest.Status, src => src.Status)
+                    .Map(dest => dest.TrackingNumber, src => src.TrackingNumber)
+                    .Map(dest => dest.UpdatedAt, src => DateTime.UtcNow);
             }
         }
 }
