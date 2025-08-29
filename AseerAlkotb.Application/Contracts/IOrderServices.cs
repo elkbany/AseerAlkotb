@@ -1,4 +1,4 @@
-﻿using AseerAlkotb.Application.Features.Orders.Requests;
+﻿﻿﻿using AseerAlkotb.Application.Features.Orders.Requests;
 using AseerAlkotb.Application.Features.Orders.Responses;
 using AseerAlkotb.Application.ResponseHandler;
 
@@ -18,5 +18,7 @@ namespace AseerAlkotb.Application.Contracts
         Task<ApiResponse<GetOrderByAdminByTrackingNumberResponse>> GetOrderByTrackingNumberByAdminAsync(GetOrderByAdminByTrackingNumberRequest request);
 
         Task<ApiResponse<GetUserOrderByTrackingNumberResponse>> GetOrderByTrackingNumberByUserAsync(GetUserOrderByTrackingNumberRequest request);
+
+        Task<ApiResponse<UpdateOrderStatusResponse>> UpdateOrderStatusAsync(UpdateOrderStatusRequest request);
     }
 }
