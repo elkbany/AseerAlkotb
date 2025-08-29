@@ -6,7 +6,9 @@ using AseerAlkotb.Application.Features.Books.Responses;
 using AseerAlkotb.Application.Features.Categories.Requests;
 using AseerAlkotb.Application.Features.Publishers.Requests;
 using AseerAlkotb.Application.Features.Reviews.Requests;
+using AseerAlkotb.Application.Services;
 using AseerAlkotb.Domain.Entites.Models;
+using Azure;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AseerAlkotb.Dashboard.Controllers
@@ -165,41 +167,21 @@ namespace AseerAlkotb.Dashboard.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(UpdateBookRequest request)
+        public async Task<IActionResult> Edit(int id,UpdateBookRequest request)
         {
-           
             if (ModelState.IsValid)
             {
-                await _bookServices.UpdateBookAsync(request);
-                return RedirectToAction(nameof(Index));
+                var result = await _bookServices.UpdateBookAsync(request);
+                if (result.Succeeded)
+                {
+                    TempData["Success"] = "Book updated successfully.";
+                    return RedirectToAction(nameof(Index));
+                }
+                TempData["Error"] = result.Message;
             }
-
-            var currentBook = await _bookServices.GetBookByIdAsync(new GetBookByIdRequest(request.Id));
-            string? currentCoverImageUrl = currentBook.Succeeded && currentBook.Data != null
-                ? currentBook.Data.CoverImageUrl
-                : string.Empty;
-
-            var model = new UpdateBookResponse(
-                request.Id,
-                request.Title,
-                request.ISBN,
-                request.Price,
-                request.Description,
-                request.DiscountPercentage,
-                request.PublishedDate,
-                request.PageCount,
-                request.Language,
-                currentCoverImageUrl,
-                request.Format,
-                request.StockQuantity,
-                request.AuthorId,
-                request.PublisherId,
-                request.CategoryIds,
-                request.IsActive
-            );
-
-            return View(model);
+            return View(request);
         }
+
 
         [HttpGet]
         public async Task<IActionResult> Delete(int id)

@@ -78,24 +78,22 @@ namespace AseerAlkotb.Dashboard.Controllers
                 return NotFound();
             }
 
-            var apiBaseUrl = _configuration["ApiBaseUrl"];
 
-            var request = new UpdatePublisherRequest(
+            var request = new UpdatePublisherResponse(
                 response.Data.Id,
                 response.Data.Name,
                 response.Data.Description,
-                null,
+                response.Data.LogoUrl,
                 response.Data.ContactEmail
             );
 
-            ViewBag.LogoUrl = $"{apiBaseUrl}{response.Data.LogoUrl}";
 
             return View(request);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [FromForm] UpdatePublisherRequest request)
+        public async Task<IActionResult> Edit(int id, UpdatePublisherRequest request)
         {
             if (id != request.Id)
             {

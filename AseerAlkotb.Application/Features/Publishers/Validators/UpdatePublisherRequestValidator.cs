@@ -28,8 +28,6 @@ namespace AseerAlkotb.Application.Features.Publishers.Validators
                 .L("Description", "MaxLength1000");
 
             RuleFor(x => x.LogoUrl)
-                .NotEmpty()
-                .L("Publisher", "image", "Required")
                 .Must(BeValidImage)
                 .L("Publisher", "image", "invalid");
 
