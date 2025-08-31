@@ -17,12 +17,12 @@ namespace AseerAlkotb.Application.Features.Account.Validator
         { 
             RuleFor(x => x.FirstName)
             .NotEmpty().WithMessage("First name is required")
-            .Length(2, 15).WithMessage("First name must be between 2-15 characters")
+            .Length(3, 15).WithMessage("First name must be between 3-15 characters")
             .Matches(@"^[a-zA-Z]+$").WithMessage("First name can only contain letters");
 
             RuleFor(x => x.LastName)
                 .NotEmpty().WithMessage("Last name is required")
-                .Length(2, 15).WithMessage("Last name must be between 2-15 characters")
+                .Length(3, 15).WithMessage("Last name must be between 3-15 characters")
                 .Matches(@"^[a-zA-Z]+$").WithMessage("Last name can only contain letters");
 
             RuleFor(x => x.UserName)
