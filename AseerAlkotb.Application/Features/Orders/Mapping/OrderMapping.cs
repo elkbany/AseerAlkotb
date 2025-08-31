@@ -47,21 +47,22 @@ namespace AseerAlkotb.Application.Features.Orders.Mapping
                         .Select(oi => new BookDTO(oi.Book.Title, (int)oi.UnitPrice))
                         .ToList());
 
-                // Get Order By Admin (Entity → Response)
-                config.NewConfig<Order, GetOrderByAdminByTrackingNumberResponse>()
-                    .Map(dest => dest.UserName, src => src.User.FirstName)
-                    .Map(dest => dest.OrderStatus, src => src.Status)
-                    .Map(dest => dest.TotalAmount, src => src.TotalAmount)
-                    .Map(dest => dest.ShippingCost, src => src.ShippingCost)
-                    .Map(dest => dest.TaxAmount, src => src.TaxAmount)
-                    .Map(dest => dest.DiscountAmount, src => src.DiscountAmount)
-                    .Map(dest => dest.FinalAmount, src => src.FinalAmount)
-                    .Map(dest => dest.Books, src => src.OrderItems
-                        .Select(oi => new BookDTO(oi.Book.Title, (int)oi.UnitPrice))
-                        .ToList());
+            // Get Order By Admin (Entity → Response)
+            config.NewConfig<Order, GetOrderByAdminByTrackingNumberResponse>()
+                  .Map(dest => dest.UserName, src => src.User.UserName)
+                  .Map(dest => dest.OrderStatus, src => src.Status)
+                  .Map(dest => dest.TotalAmount, src => src.TotalAmount)
+                  .Map(dest => dest.ShippingCost, src => src.ShippingCost)
+                  .Map(dest => dest.TaxAmount, src => src.TaxAmount)
+                  .Map(dest => dest.DiscountAmount, src => src.DiscountAmount)
+                  .Map(dest => dest.FinalAmount, src => src.FinalAmount)
+                  .Map(dest => dest.Books, src => src.OrderItems
+                      .Select(oi => new BookDTO(oi.Book.Title, (int)oi.UnitPrice))
+                      .ToList());
 
-                // Get All User Orders Paginated
-                config.NewConfig<Order, GetAllUserOrdersPaginatedResponse>()
+
+            // Get All User Orders Paginated
+            config.NewConfig<Order, GetAllUserOrdersPaginatedResponse>()
                     .Map(dest => dest.UserName, src => src.User.FirstName)
                     .Map(dest => dest.OrderStatus, src => src.Status)
                     .Map(dest => dest.Books, src => src.OrderItems

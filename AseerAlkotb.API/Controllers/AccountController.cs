@@ -81,8 +81,8 @@ namespace AseerAlkotb.API.Controllers
         }
 
         // Forgot Password
-        [HttpPost("ForgotPassword")]
-        public async Task<IActionResult> ForgotPassword([FromBody] string email)
+        [HttpPost("ForgotPassword/{email}")]
+        public async Task<IActionResult> ForgotPassword(string email)
         {
             var result = await _accountServices.ForgotPassword(email);
 

@@ -38,6 +38,23 @@ namespace AseerAlkotb.Infrastructure.Repositories.Base
             return await query.FirstOrDefaultAsync(cancellationToken);
         }
 
+        public IQueryable<TEntity> GetQueryable(
+            Expression<Func<TEntity, bool>>? criteria = null,
+            Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null)
+        {
+            IQueryable<TEntity> query = _table;
+
+            if (criteria != null)
+                query = query.Where(criteria);
+
+            if (include != null)
+                query = include(query);
+
+            return query;
+        }
+
+
+
         public IQueryable<TEntity> GetAllAsyncByEx(Expression<Func<TEntity, bool>>? criteria,
            int? skip, int? take,
            CancellationToken cancellationToken = default,
