@@ -30,6 +30,22 @@ namespace AseerAlkotb.Application.Services
         }
 
 
+        //public async Task<ApiResponse<AddBookResponse>> AddBookAsync(AddBookRequest request)
+        //{
+        //    await DoValidationAsync<AddBookRequestValidator, AddBookRequest>(request);
+
+        //    var book = request.Adapt<Book>();
+        //    if (request.CoverImageUrl != null)
+        //    {
+        //        book.CoverImageUrl = await UploadImageAsync(request.CoverImageUrl, "Books");
+        //    }
+
+        //    await _uniteOfWork.Books.InsertAsync(book);
+        //    await _uniteOfWork.CommitAsync();
+
+        //    var bookMap = book.Adapt<AddBookResponse>();
+        //    return Success(bookMap);
+        //}
         public async Task<ApiResponse<AddBookResponse>> AddBookAsync(AddBookRequest request)
         {
             await DoValidationAsync<AddBookRequestValidator, AddBookRequest>(request);
@@ -40,6 +56,18 @@ namespace AseerAlkotb.Application.Services
                 book.CoverImageUrl = await UploadImageAsync(request.CoverImageUrl, "Books");
             }
 
+           
+            if (request.CategoryIds != null && request.CategoryIds.Any())
+            {
+                var categories = await _uniteOfWork.Categories
+                    .GetAllAsync(c => request.CategoryIds.Contains(c.Id));
+
+                foreach (var category in categories)
+                {
+                    book.Categories.Add(category);
+                }
+            }
+
             await _uniteOfWork.Books.InsertAsync(book);
             await _uniteOfWork.CommitAsync();
 
@@ -47,19 +75,51 @@ namespace AseerAlkotb.Application.Services
             return Success(bookMap);
         }
 
+        //public async Task<ApiResponse<UpdateBookResponse>> UpdateBookAsync(UpdateBookRequest request)
+        //{
+        //    await DoValidationAsync<UpdateBookRequestValidator, UpdateBookRequest>(request);
+
+        //    var book = await _uniteOfWork.Books.FirstOrDefaultAsync(b => b.Id == request.Id);
+
+        //    if (book == null)
+        //    {
+        //        return NotFound<UpdateBookResponse>($"{_stringLocalizer["Book"]} {_stringLocalizer["NotFound"]}");
+        //    }
+
+        //    request.Adapt(book);
+
+        //    if (request.CoverImageUrl != null)
+        //    {
+        //        if (!string.IsNullOrEmpty(book.CoverImageUrl))
+        //        {
+        //            await DeleteImageAsync(book.CoverImageUrl);
+        //        }
+        //        book.CoverImageUrl = await UploadImageAsync(request.CoverImageUrl, "Books");
+        //    }
+
+        //    _uniteOfWork.Books.Update(book);
+
+        //    await _uniteOfWork.CommitAsync();
+
+        //    var bookMap = book.Adapt<UpdateBookResponse>();
+        //    return Success(bookMap);
+        //}
         public async Task<ApiResponse<UpdateBookResponse>> UpdateBookAsync(UpdateBookRequest request)
         {
             await DoValidationAsync<UpdateBookRequestValidator, UpdateBookRequest>(request);
 
-            var book = await _uniteOfWork.Books.FirstOrDefaultAsync(b => b.Id == request.Id);
+            var book = await _uniteOfWork.Books
+                .FirstOrDefaultAsync(b => b.Id == request.Id,default,b=>b.Categories);
 
             if (book == null)
             {
                 return NotFound<UpdateBookResponse>($"{_stringLocalizer["Book"]} {_stringLocalizer["NotFound"]}");
             }
 
+            // update basic fields
             request.Adapt(book);
 
+            // update cover image if provided
             if (request.CoverImageUrl != null)
             {
                 if (!string.IsNullOrEmpty(book.CoverImageUrl))
@@ -69,13 +129,29 @@ namespace AseerAlkotb.Application.Services
                 book.CoverImageUrl = await UploadImageAsync(request.CoverImageUrl, "Books");
             }
 
-            _uniteOfWork.Books.Update(book);
+            // sync categories if provided
+            if (request.CategoryIds != null && request.CategoryIds.Any())
+            {
+                // clear old categories
+                book.Categories.Clear();
 
+                // fetch new categories from DB
+                var categories = await _uniteOfWork.Categories
+                    .GetAllAsync(c => request.CategoryIds.Contains(c.Id));
+
+                foreach (var category in categories)
+                {
+                    book.Categories.Add(category);
+                }
+            }
+
+            _uniteOfWork.Books.Update(book);
             await _uniteOfWork.CommitAsync();
 
             var bookMap = book.Adapt<UpdateBookResponse>();
             return Success(bookMap);
         }
+
         public async Task<ApiResponse<DeleteBookResponse>> DeleteBookAsync(DeleteBookRequest request)
         {
             await DoValidationAsync<DeleteBookRequestValidator, DeleteBookRequest>(request);
@@ -104,11 +180,13 @@ namespace AseerAlkotb.Application.Services
                 return NotFound<GetBookByIdResponse>($"{_stringLocalizer["Book"]} {_stringLocalizer["NotFound"]}");
             }
             var bookMap = book.Adapt<GetBookByIdResponse>();
+            bookMap.Title = LocalizeEntity("Book", book.Id, "Title", bookMap.Title);
+            bookMap.Description = LocalizeEntity("Book", book.Id, "Description", bookMap.Description);
 
             bookMap.Rating = book.Reviews?.Any() == true ? (decimal)book.Reviews.Average(r => r.Rating) : 0;
             //manual
             bookMap.CategoryIds = book.Categories?.Select(c => c.Id).ToList() ?? new List<int>();
-            bookMap.CategoryNames = book.Categories?.Select(c => c.Name).ToList() ?? new List<string>();
+            bookMap.CategoryNames = book.Categories?.Select(c => LocalizeEntity("Category", c.Id, "Name", c.Name)).ToList() ?? new List<string>();
 
 
             return Success(bookMap);
@@ -125,9 +203,10 @@ namespace AseerAlkotb.Application.Services
             var bookMap = books.Select(book =>
             {
                 var bookDto = book.Adapt<GetAllBooksPaginatedResponse>();
+                bookDto.Title = LocalizeEntity("Book", book.Id, "Title", bookDto.Title);
                 //manual
                 bookDto.CategoryIds = book.Categories?.Select(c => c.Id).ToList() ?? new List<int>();
-                bookDto.CategoryNames = book.Categories?.Select(c => c.Name).ToList() ?? new List<string>();
+                bookDto.CategoryNames = book.Categories?.Select(c => LocalizeEntity("Category", c.Id, "Name", c.Name)).ToList() ?? new List<string>();
                 bookDto.Rating = book.Reviews?.Any() == true ? (decimal)book.Reviews.Average(r => r.Rating) : 0;
 
                 return bookDto;
@@ -182,7 +261,11 @@ namespace AseerAlkotb.Application.Services
             var bookMap = paginatedBooks.Select(book =>
             {
                 var bookDto = book.Adapt<GetAllBooksPaginatedResponse>();
-                bookDto.Rating = book.Reviews?.Any() == true ? (int)Math.Round(book.Reviews.Average(r => r.Rating)) : 0;
+                //manual
+                bookDto.CategoryIds = book.Categories?.Select(c => c.Id).ToList() ?? new List<int>();
+                bookDto.CategoryNames = book.Categories?.Select(c => c.Name).ToList() ?? new List<string>();
+                bookDto.Rating = book.Reviews?.Any() == true ? (decimal)book.Reviews.Average(r => r.Rating) : 0;
+
                 return bookDto;
             }).ToList();
 

@@ -15,5 +15,5 @@ namespace AseerAlkotb.Domain.Entites.Models
         #endregion
 
 
-    }
+    } 
 }

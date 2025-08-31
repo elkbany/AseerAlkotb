@@ -57,7 +57,8 @@ namespace AseerAlkotb.Application.Features.Books.Mapping
 
             #region Get Book By Id Mapping
             TypeAdapterConfig<Book, GetBookByIdResponse>.NewConfig()
-
+                .Map(dest=>dest.AuthorName, src => src.AuthorId != null ? src.Author.Name : string.Empty)
+                .Map(dest => dest.PublisherName, src => src.Publisher.Name != null ? src.Publisher.Name : string.Empty)
                 .Ignore(dest => dest.CategoryIds)
                 .Ignore(dest => dest.CategoryNames)
                 .Ignore(dest => dest.Rating);

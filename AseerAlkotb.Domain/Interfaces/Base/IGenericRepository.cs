@@ -12,7 +12,9 @@ namespace AseerAlkotb.Domain.Interfaces.Base
          where Key : struct
          where TEntity : class
     {
-        
+        public IQueryable<TEntity> GetQueryable(
+            Expression<Func<TEntity, bool>>? criteria = null,
+            Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null);
         Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> criteria,
             CancellationToken cancellationToken = default,
             params Expression<Func<TEntity, object>>[] includes);

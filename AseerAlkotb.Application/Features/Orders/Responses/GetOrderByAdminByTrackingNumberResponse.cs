@@ -1,4 +1,4 @@
-﻿using AseerAlkotb.Application.Features.Books.DTOs;
+﻿﻿using AseerAlkotb.Application.Features.Books.DTOs;
 using AseerAlkotb.Domain.Enums;
 using System;
 using System.Collections.Generic;
@@ -18,6 +18,10 @@ namespace AseerAlkotb.Application.Features.Orders.Responses
         EgyptCities City,
        OrderStatus OrderStatus,
        string TrackingNumber,
+       decimal TotalAmount,
+       decimal ShippingCost,
+       decimal TaxAmount,
+       decimal DiscountAmount,
        decimal FinalAmount,
        DateTime OrderDate,
        List<BookDTO> Books

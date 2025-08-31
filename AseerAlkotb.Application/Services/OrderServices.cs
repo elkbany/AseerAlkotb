@@ -1,4 +1,5 @@
-﻿using AseerAlkotb.Application.Contracts;
+﻿﻿using AseerAlkotb.Application.Contracts;
+using AseerAlkotb.Application.Features.Books.DTOs;
 using AseerAlkotb.Application.Features.Orders.Filters;
 using AseerAlkotb.Application.Features.Orders.Requests;
 using AseerAlkotb.Application.Features.Orders.Responses;
@@ -11,6 +12,7 @@ using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using static AseerAlkotb.Application.ResponseHandler.ApiResponseHandler;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 
 
@@ -261,7 +263,7 @@ namespace AseerAlkotb.Application.Services
         public async Task<ApiResponsePaginated<List<GetAllOrdersPaginatedResponse>>> GetAllOrdersPaginatedByAdminAsync(GetAllOrdersPaginatedRequest request)
         {
             await DoValidationAsync<GetAllOrdersPaginatedRequestValidator, GetAllOrdersPaginatedRequest>(request);
-            var orders = unitOfWork.Orders.GetAllAsync((request.PageNumber - 1) * request.PageSize, request.PageSize, default, o => o.OrderItems).Filter(request);
+            var orders = await unitOfWork.Orders.GetAllAsync((request.PageNumber - 1) * request.PageSize, request.PageSize, default, o => o.OrderItems).Filter(request).ToListAsync();
             var totalCount = await unitOfWork.Orders.CountAsync();
 
             var ordsMap = orders.Adapt<List<GetAllOrdersPaginatedResponse>>();
@@ -283,12 +285,40 @@ namespace AseerAlkotb.Application.Services
         public async Task<ApiResponse<GetOrderByAdminByTrackingNumberResponse>> GetOrderByTrackingNumberByAdminAsync(GetOrderByAdminByTrackingNumberRequest request)
         {
             await DoValidationAsync<GetOrderByAdminByTrackingNumberRequestValidator, GetOrderByAdminByTrackingNumberRequest>(request);
-            var order = await unitOfWork.Orders.FirstOrDefaultAsync(o => o.TrackingNumber == request.TrackingNumber, default, o => o.OrderItems);
+            var query = unitOfWork.Orders.GetQueryable(
+     o => o.TrackingNumber == request.TrackingNumber,
+     q => q.Include(o => o.User)
+           .Include(o => o.OrderItems)
+     .ThenInclude(oi => oi.Book)
+ );
+            var order = await query.FirstOrDefaultAsync();
             if (order == null)
             {
                 return NotFound<GetOrderByAdminByTrackingNumberResponse>("Order not found");
             }
-            var ordMap = order.Adapt<GetOrderByAdminByTrackingNumberResponse>();
+            var ordMap = new GetOrderByAdminByTrackingNumberResponse(
+     order.Id,
+     order.User?.UserName ?? string.Empty, // keep nullable-safe
+     order.PaymentMethod,
+     order.PaymentStatus,
+     order.Governorate,
+     order.City,
+     order.Status,
+     order.TrackingNumber,
+     order.TotalAmount,
+     order.ShippingCost,
+     order.TaxAmount,
+     order.DiscountAmount,
+     order.FinalAmount,
+     order.OrderDate,
+     order.OrderItems
+         .Where(oi => oi.Book != null)
+         .Select(oi => new BookDTO(
+             oi.Book.Title,
+            (oi.UnitPrice) 
+         ))
+         .ToList()
+ );
             return Success(ordMap);
 
         }
@@ -301,9 +331,65 @@ namespace AseerAlkotb.Application.Services
             {
                 return NotFound<GetUserOrderByTrackingNumberResponse>("Order not found");
             }
-            var ordMap = order.Adapt<GetUserOrderByTrackingNumberResponse>();
+            var ordMap= new GetUserOrderByTrackingNumberResponse(
+                order.Id,
+                order.User?.UserName ?? string.Empty, 
+                order.PaymentMethod,          
+                order.PaymentStatus,          
+                order.Governorate,                   
+                order.City,                          
+                order.Status,                         
+                order.TrackingNumber,
+                order.FinalAmount,                    
+                order.OrderDate,
+                order.OrderItems
+                    .Where(oi => oi.Book != null)
+                    .Select(oi => new BookDTO(
+                        oi.Book.Title,
+                        oi.UnitPrice
+                    ))
+                    .ToList()
+            );
+
             return Success(ordMap);
 
+        }
+
+        public async Task<ApiResponse<UpdateOrderStatusResponse>> UpdateOrderStatusAsync(UpdateOrderStatusRequest request)
+        {
+            await DoValidationAsync<UpdateOrderStatusRequestValidator, UpdateOrderStatusRequest>(request);
+            
+            var order = await unitOfWork.Orders.FirstOrDefaultAsync(o => o.Id == request.OrderId);
+            if (order == null)
+            {
+                return NotFound<UpdateOrderStatusResponse>("Order not found");
+            }
+
+            // Validate status transition
+            if (!IsValidStatusTransition(order.Status, request.NewStatus))
+            {
+                return BadRequest<UpdateOrderStatusResponse>($"Cannot change status from {order.Status} to {request.NewStatus}");
+            }
+
+            order.Status = request.NewStatus;
+            unitOfWork.Orders.Update(order);
+            await unitOfWork.CommitAsync();
+
+            var response = new UpdateOrderStatusResponse(
+                order.Id,
+                order.Status,
+                order.TrackingNumber,
+                DateTime.UtcNow
+            );
+
+            return Success(response);
+        }
+
+        private static bool IsValidStatusTransition(OrderStatus currentStatus, OrderStatus newStatus)
+        {
+            // Allow any status change for admin flexibility, but log invalid transitions
+            // You can implement more restrictive rules here if needed
+            return true;
         }
     }
 }
