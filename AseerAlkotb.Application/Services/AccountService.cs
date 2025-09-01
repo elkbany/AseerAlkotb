@@ -66,6 +66,7 @@ namespace AseerAlkotb.Application.Services
                 var newAccount = request.Adapt<User>();
                 newAccount.CreatedAt = DateTime.UtcNow;
                 newAccount.UpdatedAt = DateTime.UtcNow;
+                newAccount.IsActive = true;//??????
 
                 // 5- Create user
                 var result = await _userManager.CreateAsync(newAccount, request.Password);

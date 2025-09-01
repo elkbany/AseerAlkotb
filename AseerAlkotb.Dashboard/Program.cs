@@ -5,10 +5,17 @@ using AseerAlkotb.Infrastructure.Context;
 using AseerAlkotb.Infrastructure.Repositories.Base;
 using AseerAlkotb.Domain.Interfaces.Base;
 using AseerAlkotb.Application.Contracts;
+using AseerAlkotb.Application.Contracts.External;
+using AseerAlkotb.Application.ResponseHandler;
 using AseerAlkotb.Application.Services;
 using AseerAlkotb.Application.Contracts.External;
 using AseerAlkotb.Infrastructure.ExternalServices;
 using Mapster;
+using AseerAlkotb.Infrastructure.Repositories.Base;
+using AseerAlkotb.Localization.Resources;
+using Mapster;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 
 namespace AseerAlkotb.Dashboard
 {
@@ -58,6 +65,18 @@ namespace AseerAlkotb.Dashboard
 
             #region Other Configurations
             // Configure Mapster for object mapping
+            #region Localization
+            builder.Services.AddLocalization();
+            builder.Services.Configure<RequestLocalizationOptions>(options =>
+            {
+                var supportedCultures = new[] { "en", "ar" };
+                options.SetDefaultCulture(supportedCultures[0])
+                       .AddSupportedCultures(supportedCultures)
+                       .AddSupportedUICultures(supportedCultures);
+            });
+            builder.Services.AddHttpContextAccessor();
+            #endregion
+            // Configure Mapster
             builder.Services.AddMapster();
             TypeAdapterConfig.GlobalSettings.Compile();
 
@@ -74,7 +93,17 @@ namespace AseerAlkotb.Dashboard
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
+            #region Localization
+            app.UseRequestLocalization();
+            #endregion
 
+            // Initialize LocalizerProvider correctly
+            using (var scope = app.Services.CreateScope())
+            {
+                var localizer = scope.ServiceProvider.GetRequiredService<IStringLocalizer<SharedResources>>();
+                var httpContextAccessor = scope.ServiceProvider.GetRequiredService<IHttpContextAccessor>();
+                LocalizerProvider.Init(localizer, httpContextAccessor);
+            }
             app.UseHttpsRedirection();
             app.UseStaticFiles(); // Serves static files from wwwroot
 

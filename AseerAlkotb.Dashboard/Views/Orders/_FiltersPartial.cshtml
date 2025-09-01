@@ -1,0 +1,115 @@
+<form method="get" action="@Url.Action("Index")" class="row g-3">
+    <!-- Search Input -->
+    <div class="col-md-3">
+        <label for="search" class="form-label">
+            <i class="fas fa-search me-1"></i>Search
+        </label>
+        <input type="text" 
+               class="form-control" 
+               id="search" 
+               name="search" 
+               placeholder="Customer name, tracking number..." 
+               value="@ViewBag.SearchTerm">
+    </div>
+
+    <!-- Order Status Filter -->
+    <div class="col-md-2">
+        <label for="orderStatus" class="form-label">
+            <i class="fas fa-tasks me-1"></i>Status
+        </label>
+        <select class="form-select" id="orderStatus" name="orderStatus">
+            <option value="">All Statuses</option>
+            @foreach (var status in ViewBag.OrderStatuses as AseerAlkotb.Domain.Enums.OrderStatus[])
+            {
+                var statusValue = (int)status;
+                var isSelected = ViewBag.SelectedOrderStatus?.Equals(status) == true;
+                <option value="@statusValue" selected="@isSelected">
+                    @status
+                </option>
+            }
+        </select>
+    </div>
+
+    <!-- Governorate Filter -->
+    <div class="col-md-2">
+        <label for="governorate" class="form-label">
+            <i class="fas fa-map-marker-alt me-1"></i>Governorate
+        </label>
+        <select class="form-select" id="governorate" name="governorate">
+            <option value="">All Governorates</option>
+            @foreach (var gov in ViewBag.Governorates as AseerAlkotb.Domain.Enums.EgyptGovernorates[])
+            {
+                var govValue = (int)gov;
+                var isSelected = ViewBag.SelectedGovernorate?.Equals(gov) == true;
+                <option value="@govValue" selected="@isSelected">
+                    @gov.ToString().Replace("_", " ")
+                </option>
+            }
+        </select>
+    </div>
+
+    <!-- Date Sorting -->
+    <div class="col-md-2">
+        <label for="dateAscending" class="form-label">
+            <i class="fas fa-sort me-1"></i>Date Order
+        </label>
+        <select class="form-select" id="dateAscending" name="dateAscending">
+            <option value="false" selected="@(!ViewBag.DateAscending)">Newest First</option>
+            <option value="true" selected="@(ViewBag.DateAscending)">Oldest First</option>
+        </select>
+    </div>
+
+    <!-- Page Size -->
+    <div class="col-md-2">
+        <label for="pageSize" class="form-label">
+            <i class="fas fa-list me-1"></i>Per Page
+        </label>
+        <select class="form-select" id="pageSize" name="pageSize">
+            <option value="10" selected="@(ViewBag.PageSize == 10)">10</option>
+            <option value="25" selected="@(ViewBag.PageSize == 25)">25</option>
+            <option value="50" selected="@(ViewBag.PageSize == 50)">50</option>
+            <option value="100" selected="@(ViewBag.PageSize == 100)">100</option>
+        </select>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="col-md-1">
+        <label class="form-label">&nbsp;</label>
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-filter"></i>
+            </button>
+            <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                <i class="fas fa-times"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Hidden field to maintain page number on filter -->
+    <input type="hidden" name="pageNumber" value="1" />
+</form>
+
+<!-- Quick Filter Badges -->
+<div class="row mt-3">
+    <div class="col-12">
+        <div class="d-flex flex-wrap gap-2">
+            <span class="text-muted small">Quick filters:</span>
+            <a href="@Url.Action("Index", new { orderStatus = (int)AseerAlkotb.Domain.Enums.OrderStatus.Pending })" 
+               class="badge bg-warning text-decoration-none">
+                <i class="fas fa-clock me-1"></i>Pending Orders
+            </a>
+            <a href="@Url.Action("Index", new { orderStatus = (int)AseerAlkotb.Domain.Enums.OrderStatus.Shipped })" 
+               class="badge bg-primary text-decoration-none">
+                <i class="fas fa-shipping-fast me-1"></i>Shipped Orders
+            </a>
+            <a href="@Url.Action("Index", new { orderStatus = (int)AseerAlkotb.Domain.Enums.OrderStatus.Delivered })" 
+               class="badge bg-success text-decoration-none">
+                <i class="fas fa-check-circle me-1"></i>Delivered Orders
+            </a>
+            <a href="@Url.Action("Index", new { orderStatus = (int)AseerAlkotb.Domain.Enums.OrderStatus.Cancelled })" 
+               class="badge bg-danger text-decoration-none">
+                <i class="fas fa-times-circle me-1"></i>Cancelled Orders
+            </a>
+        </div>
+    </div>
+</div>

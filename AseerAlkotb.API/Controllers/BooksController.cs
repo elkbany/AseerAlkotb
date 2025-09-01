@@ -40,9 +40,8 @@ namespace AseerAlkotb.API.Controllers
             var result = await _bookServices.DeleteBookAsync(request);
             return ApiResult(result);
         }
-
-        [HttpGet]
-        public async Task<IActionResult> GetById([FromQuery] GetBookByIdRequest request)
+        [HttpGet("{Id}")]
+        public async Task<IActionResult> GetById([FromRoute] GetBookByIdRequest request)
         {
             var result = await _bookServices.GetBookByIdAsync(request);
             return ApiResult(result);
