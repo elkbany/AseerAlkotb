@@ -115,10 +115,17 @@ namespace AseerAlkotb.Application.Services
             {
                 return NotFound<UpdatePublisherResponse>($"{_stringLocalizer["Publisher"]} {_stringLocalizer["NotFound"]}");
             }
+            var oldLogoUrl = publisher.LogoUrl;
+
             request.Adapt(publisher);
+
             if (request.LogoUrl != null)
             {
-                publisher.LogoUrl = await UpdateImageAsync(request.LogoUrl,publisher.LogoUrl, "Publishers");
+                publisher.LogoUrl = await UpdateImageAsync(request.LogoUrl, oldLogoUrl, "Publishers");
+            }
+            else
+            {
+                publisher.LogoUrl = oldLogoUrl; 
             }
             unitOfWork.Publishers.Update(publisher);
             await unitOfWork.CommitAsync();

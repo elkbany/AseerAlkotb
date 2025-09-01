@@ -5,6 +5,10 @@ using AseerAlkotb.Application.Features.Books.Requests;
 using AseerAlkotb.Application.Features.Books.Responses;
 using AseerAlkotb.Application.Features.Categories.Requests;
 using AseerAlkotb.Application.Features.Publishers.Requests;
+using AseerAlkotb.Application.Features.Reviews.Requests;
+using AseerAlkotb.Application.Services;
+using AseerAlkotb.Domain.Entites.Models;
+using Azure;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AseerAlkotb.Dashboard.Controllers
@@ -15,22 +19,39 @@ namespace AseerAlkotb.Dashboard.Controllers
         private readonly IAuthorServices _authorServices;
         private readonly ICategoryServices _categoryServices;
         private readonly IPublisherServices _publisherServices;
+        private readonly IReviewServices _reviewServices; // Add this
 
         public BooksController(
             IBookServices bookServices,
             IAuthorServices authorServices,
             ICategoryServices categoryServices,
-            IPublisherServices publisherServices)
+            IPublisherServices publisherServices,
+            IReviewServices reviewServices) // Add this parameter
         {
             _bookServices = bookServices;
             _authorServices = authorServices;
             _categoryServices = categoryServices;
             _publisherServices = publisherServices;
+            _reviewServices = reviewServices; // Add this
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 10, string Search = "")
         {
-            var result = await _bookServices.GetAllBooksPaginatedAsync(new GetAllBooksPaginatedRequest());
+            var request = new GetAllBooksPaginatedRequest
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                Search = Search
+            };
+
+            var result = await _bookServices.GetAllBooksPaginatedAsync(request);
+
+            if (result != null)
+            {
+                ViewBag.TotalPages = (int)Math.Ceiling((double)result.TotalCount / pageSize);
+                ViewBag.CurrentPage = pageNumber;
+                ViewBag.SearchTerm = Search;
+            }
             return View(result);
         }
 
@@ -44,13 +65,33 @@ namespace AseerAlkotb.Dashboard.Controllers
             if (result.Data.PublisherId == 0)
                 return BadRequest("Book has no publisher assigned");
 
+            // Get book reviews
+            var reviewsRequest = new GetAllReviewsPaginatedRequest(
+                AuthorId: null,
+                BookId: id,
+                PageNumber: 1,
+                PageSize: 100, // Get all reviews for rating calculation
+                Search: ""
+            );
+
+            var reviewsResult = await _reviewServices.GetAllReviewsAsync(reviewsRequest);
+            var reviews = reviewsResult?.Data ?? new List<AseerAlkotb.Application.Features.Reviews.Responses.GetAllReviewsPaginatedResponse>();
+
+            // Update the book's rating based on reviews
+            if (reviews.Any())
+            {
+                var averageRating = reviews.Average(r => (decimal)r.Rating);
+                // You might want to update the book's Rating property here
+                // or handle it in your business logic layer
+                result.Data.Rating = averageRating;
+            }
+
             var author = await _authorServices.GetAuthorByIdAsync(new GetAuthorByIdRequest(result.Data.AuthorId));
             var publisher = await _publisherServices.GetPublisherByIdAsync(new GetPublisherByIdRequest(result.Data.PublisherId));
 
             if (publisher == null || publisher.Data == null)
                 return NotFound("Publisher not found");
 
-            // استرجاع التصنيفات المرتبطة بالكتاب
             var selectedCategories = new List<string>();
             if (result.Data.CategoryIds != null)
             {
@@ -65,10 +106,12 @@ namespace AseerAlkotb.Dashboard.Controllers
             ViewBag.Author = author.Data;
             ViewBag.Publisher = publisher.Data;
             ViewBag.Categories = selectedCategories;
+            ViewBag.Reviews = reviews; // Pass reviews to the view
 
             return View(result.Data);
         }
 
+        // Rest of your existing methods remain the same...
         public IActionResult Create()
         {
             return View();
@@ -80,6 +123,11 @@ namespace AseerAlkotb.Dashboard.Controllers
         {
             if (ModelState.IsValid)
             {
+                if (request.CategoryIds == null)
+                {
+                    request = request with { CategoryIds = new List<int>() };
+                }
+
                 await _bookServices.AddBookAsync(request);
                 return RedirectToAction(nameof(Index));
             }
@@ -93,6 +141,7 @@ namespace AseerAlkotb.Dashboard.Controllers
 
             if (!response.Succeeded || response.Data == null)
                 return NotFound();
+
 
             var model = new UpdateBookResponse(
                 response.Data.Id,
@@ -113,26 +162,41 @@ namespace AseerAlkotb.Dashboard.Controllers
                 response.Data.IsActive
             );
 
+            ViewBag.CategoryIds = response.Data.CategoryIds;
+            ViewBag.CategoryNames = response.Data.CategoryNames;
+
+
             return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(UpdateBookRequest request)
+        public async Task<IActionResult> Edit(int id,UpdateBookRequest request)
         {
             if (ModelState.IsValid)
             {
-                await _bookServices.UpdateBookAsync(request);
-                return RedirectToAction(nameof(Index));
+                var result = await _bookServices.UpdateBookAsync(request);
+                if (result.Succeeded)
+                {
+                    TempData["Success"] = "Book updated successfully.";
+                    return RedirectToAction(nameof(Index));
+                }
+                TempData["Error"] = result.Message;
             }
-
             return View(request);
         }
+
 
         [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {
             var book = await _bookServices.GetBookByIdAsync(new GetBookByIdRequest(id));
+            var author = await _authorServices.GetAuthorByIdAsync(new GetAuthorByIdRequest(book.Data.AuthorId));
+            var publisher = await _publisherServices.GetPublisherByIdAsync(new GetPublisherByIdRequest(book.Data.PublisherId));
+            ViewBag.Author = author.Data;
+            ViewBag.Publisher = publisher.Data;
+
+
             return View("DeleteBook", book.Data);
         }
 
@@ -152,16 +216,9 @@ namespace AseerAlkotb.Dashboard.Controllers
             var categories = await _categoryServices.GetAllCategoriesPaginatedAsync(
                 new GetAllCategoriesPaginatedRequest { Search = term, PageSize = 10 });
 
-            return Json(categories.Data.Select(c => new { id = c.Id, text = c.Name }));
-        }
+            var parents = categories.Data.Select(c => new { id = c.Id, text = c.Name });
 
-        [HttpGet]
-        public async Task<IActionResult> GetSubCategories(int categoryId, string? term)
-        {
-            var subCategories = await _categoryServices.GetAllSubCategoriesPaginatedAsync(
-                new GetAllSubCategoriesPaginatedRequest(1, 10, categoryId, term));
-
-            return Json(subCategories.Data.Select(sc => new { id = sc.Id, text = sc.Name }));
+            return Json(parents);
         }
 
         [HttpGet]
