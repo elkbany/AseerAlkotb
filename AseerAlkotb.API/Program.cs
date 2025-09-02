@@ -23,13 +23,13 @@ using Microsoft.Extensions.Localization;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 using System.Reflection;
 using AseerAlkotb.Infrastructure.Data;
+using Microsoft.OpenApi.Models;
+
 namespace AseerAlkotb.API
 {
     public class Program
@@ -51,11 +51,17 @@ namespace AseerAlkotb.API
             builder.Services.AddHttpContextAccessor();
             #endregion
 
-        
             #region Identity Registration
-            builder.Services.AddIdentity<User, IdentityRole<int>>()
+            builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
+            {
+                // Configure password requirements if needed
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequiredLength = 6;
+            })
                 .AddEntityFrameworkStores<ApplicationDbContext>()
-                // Gnerates the default token providers for password reset, email confirmation, etc.
                 .AddDefaultTokenProviders();
 
             builder.Services.Configure<IdentityOptions>(options =>
@@ -68,22 +74,45 @@ namespace AseerAlkotb.API
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                //options.DefaultScheme= JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(option =>
             {
-                option.SaveToken=true;
-                option.RequireHttpsMetadata = true;//http=false
+                option.SaveToken = true;
+                option.RequireHttpsMetadata = false; // Set to false for development (localhost)
                 option.TokenValidationParameters = new TokenValidationParameters()
                 {
                     ValidateIssuer = true,
                     ValidIssuer = builder.Configuration["JWT:IssuerIP"],
                     ValidateAudience = true,
-                    ValidAudience= builder.Configuration["JWT:AudienceIP"],
+                    ValidAudience = builder.Configuration["JWT:AudienceIP"],
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:SecretKey"])),
+                    ClockSkew = TimeSpan.Zero // Removes the default 5-minute clock skew
+                };
+
+                // Handle JWT Bearer events for better debugging
+                option.Events = new JwtBearerEvents
+                {
+                    OnAuthenticationFailed = context =>
+                    {
+                        Console.WriteLine($"Authentication failed: {context.Exception.Message}");
+                        return Task.CompletedTask;
+                    },
+                    OnTokenValidated = context =>
+                    {
+                        Console.WriteLine("Token validated successfully");
+                        return Task.CompletedTask;
+                    },
+                    OnChallenge = context =>
+                    {
+                        Console.WriteLine($"JWT Challenge: {context.Error}, {context.ErrorDescription}");
+                        return Task.CompletedTask;
+                    }
                 };
             });
-                
             #endregion
+
             #region Repositories Registerations
             builder.Services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -92,18 +121,12 @@ namespace AseerAlkotb.API
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
             builder.Services.AddScoped<IPublisherRepository, PublisherRepository>();
             builder.Services.AddScoped<IQuoteRepository, QuoteRepository>();
-
-
             builder.Services.AddScoped<ICartRepository, CartRepository>();
-
-            builder.Services.AddScoped<IPublisherRepository , PublisherRepository>();
             builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
             builder.Services.AddScoped<IWishlistRepository, WishlistRepository>();
-
             builder.Services.AddScoped<IOrderRepository, OrderRepository>();
             builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
             builder.Services.AddScoped<IAccountRepository, AccountRepository>();
-
             #endregion
 
             #region Services
@@ -117,15 +140,14 @@ namespace AseerAlkotb.API
             builder.Services.AddScoped<IPaymobService, PaymobService>();
             builder.Services.AddScoped<IOrderServices, OrderServices>();
             builder.Services.AddScoped<IEmailService, EmailService>();
-
             builder.Services.AddScoped<IAccountServices, AccountService>();
             builder.Services.AddScoped<IAdminServices, AdminServices>();
-            builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
-    });
 
+            builder.Services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+                });
             #endregion
 
             #region AutoMapper 
@@ -145,7 +167,6 @@ namespace AseerAlkotb.API
             {
                 options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
             });
-
             #endregion
 
             #region HttpClient Registeration
@@ -158,13 +179,44 @@ namespace AseerAlkotb.API
                 options.AddPolicy("AllowLocalhost4200",
                     policy => policy.WithOrigins("http://localhost:4200")
                                     .AllowAnyHeader()
-                                    .AllowAnyMethod());
+                                    .AllowAnyMethod()
+                                    .AllowCredentials()); // Added for authentication support
             });
             #endregion
 
             #region Swagger
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("v1", new() { Title = "AseerAlktob", Version = "v1" });
+
+                // Add JWT Bearer definition
+                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = "Enter 'Bearer' [space] and then your valid token.\n\nExample: Bearer abc123xyz"
+                });
+
+                // Make sure Swagger requires this scheme
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        new string[] { }
+                    }
+                });
+            });
             #endregion
 
             var app = builder.Build();
@@ -186,7 +238,8 @@ namespace AseerAlkotb.API
                 await RoleSeeder.SeedRolesAsync(services);
             }
             #endregion
-            // Use CORS
+
+            // IMPORTANT: CORS must be before Authentication and Authorization
             app.UseCors("AllowLocalhost4200");
 
             #region Swagger
@@ -216,12 +269,12 @@ namespace AseerAlkotb.API
 
             app.UseHttpsRedirection();
 
-
+            // IMPORTANT: Order matters - Authentication before Authorization
             app.UseAuthentication();
             app.UseAuthorization();
+
             app.MapControllers();
 
-            //app.Run();
             await app.RunAsync();
         }
     }
