@@ -7,6 +7,9 @@ using AseerAlkotb.Infrastructure.ExternalServices;
 using AseerAlkotb.Infrastructure.Repositories.Base;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
+using Microsoft.AspNetCore.Identity;
+using AseerAlkotb.Domain.Entites.Models;
 
 namespace AseerAlkotb.Dashboard
 {
@@ -26,6 +29,11 @@ namespace AseerAlkotb.Dashboard
                 options.UseSqlServer(connectionString);
             });
 
+            // Add Identity
+            builder.Services.AddIdentity<User, IdentityRole<int>>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
+
             // Add Repositories
             builder.Services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -41,6 +49,7 @@ namespace AseerAlkotb.Dashboard
             builder.Services.AddScoped<IPaymobService, PaymobService>();
             builder.Services.AddScoped<IOrderServices, OrderServices>();
             builder.Services.AddScoped<IEmailService, EmailService>();
+            builder.Services.AddScoped<IAdminServices, AdminServices>();
 
             #region HttpClient Registeration
             builder.Services.AddHttpClient<IPaymobService, PaymobService>();
