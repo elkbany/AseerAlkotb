@@ -44,7 +44,7 @@
                                     <div class="form-group">
                                         <label asp-for="Description"></label>
                                         <textarea asp-for="Description" class="form-control" rows="4"
-                                            placeholder="Enter book description"></textarea>
+                                                  placeholder="Enter book description"></textarea>
                                         <span asp-validation-for="Description" class="text-danger"></span>
                                     </div>
 
@@ -60,7 +60,7 @@
                                             <div class="form-group">
                                                 <label asp-for="Language"></label>
                                                 <select asp-for="Language" class="form-control"
-                                                    asp-items="Html.GetEnumSelectList<AseerAlkotb.Domain.Enums.BookLanguage>()"></select>
+                                                        asp-items="Html.GetEnumSelectList<AseerAlkotb.Domain.Enums.BookLanguage>()"></select>
                                                 <span asp-validation-for="Language" class="text-danger"></span>
                                             </div>
                                         </div>
@@ -71,8 +71,9 @@
                                             <div class="form-group">
                                                 <label asp-for="Price"></label>
                                                 <div class="input-group">
-                                                    <div class="input-group-prepend"><span
-                                                            class="input-group-text">$</span></div>
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text">$</span>
+                                                    </div>
                                                     <input asp-for="Price" class="form-control" placeholder="0.00" />
                                                 </div>
                                                 <span asp-validation-for="Price" class="text-danger"></span>
@@ -82,7 +83,7 @@
                                             <div class="form-group">
                                                 <label asp-for="StockQuantity"></label>
                                                 <input asp-for="StockQuantity" type="number" min="0"
-                                                    class="form-control" />
+                                                       class="form-control" />
                                                 <span asp-validation-for="StockQuantity" class="text-danger"></span>
                                             </div>
                                         </div>
@@ -110,7 +111,7 @@
                                             <div class="form-group">
                                                 <label asp-for="Format"></label>
                                                 <input asp-for="Format" class="form-control"
-                                                    placeholder="Paperback, Hardcover, eBook..." />
+                                                       placeholder="Paperback, Hardcover, eBook..." />
                                                 <span asp-validation-for="Format" class="text-danger"></span>
                                             </div>
                                         </div>
@@ -119,12 +120,13 @@
                                                 <label asp-for="DiscountPercentage"></label>
                                                 <div class="input-group">
                                                     <input asp-for="DiscountPercentage" type="number" min="0" max="100"
-                                                        class="form-control" />
-                                                    <div class="input-group-append"><span
-                                                            class="input-group-text">%</span></div>
+                                                           class="form-control" />
+                                                    <div class="input-group-append">
+                                                        <span class="input-group-text">%</span>
+                                                    </div>
                                                 </div>
                                                 <span asp-validation-for="DiscountPercentage"
-                                                    class="text-danger"></span>
+                                                      class="text-danger"></span>
                                             </div>
                                         </div>
                                     </div>
@@ -142,16 +144,24 @@
                                             <div class="form-group">
                                                 <label for="authorSearch">Author</label>
                                                 <div class="input-group">
-                                                    @Html.TextBox("authorSearch", null, new { @class = "form-control",
-                                                    placeholder = "Type author name...", id = "authorSearch" })
+                                                    @Html.TextBox("authorSearch", null, new
+                                                        {
+                                                            @class = "form-control",
+                                                            placeholder = "Type author name...",
+                                                            id = "authorSearch"
+                                                        })
                                                     <div class="input-group-append">
                                                         <button class="btn btn-outline-secondary" type="button"
-                                                            id="authorSearchBtn">Search</button>
+                                                                id="authorSearchBtn">
+                                                            Search
+                                                        </button>
                                                     </div>
                                                 </div>
                                                 <input type="hidden" asp-for="AuthorId" id="AuthorId" />
-                                                <div class="small mt-2">Selected: <span id="authorSelected"
-                                                        class="font-weight-bold text-primary">None</span></div>
+                                                <div class="small mt-2">
+                                                    Selected: <span id="authorSelected"
+                                                                    class="font-weight-bold text-primary">None</span>
+                                                </div>
                                                 <ul id="authorResults" class="list-group mt-2"></ul>
                                                 <span asp-validation-for="AuthorId" class="text-danger"></span>
                                             </div>
@@ -161,63 +171,58 @@
                                             <div class="form-group">
                                                 <label for="publisherSearch">Publisher</label>
                                                 <div class="input-group">
-                                                    @Html.TextBox("publisherSearch", null, new { @class =
-                                                                                                        "form-control", placeholder = "Type publisher name...", id =
-                                                                                                        "publisherSearch" })
+                                                    @Html.TextBox("publisherSearch", null, new
+                                                        {
+                                                            @class =
+                                                             "form-control",
+                                                            placeholder = "Type publisher name...",
+                                                            id =
+                                                             "publisherSearch"
+                                                        })
                                                     <div class="input-group-append">
                                                         <button class="btn btn-outline-secondary" type="button"
-                                                            id="publisherSearchBtn">Search</button>
+                                                                id="publisherSearchBtn">
+                                                            Search
+                                                        </button>
                                                     </div>
                                                 </div>
                                                 <input type="hidden" asp-for="PublisherId" id="PublisherId" />
-                                                <div class="small mt-2">Selected: <span id="publisherSelected"
-                                                        class="font-weight-bold text-primary">None</span></div>
+                                                <div class="small mt-2">
+                                                    Selected: <span id="publisherSelected"
+                                                                    class="font-weight-bold text-primary">None</span>
+                                                </div>
                                                 <ul id="publisherResults" class="list-group mt-2"></ul>
                                                 <span asp-validation-for="PublisherId" class="text-danger"></span>
                                             </div>
                                         </div>
                                     </div>
-
-                                    <!-- Categories: Parent + Subcategories (search style) -->
+                                    <!-- Categories -->
                                     <div class="form-group">
-                                        <label for="parentCategorySearch">Parent Category</label>
+                                        <label for="categorySearch">Categories</label>
                                         <div class="input-group">
-                                            @Html.TextBox("parentCategorySearch", null, new { @class = "form-control",
-                                                                                        placeholder = "Type category name...", id = "parentCategorySearch" })
+                                            @Html.TextBox("categorySearch", null, new
+                                                {
+                                                    @class = "form-control",
+                                                    placeholder = "Type to search categories...",
+                                                    id = "categorySearch"
+                                                })
                                             <div class="input-group-append">
-                                                <button class="btn btn-outline-secondary" type="button"
-                                                    id="parentCategorySearchBtn">Search</button>
+                                                <button class="btn btn-outline-secondary" type="button" id="categorySearchBtn">Search</button>
                                             </div>
                                         </div>
-                                        <div class="small mt-2">Selected: <span id="parentCategorySelected"
-                                                class="font-weight-bold text-primary">None</span></div>
-                                        <ul id="parentCategoryResults" class="list-group mt-2"></ul>
+                                        <div class="small mt-2">
+                                            Selected: <span id="categoriesSelected" class="d-inline-block"></span>
+                                        </div>
+                                        <ul id="categoryResults" class="list-group mt-2"></ul>
                                     </div>
 
-                                    <div class="form-group">
-                                        <label for="subCategorySearch">Subcategories</label>
-                                        <div class="input-group">
-                                            @Html.TextBox("subCategorySearch", null, new { @class = "form-control",
-                                                                                        placeholder = "Type to search subcategories...", id = "subCategorySearch",
-                                                                                        disabled = "disabled" })
-                                            <div class="input-group-append">
-                                                <button class="btn btn-outline-secondary" type="button"
-                                                    id="subCategorySearchBtn" disabled>Search</button>
-                                            </div>
-                                        </div>
-                                        <div class="small mt-2">Selected:
-                                            <span id="subCategoriesSelected" class="d-inline-block"></span>
-                                        </div>
-                                        <ul id="subCategoryResults" class="list-group mt-2"></ul>
-                                    </div>
-
-                                    <!-- Storage for combined selections to bind to model -->
+                                    <!-- Hidden select for binding CategoryIds -->
                                     <div class="form-group" style="display:none;">
-                                        <label asp-for="CategoryIds">Categories</label>
-                                        <select asp-for="CategoryIds" id="categorySelect" class="form-control"
-                                            multiple></select>
+                                        <label asp-for="CategoryIds" class="control-label"></label>
+                                        <select asp-for="CategoryIds" id="categorySelect" class="form-control" multiple></select>
                                         <span asp-validation-for="CategoryIds" class="text-danger"></span>
                                     </div>
+
                                 </div>
                             </div>
                         </div>
@@ -231,13 +236,13 @@
                                 <div class="card-body">
                                     <div class="text-center mb-3">
                                         <img id="coverPreview" src="/images/default-book-cover.png"
-                                            class="img-fluid img-thumbnail" style="max-height:300px;" />
+                                             class="img-fluid img-thumbnail" style="max-height:300px;" />
                                     </div>
                                     <div class="form-group">
                                         <div class="custom-file">
                                             <!-- IMPORTANT: name/id must match property CoverImageUrl -->
                                             <input asp-for="CoverImageUrl" type="file" class="custom-file-input"
-                                                id="CoverImageUrl" accept="image/*" />
+                                                   id="CoverImageUrl" accept="image/*" />
                                             <label class="custom-file-label" for="CoverImageUrl">Choose file</label>
                                         </div>
                                         <span asp-validation-for="CoverImageUrl" class="text-danger"></span>
@@ -252,7 +257,7 @@
                                 <div class="card-body">
                                     <div class="custom-control custom-switch mb-3">
                                         <input asp-for="IsActive" type="checkbox" class="custom-control-input"
-                                            id="isActive">
+                                               id="isActive">
                                         <label class="custom-control-label" for="isActive">Publish Immediately</label>
                                     </div>
                                 </div>
@@ -276,24 +281,8 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <link rel="stylesheet" href="~/lib/select2/css/select2.min.css" />
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/select2/js/select2.full.min.js"></script>
-    <script src="~/lib/bs-custom-file-input/bs-custom-file-input.min.js"></script>
-
     <script>
         $(function () {
-            // Enhance file input + preview
-            bsCustomFileInput.init();
-            $('#CoverImageUrl').on('change', function (e) {
-                const f = e.target.files && e.target.files[0];
-                if (!f) return;
-                const reader = new FileReader();
-                reader.onload = function (ev) { $('#coverPreview').attr('src', ev.target.result); };
-                reader.readAsDataURL(f);
-            });
-
-            // Helpers
             function renderResults($list, data, onClick) {
                 $list.empty();
                 if (!data || !data.length) {
@@ -314,7 +303,24 @@
                 $.getJSON(url, payload, done);
             }
 
-            // Author search
+            // Cover preview
+            $('#CoverImageUrl').on('change', function () {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        $('#coverPreview').attr('src', e.target.result);
+                    };
+                    reader.readAsDataURL(file);
+                    const fileName = $(this).val().split('\\').pop();
+                    $(this).next('.custom-file-label').text(fileName);
+                } else {
+                    $('#coverPreview').attr('src', '/images/default-book-cover.png');
+                    $(this).next('.custom-file-label').text('Choose file');
+                }
+            });
+
+            // Author
             $('#authorSearchBtn').on('click', function () {
                 const term = $('#authorSearch').val();
                 doSearch('@Url.Action("SearchAuthors", "Books")', term, {}, function (data) {
@@ -326,7 +332,7 @@
                 });
             });
 
-            // Publisher search
+            // Publisher
             $('#publisherSearchBtn').on('click', function () {
                 const term = $('#publisherSearch').val();
                 doSearch('@Url.Action("SearchPublishers", "Books")', term, {}, function (data) {
@@ -338,71 +344,35 @@
                 });
             });
 
-            // Parent category search
-            let parentCategoryId = null;
-            $('#parentCategorySearchBtn').on('click', function () {
-                const term = $('#parentCategorySearch').val();
+            // Categories
+            function addCategoryChip(id, name) {
+                const chipId = 'chip-' + id;
+                if ($('#' + chipId).length) return;
+                const $chip = $('<span class="badge badge-info mr-1 mb-1" id="' + chipId + '"></span>');
+                $chip.text(name + ' ×');
+                $chip.css('cursor', 'pointer');
+                $chip.on('click', function () {
+                    $(this).remove();
+                    $('#categorySelect option[value="' + id + '"]').remove();
+                });
+                $('#categoriesSelected').append($chip);
+                if ($('#categorySelect option[value="' + id + '"]').length === 0) {
+                    const opt = new Option(name, id, true, true);
+                    $('#categorySelect').append(opt);
+                }
+            }
+
+            $('#categorySearchBtn').on('click', function () {
+                const term = $('#categorySearch').val();
                 doSearch('@Url.Action("SearchCategories", "Books")', term, {}, function (data) {
-                    renderResults($('#parentCategoryResults'), data, function (item) {
-                        parentCategoryId = item.id;
-                        $('#parentCategorySelected').text(item.text);
-                        $('#parentCategoryResults').empty();
-
-                        // Update hidden CategoryIds store parent
-                        const $store = $('#categorySelect');
-                        $store.find('option[data-role="parent"]').remove();
-                        const opt = new Option(item.text, item.id, true, true);
-                        $(opt).attr('data-role', 'parent');
-                        $store.append(opt).trigger('change');
-
-                        // Enable subcategory search
-                        $('#subCategorySearch').prop('disabled', false);
-                        $('#subCategorySearchBtn').prop('disabled', false);
-                        // Clear previous subcategory chips
-                        $('#subCategoriesSelected').empty();
-                        // Also remove previous subcategory options from store
-                        $store.find('option').each(function () {
-                            if (!$(this).is('[data-role="parent"])')) {
-                                $(this).remove();
-                            }
-                        });
+                    renderResults($('#categoryResults'), data, function (item) {
+                        addCategoryChip(item.id, item.text);
+                        $('#categoryResults').empty();
                     });
                 });
             });
 
-            // Subcategory search (dependent)
-            $('#subCategorySearchBtn').on('click', function () {
-                const term = $('#subCategorySearch').val();
-                if (!parentCategoryId) { return; }
-                $.getJSON('@Url.Action("GetSubCategories", "Books")', { categoryId: parentCategoryId, term: term || '' }, function (data) {
-                    renderResults($('#subCategoryResults'), data, function (item) {
-                        // Add chip
-                        const chipId = 'subchip-' + item.id;
-                        if ($('#' + chipId).length) { return; }
-                        const $chip = $('<span class="badge badge-info mr-1 mb-1" id="' + chipId + '"></span>');
-                        $chip.text(item.text + ' ×');
-                        $chip.css('cursor', 'pointer');
-                        $chip.on('click', function () {
-                            // remove chip and option from store
-                            $(this).remove();
-                            $('#categorySelect option[value="' + item.id + '"]').remove();
-                        });
-                        $('#subCategoriesSelected').append($chip);
-
-                        // Add to hidden store for CategoryIds
-                        const $store = $('#categorySelect');
-                        if ($store.find('option[value="' + item.id + '"]').length === 0) {
-                            const opt = new Option(item.text, item.id, true, true);
-                            $store.append(opt);
-                            $store.trigger('change');
-                        }
-
-                        $('#subCategoryResults').empty();
-                    });
-                });
-            });
-
-            // Optional: Enter key triggers search on the active textbox
+            // Enter key triggers
             function bindEnter(selector, buttonSelector) {
                 $(selector).on('keypress', function (e) {
                     if (e.which === 13) {
@@ -413,8 +383,9 @@
             }
             bindEnter('#authorSearch', '#authorSearchBtn');
             bindEnter('#publisherSearch', '#publisherSearchBtn');
-            bindEnter('#parentCategorySearch', '#parentCategorySearchBtn');
-            bindEnter('#subCategorySearch', '#subCategorySearchBtn');
+            bindEnter('#categorySearch', '#categorySearchBtn');
         });
     </script>
 }
+
+

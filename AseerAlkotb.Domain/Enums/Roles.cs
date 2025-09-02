@@ -8,8 +8,7 @@ namespace AseerAlkotb.Domain.Enums
 {
     public enum Roles
     {
-        Admin = 1,
-        Staff = 2,
-        Client = 3,
+        Admin = 4,
+        Client = 5,
     }
 }

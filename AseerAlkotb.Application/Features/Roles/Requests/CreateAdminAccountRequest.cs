@@ -17,7 +17,7 @@ namespace AseerAlkotb.Application.Features.Roles.Requests
       string Password,
       string ConfirmPassword,
       Gender Gender,
-      string? PhoneNumber,
-      string? Nationality
+      string? PhoneNumber
+      
     );
 }

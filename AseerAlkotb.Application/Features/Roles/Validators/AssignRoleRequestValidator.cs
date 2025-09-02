@@ -18,8 +18,8 @@ namespace AseerAlkotb.Application.Features.Roles.Validators
                .GreaterThan(0).WithMessage("UserId must be greater than 0.");
 
             RuleFor(x => x.Role)
-                .IsInEnum()
-                .WithMessage("Invalid role specified. Valid roles are: Client, Staff, Admin");
+             .IsInEnum().WithMessage("Invalid role specified. Valid roles are: Client, Admin");
+             
         }
     }
 }
