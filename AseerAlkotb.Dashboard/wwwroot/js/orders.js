@@ -126,7 +126,12 @@ function updateOrderStatus() {
             if (window.location.pathname.includes('/Details/')) {
                 setTimeout(() => {
                     window.location.reload();
-                }, 1500);
+                }, 1000); // Reduced from 1500 to 1000 for faster feedback
+            } else {
+                // If on index page, just update the table row
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
             }
         } else {
             showAlert(data.message || 'Failed to update order status', 'danger');

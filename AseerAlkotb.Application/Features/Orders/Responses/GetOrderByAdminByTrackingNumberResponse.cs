@@ -1,4 +1,4 @@
-﻿﻿using AseerAlkotb.Application.Features.Books.DTOs;
+﻿﻿﻿using AseerAlkotb.Application.Features.Books.DTOs;
 using AseerAlkotb.Domain.Enums;
 using System;
 using System.Collections.Generic;
@@ -24,6 +24,7 @@ namespace AseerAlkotb.Application.Features.Orders.Responses
        decimal DiscountAmount,
        decimal FinalAmount,
        DateTime OrderDate,
+       DateTime UpdatedAt,
        List<BookDTO> Books
     );
 }

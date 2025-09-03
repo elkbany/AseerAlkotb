@@ -24,6 +24,15 @@ namespace AseerAlkotb.Infrastructure.Configurations
             //          .HasConversion<string>()
             //          .IsRequired();
 
+                        // Configure decimal precision for Amount property
+            builder.Property(p => p.Amount)
+                .HasPrecision(18, 2);
+
+            // Configure ProviderPayload as required
+            builder.Property(p => p.ProviderPayload)
+                .IsRequired()
+                .HasDefaultValue(string.Empty);
+
         }
     }
 }

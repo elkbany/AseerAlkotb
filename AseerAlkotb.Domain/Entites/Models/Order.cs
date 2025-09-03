@@ -10,7 +10,7 @@ namespace AseerAlkotb.Domain.Entites.Models
         public decimal ShippingCost { get; set; }
         public decimal TaxAmount { get; set; }
         public decimal DiscountAmount { get; set; }
-        public decimal FinalAmount { get; set; } 
+        public decimal FinalAmount { get; set; }
         public PaymentMethod PaymentMethod { get; set; }
         public PaymentStatus PaymentStatus { get; set; }
         public EgyptGovernorates Governorate { get; set; }

@@ -115,6 +115,7 @@ namespace AseerAlkotb.API
             builder.Services.AddScoped<IPublisherServices, PublisherService>();
             builder.Services.AddScoped<IQuoteService, QuoteService>();
             builder.Services.AddScoped<IPaymobService, PaymobService>();
+            builder.Services.AddScoped<IPaymentService, PaymentService>();
             builder.Services.AddScoped<IOrderServices, OrderServices>();
             builder.Services.AddScoped<IEmailService, EmailService>();
 

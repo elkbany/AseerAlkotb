@@ -49,6 +49,15 @@ namespace AseerAlkotb.Infrastructure.Configurations
                 .HasForeignKey(o => o.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
           
+                      builder.Property(o => o.DiscountAmount)
+                .HasColumnType("decimal(18,2)");
+
+            builder.Property(o => o.FinalAmount)
+                .HasColumnType("decimal(18,2)");
+
+            builder.Property(o => o.Governorate)
+                .IsRequired()
+                .HasMaxLength(500);
 
         }
     }

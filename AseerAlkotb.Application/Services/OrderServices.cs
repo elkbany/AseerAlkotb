@@ -1,4 +1,4 @@
-﻿﻿using AseerAlkotb.Application.Contracts;
+﻿﻿﻿﻿﻿﻿using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Features.Orders.Filters;
 using AseerAlkotb.Application.Features.Orders.Requests;
 using AseerAlkotb.Application.Features.Orders.Responses;
@@ -261,7 +261,7 @@ namespace AseerAlkotb.Application.Services
         public async Task<ApiResponsePaginated<List<GetAllOrdersPaginatedResponse>>> GetAllOrdersPaginatedByAdminAsync(GetAllOrdersPaginatedRequest request)
         {
             await DoValidationAsync<GetAllOrdersPaginatedRequestValidator, GetAllOrdersPaginatedRequest>(request);
-            var orders = await unitOfWork.Orders.GetAllAsync((request.PageNumber - 1) * request.PageSize, request.PageSize, default, o => o.OrderItems).Filter(request).ToListAsync();
+            var orders = await unitOfWork.Orders.GetAllAsync((request.PageNumber - 1) * request.PageSize, request.PageSize, default, o => o.OrderItems, o => o.User).Filter(request).ToListAsync();
             var totalCount = await unitOfWork.Orders.CountAsync();
 
             var ordsMap = orders.Adapt<List<GetAllOrdersPaginatedResponse>>();
@@ -283,7 +283,12 @@ namespace AseerAlkotb.Application.Services
         public async Task<ApiResponse<GetOrderByAdminByTrackingNumberResponse>> GetOrderByTrackingNumberByAdminAsync(GetOrderByAdminByTrackingNumberRequest request)
         {
             await DoValidationAsync<GetOrderByAdminByTrackingNumberRequestValidator, GetOrderByAdminByTrackingNumberRequest>(request);
-            var order = await unitOfWork.Orders.FirstOrDefaultAsync(o => o.TrackingNumber == request.TrackingNumber, default, o => o.OrderItems);
+            var order = await unitOfWork.Orders.FirstOrDefaultAsync(
+                o => o.TrackingNumber == request.TrackingNumber, 
+                default, 
+                o => o.OrderItems, 
+                o => o.User);
+                
             if (order == null)
             {
                 return NotFound<GetOrderByAdminByTrackingNumberResponse>("Order not found");
@@ -310,7 +315,11 @@ namespace AseerAlkotb.Application.Services
         {
             await DoValidationAsync<UpdateOrderStatusRequestValidator, UpdateOrderStatusRequest>(request);
             
-            var order = await unitOfWork.Orders.FirstOrDefaultAsync(o => o.Id == request.OrderId);
+            var order = await unitOfWork.Orders.FirstOrDefaultAsync(
+                o => o.Id == request.OrderId, 
+                default, 
+                o => o.User);
+                
             if (order == null)
             {
                 return NotFound<UpdateOrderStatusResponse>("Order not found");
@@ -322,7 +331,30 @@ namespace AseerAlkotb.Application.Services
                 return BadRequest<UpdateOrderStatusResponse>($"Cannot change status from {order.Status} to {request.NewStatus}");
             }
 
+            var oldStatus = order.Status;
             order.Status = request.NewStatus;
+            
+            // For COD orders, update payment status when order is delivered
+            if (order.PaymentMethod == PaymentMethod.CashOnDelivery)
+            {
+                var payment = await unitOfWork.Payments.FirstOrDefaultAsync(p => p.OrderId == order.Id);
+                if (payment != null)
+                {
+                    switch (request.NewStatus)
+                    {
+                        case OrderStatus.Delivered:
+                            payment.Status = PaymentStatus.Paid;
+                            order.PaymentStatus = PaymentStatus.Paid;
+                            break;
+                        case OrderStatus.Cancelled:
+                            payment.Status = PaymentStatus.Cancelled;
+                            order.PaymentStatus = PaymentStatus.Cancelled;
+                            break;
+                    }
+                    unitOfWork.Payments.Update(payment);
+                }
+            }
+            
             unitOfWork.Orders.Update(order);
             await unitOfWork.CommitAsync();
 

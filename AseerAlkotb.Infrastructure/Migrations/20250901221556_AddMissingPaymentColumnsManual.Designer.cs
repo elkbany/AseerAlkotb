@@ -4,6 +4,7 @@ using AseerAlkotb.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,13 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AseerAlkotb.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250901221556_AddMissingPaymentColumnsManual")]
+    partial class AddMissingPaymentColumnsManual
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.7")
+                .HasAnnotation("ProductVersion", "9.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -656,7 +659,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Cart", (string)null);
+                    b.ToTable("Cart");
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.CartItem", b =>
@@ -1331,7 +1334,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         .IsUnique()
                         .HasFilter("[ReviewId] IS NOT NULL");
 
-                    b.ToTable("LikeDisLikes", (string)null);
+                    b.ToTable("LikeDisLikes");
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Notification", b =>
@@ -1371,7 +1374,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Notifications", (string)null);
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Order", b =>
@@ -1808,7 +1811,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
 
                     b.HasIndex("WishlistId");
 
-                    b.ToTable("WishlistItems", (string)null);
+                    b.ToTable("WishlistItems");
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Payment", b =>
@@ -1882,7 +1885,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("BookCategories", (string)null);
+                    b.ToTable("BookCategories");
 
                     b.HasData(
                         new

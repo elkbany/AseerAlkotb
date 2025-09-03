@@ -1,3 +1,4 @@
+@using AseerAlkotb.Dashboard.Helpers
 @model AseerAlkotb.Application.Features.Orders.Responses.GetAllOrdersPaginatedResponse
 
 <tr data-order-id="@Model.Id">
@@ -25,14 +26,14 @@
         <code class="bg-light p-1 rounded">@Model.TrackingNumber</code>
     </td>
     <td>
-        <span class="badge @GetStatusBadgeClass(Model.OrderStatus) order-status" data-status="@((int)Model.OrderStatus)">
-            <i class="@GetStatusIcon(Model.OrderStatus) me-1"></i>
+        <span class="badge @ViewHelper.GetStatusBadgeClass(Model.OrderStatus) order-status" data-status="@((int)Model.OrderStatus)">
+            <i class="@ViewHelper.GetStatusIcon(Model.OrderStatus) me-1"></i>
             @Model.OrderStatus
         </span>
     </td>
     <td>
         <div class="d-flex align-items-center">
-            <i class="@GetPaymentMethodIcon(Model.PaymentMethod) me-2 text-muted"></i>
+            <i class="@ViewHelper.GetPaymentMethodIcon(Model.PaymentMethod) me-2 text-muted"></i>
             <span>@Model.PaymentMethod</span>
         </div>
     </td>
@@ -92,41 +93,3 @@
     </td>
 </tr>
 
-@functions {
-    public string GetStatusBadgeClass(AseerAlkotb.Domain.Enums.OrderStatus status)
-    {
-        return status switch
-        {
-            AseerAlkotb.Domain.Enums.OrderStatus.Pending => "bg-warning",
-            AseerAlkotb.Domain.Enums.OrderStatus.Approved => "bg-info",
-            AseerAlkotb.Domain.Enums.OrderStatus.Shipped => "bg-primary",
-            AseerAlkotb.Domain.Enums.OrderStatus.Delivered => "bg-success",
-            AseerAlkotb.Domain.Enums.OrderStatus.Cancelled => "bg-danger",
-            _ => "bg-secondary"
-        };
-    }
-
-    public string GetStatusIcon(AseerAlkotb.Domain.Enums.OrderStatus status)
-    {
-        return status switch
-        {
-            AseerAlkotb.Domain.Enums.OrderStatus.Pending => "fas fa-clock",
-            AseerAlkotb.Domain.Enums.OrderStatus.Approved => "fas fa-check",
-            AseerAlkotb.Domain.Enums.OrderStatus.Shipped => "fas fa-shipping-fast",
-            AseerAlkotb.Domain.Enums.OrderStatus.Delivered => "fas fa-check-circle",
-            AseerAlkotb.Domain.Enums.OrderStatus.Cancelled => "fas fa-times-circle",
-            _ => "fas fa-question-circle"
-        };
-    }
-
-    public string GetPaymentMethodIcon(AseerAlkotb.Domain.Enums.PaymentMethod method)
-    {
-        return method switch
-        {
-            AseerAlkotb.Domain.Enums.PaymentMethod.CashOnDelivery => "fas fa-money-bill-wave",
-            AseerAlkotb.Domain.Enums.PaymentMethod.Card => "fas fa-credit-card",
-            AseerAlkotb.Domain.Enums.PaymentMethod.MobileWallet => "fas fa-mobile-alt",
-            _ => "fas fa-question-circle"
-        };
-    }
-}

@@ -1,0 +1,190 @@
+<form method="get" action="@Url.Action("Index")" class="row g-3">
+    <!-- Search Input -->
+    <div class="col-md-3">
+        <label for="search" class="form-label">
+            <i class="fas fa-search me-1"></i>Search
+        </label>
+        <input type="text" 
+               class="form-control" 
+               id="search" 
+               name="search" 
+               placeholder="Transaction ID, customer email..." 
+               value="@ViewBag.SearchTerm">
+    </div>
+
+    <!-- Payment Status Filter -->
+    <div class="col-md-2">
+        <label for="paymentStatus" class="form-label">
+            <i class="fas fa-tasks me-1"></i>Status
+        </label>
+        <select class="form-select" id="paymentStatus" name="paymentStatus">
+            <option value="">All Statuses</option>
+            @if (ViewBag.PaymentStatuses != null)
+            {
+                @foreach (var status in ViewBag.PaymentStatuses as AseerAlkotb.Domain.Enums.PaymentStatus[])
+                {
+                    var statusValue = (int)status;
+                    var isSelected = ViewBag.SelectedPaymentStatus?.Equals(status) == true;
+                    <option value="@statusValue" selected="@isSelected">
+                        @status
+                    </option>
+                }
+            }
+        </select>
+    </div>
+
+    <!-- Payment Method Filter -->
+    <div class="col-md-2">
+        <label for="paymentMethod" class="form-label">
+            <i class="fas fa-credit-card me-1"></i>Method
+        </label>
+        <select class="form-select" id="paymentMethod" name="paymentMethod">
+            <option value="">All Methods</option>
+            @if (ViewBag.PaymentMethods != null)
+            {
+                @foreach (var method in ViewBag.PaymentMethods as AseerAlkotb.Domain.Enums.PaymentMethod[])
+                {
+                    var methodValue = (int)method;
+                    var isSelected = ViewBag.SelectedPaymentMethod?.Equals(method) == true;
+                    <option value="@methodValue" selected="@isSelected">
+                        @method
+                    </option>
+                }
+            }
+        </select>
+    </div>
+
+    <!-- From Date -->
+    <div class="col-md-2">
+        <label for="fromDate" class="form-label">
+            <i class="fas fa-calendar-alt me-1"></i>From Date
+        </label>
+        <input type="date" 
+               class="form-control" 
+               id="fromDate" 
+               name="fromDate" 
+               value="@ViewBag.FromDate">
+    </div>
+
+    <!-- To Date -->
+    <div class="col-md-2">
+        <label for="toDate" class="form-label">
+            <i class="fas fa-calendar-alt me-1"></i>To Date
+        </label>
+        <input type="date" 
+               class="form-control" 
+               id="toDate" 
+               name="toDate" 
+               value="@ViewBag.ToDate">
+    </div>
+
+    <!-- Date Sorting -->
+    <div class="col-md-1">
+        <label for="dateAscending" class="form-label">
+            <i class="fas fa-sort me-1"></i>Sort
+        </label>
+        <select class="form-select" id="dateAscending" name="dateAscending">
+            <option value="false" selected="@(!ViewBag.DateAscending)">Newest</option>
+            <option value="true" selected="@(ViewBag.DateAscending)">Oldest</option>
+        </select>
+    </div>
+
+    <!-- Page Size and Actions -->
+    <div class="col-md-12">
+        <div class="row">
+            <div class="col-md-2">
+                <label for="pageSize" class="form-label">
+                    <i class="fas fa-list me-1"></i>Per Page
+                </label>
+                <select class="form-select" id="pageSize" name="pageSize">
+                    <option value="10" selected="@(ViewBag.PageSize == 10)">10</option>
+                    <option value="25" selected="@(ViewBag.PageSize == 25)">25</option>
+                    <option value="50" selected="@(ViewBag.PageSize == 50)">50</option>
+                    <option value="100" selected="@(ViewBag.PageSize == 100)">100</option>
+                </select>
+            </div>
+            <div class="col-md-10">
+                <label class="form-label">&nbsp;</label>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-filter me-1"></i>Apply Filters
+                    </button>
+                    <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                        <i class="fas fa-times me-1"></i>Clear All
+                    </a>
+                    <button type="button" class="btn btn-outline-info" onclick="setDateRange('today')">
+                        <i class="fas fa-calendar-day me-1"></i>Today
+                    </button>
+                    <button type="button" class="btn btn-outline-info" onclick="setDateRange('week')">
+                        <i class="fas fa-calendar-week me-1"></i>This Week
+                    </button>
+                    <button type="button" class="btn btn-outline-info" onclick="setDateRange('month')">
+                        <i class="fas fa-calendar-alt me-1"></i>This Month
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden field to maintain page number on filter -->
+    <input type="hidden" name="pageNumber" value="1" />
+</form>
+
+<!-- Quick Filter Badges -->
+<div class="row mt-3">
+    <div class="col-12">
+        <div class="d-flex flex-wrap gap-2">
+            <span class="text-muted small">Quick filters:</span>
+            <a href="@Url.Action("Index", new { paymentStatus = (int)AseerAlkotb.Domain.Enums.PaymentStatus.Pending })" 
+               class="badge bg-warning text-decoration-none">
+                <i class="fas fa-clock me-1"></i>Pending Payments
+            </a>
+            <a href="@Url.Action("Index", new { paymentStatus = (int)AseerAlkotb.Domain.Enums.PaymentStatus.Paid })" 
+               class="badge bg-success text-decoration-none">
+                <i class="fas fa-check-circle me-1"></i>Paid Payments
+            </a>
+            <a href="@Url.Action("Index", new { paymentStatus = (int)AseerAlkotb.Domain.Enums.PaymentStatus.Failed })" 
+               class="badge bg-danger text-decoration-none">
+                <i class="fas fa-times-circle me-1"></i>Failed Payments
+            </a>
+            <a href="@Url.Action("Index", new { paymentMethod = (int)AseerAlkotb.Domain.Enums.PaymentMethod.CashOnDelivery })" 
+               class="badge bg-info text-decoration-none">
+                <i class="fas fa-money-bill-wave me-1"></i>COD Payments
+            </a>
+            <a href="@Url.Action("Index", new { paymentMethod = (int)AseerAlkotb.Domain.Enums.PaymentMethod.Card })" 
+               class="badge bg-primary text-decoration-none">
+                <i class="fas fa-credit-card me-1"></i>Card Payments
+            </a>
+            <a href="@Url.Action("Index", new { paymentMethod = (int)AseerAlkotb.Domain.Enums.PaymentMethod.MobileWallet })" 
+               class="badge bg-dark text-decoration-none">
+                <i class="fas fa-mobile-alt me-1"></i>Wallet Payments
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+function setDateRange(range) {
+    const today = new Date();
+    let fromDate, toDate;
+    
+    switch (range) {
+        case 'today':
+            fromDate = toDate = today.toISOString().split('T')[0];
+            break;
+        case 'week':
+            const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay()));
+            fromDate = startOfWeek.toISOString().split('T')[0];
+            toDate = new Date().toISOString().split('T')[0];
+            break;
+        case 'month':
+            const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+            fromDate = startOfMonth.toISOString().split('T')[0];
+            toDate = new Date().toISOString().split('T')[0];
+            break;
+    }
+    
+    document.getElementById('fromDate').value = fromDate;
+    document.getElementById('toDate').value = toDate;
+}
+</script>

@@ -38,7 +38,7 @@ namespace AseerAlkotb.Infrastructure.Repositories.Implementations
                                  .ToListAsync(cancellationToken);
         }
 
-        public async Task UpdatePaymentStatusAsync(int paymentId, string status, CancellationToken cancellationToken = default)
+        public async Task UpdatePaymentStatusAsync(int paymentId, PaymentStatus status, CancellationToken cancellationToken = default)
         {
             var payment = await _context.Payments.FindAsync(new object[] { paymentId }, cancellationToken);
             if (payment != null)
@@ -51,7 +51,7 @@ namespace AseerAlkotb.Infrastructure.Repositories.Implementations
 
         public async Task<List<Payment>> GetPaymentsAsync(
             int? userId = null,
-            string? status = null,
+            PaymentStatus? status = null,
             DateTime? fromDate = null,
             DateTime? toDate = null,
             CancellationToken cancellationToken = default)
@@ -64,8 +64,8 @@ namespace AseerAlkotb.Infrastructure.Repositories.Implementations
             if (userId.HasValue)
                 query = query.Where(p => p.UserId == userId.Value);
 
-            if (!string.IsNullOrEmpty(status))
-                query = query.Where(p => p.Status == status );
+            if (status.HasValue)
+                query = query.Where(p => p.Status == status.Value);
 
             if (fromDate.HasValue)
                 query = query.Where(p => p.PaymentDate >= fromDate.Value);
@@ -74,6 +74,11 @@ namespace AseerAlkotb.Infrastructure.Repositories.Implementations
                 query = query.Where(p => p.PaymentDate <= toDate.Value);
 
             return await query.ToListAsync(cancellationToken);
+        }
+
+        public IQueryable<Payment> GetQueryable()
+        {
+            return _context.Payments.AsQueryable();
         }
     }
 }

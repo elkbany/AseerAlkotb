@@ -1,4 +1,4 @@
-﻿using AseerAlkotb.Application.Contracts;
+﻿﻿﻿using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Features.Payments.Requests;
 using AseerAlkotb.Application.Features.Payments.Responses;
 using AseerAlkotb.Domain.Entites;
@@ -63,7 +63,7 @@ namespace AseerAlkotb.Application.Services
                 first_name = Order.User.FirstName ?? "Guest",
                 last_name = Order.User.LastName ?? "User",
                 email = Order.User.Email,
-                phone_number = Order.User.PhoneNumber,
+                phone_number = "+2011282928979",
                 street = "N/A",
                 building = "N/A",
                 city = Order.Governorate,
@@ -129,12 +129,13 @@ namespace AseerAlkotb.Application.Services
             var payment = new Payment
                 {
                 Amount = Order.TotalAmount,
-                PaymentMethod = request.PaymentMethod,
-                UserId = Order.User.Id,
+                Method = request.PaymentMethod.ToLower() == "card" ? PaymentMethod.Card : PaymentMethod.MobileWallet,
+                UserId = Order.UserId,
                 OrderId = Order.Id,
-                Status = "Pending",
+                Status = PaymentStatus.Pending,
                 TransactionId = specialReference.ToString(),
-                PaymentDate = DateTime.UtcNow
+                PaymentDate = DateTime.UtcNow,
+                ProviderPayload = responseContent
                 };
 
 
@@ -170,8 +171,10 @@ namespace AseerAlkotb.Application.Services
 
             // Update Order Status and Payment Status
             order.PaymentStatus = PaymentStatus.Paid;
-            payment.Status = "Success";
+            payment.Status = PaymentStatus.Paid;
 
+            // TODO: Add notification functionality when Notifications table is created
+            /*
             var notification = new Notification
             {
                 Title = "Order Purchased Successfully ",
@@ -182,6 +185,7 @@ namespace AseerAlkotb.Application.Services
             };
 
             await _unitOfWork.Notifications.InsertAsync(notification);
+            */
 
             await _unitOfWork.CommitAsync();
 
@@ -206,8 +210,10 @@ namespace AseerAlkotb.Application.Services
 
             // Update Order Status and Payment Status
             order.PaymentStatus = PaymentStatus.Failed;
-            payment.Status = "Failed";
+            payment.Status = PaymentStatus.Failed;
 
+            // TODO: Add notification functionality when Notifications table is created
+            /*
             var notification = new Notification
             {
                 Title = "Order Purchased Failed ",
@@ -218,6 +224,7 @@ namespace AseerAlkotb.Application.Services
             };
 
             await _unitOfWork.Notifications.InsertAsync(notification);
+            */
 
             await _unitOfWork.CommitAsync();
 

@@ -42,6 +42,7 @@ namespace AseerAlkotb.Dashboard
             builder.Services.AddScoped<IPublisherServices, PublisherService>();
             builder.Services.AddScoped<IQuoteService, QuoteService>();
             builder.Services.AddScoped<IPaymobService, PaymobService>();
+            builder.Services.AddScoped<IPaymentService, PaymentService>();
             builder.Services.AddScoped<IOrderServices, OrderServices>();
             builder.Services.AddScoped<IEmailService, EmailService>();
 
@@ -53,7 +54,7 @@ namespace AseerAlkotb.Dashboard
             builder.Services.AddLocalization();
             builder.Services.Configure<RequestLocalizationOptions>(options =>
             {
-                var supportedCultures = new[] { "en", "ar" };
+                var supportedCultures = new[] { "ar" };
                 options.SetDefaultCulture(supportedCultures[0])
                        .AddSupportedCultures(supportedCultures)
                        .AddSupportedUICultures(supportedCultures);
