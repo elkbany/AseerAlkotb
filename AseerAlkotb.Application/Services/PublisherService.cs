@@ -12,6 +12,8 @@ using AseerAlkotb.Localization.Resources;
 using Mapster;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Localization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,11 +23,16 @@ using static AseerAlkotb.Application.ResponseHandler.ApiResponseHandler;
 
 namespace AseerAlkotb.Application.Services
 {
-    public class PublisherService : AppService , IPublisherServices
+    public class PublisherService : AppService, IPublisherServices
     {
+        private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly UserManager<User> userManager;
         private readonly IUnitOfWork unitOfWork;
-        public PublisherService(IUnitOfWork unitOfWork, IServiceProvider serviceProvider, IHostEnvironment environment ) : base(serviceProvider, environment)
+
+        public PublisherService(IHttpContextAccessor httpContextAccessor, UserManager<User> userManager, IUnitOfWork unitOfWork, IServiceProvider serviceProvider, IHostEnvironment environment) : base(serviceProvider, environment)
         {
+            this.httpContextAccessor = httpContextAccessor;
+            this.userManager = userManager;
             this.unitOfWork = unitOfWork;
         }
 
@@ -69,7 +76,7 @@ namespace AseerAlkotb.Application.Services
         {
             await DoValidationAsync<GetAllPublishersPaginatedRequestValidator, GetAllPublishersPaginatedRequest>(request);
             var publishers = await unitOfWork.Publishers
-                .GetAllAsync(search => search.Name.Contains(request.Search) , 
+                .GetAllAsync(search => search.Name.Contains(request.Search),
                 (request.PageNumber - 1) * request.PageSize, request.PageSize);
 
             var totalCount = await unitOfWork.Publishers.CountAsync((search => search.Name.Contains(request.Search)));
@@ -86,7 +93,7 @@ namespace AseerAlkotb.Application.Services
                 })
                 .ToList();
 
-            return Success(response , totalCount, request.PageNumber, request.PageSize);
+            return Success(response, totalCount, request.PageNumber, request.PageSize);
         }
 
         public async Task<ApiResponse<GetPublisherByIdResponse>> GetPublisherByIdAsync(GetPublisherByIdRequest request)
@@ -125,7 +132,7 @@ namespace AseerAlkotb.Application.Services
             }
             else
             {
-                publisher.LogoUrl = oldLogoUrl; 
+                publisher.LogoUrl = oldLogoUrl;
             }
             unitOfWork.Publishers.Update(publisher);
             await unitOfWork.CommitAsync();
@@ -138,13 +145,35 @@ namespace AseerAlkotb.Application.Services
         public async Task<ApiResponse<FollowPublisherResponse>> FollowPublisher(FollowPublisherRequest request)
         {
             await DoValidationAsync<FollowPublisherRequestValidation, FollowPublisherRequest>(request);
-            if (await unitOfWork.Publishers.IsFollowingPublisher(request.UserId, request.UserId))
+
+            // Get current user from HttpContext
+            var httpContext = httpContextAccessor.HttpContext;
+            if (httpContext?.User?.Identity?.IsAuthenticated != true)
             {
-                return BadRequest<FollowPublisherResponse>("You are already following this publisher");
+                return UnAuthorized<FollowPublisherResponse>();
+            }
+
+            var currentUser = await userManager.GetUserAsync(httpContext.User);
+            if (currentUser == null)
+            {
+                return UnAuthorized<FollowPublisherResponse>();
+            }
+
+            // Check if user has "Client" role
+            var isInClientRole = await userManager.IsInRoleAsync(currentUser, "Client");
+            if (!isInClientRole)
+            {
+                return UnAuthorized<FollowPublisherResponse>();
+            }
+
+            // Use current user's ID instead of request.UserId for security
+            if (await unitOfWork.Publishers.IsFollowingPublisher(currentUser.Id, request.PublisherId))
+            {
+                return BadRequest<FollowPublisherResponse>($"{_stringLocalizer["AlreadyFollowing"]} {_stringLocalizer["Publisher"]}");
             }
             else
             {
-                var userFollow = await unitOfWork.Publishers.FollowPublisher(request.UserId, request.PublisherId);
+                var userFollow = await unitOfWork.Publishers.FollowPublisher(currentUser.Id, request.PublisherId);
                 await unitOfWork.CommitAsync();
                 var response = userFollow.Adapt<FollowPublisherResponse>();
                 return Success(response);
@@ -154,16 +183,38 @@ namespace AseerAlkotb.Application.Services
         public async Task<ApiResponse<UnFollowPublisherResponse>> UnFollowPublisher(UnFollowPublisherRequest request)
         {
             await DoValidationAsync<UnFollowPublisherRequestValidation, UnFollowPublisherRequest>(request);
-            if (await unitOfWork.Publishers.IsFollowingPublisher(request.UserId, request.PublisherId))
+
+            // Get current user from HttpContext
+            var httpContext = httpContextAccessor.HttpContext;
+            if (httpContext?.User?.Identity?.IsAuthenticated != true)
             {
-                var userFollow = await unitOfWork.Publishers.UnFollowPublisher(request.UserId, request.PublisherId);
+                return UnAuthorized<UnFollowPublisherResponse>();
+            }
+
+            var currentUser = await userManager.GetUserAsync(httpContext.User);
+            if (currentUser == null)
+            {
+                return UnAuthorized<UnFollowPublisherResponse>();
+            }
+
+            // Check if user has "Client" role
+            var isInClientRole = await userManager.IsInRoleAsync(currentUser, "Client");
+            if (!isInClientRole)
+            {
+                return UnAuthorized<UnFollowPublisherResponse>();
+            }
+
+            // Use current user's ID instead of request.UserId for security
+            if (await unitOfWork.Publishers.IsFollowingPublisher(currentUser.Id, request.PublisherId))
+            {
+                var userFollow = await unitOfWork.Publishers.UnFollowPublisher(currentUser.Id, request.PublisherId);
                 await unitOfWork.CommitAsync();
                 var response = userFollow.Adapt<UnFollowPublisherResponse>();
                 return Success(response);
             }
             else
             {
-                return BadRequest<UnFollowPublisherResponse>("You are not following this Publisher");
+                return BadRequest<UnFollowPublisherResponse>($"{_stringLocalizer["NotFollowing"]} {_stringLocalizer["Publisher"]}");
             }
         }
 
@@ -182,10 +233,31 @@ namespace AseerAlkotb.Application.Services
         public async Task<ApiResponse<List<GetFollowedPublisherResponse>>> GetFollowedPublisher(GetFollowedPublisherRequest request)
         {
             await DoValidationAsync<GetFollowedPublisherRequestValidation, GetFollowedPublisherRequest>(request);
-            var Publishers = unitOfWork.Publishers.GetFollowedPublisher(request.UserId).ToList();
+
+            // Get current user from HttpContext
+            var httpContext = httpContextAccessor.HttpContext;
+            if (httpContext?.User?.Identity?.IsAuthenticated != true)
+            {
+                return UnAuthorized<List<GetFollowedPublisherResponse>>();
+            }
+
+            var currentUser = await userManager.GetUserAsync(httpContext.User);
+            if (currentUser == null)
+            {
+                return UnAuthorized<List<GetFollowedPublisherResponse>>();
+            }
+
+            // Check if user has "Client" role
+            var isInClientRole = await userManager.IsInRoleAsync(currentUser, "Client");
+            if (!isInClientRole)
+            {
+                return UnAuthorized<List<GetFollowedPublisherResponse>>();
+            }
+
+            // Use current user's ID instead of request.UserId for security
+            var Publishers = unitOfWork.Publishers.GetFollowedPublisher(currentUser.Id).ToList();
             var response = Publishers.Adapt<List<GetFollowedPublisherResponse>>();
             return Success(response);
-
         }
 
         public async Task<ApiResponse<List<GetFollowersPublisherResponse>>> GetFollowerPublisher(GetFollowersPublisherRequest request)
@@ -194,7 +266,6 @@ namespace AseerAlkotb.Application.Services
             var Publishers = unitOfWork.Publishers.GetFollowerPublisher(request.publisherId).ToList();
             var response = Publishers.Adapt<List<GetFollowersPublisherResponse>>();
             return Success(response);
-
         }
     }
 }
