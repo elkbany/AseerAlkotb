@@ -80,7 +80,6 @@ namespace AseerAlkotb.Dashboard
             // Register services for external dependencies, only if needed by the dashboard
             // For example, if you need email sending in your dashboard controllers
             builder.Services.AddScoped<IEmailService, EmailService>();
-            #endregion
 
             var app = builder.Build();
 
