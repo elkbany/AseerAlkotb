@@ -30,7 +30,6 @@
 
   <ItemGroup>
     <Folder Include="Features\Payments\Mapping\" />
-    <Folder Include="Features\Roles\Mapping\" />
   </ItemGroup>
 
 </Project>

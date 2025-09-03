@@ -2,6 +2,27 @@
 
 @{
     ViewData["Title"] = "Book Details";
+
+    // Get all reviews for this book to calculate rating distribution
+    var reviews = ViewBag.Reviews as List<AseerAlkotb.Application.Features.Reviews.Responses.GetAllReviewsPaginatedResponse> ?? new List<AseerAlkotb.Application.Features.Reviews.Responses.GetAllReviewsPaginatedResponse>();
+
+    // Calculate rating statistics
+    var totalReviews = reviews.Count;
+    var averageRating = totalReviews > 0 ? reviews.Average(r => r.Rating) : 0;
+
+    // Calculate distribution for each star rating
+    var starDistribution = new Dictionary<int, int>();
+    for (int i = 1; i <= 5; i++)
+    {
+        starDistribution[i] = reviews.Count(r => r.Rating == i);
+    }
+
+    // Calculate percentages
+    var starPercentages = new Dictionary<int, decimal>();
+    for (int i = 1; i <= 5; i++)
+    {
+        starPercentages[i] = totalReviews > 0 ? (decimal)starDistribution[i] / totalReviews * 100 : 0;
+    }
 }
 
 <div class="content-header">
@@ -28,8 +49,7 @@
                 <div class="card card-outline card-primary">
                     <div class="card-body box-profile">
                         <div class="text-center position-relative mb-3">
-                            <img src="@(string.IsNullOrEmpty(Model.CoverImageUrl) ? "/images/default-book.png" : Model.CoverImageUrl)"
-                                 alt="@Model.Title" class="img-fluid rounded shadow-sm" style="max-height: 300px;" />
+                            <img src="@($"http://localhost:5234{Model.CoverImageUrl}")" alt="@Model.Title" class="img-fluid rounded shadow-sm" style="max-height: 300px;" />
                             @if (Model.DiscountPercentage > 0)
                             {
                                 <div class="position-absolute badge badge-danger" style="top: 10px; right: 10px; font-size: 1rem;">
@@ -178,27 +198,118 @@
                             Rating and Reviews
                         </h3>
                     </div>
+
                     <div class="card-body">
                         <div class="row align-items-center">
                             <div class="col-md-4 text-center">
-                                <h1 class="display-4 text-warning mb-0">@Model.Rating.ToString("0.0")</h1>
+                                <h1 class="display-4 text-warning mb-0">@averageRating.ToString("0.0")</h1>
                                 <div class="rating-stars">
-                                    @for (int i = 1; i <= 5; i++)
+                                    @{
+                                        int fullStars = (int)Math.Floor((decimal)averageRating);
+                                        bool hasHalfStar = (averageRating - fullStars) >= 0.5;
+                                        int emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+                                    }
+
+                                    @* Display full stars *@
+                                    @for (int i = 1; i <= fullStars; i++)
                                     {
-                                        <i class="fas fa-star @(i <= Model.Rating ? "text-warning" : "text-muted")"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                    }
+
+                                    @* Display half star if needed *@
+                                    @if (hasHalfStar)
+                                    {
+                                        <i class="fas fa-star-half-alt text-warning"></i>
+                                    }
+
+                                    @* Display empty stars *@
+                                    @for (int i = 1; i <= emptyStars; i++)
+                                    {
+                                        <i class="far fa-star text-muted"></i>
                                     }
                                 </div>
-                                <p class="text-muted mt-2">Based on customer reviews</p>
+                                <p class="text-muted mt-2">
+                                    Based on @totalReviews customer review@(totalReviews != 1 ? "s" : "")
+                                </p>
                             </div>
                             <div class="col-md-8">
-                                <div class="progress-group mb-4">
-                                    <span class="progress-text">5 stars</span>
-                                    <div class="progress">
-                                        <div class="progress-bar bg-warning" style="width: 80%"></div>
+                                @if (totalReviews > 0)
+                                {
+                                    @for (int starLevel = 5; starLevel >= 1; starLevel--)
+                                    {
+                                        <div class="progress-group mb-3">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <span class="progress-text">
+                                                    <i class="fas fa-star text-warning me-1"></i>
+                                                    @starLevel star@(starLevel > 1 ? "s" : "")
+                                                </span>
+                                                <span class="text-muted small">
+                                                    @starDistribution[starLevel] (@starPercentages[starLevel].ToString("0")%)
+                                                </span>
+                                            </div>
+                                            <div class="progress" style="height: 8px;">
+                                                <div class="progress-bar bg-warning"
+                                                     style="width: @starPercentages[starLevel].ToString("0.0")%"
+                                                     role="progressbar"
+                                                     aria-valuenow="@starPercentages[starLevel].ToString("0.0")"
+                                                     aria-valuemin="0"
+                                                     aria-valuemax="100">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="text-center text-muted py-4">
+                                        <i class="fas fa-star-o fa-2x mb-2"></i>
+                                        <p>No reviews yet.</p>
                                     </div>
-                                </div>
+                                }
                             </div>
                         </div>
+
+                        @if (totalReviews > 0)
+                        {
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h5 class="mb-0">Customer Reviews (@totalReviews)</h5>
+                                        <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addReviewModal">
+                                            <i class="fas fa-plus"></i> Write Review
+                                        </button>
+                                    </div>
+
+                                    @* Display recent reviews *@
+                                    @foreach (var review in reviews.Take(3))
+                                    {
+                                        <div class="card border-left-warning mb-3">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <div class="rating-stars">
+                                                        @for (int i = 1; i <= 5; i++)
+                                                        {
+                                                            <i class="fas fa-star @(i <= review.Rating ? "text-warning" : "text-muted")"></i>
+                                                        }
+                                                    </div>
+                                                    <small class="text-muted">User @review.UserId</small>
+                                                </div>
+                                                <p class="mb-0">@review.Comment</p>
+                                            </div>
+                                        </div>
+                                    }
+
+                                    @if (totalReviews > 3)
+                                    {
+                                        <div class="text-center">
+                                            <a href="#" class="btn btn-outline-primary btn-sm">
+                                                View All @totalReviews Reviews
+                                            </a>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
                     </div>
                 </div>
             </div>
@@ -231,6 +342,7 @@
             color: #fff;
             padding: 0.2rem 0.6rem;
         }
+
         .select2-container--disabled .select2-selection--multiple {
             background-color: #e9ecef !important;
             cursor: not-allowed;

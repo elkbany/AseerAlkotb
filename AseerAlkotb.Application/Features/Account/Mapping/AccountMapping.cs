@@ -22,7 +22,7 @@ namespace AseerAlkotb.Application.Features.Account.Mapping
                 .Map(dest => dest.Email, src => src.Email)
                 .Map(dest => dest.FirstName, src => src.FirstName)
                 .Map(dest => dest.LastName, src => src.LastName)
-                .Map(dest => dest.IsActive, _ => true)
+                //.Map(dest => dest.IsActive, _ => true)
                 .Ignore(dest => dest.Id)
                 .Ignore("ConfirmPassword")
                 .Ignore("Password")

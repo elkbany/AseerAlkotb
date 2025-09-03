@@ -14,13 +14,12 @@
 
 <div class="content">
     <div class="container-fluid">
-        <!-- Statistics Cards -->
         <div class="row">
             <div class="col-lg-3 col-6">
                 <div class="small-box bg-info">
                     <div class="inner">
                         <h3>@ViewBag.TotalBooks</h3>
-                        <p>Total Books</p>
+                        <p>Books</p>
                     </div>
                     <div class="icon">
                         <i class="fas fa-book"></i>
@@ -41,6 +40,32 @@
                 </div>
             </div>
             <div class="col-lg-3 col-6">
+                <div class="small-box bg-purple">
+                    <div class="inner">
+                        <h3>@ViewBag.TotalPublishers</h3>
+                        <p>Publishers</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <a href="/Publishers" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-danger">
+                    <div class="inner">
+                        <h3>@ViewBag.TotalUsers</h3>
+                        <p>Users</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <a href="/Users" class="small-box-footer">
+                        More info <i class="fas fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-3 col-6">
                 <div class="small-box bg-warning">
                     <div class="inner">
                         <h3>@ViewBag.TotalOrders</h3>
@@ -53,10 +78,9 @@
                 </div>
             </div>
             <div class="col-lg-3 col-6">
-                <div class="small-box bg-danger">
+                <div class="small-box bg-secondary">
                     <div class="inner">
-                        <h3>@ViewBag.TotalReviews</h3>
-
+                        <h3>@ViewBag.TotalCategories</h3>
                         <p>Categories</p>
                     </div>
                     <div class="icon">
@@ -67,9 +91,7 @@
             </div>
         </div>
 
-        <!-- Recent Activity and Charts -->
         <div class="row">
-            <!-- Recent Orders -->
             <div class="col-md-8">
                 <div class="card">
                     <div class="card-header border-transparent">
@@ -109,7 +131,6 @@
                 </div>
             </div>
 
-            <!-- Recently Added Books -->
             <div class="col-md-4">
                 <div class="card">
                     <div class="card-header">
@@ -144,4 +165,3 @@
         </div>
     </div>
 </div>
-

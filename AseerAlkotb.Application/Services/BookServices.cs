@@ -116,10 +116,13 @@ namespace AseerAlkotb.Application.Services
                 return NotFound<UpdateBookResponse>($"{_stringLocalizer["Book"]} {_stringLocalizer["NotFound"]}");
             }
 
+            var oldCoverImageUrl = book.CoverImageUrl;
             // update basic fields
             request.Adapt(book);
 
             // update cover image if provided
+
+
             if (request.CoverImageUrl != null)
             {
                 if (!string.IsNullOrEmpty(book.CoverImageUrl))
@@ -127,6 +130,10 @@ namespace AseerAlkotb.Application.Services
                     await DeleteImageAsync(book.CoverImageUrl);
                 }
                 book.CoverImageUrl = await UploadImageAsync(request.CoverImageUrl, "Books");
+            }
+            else
+            {
+                book.CoverImageUrl = oldCoverImageUrl;
             }
 
             // sync categories if provided

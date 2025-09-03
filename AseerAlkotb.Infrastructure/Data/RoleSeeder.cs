@@ -18,7 +18,7 @@ namespace AseerAlkotb.Infrastructure.Data
                 var roleManager = services.GetRequiredService<RoleManager<IdentityRole<int>>>();
                 var userManager = services.GetRequiredService<UserManager<User>>();
 
-                string[] roles = { "Admin", "Staff", "Client" };
+                string[] roles = { "Admin", "Client" };
 
                 foreach (var role in roles)
                 {

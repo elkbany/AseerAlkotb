@@ -81,21 +81,27 @@ namespace AseerAlkotb.API.Controllers
         }
 
         // Forgot Password
-        [HttpPost("ForgotPassword")]
-        public async Task<IActionResult> ForgotPassword([FromBody] string email)
+        [HttpPost("ForgotPassword/{email}")]
+   
+        public async Task<IActionResult> ForgotPassword(string email)
         {
             var result = await _accountServices.ForgotPassword(email);
 
-            var frontendBase = _configuration["App:FrontendBaseUrl"] ?? "http://localhost:4200";
-
             if (!result.Succeeded)
-                //return BadRequest(new { Message = "If an account with this email exists, a password reset link has been sent." });
-                return Redirect($"{frontendBase}/reset-password-failed");
+                return BadRequest(new
+                {
+                    Success = false,
+                    Message = "إذا كان هناك حساب بهذا البريد الإلكتروني، فقد تم إرسال رابط إعادة تعيين كلمة المرور.",
+                    result.Errors
+                });
 
-            //return Ok(new { Message = "If an account with this email exists, a password reset link has been sent." });
-            return Redirect($"{frontendBase}/reset-password-sucess");
+            return Ok(new
+            {
+                Success = true,
+                Message = "إذا كان هناك حساب بهذا البريد الإلكتروني، فقد تم إرسال رابط إعادة تعيين كلمة المرور.",
+             
+            });
         }
-
         // Reset Password
         [HttpPost("ResetPassword")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
