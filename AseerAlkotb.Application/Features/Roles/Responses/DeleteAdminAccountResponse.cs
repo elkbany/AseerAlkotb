@@ -4,11 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AseerAlkotb.Domain.Enums
+namespace AseerAlkotb.Application.Features.Roles.Responses
 {
-    public enum Roles
-    {
-        Admin = 4,
-        Client = 5,
-    }
+    public record DeleteAdminAccountResponse(int Id);
+    
 }

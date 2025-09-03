@@ -29,8 +29,8 @@ namespace AseerAlkotb.API.Controllers
             var result =  await authorServices.DeleteAuthorAsync(request);
             return ApiResult(result);
         }
-        [HttpGet]
-        public async Task<IActionResult> GetById([FromQuery]GetAuthorByIdRequest request)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById([FromRoute]GetAuthorByIdRequest request)
         {
             var result = await authorServices.GetAuthorByIdAsync(request);
             return ApiResult(result);

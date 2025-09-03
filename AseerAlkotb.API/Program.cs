@@ -178,6 +178,7 @@ namespace AseerAlkotb.API
                 RequestPath = "/uploads"
             });
             #endregion
+
             #region seed roles
             using (var scope = app.Services.CreateScope())
             {
