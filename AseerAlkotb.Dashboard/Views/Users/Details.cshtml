@@ -1,0 +1,225 @@
+@model AseerAlkotb.Application.Features.Roles.Responses.GetAllAdminResponse
+
+@{
+    ViewData["Title"] = "User Details";
+}
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">User Details</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a asp-action="Index">Users</a></li>
+                    <li class="breadcrumb-item active">Details</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-4">
+                <!-- Profile Card -->
+                <div class="card card-primary card-outline">
+                    <div class="card-body box-profile">
+                        <div class="text-center">
+                            <img class="profile-user-img img-fluid img-circle" 
+                                 src="/images/default-user.png" 
+                                 alt="@Model.FirstName">
+                        </div>
+                        <h3 class="profile-username text-center">@Model.FirstName @Model.LastName</h3>
+                        <p class="text-muted text-center">@Model.UserName</p>
+                        
+                        <ul class="list-group list-group-unbordered mb-3">
+                            <li class="list-group-item">
+                                <b>Role</b> <a class="float-right">
+                                    @if (ViewBag.CurrentRole != null)
+                                    {
+                                        <span class="badge badge-@(ViewBag.CurrentRole == "Admin" ? "success" : "warning")">
+                                            @ViewBag.CurrentRole
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-secondary">No Role</span>
+                                    }
+                                </a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Status</b> <a class="float-right">
+                                    <span class="badge badge-@(Model.IsActive ? "success" : "secondary")">
+                                        @(Model.IsActive ? "Active" : "Inactive")
+                                    </span>
+                                </a>
+                            </li>
+                            
+                        </ul>
+                        
+                        <div class="text-center">
+                            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
+                                <i class="fas fa-edit"></i> Edit User
+                            </a>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to List
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-8">
+                <!-- User Information -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">User Information</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <dl class="row">
+                                    <dt class="col-sm-4">First Name:</dt>
+                                    <dd class="col-sm-8">@Model.FirstName</dd>
+                                    
+                                    <dt class="col-sm-4">Last Name:</dt>
+                                    <dd class="col-sm-8">@Model.LastName</dd>
+                                    
+                                    <dt class="col-sm-4">Username:</dt>
+                                    <dd class="col-sm-8">@Model.UserName</dd>
+                                    
+                                    <dt class="col-sm-4">Email:</dt>
+                                    <dd class="col-sm-8">
+                                        <a href="mailto:@Model.Email">@Model.Email</a>
+                                    </dd>
+                                </dl>
+                            </div>
+                            <div class="col-md-6">
+                                <dl class="row">
+                                    <dt class="col-sm-4">Gender:</dt>
+                                    <dd class="col-sm-8">@Model.Gender</dd>
+                                    
+                                    <dt class="col-sm-4">Phone Number:</dt>
+                                    <dd class="col-sm-8">
+                                        @(string.IsNullOrEmpty(Model.PhoneNumber) ? "Not provided" : Model.PhoneNumber)
+                                    </dd>
+                                    
+                                    <dt class="col-sm-4">Nationality:</dt>
+                                    <dd class="col-sm-8">
+                                        @(string.IsNullOrEmpty(Model.Nationality) ? "Not specified" : Model.Nationality)
+                                    </dd>
+                                    
+                                    
+                                </dl>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <!-- Role Management -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Role Management</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Current Role</h5>
+                                @if (ViewBag.CurrentRole != null)
+                                {
+                                    <p>
+                                        <span class="badge badge-@(ViewBag.CurrentRole == "Admin" ? "success" : "warning") badge-lg">
+                                            @ViewBag.CurrentRole
+                                        </span>
+                                    </p>
+                                }
+                                else
+                                {
+                                    <p><span class="badge badge-secondary badge-lg">No Role Assigned</span></p>
+                                }
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Actions</h5>
+                                <div class="btn-group-vertical w-100">
+                                    @if (ViewBag.CurrentRole != "Admin")
+                                    {
+                                        <form asp-action="AssignRole" method="post" style="display: inline;">
+                                            <input type="hidden" name="id" value="@Model.Id" />
+                                            <input type="hidden" name="role" value="Admin" />
+                                            <button type="submit" class="btn btn-success btn-sm mb-2 w-100" 
+                                                    onclick="return confirm('Are you sure you want to assign Admin role to this user?')">
+                                                <i class="fas fa-user-shield"></i> Assign Admin Role
+                                            </button>
+                                        </form>
+                                    }
+                                    @if (ViewBag.CurrentRole != "Client")
+                                    {
+                                        <form asp-action="AssignRole" method="post" style="display: inline;">
+                                            <input type="hidden" name="id" value="@Model.Id" />
+                                            <input type="hidden" name="role" value="Client" />
+                                            <button type="submit" class="btn btn-warning btn-sm mb-2 w-100"
+                                                    onclick="return confirm('Are you sure you want to assign Client role to this user?')">
+                                                <i class="fas fa-user"></i> Assign Client Role
+                                            </button>
+                                        </form>
+                                    }
+                                    @if (ViewBag.CurrentRole != null)
+                                    {
+                                        <form asp-action="RemoveRole" method="post" style="display: inline;">
+                                            <input type="hidden" name="id" value="@Model.Id" />
+                                            <input type="hidden" name="role" value="@ViewBag.CurrentRole" />
+                                            <button type="submit" class="btn btn-danger btn-sm w-100"
+                                                    onclick="return confirm('Are you sure you want to remove the @ViewBag.CurrentRole role from this user?')">
+                                                <i class="fas fa-user-times"></i> Remove @ViewBag.CurrentRole Role
+                                            </button>
+                                        </form>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Account Actions -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Account Actions</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary btn-block mb-2">
+                                    <i class="fas fa-edit"></i> Edit User
+                                </a>
+                                <a asp-action="Index" class="btn btn-secondary btn-block">
+                                    <i class="fas fa-arrow-left"></i> Back to List
+                                </a>
+                            </div>
+                            <div class="col-md-6">
+                                <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger btn-block"
+                                   onclick="return confirm('Are you sure you want to delete this user? This action cannot be undone.')">
+                                    <i class="fas fa-trash"></i> Delete User
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        $(function () {
+            // Enable tooltips
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+    </script>
+}
+

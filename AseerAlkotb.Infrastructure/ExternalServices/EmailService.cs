@@ -20,11 +20,11 @@ namespace AseerAlkotb.Infrastructure.ExternalServices
         public EmailService(IConfiguration configuration)
         {
             var emailSettings = configuration.GetSection("EmailSettings");
-            _smtpServer = emailSettings["SmtpServer"];
-            _port = int.Parse(emailSettings["Port"]);
-            _email = emailSettings["Email"];
-            _appPassword = emailSettings["AppPassword"];
-            _isBodyHtml = bool.Parse(emailSettings["IsBodyHtml"]);
+                                _smtpServer = emailSettings["SmtpServer"];
+                                _port = int.Parse(emailSettings["Port"]);
+                                _email = emailSettings["Email"];
+                                _appPassword = emailSettings["AppPassword"];
+                                _isBodyHtml = bool.Parse(emailSettings["IsBodyHtml"]);
         }
 
         public async Task SendEmailAsync(string to, string subject, string body)

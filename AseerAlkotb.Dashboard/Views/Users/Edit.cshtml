@@ -1,0 +1,195 @@
+@model AseerAlkotb.Application.Features.Roles.Requests.UpdateAdminAccountRequest
+
+@{
+    ViewData["Title"] = "Edit User";
+}
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">Edit User</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a asp-action="Index">Users</a></li>
+                    <li class="breadcrumb-item active">Edit</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Edit User Information</h3>
+                        <div class="card-tools">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to List
+                            </a>
+                        </div>
+                    </div>
+                    <form asp-action="Edit" method="post" id="editUserForm" enctype="multipart/form-data">
+                        <div class="card-body">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <input type="hidden" asp-for="Id" />
+                            
+                            <!-- Personal Information -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="FirstName" class="control-label">First Name *</label>
+                                        <input asp-for="FirstName" class="form-control" placeholder="Enter first name" />
+                                        <span asp-validation-for="FirstName" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="LastName" class="control-label">Last Name *</label>
+                                        <input asp-for="LastName" class="form-control" placeholder="Enter last name" />
+                                        <span asp-validation-for="LastName" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="UserName" class="control-label">Username *</label>
+                                        <input asp-for="UserName" class="form-control" placeholder="Enter username" />
+                                        <span asp-validation-for="UserName" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="Email" class="control-label">Email *</label>
+                                        <input asp-for="Email" type="email" class="form-control" placeholder="Enter email address" />
+                                        <span asp-validation-for="Email" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="Gender" class="control-label">Gender *</label>
+                                        <select asp-for="Gender" class="form-control" asp-items="Html.GetEnumSelectList<AseerAlkotb.Domain.Enums.Gender>()">
+                                            <option value="">Select Gender</option>
+                                        </select>
+                                        <span asp-validation-for="Gender" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="PhoneNumber" class="control-label">Phone Number</label>
+                                        <input asp-for="PhoneNumber" class="form-control" placeholder="Enter phone number (optional)" />
+                                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label asp-for="Nationality" class="control-label">Nationality</label>
+                                        <input asp-for="Nationality" class="form-control" placeholder="Enter nationality (optional)" />
+                                        <span asp-validation-for="Nationality" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Profile Picture -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="control-label">Profile Picture</label>
+                                        <div class="custom-file">
+                                            <input name="profilePictureFile" type="file" class="custom-file-input" id="profilePicture" accept="image/*">
+                                            <label class="custom-file-label" for="profilePicture">Choose file</label>
+                                        </div>
+                                        <small class="form-text text-muted">
+                                            Supported formats: JPG, PNG, GIF, WEBP. Max size: 5MB.
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Current Profile Picture Preview -->
+                            @if (!string.IsNullOrEmpty(ViewBag.CurrentProfilePicture))
+                            {
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label class="control-label">Current Profile Picture</label>
+                                            <div class="text-center">
+                                                <img src="@ViewBag.CurrentProfilePicture" alt="Current Profile Picture" 
+                                                     class="img-fluid rounded" style="max-width: 200px; max-height: 200px;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Update User
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        $(function () {
+            // File input label
+            $('.custom-file-input').on('change', function() {
+                var fileName = $(this).val().split('\\').pop();
+                $(this).next('.custom-file-label').html(fileName);
+            });
+
+            // File size validation
+            $('#profilePicture').on('change', function() {
+                var file = this.files[0];
+                var maxSize = 5 * 1024 * 1024; // 5MB
+                
+                if (file && file.size > maxSize) {
+                    alert('File size must be less than 5MB');
+                    $(this).val('');
+                    $(this).next('.custom-file-label').html('Choose file');
+                    return false;
+                }
+            });
+
+            // Form validation
+            $('#editUserForm').submit(function(e) {
+                var fileInput = $('#profilePicture')[0];
+                if (fileInput.files.length > 0) {
+                    var file = fileInput.files[0];
+                    var maxSize = 5 * 1024 * 1024; // 5MB
+                    
+                    if (file.size > maxSize) {
+                        e.preventDefault();
+                        alert('File size must be less than 5MB');
+                        return false;
+                    }
+                }
+            });
+        });
+    </script>
+}
+
