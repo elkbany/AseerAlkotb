@@ -118,6 +118,9 @@ namespace AseerAlkotb.API
             builder.Services.AddScoped<IOrderServices, OrderServices>();
             builder.Services.AddScoped<IEmailService, EmailService>();
 
+            builder.Services.AddScoped<IChatService, ChatService>();
+            builder.Services.AddSingleton<IChatLogStore, API.DependencyInjection.InMemoryChatLogStore>();
+
             builder.Services.AddScoped<IAccountServices, AccountService>();
             builder.Services.AddScoped<IAdminServices, AdminServices>();
             builder.Services.AddControllers()
@@ -150,6 +153,7 @@ namespace AseerAlkotb.API
 
             #region HttpClient Registeration
             builder.Services.AddHttpClient<IPaymobService, PaymobService>();
+            builder.Services.AddHttpClient();
             #endregion
 
             #region Cors
