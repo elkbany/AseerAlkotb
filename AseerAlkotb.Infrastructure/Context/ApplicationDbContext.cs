@@ -1,4 +1,4 @@
-﻿using AseerAlkotb.Domain.Entites;
+﻿﻿using AseerAlkotb.Domain.Entites;
 using AseerAlkotb.Domain.Entites.Models;
 using AseerAlkotb.Domain.Enums;
 using AseerAlkotb.Infrastructure.Data;
@@ -36,12 +36,8 @@ namespace AseerAlkotb.Infrastructure.Context
             modelBuilder.Entity<Review>().ToTable(r => r.HasCheckConstraint("CK_Review_OneTarget",
                       "(BookId IS NOT NULL AND AuthorId IS NULL) OR (BookId IS NULL AND AuthorId IS NOT NULL)"));
 
-            
-            modelBuilder.Entity<Payment>()
-            .HasOne(p => p.Order)
-            .WithOne(o => o.Payment)
-            .HasForeignKey<Payment>(p => p.OrderId)
-            .OnDelete(DeleteBehavior.Restrict);
+            // Payment-Order relationship is configured in OrderConfiguration.cs
+            // No need to configure it here to avoid conflicts
 
             //modelBuilder.Entity<Cart>()
             //    .HasOne(c => c.User)
@@ -87,10 +83,7 @@ namespace AseerAlkotb.Infrastructure.Context
         public DbSet<Publisher> Publishers { get; set; }
         public DbSet<Review> Reviews { get; set; }
         public DbSet<Wishlist> Wishlists { get; set; }
-
         public DbSet<Quote> Quotes { get; set; }
-
-
         public DbSet<WishlistItem> WishlistItems { get; set; }
         public DbSet<UserFollow> UserFollows { get; set; }
         public DbSet<Payment> Payments { get; set; }

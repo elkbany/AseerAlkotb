@@ -8,20 +8,154 @@ namespace AseerAlkotb.Application.Features.Payments.Mapping
     {
         public void Register(TypeAdapterConfig config)
         {
-            // Payment to GetAllPaymentsPaginatedResponse
+            // Payment to GetAllPaymentsPaginatedResponse - Manual mapping
             config.NewConfig<Payment, GetAllPaymentsPaginatedResponse>()
-                .Map(dest => dest.CustomerName, src => $"{src.User.FirstName} {src.User.LastName}")
-                .Map(dest => dest.CustomerEmail, src => src.User.Email)
-                .Map(dest => dest.PaymentMethod, src => src.Method)
-                .Map(dest => dest.Status, src => src.Status);
+                .ConstructUsing(src => new GetAllPaymentsPaginatedResponse(
+                    src.Id,
+                    src.TransactionId ?? string.Empty,
+                    src.OrderId,
+                    GetCustomerName(src),
+                    GetCustomerEmail(src),
+                    src.Method,
+                    src.Status,
+                    src.Amount,
+                    src.Currency ?? "EGP",
+                    src.PaymentDate,
+                    src.PaymobOrderId
+                ));
 
-            // Payment to GetPaymentByIdResponse
+            // Payment to GetPaymentByIdResponse - Manual mapping
             config.NewConfig<Payment, GetPaymentByIdResponse>()
-                .Map(dest => dest.CustomerName, src => $"{src.User.FirstName} {src.User.LastName}")
-                .Map(dest => dest.CustomerEmail, src => src.User.Email)
-                .Map(dest => dest.CustomerPhone, src => src.User.PhoneNumber)
-                .Map(dest => dest.PaymentMethod, src => src.Method)
-                .Map(dest => dest.Status, src => src.Status);
+                .ConstructUsing(src => new GetPaymentByIdResponse(
+                    src.Id,
+                    src.TransactionId ?? string.Empty,
+                    src.OrderId,
+                    src.UserId,
+                    GetCustomerName(src),
+                    GetCustomerEmail(src),
+                    GetCustomerPhone(src),
+                    src.Method,
+                    src.Status,
+                    src.Amount,
+                    src.Currency ?? "EGP",
+                    src.PaymentDate,
+                    src.PaymobOrderId,
+                    null // AdminNotes - not currently used
+                ));
+        }
+
+        /// <summary>
+        /// Safely gets customer name with null checking
+        /// </summary>
+        private static string GetCustomerName(Payment payment)
+        {
+            if (payment?.User == null)
+                return "Unknown Customer";
+
+            var firstName = payment.User.FirstName?.Trim() ?? string.Empty;
+            var lastName = payment.User.LastName?.Trim() ?? string.Empty;
+
+            if (string.IsNullOrEmpty(firstName) && string.IsNullOrEmpty(lastName))
+                return "Unknown Customer";
+
+            return $"{firstName} {lastName}".Trim();
+        }
+
+        /// <summary>
+        /// Safely gets customer email with null checking
+        /// </summary>
+        private static string GetCustomerEmail(Payment payment)
+        {
+            return payment?.User?.Email?.Trim() ?? "N/A";
+        }
+
+        /// <summary>
+        /// Safely gets customer phone with null checking
+        /// </summary>
+        private static string GetCustomerPhone(Payment payment)
+        {
+            return payment?.User?.PhoneNumber?.Trim() ?? "N/A";
+        }
+    }
+
+    /// <summary>
+    /// Manual mapping extension methods for Payment entity
+    /// </summary>
+    public static class PaymentMappingExtensions
+    {
+        public static GetAllPaymentsPaginatedResponse ToGetAllPaymentsPaginatedResponse(this Payment payment)
+        {
+            return new GetAllPaymentsPaginatedResponse(
+                payment.Id,
+                payment.TransactionId ?? string.Empty,
+                payment.OrderId,
+                GetCustomerName(payment),
+                GetCustomerEmail(payment),
+                payment.Method,
+                payment.Status,
+                payment.Amount,
+                payment.Currency ?? "EGP",
+                payment.PaymentDate,
+                payment.PaymobOrderId
+            );
+        }
+
+        public static GetPaymentByIdResponse ToGetPaymentByIdResponse(this Payment payment)
+        {
+            return new GetPaymentByIdResponse(
+                payment.Id,
+                payment.TransactionId ?? string.Empty,
+                payment.OrderId,
+                payment.UserId,
+                GetCustomerName(payment),
+                GetCustomerEmail(payment),
+                GetCustomerPhone(payment),
+                payment.Method,
+                payment.Status,
+                payment.Amount,
+                payment.Currency ?? "EGP",
+                payment.PaymentDate,
+                payment.PaymobOrderId,
+                null // AdminNotes - not currently used
+            );
+        }
+
+        public static List<GetAllPaymentsPaginatedResponse> ToGetAllPaymentsPaginatedResponseList(this IEnumerable<Payment> payments)
+        {
+            return payments.Select(p => p.ToGetAllPaymentsPaginatedResponse()).ToList();
+        }
+
+        /// <summary>
+        /// Safely gets customer name with null checking
+        /// </summary>
+        private static string GetCustomerName(Payment payment)
+        {
+            if (payment?.User == null)
+                return "Unknown Customer";
+
+            var firstName = payment.User.FirstName?.Trim() ?? string.Empty;
+            var lastName = payment.User.LastName?.Trim() ?? string.Empty;
+
+            if (string.IsNullOrEmpty(firstName) && string.IsNullOrEmpty(lastName))
+                return "Unknown Customer";
+
+            return $"{firstName} {lastName}".Trim();
+        }
+
+        /// <summary>
+        /// Safely gets customer email with null checking
+        /// </summary>
+        private static string GetCustomerEmail(Payment payment)
+        {
+            return payment?.User?.Email?.Trim() ?? "N/A";
+        }
+
+        /// <summary>
+        /// Safely gets customer phone with null checking
+        /// </summary>
+        private static string GetCustomerPhone(Payment payment)
+        {
+            return payment?.User?.PhoneNumber?.Trim() ?? "N/A";
         }
     }
 }

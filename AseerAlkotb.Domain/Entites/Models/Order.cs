@@ -13,17 +13,22 @@ namespace AseerAlkotb.Domain.Entites.Models
         public decimal FinalAmount { get; set; }
         public PaymentMethod PaymentMethod { get; set; }
         public PaymentStatus PaymentStatus { get; set; }
-        public EgyptGovernorates Governorate { get; set; }
-        public EgyptCities City { get; set; }
         public OrderStatus Status { get; set; }
         public string TrackingNumber { get; set; } // What i Added Assuming a tracking number for the order
+        
+        // Billing and Shipping Information
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string PhoneNumber { get; set; }
+        public string StreetAddress { get; set; }
+        public EgyptCities City { get; set; }
+        public EgyptGovernorates Governorate { get; set; }
 
         #region Navigation Properties
 
         public int UserId { get; set; }
         public virtual User User { get; set; } // Assuming a User entity exists
         public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
-        public int? PayId { get; set; }
         public virtual Payment? Payment { get; set; } 
         #endregion
 

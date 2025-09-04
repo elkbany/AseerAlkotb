@@ -2,34 +2,27 @@ using AseerAlkotb.API.DependencyInjection;
 using AseerAlkotb.API.Extensions;
 using AseerAlkotb.API.Middlewares;
 using AseerAlkotb.Application.Contracts;
-using AseerAlkotb.Application.ResponseHandler;
 using AseerAlkotb.Application.Contracts.External;
+using AseerAlkotb.Application.ResponseHandler;
 using AseerAlkotb.Application.Services;
 using AseerAlkotb.Domain.Entites.Models;
 using AseerAlkotb.Domain.Interfaces.Base;
 using AseerAlkotb.Domain.Interfaces.Repositories;
-using AseerAlkotb.Localization.Resources;
-
 using AseerAlkotb.Infrastructure.Context;
+using AseerAlkotb.Infrastructure.Data;
 using AseerAlkotb.Infrastructure.ExternalServices;
 using AseerAlkotb.Infrastructure.Repositories.Base;
 using AseerAlkotb.Infrastructure.Repositories.Implementations;
+using AseerAlkotb.Localization.Resources;
 using Mapster;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Localization;
-
-using MapsterMapper;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-
-using System.Reflection;
-using AseerAlkotb.Infrastructure.Data;
 namespace AseerAlkotb.API
 {
     public class Program

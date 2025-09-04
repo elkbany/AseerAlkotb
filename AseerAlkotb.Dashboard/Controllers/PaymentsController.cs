@@ -2,10 +2,12 @@ using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Features.Payments.Requests;
 using AseerAlkotb.Application.Features.Payments.Responses;
 using AseerAlkotb.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AseerAlkotb.Dashboard.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class PaymentsController : Controller
     {
         private readonly IPaymentService _paymentService;
@@ -26,85 +28,154 @@ namespace AseerAlkotb.Dashboard.Controllers
             DateTime? toDate = null,
             bool dateAscending = false)
         {
-            // Always set enum values for dropdowns first (before any potential errors)
-            ViewBag.PaymentStatuses = Enum.GetValues<PaymentStatus>();
-            ViewBag.PaymentMethods = Enum.GetValues<PaymentMethod>();
-            
-            var request = new GetAllPaymentsPaginatedRequest(
-                paymentStatus,
-                paymentMethod,
-                fromDate,
-                toDate,
-                null, // Customer search
-                dateAscending,
-                pageNumber,
-                pageSize,
-                search);
-
-            var result = await _paymentService.GetAllPaymentsPaginatedAsync(request);
-
-            // Pass filter values to view
-            ViewBag.CurrentPage = pageNumber;
-            ViewBag.PageSize = pageSize;
-            ViewBag.SearchTerm = search;
-            ViewBag.SelectedPaymentStatus = paymentStatus;
-            ViewBag.SelectedPaymentMethod = paymentMethod;
-            ViewBag.FromDate = fromDate?.ToString("yyyy-MM-dd");
-            ViewBag.ToDate = toDate?.ToString("yyyy-MM-dd");
-            ViewBag.DateAscending = dateAscending;
-
-            if (!result.Succeeded || result.Data == null)
+            try
             {
-                TempData["Error"] = result.Message ?? "Failed to load payments";
+                // Always set enum values for dropdowns first (before any potential errors)
+                ViewBag.PaymentStatuses = Enum.GetValues<PaymentStatus>();
+                ViewBag.PaymentMethods = Enum.GetValues<PaymentMethod>();
+                
+                // Validate pagination parameters
+                pageNumber = Math.Max(1, pageNumber);
+                pageSize = Math.Max(1, Math.Min(100, pageSize)); // Limit to 100 items per page
+                search = search?.Trim() ?? "";
+                
+                // Validate date range
+                if (fromDate.HasValue && toDate.HasValue && fromDate > toDate)
+                {
+                    TempData["Warning"] = "From date cannot be later than To date";
+                    fromDate = null;
+                    toDate = null;
+                }
+                
+                var request = new GetAllPaymentsPaginatedRequest(
+                    paymentStatus,
+                    paymentMethod,
+                    fromDate,
+                    toDate,
+                    null, // Customer search
+                    dateAscending,
+                    pageNumber,
+                    pageSize,
+                    search);
+
+                var result = await _paymentService.GetAllPaymentsPaginatedAsync(request);
+
+                // Pass filter values to view
+                ViewBag.CurrentPage = pageNumber;
+                ViewBag.PageSize = pageSize;
+                ViewBag.SearchTerm = search;
+                ViewBag.SelectedPaymentStatus = paymentStatus;
+                ViewBag.SelectedPaymentMethod = paymentMethod;
+                ViewBag.FromDate = fromDate?.ToString("yyyy-MM-dd");
+                ViewBag.ToDate = toDate?.ToString("yyyy-MM-dd");
+                ViewBag.DateAscending = dateAscending;
+
+                if (!result.Succeeded || result.Data == null)
+                {
+                    TempData["Error"] = result.Message ?? "Failed to load payments";
+                    ViewBag.TotalPages = 0;
+                    ViewBag.TotalCount = 0;
+                    return View(new List<GetAllPaymentsPaginatedResponse>());
+                }
+
+                ViewBag.TotalPages = (int)Math.Ceiling((double)result.TotalCount / pageSize);
+                ViewBag.TotalCount = result.TotalCount;
+
+                return View(result.Data);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "An unexpected error occurred while loading payments";
+                
+                // Ensure ViewBag values are set even in error cases
+                ViewBag.PaymentStatuses = Enum.GetValues<PaymentStatus>();
+                ViewBag.PaymentMethods = Enum.GetValues<PaymentMethod>();
+                ViewBag.CurrentPage = pageNumber;
+                ViewBag.PageSize = pageSize;
                 ViewBag.TotalPages = 0;
                 ViewBag.TotalCount = 0;
+                ViewBag.SearchTerm = search;
+                ViewBag.SelectedPaymentStatus = paymentStatus;
+                ViewBag.SelectedPaymentMethod = paymentMethod;
+                ViewBag.FromDate = fromDate?.ToString("yyyy-MM-dd");
+                ViewBag.ToDate = toDate?.ToString("yyyy-MM-dd");
+                ViewBag.DateAscending = dateAscending;
+                
                 return View(new List<GetAllPaymentsPaginatedResponse>());
             }
-
-            ViewBag.TotalPages = (int)Math.Ceiling((double)result.TotalCount / pageSize);
-            ViewBag.TotalCount = result.TotalCount;
-
-            return View(result.Data);
         }
 
         // GET: Payments/Details/5
         public async Task<IActionResult> Details(int id)
         {
-            var result = await _paymentService.GetPaymentByIdAsync(id);
-
-            if (!result.Succeeded || result.Data == null)
+            try
             {
-                TempData["Error"] = result.Message ?? "Payment not found";
+                if (id <= 0)
+                {
+                    TempData["Error"] = "Invalid payment ID";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                var result = await _paymentService.GetPaymentByIdAsync(id);
+
+                if (!result.Succeeded || result.Data == null)
+                {
+                    TempData["Error"] = result.Message ?? "Payment not found";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                ViewBag.PaymentStatuses = Enum.GetValues<PaymentStatus>();
+                return View(result.Data);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "An unexpected error occurred while loading payment details";
                 return RedirectToAction(nameof(Index));
             }
-
-            ViewBag.PaymentStatuses = Enum.GetValues<PaymentStatus>();
-            return View(result.Data);
         }
 
         // POST: Payments/UpdateStatus
         [HttpPost]
         public async Task<IActionResult> UpdateStatus([FromBody] UpdatePaymentStatusRequest request)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return Json(new { success = false, message = "Invalid request data" });
-            }
-
-            var result = await _paymentService.UpdatePaymentStatusAsync(request);
-
-            if (result.Succeeded)
-            {
-                return Json(new
+                // Validate anti-forgery token for AJAX requests
+                var token = Request.Headers["RequestVerificationToken"].FirstOrDefault();
+                if (string.IsNullOrEmpty(token))
                 {
-                    success = true,
-                    message = "Payment status updated successfully",
-                    newStatus = request.NewStatus.ToString(),
-                    updatedAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm")
-                });
-            }
+                    return Json(new { success = false, message = "Invalid security token" });
+                }
 
-            return Json(new { success = false, message = result.Message ?? "Failed to update payment status" });
+                if (!ModelState.IsValid)
+                {
+                    return Json(new { success = false, message = "Invalid request data" });
+                }
+
+                if (request.PaymentId <= 0)
+                {
+                    return Json(new { success = false, message = "Invalid payment ID" });
+                }
+
+                var result = await _paymentService.UpdatePaymentStatusAsync(request);
+
+                if (result.Succeeded)
+                {
+                    return Json(new
+                    {
+                        success = true,
+                        message = "Payment status updated successfully",
+                        newStatus = request.NewStatus.ToString(),
+                        updatedAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm")
+                    });
+                }
+
+                return Json(new { success = false, message = result.Message ?? "Failed to update payment status" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "An unexpected error occurred while updating the payment status" });
+            }
         }
 
         // GET: Payments/GetStatusBadgeClass
@@ -134,7 +205,7 @@ namespace AseerAlkotb.Dashboard.Controllers
             {
                 PaymentMethod.CashOnDelivery => "fas fa-money-bill-wave",
                 PaymentMethod.Card => "fas fa-credit-card",
-                PaymentMethod.MobileWallet => "fas fa-mobile-alt",
+                PaymentMethod.Wallet => "fas fa-mobile-alt",
                 _ => "fas fa-question-circle"
             };
 
@@ -168,38 +239,74 @@ namespace AseerAlkotb.Dashboard.Controllers
             return RedirectToAction(nameof(Details), new { id });
         }
 
-        // POST: Payments/BulkUpdateStatus (Future implementation)
+        // POST: Payments/BulkUpdateStatus
         [HttpPost]
-        public async Task<IActionResult> BulkUpdateStatus([FromBody] List<int> paymentIds, PaymentStatus newStatus)
+        public async Task<IActionResult> BulkUpdateStatus([FromBody] BulkUpdateRequest request)
         {
             try
             {
+                // Validate anti-forgery token for AJAX requests
+                var token = Request.Headers["RequestVerificationToken"].FirstOrDefault();
+                if (string.IsNullOrEmpty(token))
+                {
+                    return Json(new { success = false, message = "Invalid security token" });
+                }
+
+                if (request.PaymentIds == null || !request.PaymentIds.Any())
+                {
+                    return Json(new { success = false, message = "No payments selected" });
+                }
+
+                if (request.PaymentIds.Count > 50)
+                {
+                    return Json(new { success = false, message = "Cannot update more than 50 payments at once" });
+                }
+
                 var successCount = 0;
                 var failCount = 0;
+                var errorMessages = new List<string>();
 
-                foreach (var paymentId in paymentIds)
+                foreach (var paymentId in request.PaymentIds)
                 {
-                    var request = new UpdatePaymentStatusRequest(paymentId, newStatus);
-                    var result = await _paymentService.UpdatePaymentStatusAsync(request);
+                    var updateRequest = new UpdatePaymentStatusRequest(paymentId, request.NewStatus);
+                    var result = await _paymentService.UpdatePaymentStatusAsync(updateRequest);
                     
                     if (result.Succeeded)
                         successCount++;
                     else
+                    {
                         failCount++;
+                        if (!string.IsNullOrEmpty(result.Message))
+                            errorMessages.Add($"Payment {paymentId}: {result.Message}");
+                    }
+                }
+
+                var message = $"Updated {successCount} payments successfully.";
+                if (failCount > 0)
+                {
+                    message += $" {failCount} failed.";
                 }
 
                 return Json(new
                 {
-                    success = true,
-                    message = $"Updated {successCount} payments successfully. {failCount} failed.",
+                    success = successCount > 0,
+                    message,
                     successCount,
-                    failCount
+                    failCount,
+                    errors = errorMessages
                 });
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = "Failed to update payments" });
+                return Json(new { success = false, message = "An unexpected error occurred during bulk update" });
             }
         }
+    }
+
+    // Helper class for bulk update request
+    public class BulkUpdateRequest
+    {
+        public List<int> PaymentIds { get; set; } = new();
+        public PaymentStatus NewStatus { get; set; }
     }
 }

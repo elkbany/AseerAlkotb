@@ -57,7 +57,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Payments</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">@ViewBag.TotalCount</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@(ViewBag.TotalCount ?? 0)</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-credit-card fa-2x text-gray-300"></i>
@@ -72,7 +72,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Paid</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.Count(p => p.Status == AseerAlkotb.Domain.Enums.PaymentStatus.Paid)</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@(Model?.Count(p => p.Status == AseerAlkotb.Domain.Enums.PaymentStatus.Paid) ?? 0)</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-check-circle fa-2x text-gray-300"></i>
@@ -87,7 +87,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Pending</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.Count(p => p.Status == AseerAlkotb.Domain.Enums.PaymentStatus.Pending)</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@(Model?.Count(p => p.Status == AseerAlkotb.Domain.Enums.PaymentStatus.Pending) ?? 0)</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-clock fa-2x text-gray-300"></i>
@@ -102,7 +102,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Failed</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.Count(p => p.Status == AseerAlkotb.Domain.Enums.PaymentStatus.Failed)</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@(Model?.Count(p => p.Status == AseerAlkotb.Domain.Enums.PaymentStatus.Failed) ?? 0)</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-times-circle fa-2x text-gray-300"></i>
@@ -117,7 +117,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1">COD</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.Count(p => p.PaymentMethod == AseerAlkotb.Domain.Enums.PaymentMethod.CashOnDelivery)</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@(Model?.Count(p => p.PaymentMethod == AseerAlkotb.Domain.Enums.PaymentMethod.CashOnDelivery) ?? 0)</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-money-bill-wave fa-2x text-gray-300"></i>
@@ -132,7 +132,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-dark text-uppercase mb-1">Online</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.Count(p => p.PaymentMethod != AseerAlkotb.Domain.Enums.PaymentMethod.CashOnDelivery)</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@(Model?.Count(p => p.PaymentMethod != AseerAlkotb.Domain.Enums.PaymentMethod.CashOnDelivery) ?? 0)</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-globe fa-2x text-gray-300"></i>
@@ -208,16 +208,22 @@
                                 <div class="row align-items-center">
                                     <div class="col-md-6">
                                         <span id="selectedCount">0</span> payments selected
+                                        <button class="btn btn-sm btn-outline-secondary ms-2" onclick="clearAllSelections()">
+                                            <i class="fas fa-times me-1"></i>Clear All
+                                        </button>
                                     </div>
                                     <div class="col-md-6 text-end">
                                         <select id="bulkStatusSelect" class="form-select d-inline-block w-auto me-2">
                                             <option value="">Select new status...</option>
-                                            @foreach (var status in ViewBag.PaymentStatuses as AseerAlkotb.Domain.Enums.PaymentStatus[])
+                                            @if (ViewBag.PaymentStatuses != null)
                                             {
-                                                <option value="@((int)status)">@status</option>
+                                                @foreach (var status in ViewBag.PaymentStatuses as AseerAlkotb.Domain.Enums.PaymentStatus[])
+                                                {
+                                                    <option value="@((int)status)">@status</option>
+                                                }
                                             }
                                         </select>
-                                        <button class="btn btn-primary" onclick="bulkUpdateStatus()">
+                                        <button class="btn btn-primary" onclick="bulkUpdateStatus()" id="bulkUpdateBtn">
                                             <i class="fas fa-save me-1"></i>Update Status
                                         </button>
                                         <button class="btn btn-secondary" onclick="toggleBulkMode()">
@@ -230,29 +236,35 @@
                     </div>
 
                     <!-- Pagination -->
-                    @if (ViewBag.TotalPages > 1)
+                    @if ((ViewBag.TotalPages ?? 0) > 1)
                     {
                         <nav aria-label="Payments pagination" class="mt-4">
                             <ul class="pagination justify-content-center">
-                                <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
-                                    <a class="page-link" href="@Url.Action("Index", new { pageNumber = ViewBag.CurrentPage - 1, pageSize = ViewBag.PageSize, search = ViewBag.SearchTerm, paymentStatus = ViewBag.SelectedPaymentStatus, paymentMethod = ViewBag.SelectedPaymentMethod, fromDate = ViewBag.FromDate, toDate = ViewBag.ToDate, dateAscending = ViewBag.DateAscending })">
+                                <li class="page-item @((ViewBag.CurrentPage ?? 1) == 1 ? "disabled" : "")">
+                                    <a class="page-link" href="@Url.Action("Index", new { pageNumber = (ViewBag.CurrentPage ?? 1) - 1, pageSize = ViewBag.PageSize, search = ViewBag.SearchTerm, paymentStatus = ViewBag.SelectedPaymentStatus, paymentMethod = ViewBag.SelectedPaymentMethod, fromDate = ViewBag.FromDate, toDate = ViewBag.ToDate, dateAscending = ViewBag.DateAscending })">
                                         <i class="fas fa-chevron-left"></i>
                                     </a>
                                 </li>
 
-                                @for (int i = Math.Max(1, ViewBag.CurrentPage - 2); i <= Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 2); i++)
+                                @for (int i = Math.Max(1, (ViewBag.CurrentPage ?? 1) - 2); i <= Math.Min((ViewBag.TotalPages ?? 1), (ViewBag.CurrentPage ?? 1) + 2); i++)
                                 {
-                                    <li class="page-item @(ViewBag.CurrentPage == i ? "active" : "")">
+                                    <li class="page-item @((ViewBag.CurrentPage ?? 1) == i ? "active" : "")">
                                         <a class="page-link" href="@Url.Action("Index", new { pageNumber = i, pageSize = ViewBag.PageSize, search = ViewBag.SearchTerm, paymentStatus = ViewBag.SelectedPaymentStatus, paymentMethod = ViewBag.SelectedPaymentMethod, fromDate = ViewBag.FromDate, toDate = ViewBag.ToDate, dateAscending = ViewBag.DateAscending })">@i</a>
                                     </li>
                                 }
 
-                                <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
-                                    <a class="page-link" href="@Url.Action("Index", new { pageNumber = ViewBag.CurrentPage + 1, pageSize = ViewBag.PageSize, search = ViewBag.SearchTerm, paymentStatus = ViewBag.SelectedPaymentStatus, paymentMethod = ViewBag.SelectedPaymentMethod, fromDate = ViewBag.FromDate, toDate = ViewBag.ToDate, dateAscending = ViewBag.DateAscending })">
+                                <li class="page-item @((ViewBag.CurrentPage ?? 1) == (ViewBag.TotalPages ?? 1) ? "disabled" : "")">
+                                    <a class="page-link" href="@Url.Action("Index", new { pageNumber = (ViewBag.CurrentPage ?? 1) + 1, pageSize = ViewBag.PageSize, search = ViewBag.SearchTerm, paymentStatus = ViewBag.SelectedPaymentStatus, paymentMethod = ViewBag.SelectedPaymentMethod, fromDate = ViewBag.FromDate, toDate = ViewBag.ToDate, dateAscending = ViewBag.DateAscending })">
                                         <i class="fas fa-chevron-right"></i>
                                     </a>
                                 </li>
                             </ul>
+                            <div class="text-center mt-2">
+                                <small class="text-muted">
+                                    Showing page @(ViewBag.CurrentPage ?? 1) of @(ViewBag.TotalPages ?? 1) 
+                                    (@(ViewBag.TotalCount ?? 0) total payments)
+                                </small>
+                            </div>
                         </nav>
                     }
                 </div>
@@ -310,5 +322,6 @@
 </div>
 
 @section Scripts {
+    @Html.AntiForgeryToken()
     <script src="~/js/payments.js"></script>
 }

@@ -1,8 +1,10 @@
-﻿﻿using AseerAlkotb.Application.Contracts;
+﻿﻿﻿﻿﻿using AseerAlkotb.Application.Contracts;
+using AseerAlkotb.Application.Features.Books.DTOs;
 using AseerAlkotb.Application.Features.Orders.Filters;
 using AseerAlkotb.Application.Features.Orders.Requests;
 using AseerAlkotb.Application.Features.Orders.Responses;
 using AseerAlkotb.Application.Features.Orders.Validators;
+using AseerAlkotb.Application.Features.Payments.Requests;
 using AseerAlkotb.Application.ResponseHandler;
 using AseerAlkotb.Domain.Entites.Models;
 using AseerAlkotb.Domain.Enums;
@@ -20,10 +22,12 @@ namespace AseerAlkotb.Application.Services
     public class OrderServices : AppService,IOrderServices
     {
         private readonly IUnitOfWork unitOfWork;
+        private readonly IPaymentService _paymentService;
 
-        public OrderServices(IUnitOfWork unitOfWork, IServiceProvider serviceProvider, IHostEnvironment environment) : base(serviceProvider, environment)
+        public OrderServices(IUnitOfWork unitOfWork, IServiceProvider serviceProvider, IHostEnvironment environment, IPaymentService paymentService) : base(serviceProvider, environment)
         {
             this.unitOfWork = unitOfWork;
+            _paymentService = paymentService;
         }
         #region Checkout Unorganised version
         //public async Task<ApiResponse<AddOrderResponse>> AddOrderAsync(AddOrderRequest request)
@@ -115,6 +119,7 @@ namespace AseerAlkotb.Application.Services
 
             // Return response
             var response = order.Adapt<AddOrderResponse>();
+            await _paymentService.InitializePaymentAsync(new InitializePaymentRequest();
             return Success(response);
         }
 
@@ -262,7 +267,10 @@ namespace AseerAlkotb.Application.Services
         public async Task<ApiResponsePaginated<List<GetAllOrdersPaginatedResponse>>> GetAllOrdersPaginatedByAdminAsync(GetAllOrdersPaginatedRequest request)
         {
             await DoValidationAsync<GetAllOrdersPaginatedRequestValidator, GetAllOrdersPaginatedRequest>(request);
-            var orders = await unitOfWork.Orders.GetAllAsync((request.PageNumber - 1) * request.PageSize, request.PageSize, default, o => o.OrderItems, o => o.User).Filter(request).ToListAsync();
+            var orders = await unitOfWork.Orders.GetAllAsync((request.PageNumber - 1) * request.PageSize, request.PageSize, default, o => o.OrderItems, o => o.User)
+                .Filter(request)
+                .OrderByDescending(o => o.OrderDate)
+                .ToListAsync();
             var totalCount = await unitOfWork.Orders.CountAsync();
 
             var ordsMap = orders.Adapt<List<GetAllOrdersPaginatedResponse>>();
@@ -273,7 +281,9 @@ namespace AseerAlkotb.Application.Services
         public async Task<ApiResponsePaginated<List<GetAllUserOrdersPaginatedResponse>>> GetAllUserOrdersPaginatedAsync(GetAllUserOrdersPaginatedRequest request)
         {
             await DoValidationAsync<GetAllUserOrdersPaginatedRequestValidator, GetAllUserOrdersPaginatedRequest>(request);
-            var orders = unitOfWork.Orders.GetAllAsyncByEx(o => o.UserId == request.UserId, (request.PageNumber - 1) * request.PageSize, request.PageSize, default, o => o.OrderItems);
+            var orders = await unitOfWork.Orders.GetAllAsyncByEx(o => o.UserId == request.UserId, (request.PageNumber - 1) * request.PageSize, request.PageSize, default, o => o.OrderItems)
+                .OrderByDescending(o => o.OrderDate)
+                .ToListAsync();
             var totalCount = await unitOfWork.Orders.CountAsync();
 
             var ordsMap = orders.Adapt<List<GetAllUserOrdersPaginatedResponse>>();
@@ -310,6 +320,7 @@ namespace AseerAlkotb.Application.Services
      order.DiscountAmount,
      order.FinalAmount,
      order.OrderDate,
+     order.UpdatedAt,
      order.OrderItems
          .Where(oi => oi.Book != null)
          .Select(oi => new BookDTO(
@@ -325,7 +336,7 @@ namespace AseerAlkotb.Application.Services
         public async Task<ApiResponse<GetUserOrderByTrackingNumberResponse>> GetOrderByTrackingNumberByUserAsync(GetUserOrderByTrackingNumberRequest request)
         {
             await DoValidationAsync<GetUserOrderByTrackingNumberRequestValidator, GetUserOrderByTrackingNumberRequest>(request);
-            var order = await unitOfWork.Orders.FirstOrDefaultAsync(o => o.TrackingNumber == request.TrackingNumber, default, o => o.OrderItems);
+            var order = await unitOfWork.Orders.FirstOrDefaultAsync(o => o.TrackingNumber == request.TrackingNumber, default, o => o.OrderItems, o => o.User);
             if (order == null)
             {
                 return NotFound<GetUserOrderByTrackingNumberResponse>("Order not found");

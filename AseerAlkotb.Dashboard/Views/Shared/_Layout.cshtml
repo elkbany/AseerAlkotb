@@ -236,10 +236,16 @@
                         <a href="/Admin/Settings" class="dropdown-item">
                             <i class="fas fa-cog mr-2 text-secondary"></i> Account Settings
                         </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="/Account/Logout" class="dropdown-item dropdown-footer text-danger">
-                            <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                        <a asp-controller="AuditLogs" asp-action="Index" class="dropdown-item">
+                            <i class="fas fa-clipboard-list mr-2 text-primary"></i> Audit Logs
                         </a>
+                        <div class="dropdown-divider"></div>
+                        <form asp-controller="Account" asp-action="Logout" method="post" class="dropdown-item dropdown-footer text-danger p-0 m-0">
+                            <button type="submit" class="btn btn-link text-danger w-100 text-start">
+                                <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                            </button>
+                            @Html.AntiForgeryToken()
+                        </form>
                     </div>
                 </li>
 
@@ -420,12 +426,6 @@
                                     </a>
                                 </li>
                             </ul>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/Reviews" class="nav-link">
-                                <i class="nav-icon fas fa-star"></i>
-                                <p>Reviews</p>
-                            </a>
                         </li>
                     </ul>
                 </nav>

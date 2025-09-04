@@ -45,8 +45,7 @@ namespace AseerAlkotb.API.Controllers
         {
             try
             {
-                _logger.LogInformation("Initializing payment for Order {OrderId} with method {PaymentMethod}", 
-                    request.OrderId, request.PaymentMethod);
+
 
                 var response = await _paymentService.InitializePaymentAsync(request);
                 
@@ -290,7 +289,7 @@ namespace AseerAlkotb.API.Controllers
                 {
                     new { id = (int)PaymentMethod.CashOnDelivery, name = "Cash on Delivery", code = "COD" },
                     new { id = (int)PaymentMethod.Card, name = "Credit/Debit Card", code = "Card" },
-                    new { id = (int)PaymentMethod.MobileWallet, name = "Mobile Wallet", code = "Wallet" }
+                    new { id = (int)PaymentMethod.Wallet, name = "Mobile Wallet", code = "Wallet" }
                 };
 
                 return Ok(Success(methods));

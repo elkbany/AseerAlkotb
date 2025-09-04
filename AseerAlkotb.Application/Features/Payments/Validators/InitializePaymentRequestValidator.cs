@@ -11,13 +11,7 @@ namespace AseerAlkotb.Application.Features.Payments.Validators
                 .GreaterThan(0)
                 .WithMessage("Order ID must be greater than 0");
 
-            RuleFor(x => x.UserId)
-                .GreaterThan(0)
-                .WithMessage("User ID must be greater than 0");
 
-            RuleFor(x => x.PaymentMethod)
-                .IsInEnum()
-                .WithMessage("Invalid payment method");
 
         }
     }

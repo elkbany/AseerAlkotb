@@ -1,5 +1,8 @@
+@using AseerAlkotb.Dashboard.Helpers
 @model AseerAlkotb.Application.Features.Payments.Responses.GetAllPaymentsPaginatedResponse
 
+@if (Model != null)
+{
 <tr data-payment-id="@Model.Id">
     <td class="bulk-checkbox" style="display: none;">
         <input type="checkbox" class="payment-checkbox" value="@Model.Id" onchange="updateSelectedCount()">
@@ -8,10 +11,13 @@
         <strong class="text-primary">#@Model.Id</strong>
     </td>
     <td>
-        <code class="bg-light p-1 rounded">@Model.TransactionId</code>
-        <button class="btn btn-sm btn-outline-secondary ms-1" onclick="copyToClipboard('@Model.TransactionId')" title="Copy Transaction ID">
-            <i class="fas fa-copy"></i>
-        </button>
+        <code class="bg-light p-1 rounded">@(Model.TransactionId ?? "N/A")</code>
+        @if (!string.IsNullOrEmpty(Model.TransactionId))
+        {
+            <button class="btn btn-sm btn-outline-secondary ms-1" onclick="copyToClipboard('@Model.TransactionId')" title="Copy Transaction ID">
+                <i class="fas fa-copy"></i>
+            </button>
+        }
     </td>
     <td>
         <div class="d-flex align-items-center">
@@ -27,25 +33,32 @@
             </div>
             <div>
                 <div class="font-weight-bold">@(Model.CustomerName ?? "Unknown")</div>
-                <small class="text-muted">@Model.CustomerEmail</small>
+                <small class="text-muted">@(Model.CustomerEmail ?? "N/A")</small>
             </div>
         </div>
     </td>
     <td>
-        <a href="@Url.Action("Details", "Orders", new { id = Model.OrderId })" class="text-decoration-none">
-            <strong>#@Model.OrderId</strong>
-            <i class="fas fa-external-link-alt ms-1 text-muted"></i>
-        </a>
+        @if (Model.OrderId > 0)
+        {
+            <a href="@Url.Action("Details", "Orders", new { id = Model.OrderId })" class="text-decoration-none">
+                <strong>#@Model.OrderId</strong>
+                <i class="fas fa-external-link-alt ms-1 text-muted"></i>
+            </a>
+        }
+        else
+        {
+            <span class="text-muted">N/A</span>
+        }
     </td>
     <td>
         <div class="d-flex align-items-center">
-            <i class="@GetPaymentMethodIcon(Model.PaymentMethod) me-2 text-muted"></i>
-            <span>@GetPaymentMethodDisplayName(Model.PaymentMethod)</span>
+            <i class="@ViewHelper.GetPaymentMethodIcon(Model.PaymentMethod) me-2 text-muted"></i>
+            <span>@ViewHelper.GetPaymentMethodDisplayName(Model.PaymentMethod)</span>
         </div>
     </td>
     <td>
-        <span class="badge @GetStatusBadgeClass(Model.Status) payment-status" data-status="@((int)Model.Status)">
-            <i class="@GetStatusIcon(Model.Status) me-1"></i>
+        <span class="badge @ViewHelper.GetPaymentStatusBadgeClass(Model.Status) payment-status" data-status="@((int)Model.Status)">
+            <i class="@ViewHelper.GetPaymentStatusIcon(Model.Status) me-1"></i>
             @Model.Status
         </span>
     </td>
@@ -55,7 +68,7 @@
                 @Model.Amount.ToString("C", new System.Globalization.CultureInfo("ar-EG"))
             </strong>
             <br>
-            <small class="text-muted">@Model.Currency</small>
+            <small class="text-muted">@(Model.Currency ?? "EGP")</small>
         </div>
     </td>
     <td>
@@ -73,7 +86,7 @@
             </a>
             <button type="button" 
                     class="btn btn-sm btn-outline-warning" 
-                    onclick="openStatusUpdateModal(@Model.Id, '@Model.TransactionId', '@Model.Status', '@Model.CustomerName')"
+                    onclick="openStatusUpdateModal(@Model.Id, '@(Model.TransactionId ?? "")', '@Model.Status', '@(Model.CustomerName ?? "Unknown")')"
                     title="Update Status">
                 <i class="fas fa-edit"></i>
             </button>
@@ -91,16 +104,19 @@
                             <i class="fas fa-print me-2"></i>Print Receipt
                         </a>
                     </li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li>
-                        <a class="dropdown-item text-info" href="#" onclick="copyToClipboard('@Model.TransactionId')">
-                            <i class="fas fa-copy me-2"></i>Copy Transaction ID
-                        </a>
-                    </li>
-                    @if (Model.PaymentMethod != AseerAlkotb.Domain.Enums.PaymentMethod.CashOnDelivery)
+                    @if (!string.IsNullOrEmpty(Model.TransactionId))
+                    {
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item text-info" href="#" onclick="copyToClipboard('@Model.TransactionId')">
+                                <i class="fas fa-copy me-2"></i>Copy Transaction ID
+                            </a>
+                        </li>
+                    }
+                    @if (Model.PaymentMethod != AseerAlkotb.Domain.Enums.PaymentMethod.CashOnDelivery && Model.PaymobOrderId.HasValue)
                     {
                         <li>
-                            <a class="dropdown-item text-primary" href="#" onclick="viewPaymobDetails(@Model.PaymobOrderId)">
+                            <a class="dropdown-item text-primary" href="#" onclick="viewPaymobDetails('@Model.PaymobOrderId.Value')">
                                 <i class="fas fa-external-link-alt me-2"></i>View in Paymob
                             </a>
                         </li>
@@ -119,57 +135,4 @@
         </div>
     </td>
 </tr>
-
-@functions {
-    public string GetStatusBadgeClass(AseerAlkotb.Domain.Enums.PaymentStatus status)
-    {
-        return status switch
-        {
-            AseerAlkotb.Domain.Enums.PaymentStatus.Pending => "bg-warning",
-            AseerAlkotb.Domain.Enums.PaymentStatus.Processing => "bg-info",
-            AseerAlkotb.Domain.Enums.PaymentStatus.Paid => "bg-success",
-            AseerAlkotb.Domain.Enums.PaymentStatus.Failed => "bg-danger",
-            AseerAlkotb.Domain.Enums.PaymentStatus.Cancelled => "bg-secondary",
-            AseerAlkotb.Domain.Enums.PaymentStatus.Refunded => "bg-dark",
-            AseerAlkotb.Domain.Enums.PaymentStatus.PartiallyRefunded => "bg-primary",
-            _ => "bg-secondary"
-        };
-    }
-
-    public string GetStatusIcon(AseerAlkotb.Domain.Enums.PaymentStatus status)
-    {
-        return status switch
-        {
-            AseerAlkotb.Domain.Enums.PaymentStatus.Pending => "fas fa-clock",
-            AseerAlkotb.Domain.Enums.PaymentStatus.Processing => "fas fa-spinner fa-spin",
-            AseerAlkotb.Domain.Enums.PaymentStatus.Paid => "fas fa-check-circle",
-            AseerAlkotb.Domain.Enums.PaymentStatus.Failed => "fas fa-times-circle",
-            AseerAlkotb.Domain.Enums.PaymentStatus.Cancelled => "fas fa-ban",
-            AseerAlkotb.Domain.Enums.PaymentStatus.Refunded => "fas fa-undo",
-            AseerAlkotb.Domain.Enums.PaymentStatus.PartiallyRefunded => "fas fa-undo-alt",
-            _ => "fas fa-question-circle"
-        };
-    }
-
-    public string GetPaymentMethodIcon(AseerAlkotb.Domain.Enums.PaymentMethod method)
-    {
-        return method switch
-        {
-            AseerAlkotb.Domain.Enums.PaymentMethod.CashOnDelivery => "fas fa-money-bill-wave",
-            AseerAlkotb.Domain.Enums.PaymentMethod.Card => "fas fa-credit-card",
-            AseerAlkotb.Domain.Enums.PaymentMethod.MobileWallet => "fas fa-mobile-alt",
-            _ => "fas fa-question-circle"
-        };
-    }
-
-    public string GetPaymentMethodDisplayName(AseerAlkotb.Domain.Enums.PaymentMethod method)
-    {
-        return method switch
-        {
-            AseerAlkotb.Domain.Enums.PaymentMethod.CashOnDelivery => "Cash on Delivery",
-            AseerAlkotb.Domain.Enums.PaymentMethod.Card => "Credit/Debit Card",
-            AseerAlkotb.Domain.Enums.PaymentMethod.MobileWallet => "Mobile Wallet",
-            _ => method.ToString()
-        };
-    }
 }

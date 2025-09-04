@@ -83,6 +83,7 @@ function openStatusUpdateModal(orderId, trackingNumber, currentStatus, customerN
 function updateOrderStatus() {
     const orderId = document.getElementById('orderId').value;
     const newStatus = document.getElementById('newStatus').value;
+    const statusChangeReason = document.getElementById('statusChangeReason')?.value || '';
     
     if (!orderId || !newStatus) {
         showAlert('Please select a new status', 'warning');
@@ -98,7 +99,8 @@ function updateOrderStatus() {
     // Prepare request data
     const requestData = {
         OrderId: parseInt(orderId),
-        NewStatus: parseInt(newStatus)
+        NewStatus: parseInt(newStatus),
+        Reason: statusChangeReason
     };
     
     // Make AJAX request

@@ -1,4 +1,5 @@
 ﻿using AseerAlkotb.Domain.Entites;
+using AseerAlkotb.Domain.Entites.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
@@ -32,6 +33,11 @@ namespace AseerAlkotb.Infrastructure.Configurations
             builder.Property(p => p.ProviderPayload)
                 .IsRequired()
                 .HasDefaultValue(string.Empty);
+
+            //builder.HasOne(p => p.Order)
+            //   .WithOne(o => o.Payment)
+            //   .HasForeignKey<Order>(o => o.PayId);
+
 
         }
     }

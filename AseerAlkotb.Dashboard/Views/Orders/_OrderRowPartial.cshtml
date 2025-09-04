@@ -1,6 +1,8 @@
 @using AseerAlkotb.Dashboard.Helpers
 @model AseerAlkotb.Application.Features.Orders.Responses.GetAllOrdersPaginatedResponse
 
+@if (Model != null)
+{
 <tr data-order-id="@Model.Id">
     <td>
         <strong class="text-primary">#@Model.Id</strong>
@@ -23,7 +25,13 @@
         </div>
     </td>
     <td>
-        <code class="bg-light p-1 rounded">@Model.TrackingNumber</code>
+        <code class="bg-light p-1 rounded">@(Model.TrackingNumber ?? "N/A")</code>
+        @if (!string.IsNullOrEmpty(Model.TrackingNumber))
+        {
+            <button class="btn btn-sm btn-outline-secondary ms-1" onclick="copyTrackingNumber('@Model.TrackingNumber')" title="Copy Tracking Number">
+                <i class="fas fa-copy"></i>
+            </button>
+        }
     </td>
     <td>
         <span class="badge @ViewHelper.GetStatusBadgeClass(Model.OrderStatus) order-status" data-status="@((int)Model.OrderStatus)">
@@ -34,7 +42,7 @@
     <td>
         <div class="d-flex align-items-center">
             <i class="@ViewHelper.GetPaymentMethodIcon(Model.PaymentMethod) me-2 text-muted"></i>
-            <span>@Model.PaymentMethod</span>
+            <span>@ViewHelper.GetPaymentMethodDisplayName(Model.PaymentMethod)</span>
         </div>
     </td>
     <td>
@@ -51,7 +59,7 @@
     <td>
         <div>
             <i class="fas fa-map-marker-alt text-muted me-1"></i>
-            <span class="small">@Model.City, @Model.Governorate.ToString().Replace("_", " ")</span>
+            <span class="small">@Model.City.ToString().Replace("_", " "), @Model.Governorate.ToString().Replace("_", " ")</span>
         </div>
     </td>
     <td>
@@ -63,7 +71,7 @@
             </a>
             <button type="button" 
                     class="btn btn-sm btn-outline-warning" 
-                    onclick="openStatusUpdateModal(@Model.Id, '@Model.TrackingNumber', '@Model.OrderStatus', '@Model.UserName')"
+                    onclick="openStatusUpdateModal(@Model.Id, '@(Model.TrackingNumber ?? "")', '@Model.OrderStatus', '@(Model.UserName ?? "Unknown")')"
                     title="Update Status">
                 <i class="fas fa-edit"></i>
             </button>
@@ -81,15 +89,19 @@
                             <i class="fas fa-print me-2"></i>Print Order
                         </a>
                     </li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li>
-                        <a class="dropdown-item text-info" href="#" onclick="copyTrackingNumber('@Model.TrackingNumber')">
-                            <i class="fas fa-copy me-2"></i>Copy Tracking Number
-                        </a>
-                    </li>
+                    @if (!string.IsNullOrEmpty(Model.TrackingNumber))
+                    {
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item text-info" href="#" onclick="copyTrackingNumber('@Model.TrackingNumber')">
+                                <i class="fas fa-copy me-2"></i>Copy Tracking Number
+                            </a>
+                        </li>
+                    }
                 </ul>
             </div>
         </div>
     </td>
 </tr>
+}
 

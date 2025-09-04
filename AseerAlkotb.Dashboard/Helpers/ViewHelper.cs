@@ -32,23 +32,25 @@ namespace AseerAlkotb.Dashboard.Helpers
 
         public static string GetPaymentMethodIcon(PaymentMethod method)
         {
-            return method switch
+            return ((int)method) switch
             {
-                PaymentMethod.CashOnDelivery => "fas fa-money-bill-wave",
-                PaymentMethod.Card => "fas fa-credit-card",
-                PaymentMethod.MobileWallet => "fas fa-mobile-alt",
+                1 => "fas fa-money-bill-wave", // CashOnDelivery
+                2 => "fas fa-credit-card", // Card
+                3 => "fas fa-mobile-alt", // Wallet
+                0 => "fas fa-question-circle", // Handle 0 value in database
                 _ => "fas fa-question-circle"
             };
         }
 
         public static string GetPaymentMethodDisplayName(PaymentMethod method)
         {
-            return method switch
+            return ((int)method) switch
             {
-                PaymentMethod.CashOnDelivery => "Cash on Delivery",
-                PaymentMethod.Card => "Credit/Debit Card",
-                PaymentMethod.MobileWallet => "Mobile Wallet",
-                _ => method.ToString()
+                1 => "Cash on Delivery", // CashOnDelivery
+                2 => "Credit/Debit Card", // Card
+                3 => "Mobile Wallet", // Wallet
+                0 => "Unknown Method", // Handle 0 value in database
+                _ => $"Method {(int)method}"
             };
         }
 
@@ -57,10 +59,28 @@ namespace AseerAlkotb.Dashboard.Helpers
             return status switch
             {
                 PaymentStatus.Pending => "bg-warning",
+                PaymentStatus.Processing => "bg-info",
                 PaymentStatus.Paid => "bg-success",
                 PaymentStatus.Failed => "bg-danger",
                 PaymentStatus.Cancelled => "bg-secondary",
+                PaymentStatus.Refunded => "bg-dark",
+                PaymentStatus.PartiallyRefunded => "bg-primary",
                 _ => "bg-secondary"
+            };
+        }
+        
+        public static string GetPaymentStatusIcon(PaymentStatus status)
+        {
+            return status switch
+            {
+                PaymentStatus.Pending => "fas fa-clock",
+                PaymentStatus.Processing => "fas fa-spinner fa-spin",
+                PaymentStatus.Paid => "fas fa-check-circle",
+                PaymentStatus.Failed => "fas fa-times-circle",
+                PaymentStatus.Cancelled => "fas fa-ban",
+                PaymentStatus.Refunded => "fas fa-undo",
+                PaymentStatus.PartiallyRefunded => "fas fa-undo-alt",
+                _ => "fas fa-question-circle"
             };
         }
     }

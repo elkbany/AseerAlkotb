@@ -1,10 +1,13 @@
 using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Features.Orders.Requests;
+using AseerAlkotb.Application.Features.Orders.Responses;
 using AseerAlkotb.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AseerAlkotb.Dashboard.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class OrdersController : Controller
     {
         private readonly IOrderServices _orderServices;
@@ -23,89 +26,152 @@ namespace AseerAlkotb.Dashboard.Controllers
             EgyptGovernorates? governorate = null,
             bool dateAscending = false)
         {
-            var request = new GetAllOrdersPaginatedRequest(
-                orderStatus, 
-                governorate, 
-                dateAscending, 
-                pageNumber, 
-                pageSize, 
-                search);
-
-            var result = await _orderServices.GetAllOrdersPaginatedByAdminAsync(request);
-
-            if (!result.Succeeded)
+            try
             {
-                TempData["Error"] = result.Message ?? "Failed to load orders";
-                return View(new List<object>());
+                // Validate pagination parameters
+                pageNumber = Math.Max(1, pageNumber);
+                pageSize = Math.Max(1, Math.Min(100, pageSize)); // Limit to 100 items per page
+                search = search?.Trim() ?? "";
+
+                var request = new GetAllOrdersPaginatedRequest(
+                    orderStatus, 
+                    governorate, 
+                    dateAscending, 
+                    pageNumber, 
+                    pageSize, 
+                    search);
+
+                var result = await _orderServices.GetAllOrdersPaginatedByAdminAsync(request);
+
+                // Set default values and handle null cases
+                ViewBag.CurrentPage = pageNumber;
+                ViewBag.PageSize = pageSize;
+                ViewBag.TotalPages = result.Succeeded ? (int)Math.Ceiling((double)result.TotalCount / pageSize) : 0;
+                ViewBag.TotalCount = result.Succeeded ? result.TotalCount : 0;
+                ViewBag.SearchTerm = search;
+                ViewBag.SelectedOrderStatus = orderStatus;
+                ViewBag.SelectedGovernorate = governorate;
+                ViewBag.DateAscending = dateAscending;
+                
+                // Pass enum values for dropdowns
+                ViewBag.OrderStatuses = Enum.GetValues<OrderStatus>();
+                ViewBag.Governorates = Enum.GetValues<EgyptGovernorates>();
+
+                if (!result.Succeeded)
+                {
+                    TempData["Error"] = result.Message ?? "Failed to load orders";
+                    return View(new List<GetAllOrdersPaginatedResponse>());
+                }
+
+                return View(result.Data ?? new List<GetAllOrdersPaginatedResponse>());
             }
-
-            // Pass filter values to view
-            ViewBag.CurrentPage = pageNumber;
-            ViewBag.PageSize = pageSize;
-            ViewBag.TotalPages = (int)Math.Ceiling((double)result.TotalCount / pageSize);
-            ViewBag.TotalCount = result.TotalCount;
-            ViewBag.SearchTerm = search;
-            ViewBag.SelectedOrderStatus = orderStatus;
-            ViewBag.SelectedGovernorate = governorate;
-            ViewBag.DateAscending = dateAscending;
-            
-            // Pass enum values for dropdowns
-            ViewBag.OrderStatuses = Enum.GetValues<OrderStatus>();
-            ViewBag.Governorates = Enum.GetValues<EgyptGovernorates>();
-
-            return View(result.Data);
+            catch (Exception ex)
+            {
+                TempData["Error"] = "An unexpected error occurred while loading orders";
+                ViewBag.CurrentPage = pageNumber;
+                ViewBag.PageSize = pageSize;
+                ViewBag.TotalPages = 0;
+                ViewBag.TotalCount = 0;
+                ViewBag.SearchTerm = search;
+                ViewBag.SelectedOrderStatus = orderStatus;
+                ViewBag.SelectedGovernorate = governorate;
+                ViewBag.DateAscending = dateAscending;
+                ViewBag.OrderStatuses = Enum.GetValues<OrderStatus>();
+                ViewBag.Governorates = Enum.GetValues<EgyptGovernorates>();
+                
+                return View(new List<GetAllOrdersPaginatedResponse>());
+            }
         }
 
         // GET: Orders/Details/5
         public async Task<IActionResult> Details(int id)
         {
-            // First get the order by ID to get tracking number
-            var orders = await _orderServices.GetAllOrdersPaginatedByAdminAsync(
-                new GetAllOrdersPaginatedRequest(null, null, true, 1, 1000, ""));
-            
-            var order = orders.Data?.FirstOrDefault(o => o.Id == id);
-            if (order == null)
+            try
             {
-                TempData["Error"] = "Order not found";
+                if (id <= 0)
+                {
+                    TempData["Error"] = "Invalid order ID";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                // First get the order by ID to get tracking number
+                var orders = await _orderServices.GetAllOrdersPaginatedByAdminAsync(
+                    new GetAllOrdersPaginatedRequest(null, null, true, 1, 1000, ""));
+                
+                if (!orders.Succeeded || orders.Data == null)
+                {
+                    TempData["Error"] = "Failed to retrieve orders";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                var order = orders.Data.FirstOrDefault(o => o.Id == id);
+                if (order == null)
+                {
+                    TempData["Error"] = "Order not found";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                if (string.IsNullOrEmpty(order.TrackingNumber))
+                {
+                    TempData["Error"] = "Order tracking number is missing";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                // Get detailed order information using tracking number
+                var request = new GetOrderByAdminByTrackingNumberRequest(order.TrackingNumber);
+                var result = await _orderServices.GetOrderByTrackingNumberByAdminAsync(request);
+
+                if (!result.Succeeded || result.Data == null)
+                {
+                    TempData["Error"] = result.Message ?? "Order details not found";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                ViewBag.OrderStatuses = Enum.GetValues<OrderStatus>();
+                return View(result.Data);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "An unexpected error occurred while loading order details";
                 return RedirectToAction(nameof(Index));
             }
-
-            // Get detailed order information using tracking number
-            var request = new GetOrderByAdminByTrackingNumberRequest(order.TrackingNumber);
-            var result = await _orderServices.GetOrderByTrackingNumberByAdminAsync(request);
-
-            if (!result.Succeeded || result.Data == null)
-            {
-                TempData["Error"] = result.Message ?? "Order not found";
-                return RedirectToAction(nameof(Index));
-            }
-
-            ViewBag.OrderStatuses = Enum.GetValues<OrderStatus>();
-            return View(result.Data);
         }
 
         // POST: Orders/UpdateStatus
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateStatus([FromBody] UpdateOrderStatusRequest request)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return Json(new { success = false, message = "Invalid request data" });
+                if (!ModelState.IsValid)
+                {
+                    return Json(new { success = false, message = "Invalid request data" });
+                }
+
+                if (request.OrderId <= 0)
+                {
+                    return Json(new { success = false, message = "Invalid order ID" });
+                }
+
+                var result = await _orderServices.UpdateOrderStatusAsync(request);
+
+                if (result.Succeeded && result.Data != null)
+                {
+                    return Json(new { 
+                        success = true, 
+                        message = "Order status updated successfully",
+                        newStatus = result.Data.Status.ToString(),
+                        updatedAt = result.Data.UpdatedAt.ToString("yyyy-MM-dd HH:mm")
+                    });
+                }
+
+                return Json(new { success = false, message = result.Message ?? "Failed to update order status" });
             }
-
-            var result = await _orderServices.UpdateOrderStatusAsync(request);
-
-            if (result.Succeeded)
+            catch (Exception ex)
             {
-                return Json(new { 
-                    success = true, 
-                    message = "Order status updated successfully",
-                    newStatus = result.Data.Status.ToString(),
-                    updatedAt = result.Data.UpdatedAt.ToString("yyyy-MM-dd HH:mm")
-                });
+                return Json(new { success = false, message = "An unexpected error occurred while updating the order status" });
             }
-
-            return Json(new { success = false, message = result.Message ?? "Failed to update order status" });
         }
 
         // GET: Orders/GetStatusBadgeClass

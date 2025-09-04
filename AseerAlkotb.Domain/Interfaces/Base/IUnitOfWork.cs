@@ -12,25 +12,12 @@ namespace AseerAlkotb.Domain.Interfaces.Base
         //public IEntityRepository EntityRepository {get;}
         public IAuthorRepository Authors { get; }
         public ICategoryRepository Categories { get; }
-
         public IBookRepository Books { get; }
-
-
         public ICartRepository Carts { get; }
-
-
         public IPublisherRepository Publishers { get;}
-
-
         public IReviewRepository Reviews { get; }
-        
-        IWishlistRepository Wishlists { get; }
-
-
+        public IWishlistRepository Wishlists { get; }
         public IQuoteRepository Quotes { get; }
-
-
-
         public IOrderRepository Orders { get; }
         public IPaymentRepository Payments { get; }
         public INotificationRepository Notifications { get; }

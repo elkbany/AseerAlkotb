@@ -55,21 +55,20 @@ namespace AseerAlkotb.Application.Services
             int specialReference = $"{Order.Id}{Order.UserId}{DateTime.UtcNow.Ticks}".GetHashCode() & 0x7FFFFFFF; // Ensure positive hash code
 
             // Create intention request Payload
-            var amountCents = (int)(Order.TotalAmount * 100); // Convert to cents
+            var amountCents = (int)(Order.FinalAmount * 100); // Convert to cents
 
             var billingData = new
             {
-
                 first_name = Order.User.FirstName ?? "Guest",
                 last_name = Order.User.LastName ?? "User",
                 email = Order.User.Email,
-                phone_number = "+2011282928979",
-                street = "N/A",
+                phone_number = Order.PhoneNumber ?? "+201128292897",
+                street = Order.StreetAddress ?? "N/A",
                 building = "N/A",
-                city = Order.Governorate,
+                city = Order.City,
                 country = "Egypt",
                 floor = "N/A",
-                state = "N/A"
+                state = Order.Governorate.ToString() ?? "N/A"
             };
 
             // Get Wallet Integration Id 
@@ -81,19 +80,27 @@ namespace AseerAlkotb.Application.Services
                 currency = "EGP",
                 payment_methods = new[] { IntegrationId },
                 billing_data = billingData,
-                items = new[]
+                // add order items = list of items in the order (forEach item: name, amount_cents, quantity)
+                items = Order.OrderItems.Select(item => new
                 {
-                    new {
-                        name = $"Order #{specialReference-145}",
-                        amount = amountCents,
-                        description = "Payment for Order: " + Order.Id,
-                        quantity = 1
-                    }
-                },
+                    name = item.BookId,
+                    amount = (int)(item.UnitPrice * 100),
+                    quantity = item.Quantity
+                }).ToArray(),
+
+                //items = new[]
+                //{
+                //    new {
+                //        name = $"Order #{specialReference-145}",
+                //        amount = amountCents,
+                //        description = "Payment for Order: " + Order.Id,
+                //        quantity = 1
+                //    }
+                //}
                 customer = new
                 {
-                    first_name = Order.User.FirstName ?? "Guest",
-                    last_name = Order.User.LastName ?? "User",
+                    first_name = Order.FirstName ?? "Guest",
+                    last_name = Order.LastName ?? "User",
                     email = Order.User.Email,
                     //phone_number = Order.User.PhoneNumber
                 },
@@ -129,7 +136,7 @@ namespace AseerAlkotb.Application.Services
             var payment = new Payment
                 {
                 Amount = Order.TotalAmount,
-                Method = request.PaymentMethod.ToLower() == "card" ? PaymentMethod.Card : PaymentMethod.MobileWallet,
+                Method = request.PaymentMethod.ToLower() == "card" ? PaymentMethod.Card : PaymentMethod.Wallet,
                 UserId = Order.UserId,
                 OrderId = Order.Id,
                 Status = PaymentStatus.Pending,

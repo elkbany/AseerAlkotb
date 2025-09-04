@@ -1,5 +1,6 @@
 using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Contracts.External;
+using AseerAlkotb.Application.Features.Payments.Mapping;
 using AseerAlkotb.Application.Features.Payments.Requests;
 using AseerAlkotb.Application.Features.Payments.Responses;
 using AseerAlkotb.Application.Features.Payments.Validators;
@@ -55,20 +56,20 @@ namespace AseerAlkotb.Application.Services
                 }
 
                 _logger.LogInformation("Initializing payment for Order {OrderId} with method {PaymentMethod}", 
-                    request.OrderId, request.PaymentMethod);
+                    request.OrderId, order.PaymentMethod);
 
-                // Handle different payment methods
-                switch (request.PaymentMethod)
+                // Handle different payment methods based on order's payment method
+                switch (order.PaymentMethod)
                 {
                     case PaymentMethod.CashOnDelivery:
                         return await ProcessCODPaymentAsync(request);
                     
                     case PaymentMethod.Card:
-                    case PaymentMethod.MobileWallet:
+                    case PaymentMethod.Wallet:
                         return await ProcessOnlinePaymentAsync(request, order);
                     
                     default:
-                        return BadRequest<InitializePaymentResponse>("Invalid payment method");
+                        return BadRequest<InitializePaymentResponse>("Invalid payment method in order");
                 }
             }
             catch (Exception ex)
@@ -88,11 +89,6 @@ namespace AseerAlkotb.Application.Services
                     return BadRequest<InitializePaymentResponse>("Order not found");
                 }
 
-                // Validate that user matches order's user
-                if (order.UserId != request.UserId)
-                {
-                    return BadRequest<InitializePaymentResponse>("User mismatch with order");
-                }
 
                 var transactionId = GenerateTransactionId(request.OrderId, request.UserId);
 
@@ -104,7 +100,7 @@ namespace AseerAlkotb.Application.Services
                     TransactionId = transactionId,
                     Amount = order.FinalAmount,
                     Currency = "EGP",
-                    Method = PaymentMethod.CashOnDelivery,
+                    Method = order.PaymentMethod, // Take payment method from the order
                     Status = PaymentStatus.Pending,
                     PaymentDate = DateTime.UtcNow,
                     ProviderPayload = "COD Payment - No external provider" // Set default for COD
@@ -112,7 +108,7 @@ namespace AseerAlkotb.Application.Services
 
                 await _unitOfWork.Payments.InsertAsync(payment);
                 order.PaymentStatus = PaymentStatus.Pending;
-                order.PaymentMethod = PaymentMethod.CashOnDelivery;
+                // Keep the order's existing payment method, don't override it
                 await _unitOfWork.CommitAsync();
 
                 _logger.LogInformation("COD payment created for Order {OrderId} with Transaction {TransactionId}", 
@@ -121,7 +117,7 @@ namespace AseerAlkotb.Application.Services
                 var response = new InitializePaymentResponse(
                     payment.Id,
                     transactionId,
-                    PaymentMethod.CashOnDelivery,
+                    order.PaymentMethod, // Use the payment method from the order
                     order.FinalAmount,
                     "EGP",
                     PaymentStatus.Pending,
@@ -147,7 +143,7 @@ namespace AseerAlkotb.Application.Services
                 var paymobRequest = new ProcessPaymentRequest
                 {
                     OrderId = request.OrderId,
-                    PaymentMethod = request.PaymentMethod.ToString().ToLower()
+                    PaymentMethod = order.PaymentMethod.ToString().ToLower()
                 };
 
                 var paymobResponse = await _paymobService.ProcessPaymentAsync(paymobRequest);
@@ -161,8 +157,8 @@ namespace AseerAlkotb.Application.Services
                     return BadRequest<InitializePaymentResponse>("Failed to create payment record");
                 }
 
-                // Update payment with new enum values
-                payment.Method = request.PaymentMethod;
+                // Update payment with payment method from order
+                payment.Method = order.PaymentMethod;
                 payment.Status = PaymentStatus.Processing;
                 _unitOfWork.Payments.Update(payment);
                 await _unitOfWork.CommitAsync();
@@ -172,7 +168,7 @@ namespace AseerAlkotb.Application.Services
                 var response = new InitializePaymentResponse(
                     payment.Id,
                     payment.TransactionId,
-                    request.PaymentMethod,
+                    order.PaymentMethod, // Use payment method from order
                     order.FinalAmount,
                     "EGP",
                     PaymentStatus.Processing,
@@ -210,7 +206,18 @@ namespace AseerAlkotb.Application.Services
                     // return BadRequest<string>("Invalid callback signature");
                 }
 
-                var isSuccess = bool.Parse(request.Success);
+                // Fix: Handle empty or null Success value with safe parsing
+                if (string.IsNullOrEmpty(request.Success))
+                {
+                    _logger.LogError("Success parameter is null or empty in callback");
+                    return BadRequest<string>("Invalid callback: Success parameter is missing");
+                }
+
+                if (!bool.TryParse(request.Success, out var isSuccess))
+                {
+                    _logger.LogError("Invalid Success parameter value: {Success}", request.Success);
+                    return BadRequest<string>("Invalid callback: Success parameter format is invalid");
+                }
                 
                 if (isSuccess)
                 {
@@ -242,7 +249,12 @@ namespace AseerAlkotb.Application.Services
                 if (notification.TryGetValue("merchant_order_id", out var merchantOrderId) &&
                     notification.TryGetValue("success", out var success))
                 {
-                    var isSuccess = bool.Parse(success);
+                    if (!bool.TryParse(success, out var isSuccess))
+                    {
+                        _logger.LogError("Invalid success parameter in notification: {Success}", success);
+                        return BadRequest<string>("Invalid notification: Success parameter format is invalid");
+                    }
+                    
                     var status = isSuccess ? PaymentStatus.Paid : PaymentStatus.Failed;
                     
                     await UpdatePaymentStatusFromCallback(merchantOrderId, status);
@@ -333,7 +345,7 @@ namespace AseerAlkotb.Application.Services
                     .Take(request.PageSize)
                     .ToListAsync();
 
-                var mappedPayments = payments.Adapt<List<GetAllPaymentsPaginatedResponse>>();
+                var mappedPayments = payments.ToGetAllPaymentsPaginatedResponseList();
                 
                 return Success(mappedPayments, totalCount, request.PageNumber, request.PageSize);
             }
@@ -362,7 +374,7 @@ namespace AseerAlkotb.Application.Services
                     return NotFound<GetPaymentByIdResponse>("Payment not found");
                 }
 
-                var response = payment.Adapt<GetPaymentByIdResponse>();
+                var response = payment.ToGetPaymentByIdResponse();
                 return Success(response);
             }
             catch (Exception ex)
@@ -436,9 +448,11 @@ namespace AseerAlkotb.Application.Services
                 var payments = await _unitOfWork.Payments.GetAllAsyncByEx(
                     p => p.OrderId == orderId,
                     0, 100, default,
-                    p => p.User, p => p.Order).ToListAsync();
+                    p => p.User, p => p.Order)
+                    .OrderByDescending(p => p.PaymentDate)
+                    .ToListAsync();
 
-                var response = payments.Adapt<List<GetAllPaymentsPaginatedResponse>>();
+                var response = payments.ToGetAllPaymentsPaginatedResponseList();
                 return Success(response);
             }
             catch (Exception ex)
@@ -455,9 +469,11 @@ namespace AseerAlkotb.Application.Services
                 var payments = await _unitOfWork.Payments.GetAllAsyncByEx(
                     p => p.UserId == userId,
                     0, 100, default,
-                    p => p.User, p => p.Order).ToListAsync();
+                    p => p.User, p => p.Order)
+                    .OrderByDescending(p => p.PaymentDate)
+                    .ToListAsync();
 
-                var response = payments.Adapt<List<GetAllPaymentsPaginatedResponse>>();
+                var response = payments.ToGetAllPaymentsPaginatedResponseList();
                 return Success(response);
             }
             catch (Exception ex)

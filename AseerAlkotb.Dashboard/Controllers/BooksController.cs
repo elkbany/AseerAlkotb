@@ -9,10 +9,12 @@ using AseerAlkotb.Application.Features.Reviews.Requests;
 using AseerAlkotb.Application.Services;
 using AseerAlkotb.Domain.Entites.Models;
 using Azure;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AseerAlkotb.Dashboard.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class BooksController : Controller
     {
         private readonly IBookServices _bookServices;
