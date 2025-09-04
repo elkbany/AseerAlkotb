@@ -3,6 +3,7 @@ using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Features.Authors.Requests;
 using AseerAlkotb.Application.Features.Publishers.Requests;
 using AseerAlkotb.Application.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -55,6 +56,7 @@ namespace AseerAlkotb.API.Controllers
 
         /////////////////////////////////follow///////////////////////////////////////////////////////
         [HttpPost("FollowPublisher")]
+        [Authorize(Roles = "Client")]
         public async Task<IActionResult> FollowPublisher(FollowPublisherRequest request)
         {
             var result = await _publisherServices.FollowPublisher(request);
@@ -62,6 +64,7 @@ namespace AseerAlkotb.API.Controllers
         }
 
         [HttpDelete("UnFollowPublisher")]
+        [Authorize(Roles = "Client")]
         public async Task<IActionResult> UnFollowPublisher(UnFollowPublisherRequest request)
         {
             var result = await _publisherServices.UnFollowPublisher(request);
@@ -76,6 +79,7 @@ namespace AseerAlkotb.API.Controllers
         }
 
         [HttpGet("GetFollowedPublisher")]
+        [Authorize(Roles = "Client")]
         public async Task<IActionResult> GetFollowedPublisher([FromQuery] GetFollowedPublisherRequest request)
         {
             var result = await _publisherServices.GetFollowedPublisher(request);

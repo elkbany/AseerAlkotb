@@ -64,6 +64,10 @@ namespace AseerAlkotb.Dashboard
 
             #region HttpClient Registeration
             builder.Services.AddHttpClient<IPaymobService, PaymobService>();
+            builder.Services.AddScoped<IAccountServices, AccountService>();
+            builder.Services.AddScoped<IAdminServices, AdminServices>();
+            builder.Services.AddScoped<IEmailService, EmailService>();
+            // Add other services needed by the dashboard controllers
             #endregion
 
             // Configure Mapster for object mapping
