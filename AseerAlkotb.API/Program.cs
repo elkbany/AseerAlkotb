@@ -21,23 +21,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Localization;
-
-using MapsterMapper;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.FileProviders;
-
-using System.Reflection;
-using AseerAlkotb.Infrastructure.Data;
-using Microsoft.OpenApi.Models;
-
-using System.Reflection;
-using AseerAlkotb.Infrastructure.Data;
-using System.Reflection;
-using AseerAlkotb.Infrastructure.Data;
-using System.Reflection;
-using AseerAlkotb.Infrastructure.Data;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 namespace AseerAlkotb.API
 {
     public class Program

@@ -26,8 +26,7 @@ namespace AseerAlkotb.Application.Services
         private readonly IUnitOfWork unitOfWork;
         private readonly IPaymentService _paymentService;
 
-        public OrderServices(IHttpContextAccessor httpContextAccessor, UserManager<User> userManager, IUnitOfWork unitOfWork, IServiceProvider serviceProvider, IHostEnvironment environment) : base(serviceProvider, environment)
-        public OrderServices(IUnitOfWork unitOfWork, IServiceProvider serviceProvider, IHostEnvironment environment, IPaymentService paymentService) : base(serviceProvider, environment)
+        public OrderServices(IHttpContextAccessor httpContextAccessor, UserManager<User> userManager, IUnitOfWork unitOfWork, IServiceProvider serviceProvider, IHostEnvironment environment, IPaymentService paymentService) : base(serviceProvider, environment)
         {
             this.httpContextAccessor = httpContextAccessor;
             this.userManager = userManager;
@@ -77,7 +76,7 @@ namespace AseerAlkotb.Application.Services
 
             // Return response
             var response = order.Adapt<AddOrderResponse>();
-            await _paymentService.InitializePaymentAsync(new InitializePaymentRequest();
+            //await _paymentService.InitializePaymentAsync(new InitializePaymentRequest();
             return Success(response);
         }
 
