@@ -65,5 +65,12 @@ namespace AseerAlkotb.API.Controllers
             var result = await wishlistServices.IsBookInWishlistAsync(request);
             return ApiResult(result);
         }
+        [HttpGet("GetAll")]
+        [Authorize(Roles ="Client")]
+        public async Task<IActionResult> GetWishlistItems([FromQuery]GetWishlistItemsRequest request)
+        {
+            var result =await wishlistServices.GetwishlistItemsAsync(request);
+            return ApiResult(result);
+        }
     }
 }

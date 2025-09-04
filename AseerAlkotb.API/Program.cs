@@ -142,6 +142,7 @@ namespace AseerAlkotb.API
             builder.Services.AddScoped<IEmailService, EmailService>();
             builder.Services.AddScoped<IAccountServices, AccountService>();
             builder.Services.AddScoped<IAdminServices, AdminServices>();
+            builder.Services.AddScoped<IWishlistServices, WishlistServices>();
 
             builder.Services.AddControllers()
                 .AddJsonOptions(options =>

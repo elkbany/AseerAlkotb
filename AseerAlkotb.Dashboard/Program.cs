@@ -60,6 +60,7 @@ namespace AseerAlkotb.Dashboard
             builder.Services.AddScoped<IReviewServices, ReviewServices>();
             builder.Services.AddScoped<IAccountServices, AccountService>();
             builder.Services.AddScoped<IAdminServices, AdminServices>();
+            builder.Services.AddScoped<IEmailService, EmailService>();
             // Add other services needed by the dashboard controllers
             #endregion
 

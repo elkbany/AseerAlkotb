@@ -208,6 +208,39 @@ namespace AseerAlkotb.Application.Services
             var response = new GetWishlistItemCountResponse(count);
             return Success(response);
         }
+        public async Task<ApiResponsePaginated<List<GetWishlistItemsResponse>>> GetwishlistItemsAsync(GetWishlistItemsRequest request)
+        {
+            // Get current user from HttpContext
+            var httpContext = httpContextAccessor.HttpContext;
+            if (httpContext?.User?.Identity?.IsAuthenticated != true)
+            {
+                return (ApiResponsePaginated<List<GetWishlistItemsResponse>>)UnAuthorized<List<GetWishlistItemsResponse>>();
+            }
+            var currentUser = await userManager.GetUserAsync(httpContext.User);
+            if (currentUser == null)
+            {
+                return (ApiResponsePaginated<List<GetWishlistItemsResponse>>)UnAuthorized<List<GetWishlistItemsResponse>>();
+            }
+            // Check if user has "Client" role
+            var isInClientRole = await userManager.IsInRoleAsync(currentUser, "Client");
+            if (!isInClientRole)
+            {
+                return (ApiResponsePaginated<List<GetWishlistItemsResponse>>)UnAuthorized<List<GetWishlistItemsResponse>>();
+            }
+            // Use current user's ID instead of request.UserId for security
+            var wishlistItems =  unitOfWork.Wishlists.GetAllAsync((request.PageNumber - 1) * request.PageSize, request.PageSize, default,wi=>wi.WishlistItems).FirstOrDefault(wi => wi.UserId == currentUser.Id);
+            var responseItems = wishlistItems.WishlistItems.Select(w => new GetWishlistItemsResponse(
+                w.Book.Title,
+                w.BookId,
+                w.Book.Author?.Name ?? string.Empty,
+                w.Book.AuthorId,
+                w.Book.CoverImageUrl,
+                w.Book.Price,
+                w.Book.DiscountedPrice
+            )).ToList();
+
+            return Success(responseItems, responseItems.Count,request.PageNumber,request.PageSize);
+        }
 
         public async Task<ApiResponse<IsBookInWishlistResponse>> IsBookInWishlistAsync(IsBookInWishlistRequest request)
         {
