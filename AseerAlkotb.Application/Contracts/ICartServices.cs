@@ -25,6 +25,6 @@ namespace AseerAlkotb.Application.Contracts
 
         Task<ApiResponse<UpdateItemQuantityResponse>> UpdateCartItemQuantity(UpdateItemQuantityRequest request);
 
-        Task<ApiResponse<ClearCartResponse>> ClearCart(ClearCartRequest request);
+        Task<ApiResponse<ClearCartResponse>> ClearCart();
     }
 }

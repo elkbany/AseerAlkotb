@@ -12,10 +12,7 @@ namespace AseerAlkotb.Application.Features.CartItems.Validation
     {
         public UpdateItemQuantityValidation() 
         {
-            RuleFor(x => x.UserId)
-                .NotEmpty()
-                .GreaterThan(0)
-                .WithMessage("user ID must be greater than 0");
+           
 
             RuleFor(x => x.BookId)
                 .NotEmpty()

@@ -56,9 +56,10 @@ namespace AseerAlkotb.API.Controllers
         }
 
         [HttpDelete("ClearCart")]
-        public async Task<IActionResult> ClearUserCart(ClearCartRequest request)
+        [Authorize(Roles = "Client")]
+        public async Task<IActionResult> ClearUserCart()
         {
-            var result = await _CartServices.ClearCart(request);
+            var result = await _CartServices.ClearCart();
             return Ok(result);
             //return ApiResult(result);
         }

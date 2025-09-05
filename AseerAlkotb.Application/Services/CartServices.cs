@@ -231,10 +231,29 @@ namespace AseerAlkotb.Application.Services
 
         }
 
-        public async Task<ApiResponse<ClearCartResponse>> ClearCart(ClearCartRequest request)
+        public async Task<ApiResponse<ClearCartResponse>> ClearCart()
         {
-            await DoValidationAsync<ClearCartRequestValidation, ClearCartRequest>(request);
-            var cart = await unitOfWork.Carts.GetUserCartAsync(request.UserId);
+
+            // Get current user from HttpContext
+            var httpContext = httpContextAccessor.HttpContext;
+            if (httpContext?.User?.Identity?.IsAuthenticated != true)
+            {
+                return UnAuthorized<ClearCartResponse>();
+            }
+
+            var currentUser = await userManager.GetUserAsync(httpContext.User);
+            if (currentUser == null)
+            {
+                return UnAuthorized<ClearCartResponse>();
+            }
+
+            // Check if user has "Client" role
+            var isInClientRole = await userManager.IsInRoleAsync(currentUser, "Client");
+            if (!isInClientRole)
+            {
+                return UnAuthorized<ClearCartResponse>();
+            }
+            var cart = await unitOfWork.Carts.GetUserCartAsync(currentUser.Id);
             foreach (var item in cart.CartItems.ToList())
             {
                 await unitOfWork.Carts.RemoveCartItemAsync(item);
