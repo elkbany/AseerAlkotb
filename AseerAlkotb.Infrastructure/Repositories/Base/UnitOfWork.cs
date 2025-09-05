@@ -1,10 +1,10 @@
-﻿using AseerAlkotb.Domain.Interfaces.Base;
+﻿﻿﻿using AseerAlkotb.Domain.Interfaces.Base;
 using AseerAlkotb.Domain.Interfaces.Repositories;
 using AseerAlkotb.Infrastructure.Context;
 using AseerAlkotb.Infrastructure.Repositories.Implementations;
-
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,6 +54,16 @@ namespace AseerAlkotb.Infrastructure.Repositories.Base
         }
 
         public async Task<int> CommitAsync()
+        {
+            return await dbContext.SaveChangesAsync();
+        }
+
+        public async Task<IDbContextTransaction> BeginTransactionAsync()
+        {
+            return await dbContext.Database.BeginTransactionAsync();
+        }
+
+        public async Task<int> SaveChangesAsync()
         {
             return await dbContext.SaveChangesAsync();
         }

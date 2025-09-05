@@ -64,9 +64,14 @@ namespace AseerAlkotb.Dashboard
 
             #region HttpClient Registeration
             builder.Services.AddHttpClient<IPaymobService, PaymobService>();
+            #endregion
             builder.Services.AddScoped<IAccountServices, AccountService>();
             builder.Services.AddScoped<IAdminServices, AdminServices>();
             builder.Services.AddScoped<IEmailService, EmailService>();
+            
+            // New services for improved Order and Payment flow
+            builder.Services.AddScoped<IOrderPaymentSyncService, OrderPaymentSyncService>();
+            builder.Services.AddScoped<IPaymentRetryService, PaymentRetryService>();
             // Add other services needed by the dashboard controllers
             #endregion
 
@@ -89,7 +94,6 @@ namespace AseerAlkotb.Dashboard
             // Register services for external dependencies, only if needed by the dashboard
             // For example, if you need email sending in your dashboard controllers
             builder.Services.AddScoped<IEmailService, EmailService>();
-            #endregion
 
             var app = builder.Build();
 

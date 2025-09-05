@@ -1,4 +1,5 @@
-﻿using AseerAlkotb.Domain.Interfaces.Repositories;
+﻿﻿using AseerAlkotb.Domain.Interfaces.Repositories;
+using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,10 @@ namespace AseerAlkotb.Domain.Interfaces.Base
         public IPaymentRepository Payments { get; }
         public INotificationRepository Notifications { get; }
         public IAccountRepository Account { get;}
-        public Task<int> CommitAsync();
+        
+        // Transaction support
+        Task<IDbContextTransaction> BeginTransactionAsync();
+        Task<int> SaveChangesAsync();
+        Task<int> CommitAsync();
     }
 }
