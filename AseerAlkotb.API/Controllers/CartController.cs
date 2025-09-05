@@ -19,7 +19,7 @@ namespace AseerAlkotb.API.Controllers
             _CartServices = cartServices;
         }
 
-        [HttpPost]
+        [HttpPost("Add")]
         [Authorize(Roles = "Client")]
         public async Task<IActionResult> AddItemToCart(AddItemToCartRequest request)
         {

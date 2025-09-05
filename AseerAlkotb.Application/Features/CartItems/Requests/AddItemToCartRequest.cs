@@ -6,6 +6,6 @@ using System.Threading.Tasks;
 
 namespace AseerAlkotb.Application.Features.CartItems.Requests
 {
-    public record AddItemToCartRequest(int UserId,int BookId);
+    public record AddItemToCartRequest(int BookId);
     
 }
