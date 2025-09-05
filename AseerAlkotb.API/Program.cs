@@ -22,6 +22,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Localization;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Text;
 namespace AseerAlkotb.API
 {
@@ -137,6 +138,7 @@ namespace AseerAlkotb.API
             builder.Services.AddScoped<IAccountServices, AccountService>();
             builder.Services.AddScoped<IAdminServices, AdminServices>();
             builder.Services.AddScoped<IWishlistServices, WishlistServices>();
+            builder.Services.AddScoped<ICategoryServices, CategoryServices>();
 
             builder.Services.AddControllers()
                 .AddJsonOptions(options =>
@@ -181,7 +183,37 @@ namespace AseerAlkotb.API
 
             #region Swagger
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("v1", new() { Title = "AseerAlktob", Version = "v1" });
+
+                // Add JWT Bearer definition
+                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = "Enter 'Bearer' [space] and then your valid token.\n\nExample: Bearer abc123xyz"
+                });
+
+                // Make sure Swagger requires this scheme
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        new string[] { }
+                    }
+                });
+            });
             #endregion
 
             var app = builder.Build();
