@@ -150,7 +150,6 @@ namespace AseerAlkotb.Dashboard.Controllers
                     ViewBag.UserRole = "Admin";
                     var updateRequest = new UpdateAdminAccountRequest
                     {
-                        Id = admin.Id,
                         FirstName = admin.FirstName,
                         LastName = admin.LastName,
                         UserName = admin.UserName,
@@ -171,7 +170,6 @@ namespace AseerAlkotb.Dashboard.Controllers
                     ViewBag.UserRole = "Client";
                     var updateRequest = new UpdateAdminAccountRequest
                     {
-                        Id = client.Id,
                         FirstName = client.FirstName,
                         LastName = client.LastName,
                         UserName = client.UserName,

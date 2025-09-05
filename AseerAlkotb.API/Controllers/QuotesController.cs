@@ -45,8 +45,8 @@ namespace AseerAlkotb.API.Controllers
             return ApiResult(response);
         }
 
-        [HttpDelete("DeleteQuote")]
-        public async Task<IActionResult> DeleteQuote(DeleteQuoteRequest request)
+        [HttpDelete("DeleteQuote/{id}")]
+        public async Task<IActionResult> DeleteQuote([FromRoute] DeleteQuoteRequest request)
         {
             var response = await quoteService.DeleteQuoteAsync(request);
             return ApiResult(response);

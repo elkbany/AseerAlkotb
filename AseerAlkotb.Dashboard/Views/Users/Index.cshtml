@@ -22,14 +22,47 @@
     <div class="container-fluid">
         <!-- Statistics Cards -->
         <div class="row">
-            <div class="col-lg-4 col-12">
-                <div class="small-box bg-success">
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-info">
                     <div class="inner">
                         <h3>@ViewBag.TotalUsers</h3>
+                        <p>Total Users</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-success">
+                    <div class="inner">
+                        <h3>@ViewBag.Admins?.Count</h3>
                         <p>Administrators</p>
                     </div>
                     <div class="icon">
                         <i class="fas fa-user-shield"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-warning">
+                    <div class="inner">
+                        <h3>@ViewBag.Clients?.Count</h3>
+                        <p>Clients</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-primary">
+                    <div class="inner">
+                        <h3>@((ViewBag.Admins?.Count ?? 0) + (ViewBag.Clients?.Count ?? 0))</h3>
+                        <p>Active Users</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-user-check"></i>
                     </div>
                 </div>
             </div>
@@ -46,61 +79,265 @@
                 </div>
             </div>
             <div class="card-body">
-                <div class="table-responsive mt-3">
-                    <table class="table table-hover table-striped">
-                        <thead class="thead-light">
-                            <tr>
-                                <th>Profile</th>
-                                <th>Name</th>
-                                <th>Username</th>
-                                <th>Email</th>
-                                <th>Phone</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if (ViewBag.Admins != null)
-                            {
-                                @foreach (var admin in ViewBag.Admins)
-                                {
+                <!-- Tabs -->
+                <ul class="nav nav-tabs" id="usersTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link active" id="all-tab" data-toggle="tab" href="#all" role="tab" aria-controls="all" aria-selected="true">
+                            All Users (@ViewBag.TotalUsers)
+                        </a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" id="admins-tab" data-toggle="tab" href="#admins" role="tab" aria-controls="admins" aria-selected="false">
+                            Administrators (@ViewBag.Admins?.Count)
+                        </a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" id="clients-tab" data-toggle="tab" href="#clients" role="tab" aria-controls="clients" aria-selected="false">
+                            Clients (@ViewBag.Clients?.Count)
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- Tab Content -->
+                <div class="tab-content" id="usersTabContent">
+                    <!-- All Users Tab -->
+                    <div class="tab-pane fade show active" id="all" role="tabpanel" aria-labelledby="all-tab">
+                        <div class="table-responsive mt-3">
+                            <table class="table table-hover table-striped">
+                                <thead class="thead-light">
                                     <tr>
-                                        <td>
-                                            <img src="/images/default-user.png" 
-                                                 alt="@admin.FirstName" class="img-circle" style="width: 40px; height: 40px;">
-                                        </td>
-                                        <td>
-                                            <div class="d-flex flex-column">
-                                                <strong>@admin.FirstName @admin.LastName</strong>
-                                                <small class="text-muted">@admin.Nationality</small>
-                                            </div>
-                                        </td>
-                                        <td>@admin.UserName</td>
-                                        <td>@admin.Email</td>
-                                        <td>@(string.IsNullOrEmpty(admin.PhoneNumber) ? "N/A" : admin.PhoneNumber)</td>
-                                        <td>
-                                            <span class="badge @(admin.IsActive ? "badge-success" : "badge-secondary")">
-                                                @(admin.IsActive ? "Active" : "Inactive")
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <div class="btn-group">
-                                                <a asp-action="Edit" asp-route-id="@admin.Id" class="btn btn-sm btn-outline-primary" title="Edit">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
-                                                <a asp-action="Details" asp-route-id="@admin.Id" class="btn btn-sm btn-outline-info" title="Details">
-                                                    <i class="fas fa-info-circle"></i>
-                                                </a>
-                                                <a asp-action="Delete" asp-route-id="@admin.Id" class="btn btn-sm btn-outline-danger" title="Delete">
-                                                    <i class="fas fa-trash"></i>
-                                                </a>
-                                            </div>
-                                        </td>
+                                        <th>Profile</th>
+                                        <th>Name</th>
+                                        <th>Username</th>
+                                        <th>Email</th>
+                                        <th>Phone</th>
+                                        <th>Role</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
                                     </tr>
-                                }
-                            }
-                        </tbody>
-                    </table>
+                                </thead>
+                                <tbody>
+                                    @if (ViewBag.Admins != null)
+                                    {
+                                        @foreach (var admin in ViewBag.Admins)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <img src="@(string.IsNullOrEmpty(admin.ProfilePictureUrl) ? "/images/default-user.png" : admin.ProfilePictureUrl)" 
+                                                         alt="@admin.FirstName" class="img-circle" style="width: 40px; height: 40px;">
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex flex-column">
+                                                        <strong>@admin.FirstName @admin.LastName</strong>
+                                                        <small class="text-muted">@admin.Nationality</small>
+                                                    </div>
+                                                </td>
+                                                <td>@admin.UserName</td>
+                                                <td>@admin.Email</td>
+                                                <td>@(string.IsNullOrEmpty(admin.PhoneNumber) ? "N/A" : admin.PhoneNumber)</td>
+                                                <td>
+                                                    <span class="badge badge-success">Admin</span>
+                                                </td>
+                                                <td>
+                                                    <span class="badge @(admin.IsActive ? "badge-success" : "badge-secondary")">
+                                                        @(admin.IsActive ? "Active" : "Inactive")
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <div class="btn-group">
+                                                        <a asp-action="Edit" asp-route-id="@admin.Id" class="btn btn-sm btn-outline-primary" title="Edit">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                        <a asp-action="Details" asp-route-id="@admin.Id" class="btn btn-sm btn-outline-info" title="Details">
+                                                            <i class="fas fa-info-circle"></i>
+                                                        </a>
+                                                        <a asp-action="AssignRole" asp-route-id="@admin.Id" class="btn btn-sm btn-outline-warning" title="Manage Role">
+                                                            <i class="fas fa-user-tag"></i>
+                                                        </a>
+                                                        <a asp-action="Delete" asp-route-id="@admin.Id" class="btn btn-sm btn-outline-danger" title="Delete">
+                                                            <i class="fas fa-trash"></i>
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+
+                                    @if (ViewBag.Clients != null)
+                                    {
+                                        @foreach (var client in ViewBag.Clients)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <img src="@(string.IsNullOrEmpty(client.ProfilePictureUrl) ? "/images/default-user.png" : client.ProfilePictureUrl)" 
+                                                         alt="@client.FirstName" class="img-circle" style="width: 40px; height: 40px;">
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex flex-column">
+                                                        <strong>@client.FirstName @client.LastName</strong>
+                                                        <small class="text-muted">@client.Nationality</small>
+                                                    </div>
+                                                </td>
+                                                <td>@client.UserName</td>
+                                                <td>@client.Email</td>
+                                                <td>@(string.IsNullOrEmpty(client.PhoneNumber) ? "N/A" : client.PhoneNumber)</td>
+                                                <td>
+                                                    <span class="badge badge-warning">Client</span>
+                                                </td>
+                                                <td>
+                                                    <span class="badge @(client.IsActive ? "badge-success" : "badge-secondary")">
+                                                        @(client.IsActive ? "Active" : "Inactive")
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <div class="btn-group">
+                                                        <a asp-action="Edit" asp-route-id="@client.Id" class="btn btn-sm btn-outline-primary" title="Edit">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                        <a asp-action="Details" asp-route-id="@client.Id" class="btn btn-sm btn-outline-info" title="Details">
+                                                            <i class="fas fa-info-circle"></i>
+                                                        </a>
+                                                        <a asp-action="AssignRole" asp-route-id="@client.Id" class="btn btn-sm btn-outline-warning" title="Manage Role">
+                                                            <i class="fas fa-user-tag"></i>
+                                                        </a>
+                                                        <a asp-action="Delete" asp-route-id="@client.Id" class="btn btn-sm btn-outline-danger" title="Delete">
+                                                            <i class="fas fa-trash"></i>
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Admins Tab -->
+                    <div class="tab-pane fade" id="admins" role="tabpanel" aria-labelledby="admins-tab">
+                        <div class="table-responsive mt-3">
+                            <table class="table table-hover table-striped">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Profile</th>
+                                        <th>Name</th>
+                                        <th>Username</th>
+                                        <th>Email</th>
+                                        <th>Phone</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (ViewBag.Admins != null)
+                                    {
+                                        @foreach (var admin in ViewBag.Admins)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <img src="@(string.IsNullOrEmpty(admin.ProfilePictureUrl) ? "/images/default-user.png" : admin.ProfilePictureUrl)" 
+                                                         alt="@admin.FirstName" class="img-circle" style="width: 40px; height: 40px;">
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex flex-column">
+                                                        <strong>@admin.FirstName @admin.LastName</strong>
+                                                        <small class="text-muted">@admin.Nationality</small>
+                                                    </div>
+                                                </td>
+                                                <td>@admin.UserName</td>
+                                                <td>@admin.Email</td>
+                                                <td>@(string.IsNullOrEmpty(admin.PhoneNumber) ? "N/A" : admin.PhoneNumber)</td>
+                                                <td>
+                                                    <span class="badge @(admin.IsActive ? "badge-success" : "badge-secondary")">
+                                                        @(admin.IsActive ? "Active" : "Inactive")
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <div class="btn-group">
+                                                        <a asp-action="Edit" asp-route-id="@admin.Id" class="btn btn-sm btn-outline-primary" title="Edit">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                        <a asp-action="Details" asp-route-id="@admin.Id" class="btn btn-sm btn-outline-info" title="Details">
+                                                            <i class="fas fa-info-circle"></i>
+                                                        </a>
+                                                        <a asp-action="AssignRole" asp-route-id="@admin.Id" class="btn btn-sm btn-outline-warning" title="Manage Role">
+                                                            <i class="fas fa-user-tag"></i>
+                                                        </a>
+                                                        <a asp-action="Delete" asp-route-id="@admin.Id" class="btn btn-sm btn-outline-danger" title="Delete">
+                                                            <i class="fas fa-trash"></i>
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Clients Tab -->
+                    <div class="tab-pane fade" id="clients" role="tabpanel" aria-labelledby="clients-tab">
+                        <div class="table-responsive mt-3">
+                            <table class="table table-hover table-striped">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Profile</th>
+                                        <th>Name</th>
+                                        <th>Username</th>
+                                        <th>Email</th>
+                                        <th>Phone</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (ViewBag.Clients != null)
+                                    {
+                                        @foreach (var client in ViewBag.Clients)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <img src="@(string.IsNullOrEmpty(client.ProfilePictureUrl) ? "/images/default-user.png" : client.ProfilePictureUrl)" 
+                                                         alt="@client.FirstName" class="img-circle" style="width: 40px; height: 40px;">
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex flex-column">
+                                                        <strong>@client.FirstName @client.LastName</strong>
+                                                        <small class="text-muted">@client.Nationality</small>
+                                                    </div>
+                                                </td>
+                                                <td>@client.UserName</td>
+                                                <td>@client.Email</td>
+                                                <td>@(string.IsNullOrEmpty(client.PhoneNumber) ? "N/A" : client.PhoneNumber)</td>
+                                                <td>
+                                                    <span class="badge @(client.IsActive ? "badge-success" : "badge-secondary")">
+                                                        @(client.IsActive ? "Active" : "Inactive")
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <div class="btn-group">
+                                                        <a asp-action="Edit" asp-route-id="@client.Id" class="btn btn-sm btn-outline-primary" title="Edit">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                        <a asp-action="Details" asp-route-id="@client.Id" class="btn btn-sm btn-outline-info" title="Details">
+                                                            <i class="fas fa-info-circle"></i>
+                                                        </a>
+                                                        <a asp-action="AssignRole" asp-route-id="@client.Id" class="btn btn-sm btn-outline-warning" title="Manage Role">
+                                                            <i class="fas fa-user-tag"></i>
+                                                        </a>
+                                                        <a asp-action="Delete" asp-route-id="@client.Id" class="btn btn-sm btn-outline-danger" title="Delete">
+                                                            <i class="fas fa-trash"></i>
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -130,4 +367,3 @@
         });
     </script>
 }
-

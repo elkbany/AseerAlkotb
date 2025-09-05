@@ -16,6 +16,8 @@ using AseerAlkotb.Localization.Resources;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
+using Microsoft.AspNetCore.Identity;
+using AseerAlkotb.Domain.Entites.Models;
 
 namespace AseerAlkotb.Dashboard
 {
@@ -27,7 +29,7 @@ namespace AseerAlkotb.Dashboard
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
-
+           
             #region Context and Identity
             // Add DbContext
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -36,31 +38,48 @@ namespace AseerAlkotb.Dashboard
                 options.UseSqlServer(connectionString);
             });
 
+
+            // Add Identity
+            builder.Services.AddIdentity<User, IdentityRole<int>>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
+
+
             // Add Identity services to the container.
-            builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
-            {
-                // Configure Identity options if needed
-                options.SignIn.RequireConfirmedEmail = true;
-            })
-            .AddEntityFrameworkStores<ApplicationDbContext>()
-            .AddDefaultTokenProviders();
+            //builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
+            //{
+            //    // Configure Identity options if needed
+            //    options.SignIn.RequireConfirmedEmail = true;
+            //})
+            //.AddEntityFrameworkStores<ApplicationDbContext>()
+            //.AddDefaultTokenProviders();
             #endregion
 
             #region Repositories and Services
+
             // Add Repositories
             builder.Services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+            #endregion
             // Add Application Services
             builder.Services.AddScoped<IAuthorServices, AuthorServices>();
             builder.Services.AddScoped<IBookServices, BookServices>();
             builder.Services.AddScoped<ICategoryServices, CategoryServices>();
             builder.Services.AddScoped<IOrderServices, OrderServices>();
+
+            builder.Services.AddScoped<IEmailService, EmailService>();
+            builder.Services.AddScoped<IAdminServices, AdminServices>();
+
+            #region HttpClient Registeration
+            builder.Services.AddHttpClient<IPaymobService, PaymobService>();
+
             builder.Services.AddScoped<IPublisherServices, PublisherService>();
             builder.Services.AddScoped<IReviewServices, ReviewServices>();
             builder.Services.AddScoped<IAccountServices, AccountService>();
             builder.Services.AddScoped<IAdminServices, AdminServices>();
             // Add other services needed by the dashboard controllers
+
             #endregion
 
             #region Other Configurations
