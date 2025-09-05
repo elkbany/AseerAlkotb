@@ -1,10 +1,11 @@
-﻿﻿﻿﻿﻿using AseerAlkotb.Application.Contracts;
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Features.Books.DTOs;
 using AseerAlkotb.Application.Features.Orders.Filters;
 using AseerAlkotb.Application.Features.Orders.Requests;
 using AseerAlkotb.Application.Features.Orders.Responses;
 using AseerAlkotb.Application.Features.Orders.Validators;
 using AseerAlkotb.Application.Features.Payments.Requests;
+using AseerAlkotb.Application.Features.Payments.Responses;
 using AseerAlkotb.Application.ResponseHandler;
 using AseerAlkotb.Domain.Entites.Models;
 using AseerAlkotb.Domain.Enums;
@@ -25,13 +26,15 @@ namespace AseerAlkotb.Application.Services
         private readonly UserManager<User> userManager;
         private readonly IUnitOfWork unitOfWork;
         private readonly IPaymentService _paymentService;
+        private readonly IOrderPaymentSyncService _syncService;
 
-        public OrderServices(IHttpContextAccessor httpContextAccessor, UserManager<User> userManager, IUnitOfWork unitOfWork, IServiceProvider serviceProvider, IHostEnvironment environment, IPaymentService paymentService) : base(serviceProvider, environment)
+        public OrderServices(IHttpContextAccessor httpContextAccessor, UserManager<User> userManager, IUnitOfWork unitOfWork, IServiceProvider serviceProvider, IHostEnvironment environment, IPaymentService paymentService, IOrderPaymentSyncService syncService) : base(serviceProvider, environment)
         {
             this.httpContextAccessor = httpContextAccessor;
             this.userManager = userManager;
             this.unitOfWork = unitOfWork;
             _paymentService = paymentService;
+            _syncService = syncService;
         }
 
         #region Checkout (Place Order)
@@ -67,17 +70,57 @@ namespace AseerAlkotb.Application.Services
             // Get current book prices from database
             var books = await GetBooksForCartAsync(cart);
 
-            // Create and populate order with current user's ID
-            var orderRequest = request.Adapt<AddOrderRequest>();
-            var order = await CreateOrderAsync(orderRequest, cart, books);
+            // Use database transaction for atomicity
+            using var transaction = await unitOfWork.BeginTransactionAsync();
+            try
+            {
+                // Create and populate order with current user's ID
+                var orderRequest = request.Adapt<AddOrderRequest>();
+                var order = await CreateOrderAsync(orderRequest, cart, books, currentUser);
 
-            // Process checkout transaction
-            await ProcessCheckoutTransactionAsync(order, cart);
+                // Save order first to get ID
+                await unitOfWork.Orders.InsertAsync(order);
+                await unitOfWork.SaveChangesAsync(); // Save to get order ID
 
-            // Return response
-            var response = order.Adapt<AddOrderResponse>();
-            //await _paymentService.InitializePaymentAsync(new InitializePaymentRequest();
-            return Success(response);
+                // Initialize payment - this will validate payment method and create payment record
+                var paymentInitResult = await _paymentService.InitializePaymentAsync(new InitializePaymentRequest(order));
+                if (!paymentInitResult.Succeeded)
+                {
+                    await transaction.RollbackAsync();
+                    return BadRequest<AddOrderResponse>($"Payment initialization failed: {paymentInitResult.Message}");
+                }
+
+                // Clear cart and commit transaction
+                cart.CartItems.Clear();
+                unitOfWork.Carts.Update(cart);
+                await unitOfWork.SaveChangesAsync();
+                
+                await transaction.CommitAsync();
+
+                // Return successful response with payment info
+                var response = new AddOrderResponse(
+                    order.Id,
+                    order.TrackingNumber,
+                    new PaymentInitializationInfo(
+                        paymentInitResult.Data.PaymentId,
+                        paymentInitResult.Data.TransactionId,
+                        paymentInitResult.Data.PaymentMethod,
+                        paymentInitResult.Data.Amount,
+                        paymentInitResult.Data.Currency,
+                        paymentInitResult.Data.Status,
+                        paymentInitResult.Data.RedirectUrl,
+                        paymentInitResult.Data.Instructions,
+                        paymentInitResult.Data.RequiresRedirect
+                    )
+                );
+                
+                return Success(response);
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                return BadRequest<AddOrderResponse>($"Checkout failed: {ex.Message}");
+            }
         }
 
         private async Task<Cart> GetCartWithItemsAsync(int userId)
@@ -102,10 +145,10 @@ namespace AseerAlkotb.Application.Services
             return await unitOfWork.Books.GetByIdsAsync(bookIds);
         }
 
-        private async Task<Order> CreateOrderAsync(AddOrderRequest request, Cart cart, List<Book> books)
+        private async Task<Order> CreateOrderAsync(AddOrderRequest request, Cart cart, List<Book> books, User user)
         {
             var order = request.Adapt<Order>();
-
+            order.User = user;
             // Add order items with current prices
             AddOrderItems(order, cart.CartItems, books);
 
@@ -160,19 +203,6 @@ namespace AseerAlkotb.Application.Services
                 order.DiscountAmount = 0;
             }
             return order.DiscountAmount;
-        }
-
-        private async Task ProcessCheckoutTransactionAsync(Order order, Cart cart)
-        {
-            // Save order
-            await unitOfWork.Orders.InsertAsync(order);
-
-            // Clear cart
-            cart.CartItems.Clear();
-            unitOfWork.Carts.Update(cart);
-
-            // Commit transaction
-            await unitOfWork.CommitAsync();
         }
 
         private async Task<string> GenerateUniqueTrackingNumberAsync()
@@ -439,7 +469,20 @@ namespace AseerAlkotb.Application.Services
             var oldStatus = order.Status;
             order.Status = request.NewStatus;
             
-            // For COD orders, update payment status when order is delivered
+            // Update order first
+            unitOfWork.Orders.Update(order);
+            await unitOfWork.CommitAsync();
+
+            // Use synchronization service to update payment status
+            var syncResult = await _syncService.SyncPaymentStatusFromOrderAsync(request.OrderId, request.NewStatus, oldStatus);
+            if (!syncResult)
+            {
+                // Log warning but don't fail the order update
+                // The synchronization service already logs the specific error
+                // We could implement compensation logic here if needed
+            }
+            
+            // For now, use the old logic for COD orders
             if (order.PaymentMethod == PaymentMethod.CashOnDelivery)
             {
                 var payment = await unitOfWork.Payments.FirstOrDefaultAsync(p => p.OrderId == order.Id);
@@ -457,11 +500,9 @@ namespace AseerAlkotb.Application.Services
                             break;
                     }
                     unitOfWork.Payments.Update(payment);
+                    await unitOfWork.CommitAsync();
                 }
             }
-            
-            unitOfWork.Orders.Update(order);
-            await unitOfWork.CommitAsync();
 
             var response = new UpdateOrderStatusResponse(
                 order.Id,

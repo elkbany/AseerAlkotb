@@ -51,17 +51,17 @@ namespace AseerAlkotb.API.Controllers
                 
                 if (response.Succeeded)
                 {
-                    _logger.LogInformation("Payment initialized successfully for Order {OrderId}", request.OrderId);
+                    _logger.LogInformation("Payment initialized successfully for Order {OrderId}", request.order.Id);
                     return Ok(response);
                 }
                 
                 _logger.LogWarning("Payment initialization failed for Order {OrderId}: {Message}", 
-                    request.OrderId, response.Message);
+                    request.order.Id, response.Message);
                 return BadRequest(response);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error initializing payment for Order {OrderId}", request.OrderId);
+                _logger.LogError(ex, "Error initializing payment for Order {OrderId}", request.order.Id);
                 return StatusCode(StatusCodes.Status500InternalServerError, 
                     BadRequest<string>("An error occurred while initializing payment"));
             }

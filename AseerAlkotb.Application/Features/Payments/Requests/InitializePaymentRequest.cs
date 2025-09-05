@@ -1,9 +1,9 @@
+using AseerAlkotb.Domain.Entites.Models;
 using AseerAlkotb.Domain.Enums;
 
 namespace AseerAlkotb.Application.Features.Payments.Requests
 {
     public record InitializePaymentRequest(
-        int OrderId,
-        int UserId
+        Order order
     );
 }

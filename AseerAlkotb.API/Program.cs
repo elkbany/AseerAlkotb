@@ -139,6 +139,10 @@ namespace AseerAlkotb.API
             builder.Services.AddScoped<IAdminServices, AdminServices>();
             builder.Services.AddScoped<IWishlistServices, WishlistServices>();
             builder.Services.AddScoped<ICategoryServices, CategoryServices>();
+            
+            // New services for improved Order and Payment flow
+            builder.Services.AddScoped<IOrderPaymentSyncService, OrderPaymentSyncService>();
+            builder.Services.AddScoped<IPaymentRetryService, PaymentRetryService>();
 
             builder.Services.AddControllers()
                 .AddJsonOptions(options =>

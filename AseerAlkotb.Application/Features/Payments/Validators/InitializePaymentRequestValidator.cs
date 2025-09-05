@@ -7,7 +7,7 @@ namespace AseerAlkotb.Application.Features.Payments.Validators
     {
         public InitializePaymentRequestValidator()
         {
-            RuleFor(x => x.OrderId)
+            RuleFor(x => x.order.Id)
                 .GreaterThan(0)
                 .WithMessage("Order ID must be greater than 0");
 
