@@ -488,18 +488,24 @@ namespace AseerAlkotb.Application.Services
         public async Task<ApiResponse<UpdateOrderStatusResponse>> UpdateOrderStatusAsync(UpdateOrderStatusRequest request)
         {
             await DoValidationAsync<UpdateOrderStatusRequestValidator, UpdateOrderStatusRequest>(request);
-            
+
             var order = await unitOfWork.Orders.FirstOrDefaultAsync(
-                o => o.Id == request.OrderId, 
-                default, 
+                o => o.Id == request.OrderId,
+                default,
                 o => o.User);
-                
+
             if (order == null)
             {
                 return NotFound<UpdateOrderStatusResponse>($"{_stringLocalizer["Order"]} {_stringLocalizer["NotFound"]}");
             }
 
-            // Validate status transition
+            // Check if order is already delivered - cannot change status from delivered
+            if (order.Status == OrderStatus.Delivered)
+            {
+                return BadRequest<UpdateOrderStatusResponse>($"{_stringLocalizer["CannotChangeDeliveredOrder"]}");
+            }
+
+            // Validate status transition (your existing logic)
             if (!IsValidStatusTransition(order.Status, request.NewStatus))
             {
                 return BadRequest<UpdateOrderStatusResponse>($"{_stringLocalizer["CannotChangeStatus"]} {order.Status} {_stringLocalizer["To"]} {request.NewStatus}");
@@ -507,7 +513,7 @@ namespace AseerAlkotb.Application.Services
 
             var oldStatus = order.Status;
             order.Status = request.NewStatus;
-            
+
             // Update order first
             unitOfWork.Orders.Update(order);
             await unitOfWork.CommitAsync();
@@ -520,7 +526,7 @@ namespace AseerAlkotb.Application.Services
                 // The synchronization service already logs the specific error
                 // We could implement compensation logic here if needed
             }
-            
+
             // For now, use the old logic for COD orders
             if (order.PaymentMethod == PaymentMethod.CashOnDelivery)
             {
@@ -549,15 +555,37 @@ namespace AseerAlkotb.Application.Services
                 order.TrackingNumber,
                 DateTime.UtcNow
             );
-
             return Success(response);
         }
-
         private static bool IsValidStatusTransition(OrderStatus currentStatus, OrderStatus newStatus)
         {
-            // Allow any status change for admin flexibility, but log invalid transitions
-            // You can implement more restrictive rules here if needed
-            return true;
+            // If trying to set the same status, it's valid (no change needed but not an error)
+            if (currentStatus == newStatus)
+                return true;
+
+            // Define valid transitions for each status
+            return currentStatus switch
+            {
+                OrderStatus.Pending => newStatus is
+                    OrderStatus.Approved or
+                    OrderStatus.Cancelled,
+
+                OrderStatus.Approved => newStatus is
+                    OrderStatus.Shipped or
+                    OrderStatus.Cancelled,
+
+                OrderStatus.Shipped => newStatus is
+                    OrderStatus.Delivered or
+                    OrderStatus.Cancelled, 
+
+                OrderStatus.Delivered => newStatus is
+                    OrderStatus.Delivered or
+                    OrderStatus.Cancelled, 
+
+                OrderStatus.Cancelled => false, 
+
+                _ => false // Invalid current status
+            };
         }
     }
 }
