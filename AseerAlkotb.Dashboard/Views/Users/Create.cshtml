@@ -34,7 +34,7 @@
                             </a>
                         </div>
                     </div>
-                    <form asp-action="Create" method="post" id="createUserForm">
+                    <form asp-action="Create" method="post" enctype="multipart/form-data" id="createUserForm">
                         <div class="card-body">
                             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                             
@@ -121,11 +121,38 @@
                             </div>
 
                             <div class="row">
-                                <div class="col-md-12">
+                                <div class="col-md-6">
                                     <div class="form-group">
                                         <label asp-for="Nationality" class="control-label">Nationality</label>
                                         <input asp-for="Nationality" class="form-control" placeholder="Enter nationality (optional)" />
                                         <span asp-validation-for="Nationality" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="UserRole" class="control-label">User Role *</label>
+                                        <select asp-for="UserRole" class="form-control">
+                                            <option value="">Select Role</option>
+                                            <option value="Admin">Administrator</option>
+                                            <option value="Client">Client</option>
+                                        </select>
+                                        <span asp-validation-for="UserRole" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label asp-for="ProfilePictureUrl" class="control-label">Profile Picture</label>
+                                        <div class="custom-file">
+                                            <input asp-for="ProfilePictureUrl" type="file" class="custom-file-input" id="profilePicture" accept="image/*" />
+                                            <label class="custom-file-label" for="profilePicture">Choose profile picture (optional)</label>
+                                        </div>
+                                        <span asp-validation-for="ProfilePictureUrl" class="text-danger"></span>
+                                        <small class="form-text text-muted">
+                                            Supported formats: JPG, PNG, GIF. Max size: 5MB.
+                                        </small>
                                     </div>
                                 </div>
                             </div>
@@ -183,19 +210,34 @@
                 }
             });
 
+            // File input label update
+            $('#profilePicture').on('change', function() {
+                const fileName = $(this).val().split('\\').pop();
+                $(this).next('.custom-file-label').html(fileName || 'Choose profile picture (optional)');
+            });
+
             // Form validation
             $('#createUserForm').submit(function(e) {
                 const password = $('#password').val();
                 const confirmPassword = $('#confirmPassword').val();
+                const userRole = $('#UserRole').val();
                 
                 if (password !== confirmPassword) {
                     e.preventDefault();
                     alert('Passwords do not match!');
                     return false;
                 }
+                
+                if (!userRole) {
+                    e.preventDefault();
+                    alert('Please select a user role!');
+                    return false;
+                }
             });
         });
     </script>
 }
+
+
 
 

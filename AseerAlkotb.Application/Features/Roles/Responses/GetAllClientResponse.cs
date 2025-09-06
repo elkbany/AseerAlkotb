@@ -17,6 +17,9 @@ namespace AseerAlkotb.Application.Features.Roles.Responses
       Gender Gender,
       bool IsActive,
       string PhoneNumber,
-      string Nationality
+      string Nationality,
+      string? ProfilePictureUrl,
+        DateTime CreatedAt,
+        DateTime UpdatedAt
     );
 }

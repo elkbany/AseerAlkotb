@@ -10,18 +10,23 @@ using AseerAlkotb.Domain.Interfaces.Base;
 using AseerAlkotb.Domain.Interfaces.Repositories;
 using AseerAlkotb.Infrastructure.Context;
 using AseerAlkotb.Infrastructure.Data;
+using AseerAlkotb.Infrastructure.DependencyInjection;
 using AseerAlkotb.Infrastructure.ExternalServices;
 using AseerAlkotb.Infrastructure.Repositories.Base;
 using AseerAlkotb.Infrastructure.Repositories.Implementations;
 using AseerAlkotb.Localization.Resources;
 using Mapster;
+using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Localization;
 using Microsoft.IdentityModel.Tokens;
+using System.Reflection;
 using Microsoft.OpenApi.Models;
 using System.Text;
 namespace AseerAlkotb.API
@@ -137,6 +142,16 @@ namespace AseerAlkotb.API
             builder.Services.AddScoped<IEmailService, EmailService>();
             builder.Services.AddScoped<IAccountServices, AccountService>();
             builder.Services.AddScoped<IAdminServices, AdminServices>();
+
+
+            builder.Services.AddInfrastructure(builder.Configuration);
+
+
+            builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    });
             builder.Services.AddScoped<IWishlistServices, WishlistServices>();
             builder.Services.AddScoped<ICategoryServices, CategoryServices>();
             
@@ -150,6 +165,7 @@ namespace AseerAlkotb.API
                     options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
                 });
             #endregion
+
 
             #region AutoMapper 
             builder.Services.AddMapster();
