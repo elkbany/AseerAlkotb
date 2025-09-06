@@ -18,7 +18,7 @@ namespace AseerAlkotb.Application.Features.Roles.Mapping
         {
             config.NewConfig<CreateAdminAccountRequest, User>()
                   .Ignore(dest => dest.Id)                    // Managed by Identity
-                  .Ignore(dest => dest.ProfilePictureUrl)     // Not in request
+                  .Ignore(dest => dest.ProfilePictureUrl)     // Handled separately in service
                   .Ignore(dest => dest.DateOfBirth)           // Not in request
                   .Ignore(dest => dest.Bio)                   // Not in request
                   .Ignore(dest => dest.IsActive)              // Set manually in service
