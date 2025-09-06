@@ -116,7 +116,6 @@ namespace AseerAlkotb.Application.Services
                 {
                     UserId = currentUser.Id,
                     WishlistItems = new List<WishlistItem>(),
-                    CreatedAt = DateTime.UtcNow
                 };
                 await unitOfWork.Wishlists.InsertAsync(wishlist);
                 await unitOfWork.CommitAsync();

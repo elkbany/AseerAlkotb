@@ -291,7 +291,6 @@ namespace AseerAlkotb.Application.Services
 
             // Perform cancellation
             order.Status = OrderStatus.Cancelled;
-            order.UpdatedAt = DateTime.UtcNow;
 
             unitOfWork.Orders.Update(order);
             await unitOfWork.CommitAsync();
@@ -309,39 +308,77 @@ namespace AseerAlkotb.Application.Services
                 .ToListAsync();
             var totalCount = await unitOfWork.Orders.CountAsync();
 
-            var ordsMap = orders.Adapt<List<GetAllOrdersPaginatedResponse>>();
+            // Manual mapping instead of Adapt<>
+            var ordsMap = orders.Select(order => new GetAllOrdersPaginatedResponse(
+                order.Id,
+                order.User?.UserName ?? string.Empty,
+                order.PaymentMethod,
+                order.PaymentStatus,
+                order.Governorate,
+                order.City,
+                order.Status,
+                order.TrackingNumber,
+                order.FinalAmount,
+                order.OrderDate,
+                order.OrderItems
+                    .Where(oi => oi.Book != null)
+                    .Select(oi => new BookDTO(
+                        oi.Book.Title,
+                        oi.UnitPrice,
+                        oi.Quantity
+                    ))
+                    .ToList()
+            )).ToList();
+
             return Success(ordsMap, totalCount, request.PageNumber, request.PageSize);
         }
 
         public async Task<ApiResponsePaginated<List<GetAllUserOrdersPaginatedResponse>>> GetAllUserOrdersPaginatedAsync(GetAllUserOrdersPaginatedRequest request)
         {
             await DoValidationAsync<GetAllUserOrdersPaginatedRequestValidator, GetAllUserOrdersPaginatedRequest>(request);
-
             // Get current user from HttpContext
             var httpContext = httpContextAccessor.HttpContext;
             if (httpContext?.User?.Identity?.IsAuthenticated != true)
             {
                 return (ApiResponsePaginated<List<GetAllUserOrdersPaginatedResponse>>)UnAuthorized<List<GetAllUserOrdersPaginatedResponse>>();
             }
-
             var currentUser = await userManager.GetUserAsync(httpContext.User);
             if (currentUser == null)
             {
                 return (ApiResponsePaginated<List<GetAllUserOrdersPaginatedResponse>>)UnAuthorized<List<GetAllUserOrdersPaginatedResponse>>();
             }
-
             // Check if user has "Client" role
             var isInClientRole = await userManager.IsInRoleAsync(currentUser, "Client");
             if (!isInClientRole)
             {
                 return (ApiResponsePaginated<List<GetAllUserOrdersPaginatedResponse>>)UnAuthorized<List<GetAllUserOrdersPaginatedResponse>>();
             }
-
             // Use current user's ID for security instead of request.UserId
-            var orders = unitOfWork.Orders.GetAllAsyncByEx(o => o.UserId == currentUser.Id, (request.PageNumber - 1) * request.PageSize, request.PageSize, default, o => o.OrderItems);
+            var orders =  unitOfWork.Orders.GetAllAsyncByEx(o => o.UserId == currentUser.Id, (request.PageNumber - 1) * request.PageSize, request.PageSize, default, o => o.OrderItems);
             var totalCount = await unitOfWork.Orders.CountAsync(o => o.UserId == currentUser.Id);
 
-            var ordsMap = orders.Adapt<List<GetAllUserOrdersPaginatedResponse>>();
+            // Manual mapping instead of Adapt<>
+            var ordsMap = orders.Select(order => new GetAllUserOrdersPaginatedResponse(
+                order.Id,
+                order.User.UserName ?? string.Empty,
+                order.PaymentMethod,
+                order.PaymentStatus,
+                order.Governorate,
+                order.City,
+                order.Status,
+                order.TrackingNumber,
+                order.FinalAmount,
+                order.OrderDate,
+                order.OrderItems
+                    .Where(oi => oi.Book != null)
+                    .Select(oi => new BookDTO(
+                        oi.Book.Title,
+                        oi.UnitPrice,
+                        oi.Quantity
+                    ))
+                    .ToList()
+            )).ToList();
+
             return Success(ordsMap, totalCount, request.PageNumber, request.PageSize);
         }
 
@@ -380,7 +417,8 @@ namespace AseerAlkotb.Application.Services
          .Where(oi => oi.Book != null)
          .Select(oi => new BookDTO(
              oi.Book.Title,
-            (oi.UnitPrice) 
+            oi.UnitPrice,
+            oi.Quantity
          ))
          .ToList()
  );
@@ -438,7 +476,8 @@ namespace AseerAlkotb.Application.Services
                     .Where(oi => oi.Book != null)
                     .Select(oi => new BookDTO(
                         oi.Book.Title,
-                        oi.UnitPrice
+                        oi.UnitPrice,
+                        oi.Quantity
                     ))
                     .ToList()
             );

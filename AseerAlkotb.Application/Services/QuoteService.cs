@@ -77,7 +77,6 @@ namespace AseerAlkotb.Application.Services
             var quote = request.Adapt<Quote>();
             quote.QuoteFor = request.BookId.HasValue ? QuoteFor.Book : QuoteFor.Author;
             quote.UserId = currentUser.Id; // Set the user who created the quote
-            quote.CreatedAt = DateTime.UtcNow; // Optional: set creation date
 
             await unitOfWork.Quotes.InsertAsync(quote);
             await unitOfWork.CommitAsync();
@@ -122,7 +121,6 @@ namespace AseerAlkotb.Application.Services
             }
 
             request.Adapt(quote);
-            quote.UpdatedAt = DateTime.UtcNow; // Optional: track when updated
             unitOfWork.Quotes.Update(quote);
             await unitOfWork.CommitAsync();
 

@@ -60,8 +60,7 @@ namespace AseerAlkotb.Application.Services
 
                 // 4- Map request to User entity
                 var newAccount = request.Adapt<User>();
-                newAccount.CreatedAt = DateTime.UtcNow;
-                newAccount.UpdatedAt = DateTime.UtcNow;
+              
                 newAccount.IsActive = true;
 
                 // 5- Create user
@@ -214,7 +213,6 @@ namespace AseerAlkotb.Application.Services
             }
 
             // Update the UpdatedAt 
-            user.UpdatedAt = DateTime.UtcNow;
 
             // Save changes 
             var result = await userManager.UpdateAsync(user);

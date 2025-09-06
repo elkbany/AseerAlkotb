@@ -129,7 +129,6 @@ namespace AseerAlkotb.Application.Services
             }
 
             request.Adapt(review);
-            review.UpdatedAt = DateTime.UtcNow; // Optional: track when updated
             unitOfWork.Reviews.Update(review);
             await unitOfWork.CommitAsync();
 
@@ -267,7 +266,6 @@ namespace AseerAlkotb.Application.Services
                 {
                     // Update existing
                     existing.IsLike = request.IslikeDisLike.Value;
-                    existing.UpdatedAt = DateTime.UtcNow;
                 }
                 else
                 {
@@ -277,7 +275,6 @@ namespace AseerAlkotb.Application.Services
                         ReviewId = request.ReviewId,
                         UserId = currentUser.Id, // Use current user's ID
                         IsLike = request.IslikeDisLike.Value,
-                        CreatedAt = DateTime.UtcNow
                     };
                     review.LikeDisLikes.Add(like);
                 }

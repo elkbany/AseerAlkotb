@@ -44,7 +44,7 @@ namespace AseerAlkotb.Application.Features.Orders.Mapping
                     .Map(dest => dest.UserName, src => src.User.FirstName)
                     .Map(dest => dest.OrderStatus, src => src.Status)
                     .Map(dest => dest.Books, src => src.OrderItems
-                        .Select(oi => new BookDTO(oi.Book.Title, (int)oi.UnitPrice))
+                        .Select(oi => new BookDTO(oi.Book.Title, (int)oi.UnitPrice, oi.Quantity))
                         .ToList());
 
             // Get Order By Admin (Entity → Response)
@@ -57,7 +57,7 @@ namespace AseerAlkotb.Application.Features.Orders.Mapping
                   .Map(dest => dest.DiscountAmount, src => src.DiscountAmount)
                   .Map(dest => dest.FinalAmount, src => src.FinalAmount)
                   .Map(dest => dest.Books, src => src.OrderItems
-                      .Select(oi => new BookDTO(oi.Book.Title, (int)oi.UnitPrice))
+                      .Select(oi => new BookDTO(oi.Book.Title, (int)oi.UnitPrice,oi.Quantity))
                       .ToList());
 
 
@@ -66,7 +66,7 @@ namespace AseerAlkotb.Application.Features.Orders.Mapping
                     .Map(dest => dest.UserName, src => src.User.FirstName)
                     .Map(dest => dest.OrderStatus, src => src.Status)
                     .Map(dest => dest.Books, src => src.OrderItems
-                        .Select(oi => new BookDTO(oi.Book.Title, (int)oi.UnitPrice))
+                        .Select(oi => new BookDTO(oi.Book.Title, (int)oi.UnitPrice, oi.Quantity))
                         .ToList());
 
                 // Get All Orders Paginated
@@ -74,15 +74,14 @@ namespace AseerAlkotb.Application.Features.Orders.Mapping
                     .Map(dest => dest.UserName, src => src.User.FirstName)
                     .Map(dest => dest.OrderStatus, src => src.Status)
                     .Map(dest => dest.Books, src => src.OrderItems
-                        .Select(oi => new BookDTO(oi.Book.Title, (int)oi.UnitPrice))
+                        .Select(oi => new BookDTO(oi.Book.Title, (int)oi.UnitPrice, oi.Quantity))
                         .ToList());
 
-                // Update Order Status Mapping
-                config.NewConfig<Order, UpdateOrderStatusResponse>()
-                    .Map(dest => dest.Id, src => src.Id)
-                    .Map(dest => dest.Status, src => src.Status)
-                    .Map(dest => dest.TrackingNumber, src => src.TrackingNumber)
-                    .Map(dest => dest.UpdatedAt, src => DateTime.UtcNow);
+            // Update Order Status Mapping
+            config.NewConfig<Order, UpdateOrderStatusResponse>()
+                .Map(dest => dest.Id, src => src.Id)
+                .Map(dest => dest.Status, src => src.Status)
+                .Map(dest => dest.TrackingNumber, src => src.TrackingNumber);
             }
         }
 }

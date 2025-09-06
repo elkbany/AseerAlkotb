@@ -1,4 +1,5 @@
 ﻿﻿using AseerAlkotb.Domain.Entites;
+using AseerAlkotb.Domain.Entites.Base;
 using AseerAlkotb.Domain.Entites.Models;
 using AseerAlkotb.Domain.Enums;
 using AseerAlkotb.Infrastructure.Data;
@@ -90,5 +91,61 @@ namespace AseerAlkotb.Infrastructure.Context
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<LikeDisLike> LikeDisLikes { get; set; }
         public override DbSet<User> Users { get; set; }
+        public override int SaveChanges()
+        {
+            UpdateTimestamps();
+            return base.SaveChanges();
+        }
+
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            UpdateTimestamps();
+            return await base.SaveChangesAsync(cancellationToken);
+        }
+        #region Commented int version 
+        //private void UpdateTimestamps()
+        //{
+        //    var entries = ChangeTracker.Entries<Entity<int>>();
+
+        //    foreach (var entry in entries)
+        //    {
+        //        switch (entry.State)
+        //        {
+        //            case EntityState.Added:
+        //                entry.Entity.CreatedAt = DateTime.UtcNow;
+        //                entry.Entity.UpdatedAt = DateTime.UtcNow;
+        //                break;
+
+        //            case EntityState.Modified:
+        //                entry.Entity.UpdatedAt = DateTime.UtcNow;
+        //                // Prevent CreatedAt from being updated
+        //                entry.Property(nameof(Entity<int>.CreatedAt)).IsModified = false;
+        //                break;
+        //        }
+        //    }
+        //} 
+        #endregion
+        private void UpdateTimestamps()
+        {
+            var entries = ChangeTracker.Entries()
+                .Where(e => e.Entity.GetType().BaseType?.IsGenericType == true &&
+                           e.Entity.GetType().BaseType.GetGenericTypeDefinition() == typeof(Entity<>));
+
+            foreach (var entry in entries)
+            {
+                var entity = (dynamic)entry.Entity;
+                switch (entry.State)
+                {
+                    case EntityState.Added:
+                        entity.CreatedAt = DateTime.UtcNow;
+                        entity.UpdatedAt = DateTime.UtcNow;
+                        break;
+                    case EntityState.Modified:
+                        entity.UpdatedAt = DateTime.UtcNow;
+                        entry.Property("CreatedAt").IsModified = false;
+                        break;
+                }
+            }
+        }
     }
 }
