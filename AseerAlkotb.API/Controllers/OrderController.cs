@@ -1,6 +1,8 @@
 ﻿using AseerAlkotb.API.Bases;
 using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Features.Orders.Requests;
+using AseerAlkotb.Application.Services;
+using AseerAlkotb.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -57,6 +59,12 @@ namespace AseerAlkotb.API.Controllers
         {
             var result = await orderServices.GetOrderByTrackingNumberByUserAsync(request);
             return ApiResult(result);
+        }
+        [HttpGet("GetShippingCost")]
+        public async Task<decimal> GetShippingCost([FromQuery] EgyptGovernorates Governorate)
+        {
+             var result = ShippingServices.GetShippingCostForAGovernorate(Governorate);
+             return result;
         }
     }
 }

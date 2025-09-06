@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using AseerAlkotb.Application.Contracts;
+﻿﻿using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Features.Books.DTOs;
 using AseerAlkotb.Application.Features.Orders.Filters;
 using AseerAlkotb.Application.Features.Orders.Requests;
@@ -182,7 +182,7 @@ namespace AseerAlkotb.Application.Services
             order.TotalAmount = order.OrderItems.Sum(oi => oi.TotalPrice);
 
             // Calculate shipping
-            order.ShippingCost = ShippingServices.CalculateShippingCost(request);
+            order.ShippingCost = ShippingServices.CalculateShippingCost(request,order.TotalAmount);
 
             // Calculate tax (14%)
             order.TaxAmount = order.TotalAmount * 0.14m;
