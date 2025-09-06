@@ -18,24 +18,51 @@ using Mapster;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Http;
 using static AseerAlkotb.Application.ResponseHandler.ApiResponseHandler;
 
 namespace AseerAlkotb.Application.Services
 {
-    public class CartServices : AppService,ICartServices
+    public class CartServices : AppService, ICartServices
     {
         private readonly IUnitOfWork unitOfWork;
+        private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly UserManager<User> userManager;
 
-        public CartServices(IUnitOfWork unitOfWork, IServiceProvider serviceProvider, IHostEnvironment environment) : base(serviceProvider, environment)
+        public CartServices(IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor, UserManager<User> userManager, IServiceProvider serviceProvider, IHostEnvironment environment) : base(serviceProvider, environment)
         {
             this.unitOfWork = unitOfWork;
+            this.httpContextAccessor = httpContextAccessor;
+            this.userManager = userManager;
         }
 
         public async Task<ApiResponse<ShowCartResponse>> GetUserCart(ShowCartRequest request)
         {
             await DoValidationAsync<ShowCartRequestValidation, ShowCartRequest>(request);
-            var cart = await unitOfWork.Carts.GetUserCartAsync(request.UserId);
-            //var response=cart.Adapt<ShowCartResponse>();
+
+            // Get current user from HttpContext
+            var httpContext = httpContextAccessor.HttpContext;
+            if (httpContext?.User?.Identity?.IsAuthenticated != true)
+            {
+                return UnAuthorized<ShowCartResponse>();
+            }
+
+            var currentUser = await userManager.GetUserAsync(httpContext.User);
+            if (currentUser == null)
+            {
+                return UnAuthorized<ShowCartResponse>();
+            }
+
+            // Check if user has "Client" role
+            var isInClientRole = await userManager.IsInRoleAsync(currentUser, "Client");
+            if (!isInClientRole)
+            {
+                return UnAuthorized<ShowCartResponse>();
+            }
+
+            // Use current user's ID instead of request.UserId for security
+            var cart = await unitOfWork.Carts.GetUserCartAsync(currentUser.Id);
+
             var response = new ShowCartResponse(
             Id: cart.Id,
             UserId: cart.UserId,
@@ -49,7 +76,7 @@ namespace AseerAlkotb.Application.Services
                 DiscountedPrice: ci.UnitPrice - (ci.UnitPrice * ci.Book.DiscountPercentage / 100),
                 TotalPrice: ci.TotalPrice,
                 TotalDiscountedPrice: ci.Quantity * (ci.UnitPrice - (ci.UnitPrice * ci.Book.DiscountPercentage / 100))
-            )) ,
+            )),
             SumTotalPrice: cart.CartItems.Sum(ci => ci.TotalPrice),
             SumDiscountedPrice: cart.CartItems.Sum(ci => ci.Quantity * (ci.UnitPrice - (ci.UnitPrice * ci.Book.DiscountPercentage / 100))),
             TotalItemsCount: cart.CartItems.Sum(ci => ci.Quantity)
@@ -58,11 +85,34 @@ namespace AseerAlkotb.Application.Services
 
             return Success(response);
         }
+
         public async Task<ApiResponse<AddItemToCartResponse>> AddCartItem(AddItemToCartRequest request)
         {
             AddItemToCartResponse response;
             await DoValidationAsync<AddCartItemValidation, AddItemToCartRequest>(request);
-            var cart = await unitOfWork.Carts.GetUserCartAsync(request.UserId);
+
+            // Get current user from HttpContext
+            var httpContext = httpContextAccessor.HttpContext;
+            if (httpContext?.User?.Identity?.IsAuthenticated != true)
+            {
+                return UnAuthorized<AddItemToCartResponse>();
+            }
+
+            var currentUser = await userManager.GetUserAsync(httpContext.User);
+            if (currentUser == null)
+            {
+                return UnAuthorized<AddItemToCartResponse>();
+            }
+
+            // Check if user has "Client" role
+            var isInClientRole = await userManager.IsInRoleAsync(currentUser, "Client");
+            if (!isInClientRole)
+            {
+                return UnAuthorized<AddItemToCartResponse>();
+            }
+
+            // Use current user's ID instead of request.UserId for security
+            var cart = await unitOfWork.Carts.GetUserCartAsync(currentUser.Id);
             var item = await unitOfWork.Books.GetByIdAsync(request.BookId);
             if (item.StockQuantity < 1)
             {
@@ -97,10 +147,32 @@ namespace AseerAlkotb.Application.Services
         public async Task<ApiResponse<DeleteItemResponse>> DeleteItem(DeleteItemRequest request)
         {
             await DoValidationAsync<DeleteItemValidation, DeleteItemRequest>(request);
-            var cart = await unitOfWork.Carts.GetUserCartAsync(request.UserId);
-            var item= cart.CartItems.FirstOrDefault(ci=>ci.BookId==request.bookId);
+
+            // Get current user from HttpContext
+            var httpContext = httpContextAccessor.HttpContext;
+            if (httpContext?.User?.Identity?.IsAuthenticated != true)
+            {
+                return UnAuthorized<DeleteItemResponse>();
+            }
+
+            var currentUser = await userManager.GetUserAsync(httpContext.User);
+            if (currentUser == null)
+            {
+                return UnAuthorized<DeleteItemResponse>();
+            }
+
+            // Check if user has "Client" role
+            var isInClientRole = await userManager.IsInRoleAsync(currentUser, "Client");
+            if (!isInClientRole)
+            {
+                return UnAuthorized<DeleteItemResponse>();
+            }
+
+            // Use current user's ID instead of request.UserId for security
+            var cart = await unitOfWork.Carts.GetUserCartAsync(currentUser.Id);
+            var item = cart.CartItems.FirstOrDefault(ci => ci.BookId == request.bookId);
             await unitOfWork.Carts.RemoveCartItemAsync(item);
-            item.Book.StockQuantity += item.Quantity; ///restor Quantity in stock
+            item.Book.StockQuantity += item.Quantity; ///restore Quantity in stock
             await unitOfWork.CommitAsync();
             var response = item.Adapt<DeleteItemResponse>();
             return Success(response);
@@ -109,8 +181,30 @@ namespace AseerAlkotb.Application.Services
         public async Task<ApiResponse<UpdateItemQuantityResponse>> UpdateCartItemQuantity(UpdateItemQuantityRequest request)
         {
             await DoValidationAsync<UpdateItemQuantityValidation, UpdateItemQuantityRequest>(request);
-            var cart = await unitOfWork.Carts.GetUserCartAsync(request.UserId);
-            var item= cart.CartItems.FirstOrDefault(ci=>ci.BookId==request.BookId);
+
+            // Get current user from HttpContext
+            var httpContext = httpContextAccessor.HttpContext;
+            if (httpContext?.User?.Identity?.IsAuthenticated != true)
+            {
+                return UnAuthorized<UpdateItemQuantityResponse>();
+            }
+
+            var currentUser = await userManager.GetUserAsync(httpContext.User);
+            if (currentUser == null)
+            {
+                return UnAuthorized<UpdateItemQuantityResponse>();
+            }
+
+            // Check if user has "Client" role
+            var isInClientRole = await userManager.IsInRoleAsync(currentUser, "Client");
+            if (!isInClientRole)
+            {
+                return UnAuthorized<UpdateItemQuantityResponse>();
+            }
+
+            // Use current user's ID instead of request.UserId for security
+            var cart = await unitOfWork.Carts.GetUserCartAsync(currentUser.Id);
+            var item = cart.CartItems.FirstOrDefault(ci => ci.BookId == request.BookId);
             if (item.Book.StockQuantity < request.NewQuantity)
             {
                 return BadRequest<UpdateItemQuantityResponse>("Stock Quantity is not enough");
@@ -118,28 +212,48 @@ namespace AseerAlkotb.Application.Services
             else
             {
                 var oldQuantity = item.Quantity;
-                if (oldQuantity < request.NewQuantity) {
+                if (oldQuantity < request.NewQuantity)
+                {
 
                     item.Book.StockQuantity -= request.NewQuantity - oldQuantity;
                 }
                 else
                 {
-                    item.Book.StockQuantity += oldQuantity-request.NewQuantity ;
+                    item.Book.StockQuantity += oldQuantity - request.NewQuantity;
                 }
                 item.Quantity = request.NewQuantity;
-               
+
                 await unitOfWork.Carts.UpdateCartItemAsync(item);
                 await unitOfWork.CommitAsync();
                 var respone = item.Adapt<UpdateItemQuantityResponse>();
                 return Success(respone);
             }
-            
+
         }
 
-        public async Task<ApiResponse<ClearCartResponse>> ClearCart(ClearCartRequest request)
+        public async Task<ApiResponse<ClearCartResponse>> ClearCart()
         {
-            await DoValidationAsync<ClearCartRequestValidation, ClearCartRequest>(request);
-            var cart = await unitOfWork.Carts.GetUserCartAsync(request.UserId);
+
+            // Get current user from HttpContext
+            var httpContext = httpContextAccessor.HttpContext;
+            if (httpContext?.User?.Identity?.IsAuthenticated != true)
+            {
+                return UnAuthorized<ClearCartResponse>();
+            }
+
+            var currentUser = await userManager.GetUserAsync(httpContext.User);
+            if (currentUser == null)
+            {
+                return UnAuthorized<ClearCartResponse>();
+            }
+
+            // Check if user has "Client" role
+            var isInClientRole = await userManager.IsInRoleAsync(currentUser, "Client");
+            if (!isInClientRole)
+            {
+                return UnAuthorized<ClearCartResponse>();
+            }
+            var cart = await unitOfWork.Carts.GetUserCartAsync(currentUser.Id);
             foreach (var item in cart.CartItems.ToList())
             {
                 await unitOfWork.Carts.RemoveCartItemAsync(item);

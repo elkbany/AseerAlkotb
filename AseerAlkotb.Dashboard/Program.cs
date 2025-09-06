@@ -1,16 +1,17 @@
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using AseerAlkotb.Domain.Entites.Models;
-using AseerAlkotb.Infrastructure.Context;
-using AseerAlkotb.Infrastructure.Repositories.Base;
-using AseerAlkotb.Domain.Interfaces.Base;
 using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Contracts.External;
 using AseerAlkotb.Application.ResponseHandler;
 using AseerAlkotb.Application.Services;
 using AseerAlkotb.Infrastructure.ExternalServices;
-using Mapster;
 using AseerAlkotb.Localization.Resources;
+using AseerAlkotb.Domain.Entites.Models;
+using AseerAlkotb.Domain.Interfaces.Base;
+using AseerAlkotb.Infrastructure.Context;
+using AseerAlkotb.Infrastructure.ExternalServices;
+using AseerAlkotb.Infrastructure.Repositories.Base;
+using Mapster;  
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using AseerAlkotb.Infrastructure.DependencyInjection;
 
@@ -48,7 +49,16 @@ namespace AseerAlkotb.Dashboard
             //})
             //.AddEntityFrameworkStores<ApplicationDbContext>()
             //.AddDefaultTokenProviders();
+
+            builder.Services.AddIdentity<User, IdentityRole<int>>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                // Gnerates the default token providers for password reset, email confirmation, etc.
+                .AddDefaultTokenProviders();
+
             #endregion
+
+            builder.Services.AddHttpContextAccessor();
+
 
             #region Repositories and Services
 
@@ -62,31 +72,39 @@ namespace AseerAlkotb.Dashboard
             builder.Services.AddScoped<IBookServices, BookServices>();
             builder.Services.AddScoped<ICategoryServices, CategoryServices>();
             builder.Services.AddScoped<IOrderServices, OrderServices>();
-
-            builder.Services.AddScoped<IEmailService, EmailService>();
             builder.Services.AddScoped<IAdminServices, AdminServices>();
 
             #region Infrastructure Services
             builder.Services.AddInfrastructure(builder.Configuration);
             #endregion
 
-            #region HttpClient Registeration
-            builder.Services.AddHttpClient<IPaymobService, PaymobService>();
 
             builder.Services.AddScoped<IPublisherServices, PublisherService>();
             builder.Services.AddScoped<IReviewServices, ReviewServices>();
-            builder.Services.AddScoped<IAccountServices, AccountService>();
+            builder.Services.AddScoped<IPublisherServices, PublisherService>();
+            builder.Services.AddScoped<IQuoteService, QuoteService>();
+            builder.Services.AddScoped<IPaymobService, PaymobService>();
+            builder.Services.AddScoped<IPaymentService, PaymentService>();
+            builder.Services.AddScoped<IOrderServices, OrderServices>();
+            builder.Services.AddScoped<IEmailService, EmailService>();
+
+            #region HttpClient Registeration
+            builder.Services.AddHttpClient<IPaymobService, PaymobService>();
+            #endregion
+            builder.Services.AddScoped<IAccountServices, AccountService>();            
+            // New services for improved Order and Payment flow
+            builder.Services.AddScoped<IOrderPaymentSyncService, OrderPaymentSyncService>();
+            builder.Services.AddScoped<IPaymentRetryService, PaymentRetryService>();
+
             // Add other services needed by the dashboard controllers
 
-            #endregion
 
-            #region Other Configurations
             // Configure Mapster for object mapping
             #region Localization
             builder.Services.AddLocalization();
             builder.Services.Configure<RequestLocalizationOptions>(options =>
             {
-                var supportedCultures = new[] { "en", "ar" };
+                var supportedCultures = new[] { "ar" };
                 options.SetDefaultCulture(supportedCultures[0])
                        .AddSupportedCultures(supportedCultures)
                        .AddSupportedUICultures(supportedCultures);
@@ -100,7 +118,6 @@ namespace AseerAlkotb.Dashboard
             // Register services for external dependencies, only if needed by the dashboard
             // For example, if you need email sending in your dashboard controllers
             builder.Services.AddScoped<IEmailService, EmailService>();
-            #endregion
 
             var app = builder.Build();
 
@@ -129,6 +146,9 @@ namespace AseerAlkotb.Dashboard
             app.UseAuthentication();
             app.UseAuthorization();
 
+            app.MapControllerRoute(
+                name: "account",
+                pattern: "{controller=Account}/{action=Login}/{id?}");
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");

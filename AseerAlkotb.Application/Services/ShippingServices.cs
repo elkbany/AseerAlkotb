@@ -62,12 +62,19 @@ namespace AseerAlkotb.Application.Services
         {
             return SHIPPING_RATES_FROM_CAIRO.TryGetValue(governorate, out var rate) ? rate : 50m; 
         }
-        public static decimal CalculateShippingCost(AddOrderRequest request)
+        public static decimal CalculateShippingCost(AddOrderRequest request,decimal TotalAmount)
         {
             var standardRate = GetShippingRate(request.Governorate);
-            //var isFreeShipping = request.OrderTotal >= FREE_SHIPPING_THRESHOLD;
+            var isFreeShipping =TotalAmount >= FREE_SHIPPING_THRESHOLD;
+            if(isFreeShipping)
+             standardRate = 0m;
              var result = standardRate;
             return result;
+        }
+        public static decimal GetShippingCostForAGovernorate(EgyptGovernorates governorate)
+        {
+            var standardRate = GetShippingRate(governorate);
+            return standardRate;
         }
     }
 }

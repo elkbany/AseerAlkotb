@@ -1,19 +1,21 @@
+using AseerAlkotb.Application.Contracts;
+using AseerAlkotb.Application.Features.Authors.Requests;
+using AseerAlkotb.Application.Features.Books.Requests;
+using AseerAlkotb.Application.Features.Categories.Requests;
+using AseerAlkotb.Application.Features.Orders.Requests;
+using AseerAlkotb.Application.Features.Publishers.Requests;
 using AseerAlkotb.Dashboard.Models;
+using AseerAlkotb.Domain.Entites.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity; // Add this namespace
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore; // Add this namespace
 using System.Diagnostics;
 using System.Threading.Tasks;
-using AseerAlkotb.Application.Contracts;
-using AseerAlkotb.Application.Features.Publishers.Requests;
-using AseerAlkotb.Application.Features.Books.Requests;
-using AseerAlkotb.Application.Features.Authors.Requests;
-using AseerAlkotb.Application.Features.Orders.Requests;
-using AseerAlkotb.Application.Features.Categories.Requests;
-using Microsoft.AspNetCore.Identity; // Add this namespace
-using AseerAlkotb.Domain.Entites.Models;
-using Microsoft.EntityFrameworkCore; // Add this namespace
 
 namespace AseerAlkotb.Dashboard.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;

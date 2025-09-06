@@ -1,12 +1,14 @@
 using AseerAlkotb.Application.Contracts;
+using AseerAlkotb.Application.Features.Authors.Mapping;
 using AseerAlkotb.Application.Features.Authors.Requests;
 using AseerAlkotb.Application.Features.Authors.Responses;
-using AseerAlkotb.Application.Features.Authors.Mapping;
 using AseerAlkotb.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AseerAlkotb.Dashboard.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class AuthorsController : Controller
     {
         private readonly IAuthorServices _authorServices;
