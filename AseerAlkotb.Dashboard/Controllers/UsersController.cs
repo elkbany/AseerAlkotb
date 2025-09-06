@@ -19,16 +19,27 @@ namespace AseerAlkotb.Dashboard.Controllers
             _adminServices = adminServices;
         }
 
-        // GET: Users - Show Admins only
+        // GET: Users - Show All Users (Admins + Clients)
         public async Task<IActionResult> Index()
         {
             try
             {
+                // Get all users (Admins + Clients)
+                var allUsersResult = await _adminServices.GetAllUsers();
+                var allUsers = allUsersResult.Data ?? new List<GetAllAdminResponse>();
+
+                // Get admins only
                 var adminsResult = await _adminServices.GetAllAdmins();
                 var admins = adminsResult.Data ?? new List<GetAllAdminResponse>();
 
+                // Get clients only
+                var clientsResult = await _adminServices.GetAllClients();
+                var clients = clientsResult.Data ?? new List<GetAllClientResponse>();
+
                 ViewBag.Admins = admins;
-                ViewBag.TotalUsers = admins.Count;
+                ViewBag.Clients = clients;
+                ViewBag.AllUsers = allUsers;
+                ViewBag.TotalUsers = allUsers.Count;
 
                 return View();
             }
@@ -44,41 +55,41 @@ namespace AseerAlkotb.Dashboard.Controllers
         {
             try
             {
-                // Try to find user in admins first
-                var admins = await _adminServices.GetAllAdmins();
-                var admin = admins.Data?.FirstOrDefault(a => a.Id == id);
+                // Get user details with all related data
+                var userDetailsResult = await _adminServices.GetUserDetailsWithOrders(id);
+                
+                if (!userDetailsResult.Succeeded)
+                {
+                    TempData["Error"] = userDetailsResult.Message;
+                    return RedirectToAction(nameof(Index));
+                }
 
-                if (admin != null)
+                var userDetails = userDetailsResult.Data;
+                var user = userDetails.User;
+
+                // Determine user role
+                var admins = await _adminServices.GetAllAdmins();
+                var isAdmin = admins.Data?.Any(a => a.Id == id) ?? false;
+                
+                if (isAdmin)
                 {
                     ViewBag.UserRole = "Admin";
                     ViewBag.CurrentRole = "Admin";
-                    return View("Details", admin);
                 }
-
-                // If not found in admins, try clients
-                var clients = await _adminServices.GetAllClients();
-                var client = clients.Data?.FirstOrDefault(c => c.Id == id);
-
-                if (client != null)
+                else
                 {
                     ViewBag.UserRole = "Client";
                     ViewBag.CurrentRole = "Client";
-                    var vm = new GetAllAdminResponse(
-                        client.Id,
-                        client.FirstName,
-                        client.LastName,
-                        client.UserName,
-                        client.Email,
-                        client.Gender,
-                        client.IsActive,
-                        client.PhoneNumber,
-                        client.Nationality
-                    );
-                    return View("Details", vm);
                 }
 
-                TempData["Error"] = "User not found";
-                return RedirectToAction(nameof(Index));
+                // Pass additional data to view
+                ViewBag.UserDetails = userDetails;
+                ViewBag.Orders = userDetails.Orders;
+                ViewBag.Reviews = userDetails.Reviews;
+                ViewBag.Quotes = userDetails.Quotes;
+                ViewBag.Wishlist = userDetails.Wishlist;
+
+                return View("Details", user);
             }
             catch (Exception ex)
             {
@@ -100,13 +111,23 @@ namespace AseerAlkotb.Dashboard.Controllers
         {
             try
             {
+                // Handle file upload
+                if (Request.Form.Files != null && Request.Form.Files.Count > 0)
+                {
+                    var file = Request.Form.Files["ProfilePictureUrl"];
+                    if (file != null && file.Length > 0)
+                    {
+                        request = request with { ProfilePictureUrl = file };
+                    }
+                }
+
                 if (ModelState.IsValid)
                 {
                     var result = await _adminServices.createAdminAccount(request);
                     
                     if (result.Succeeded)
                     {
-                        TempData["Success"] = "User created successfully";
+                        TempData["Success"] = $"User created successfully as {request.UserRole}";
                         return RedirectToAction(nameof(Index));
                     }
                     else
@@ -123,8 +144,16 @@ namespace AseerAlkotb.Dashboard.Controllers
                         }
                         else
                         {
-                            ModelState.AddModelError("", "Failed to create user");
+                            ModelState.AddModelError("", result.Message ?? "Failed to create user");
                         }
+                    }
+                }
+                else
+                {
+                    // Log ModelState errors for debugging
+                    foreach (var modelError in ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        Console.WriteLine($"ModelState Error: {modelError.ErrorMessage}");
                     }
                 }
             }
@@ -148,6 +177,7 @@ namespace AseerAlkotb.Dashboard.Controllers
                 if (admin != null)
                 {
                     ViewBag.UserRole = "Admin";
+                    ViewBag.CurrentProfilePicture = admin.ProfilePictureUrl;
                     var updateRequest = new UpdateAdminAccountRequest
                     {
                         FirstName = admin.FirstName,
@@ -168,6 +198,7 @@ namespace AseerAlkotb.Dashboard.Controllers
                 if (client != null)
                 {
                     ViewBag.UserRole = "Client";
+                    ViewBag.CurrentProfilePicture = client.ProfilePictureUrl;
                     var updateRequest = new UpdateAdminAccountRequest
                     {
                         FirstName = client.FirstName,
@@ -204,7 +235,7 @@ namespace AseerAlkotb.Dashboard.Controllers
                     if (Request.Form.Files != null && Request.Form.Files.Count > 0)
                     {
                         var file = Request.Form.Files["profilePictureFile"];
-                        if (file != null)
+                        if (file != null && file.Length > 0)
                         {
                             request.ProfilePictureUrl = file;
                         }
@@ -276,7 +307,10 @@ namespace AseerAlkotb.Dashboard.Controllers
                         client.Gender,
                         client.IsActive,
                         client.PhoneNumber,
-                        client.Nationality
+                        client.Nationality,
+                        client.ProfilePictureUrl,
+                        client.CreatedAt,
+                        client.UpdatedAt
                     );
                     return View("Delete", vm);
                 }
@@ -458,6 +492,32 @@ namespace AseerAlkotb.Dashboard.Controllers
             }
 
             return RedirectToAction(nameof(Index));
+        }
+
+        // GET: Users/ClientDetails/5
+        public async Task<IActionResult> ClientDetails(int id)
+        {
+            try
+            {
+                var clientResult = await _adminServices.GetClientDetails(id);
+                
+                if (!clientResult.Succeeded)
+                {
+                    TempData["Error"] = clientResult.Message;
+                    return RedirectToAction(nameof(Index));
+                }
+
+                var client = clientResult.Data;
+                ViewBag.UserRole = "Client";
+                ViewBag.CurrentRole = "Client";
+                
+                return View("Details", client);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error loading client details: " + ex.Message;
+                return RedirectToAction(nameof(Index));
+            }
         }
     }
 }

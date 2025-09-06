@@ -47,37 +47,79 @@ namespace AseerAlkotb.Application.Services
         {
             try
             {
+                Console.WriteLine($"=== Starting createAdminAccount ===");
+                Console.WriteLine($"Creating user: {request.UserName}, Email: {request.Email}, Role: {request.UserRole}");
+                Console.WriteLine($"ProfilePictureUrl: {(request.ProfilePictureUrl != null ? $"{request.ProfilePictureUrl.FileName} ({request.ProfilePictureUrl.Length} bytes)" : "null")}");
+                
                 // 1- Validate input
+                Console.WriteLine("Starting validation...");
                 await DoValidationAsync<CreateAdminAccountRequestValidator, CreateAdminAccountRequest>(request);
+                Console.WriteLine("Validation passed successfully");
 
                 // 2- Check for duplicate email
+                Console.WriteLine("Checking for duplicate email...");
                 if (await userManager.FindByEmailAsync(request.Email) is not null)
+                {
+                    Console.WriteLine("Email already exists");
                     return BadRequest<CreateAdminAccountResponse>("Email is already taken");
+                }
+                Console.WriteLine("Email is unique");
 
                 // 3- Check for duplicate username
+                Console.WriteLine("Checking for duplicate username...");
                 if (await userManager.FindByNameAsync(request.UserName) is not null)
+                {
+                    Console.WriteLine("Username already exists");
                     return BadRequest<CreateAdminAccountResponse>("Username is already taken");
+                }
+                Console.WriteLine("Username is unique");
 
                 // 4- Map request to User entity
+                Console.WriteLine("Mapping request to User entity...");
                 var newAccount = request.Adapt<User>();
                 newAccount.CreatedAt = DateTime.UtcNow;
                 newAccount.UpdatedAt = DateTime.UtcNow;
                 newAccount.IsActive = true;
+                Console.WriteLine("User entity created successfully");
+
+                // Handle Profile Picture Upload if provided
+                if (request.ProfilePictureUrl != null && request.ProfilePictureUrl.Length > 0)
+                {
+                    Console.WriteLine($"Uploading profile picture: {request.ProfilePictureUrl.FileName}, Size: {request.ProfilePictureUrl.Length}");
+                    
+                    var uploadResult = await UpdateImageAsync(
+                     request.ProfilePictureUrl, // new image (IFormFile)
+                     null,                      // old image url (string) - مفيش صورة قديمة
+                     "user"                     // folder (string)
+                 );
+
+                    newAccount.ProfilePictureUrl = !string.IsNullOrEmpty(uploadResult.CloudUrl) ? uploadResult.CloudUrl : uploadResult.LocalUrl;
+                    Console.WriteLine($"Profile picture uploaded successfully: {newAccount.ProfilePictureUrl}");
+                }
 
                 // 5- Create user
+                Console.WriteLine($"Creating user in database...");
                 var result = await userManager.CreateAsync(newAccount, request.Password);
                 if (!result.Succeeded)
-                    return BadRequest<CreateAdminAccountResponse>(
-                        string.Join(", ", result.Errors.Select(e => e.Description))
-                    );
+                {
+                    var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                    Console.WriteLine($"User creation failed: {errors}");
+                    return BadRequest<CreateAdminAccountResponse>(errors);
+                }
+                
+                Console.WriteLine($"User created successfully with ID: {newAccount.Id}");
 
-                //add role to the new Admin
-                var addRole = await userManager.AddToRoleAsync(newAccount, "Admin");
+                //add role to the new user based on UserRole
+                Console.WriteLine($"Assigning role: {request.UserRole}");
+                var roleToAssign = string.IsNullOrEmpty(request.UserRole) ? "Client" : request.UserRole;
+                var addRole = await userManager.AddToRoleAsync(newAccount, roleToAssign);
                 if (!addRole.Succeeded)
                 {
-                    return BadRequest<CreateAdminAccountResponse>("Failed to assign role to user");
-                    //return BadRequest<RegisterResponse>(addRole.Errors.Select(e => e.Description).ToList());
+                    var roleErrors = string.Join(", ", addRole.Errors.Select(e => e.Description));
+                    Console.WriteLine($"Role assignment failed: {roleErrors}");
+                    return BadRequest<CreateAdminAccountResponse>($"Failed to assign role to user: {roleErrors}");
                 }
+                Console.WriteLine("Role assigned successfully");
 
                 // 6- Generate email confirmation token
                 var token = await userManager.GenerateEmailConfirmationTokenAsync(newAccount);
@@ -100,7 +142,7 @@ namespace AseerAlkotb.Application.Services
                 var BackendBase = configuration["App:BackendBaseUrl"] ?? "http://localhost:5234";
                 var confirmUrl = $"{BackendBase}/api/Account/confirm-email?userId={newAccount.Id}&token={tokenEncoded}";
 
-                // 9- Send email
+                // 9- Send email (Optional - Skip if email service fails)
                 var subject = "Confirm your email";
                 var body = $@"
                     <p>Hello {newAccount.UserName},</p>
@@ -110,23 +152,31 @@ namespace AseerAlkotb.Application.Services
 
                 try
                 {
+                    Console.WriteLine("Sending confirmation email...");
                     await emailService.SendEmailAsync(newAccount.Email!, subject, body);
+                    var response = newAccount.Adapt<CreateAdminAccountResponse>();
+                    Console.WriteLine("=== createAdminAccount completed successfully with email ===");
+                    return Success(response, "Admin account created successfully. Confirmation email sent.");
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Failed to send confirmation email: {ex.Message}");
-                    // retry mechanism 
-                    return BadRequest<CreateAdminAccountResponse>("Failed to send confirmation email. Please try again later.");
+                    Console.WriteLine($"Email service failed: {ex.Message}");
+                    // Continue without email - Admin account is still created
+                    var response = newAccount.Adapt<CreateAdminAccountResponse>();
+                    Console.WriteLine("=== createAdminAccount completed successfully without email ===");
+                    return Success(response, "Admin account created successfully. Note: Email confirmation was not sent due to email service issues.");
                 }
-
-                var response = newAccount.Adapt<CreateAdminAccountResponse>();
-                return Success(response, "Registered successfully. Please check your email to confirm.");
             }
             catch (Exception ex)
             {
-                // Log the exception
-                Console.WriteLine($"Unexpected error in Register: {ex.Message}");
-                return BadRequest<CreateAdminAccountResponse>("An unexpected error occurred. Try again.");
+                // Log the exception with full details
+                Console.WriteLine($"Unexpected error in createAdminAccount: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+                }
+                return BadRequest<CreateAdminAccountResponse>($"An unexpected error occurred: {ex.Message}");
             }
         }
 
@@ -206,11 +256,21 @@ namespace AseerAlkotb.Application.Services
             // Handle Profile Picture Upload 
             if (request.ProfilePictureUrl != null && request.ProfilePictureUrl.Length > 0)
             {
-                user.ProfilePictureUrl = await UpdateImageAsync(
-                    request.ProfilePictureUrl,
-                    user.ProfilePictureUrl,
-                    "user"
-                );
+                try
+                {
+                    var uploadResult = await UpdateImageAsync(
+                         request.ProfilePictureUrl,  // الصورة الجديدة
+                         user.ProfilePictureUrl ?? string.Empty,     // الصورة القديمة (هتتمسح)
+                         "user"                      // الفولدر
+                     );
+
+                    user.ProfilePictureUrl = !string.IsNullOrEmpty(uploadResult.CloudUrl) ? uploadResult.CloudUrl : uploadResult.LocalUrl; // أو أي property فيه الـ URL الجديد
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error uploading profile picture: {ex.Message}");
+                    return BadRequest<UpdateAdminAccountResponse>($"Failed to upload profile picture: {ex.Message}");
+                }
             }
 
             // Update the UpdatedAt 
@@ -250,6 +310,131 @@ namespace AseerAlkotb.Application.Services
             var response = clients.Adapt<List<GetAllAdminResponse>>();
 
             return Success(response);
+        }
+
+        // Get All Users (Admins + Clients)
+        public async Task<ApiResponse<List<GetAllAdminResponse>>> GetAllUsers()
+        {
+            try
+            {
+                var admins = await userManager.GetUsersInRoleAsync(Roles.Admin.ToString());
+                var clients = await userManager.GetUsersInRoleAsync(Roles.Client.ToString());
+                
+                var allUsers = new List<User>();
+                allUsers.AddRange(admins);
+                allUsers.AddRange(clients);
+
+                var response = allUsers.Adapt<List<GetAllAdminResponse>>();
+                return Success(response);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting all users: {ex.Message}");
+                return BadRequest<List<GetAllAdminResponse>>("Failed to retrieve users");
+            }
+        }
+
+        // Get Client Details with all information
+        public async Task<ApiResponse<GetAllAdminResponse>> GetClientDetails(int clientId)
+        {
+            try
+            {
+                var user = await userManager.FindByIdAsync(clientId.ToString());
+                if (user == null)
+                {
+                    return NotFound<GetAllAdminResponse>("Client not found");
+                }
+
+                // Check if user is actually a client
+                var isClient = await userManager.IsInRoleAsync(user, Roles.Client.ToString());
+                if (!isClient)
+                {
+                    return BadRequest<GetAllAdminResponse>("User is not a client");
+                }
+
+                var response = user.Adapt<GetAllAdminResponse>();
+                return Success(response);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting client details: {ex.Message}");
+                return BadRequest<GetAllAdminResponse>("Failed to retrieve client details");
+            }
+        }
+
+        // Get User Details with Orders and all related data
+        public async Task<ApiResponse<UserDetailsResponse>> GetUserDetailsWithOrders(int userId)
+        {
+            try
+            {
+                var user = await userManager.FindByIdAsync(userId.ToString());
+                if (user == null)
+                {
+                    return NotFound<UserDetailsResponse>("User not found");
+                }
+
+                // Get user orders with order items and books
+                var orders = await unitOfWork.Orders.GetAllAsync(
+                    o => o.UserId == userId,
+                    includes: o => o.OrderItems
+                );
+
+                // Get user reviews
+                var reviews = await unitOfWork.Reviews.GetAllAsync(
+                    r => r.UserId == userId,
+                    includes: r => r.Book
+                );
+
+                // Get user quotes
+                var quotes = await unitOfWork.Quotes.GetAllAsync(
+                    q => q.UserId == userId,
+                    includes: q => q.Book
+                );
+
+                // Get user wishlist
+                var wishlist = await unitOfWork.Wishlists.GetAllAsync(
+                    w => w.UserId == userId,
+                    includes: w => w.WishlistItems
+                );
+
+                // Get wishlist items from all wishlists
+                var wishlistItems = new List<WishlistItemDetailsResponse>();
+                foreach (var w in wishlist)
+                {
+                    if (w.WishlistItems != null)
+                    {
+                        foreach (var item in w.WishlistItems)
+                        {
+                            wishlistItems.Add(new WishlistItemDetailsResponse
+                            {
+                                Id = item.BookId,
+                                BookId = item.BookId,
+                                BookTitle = item.Book?.Title ?? "Unknown Book",
+                                BookCoverImageUrl = item.Book?.CoverImageUrl ?? "/images/default-book.png",
+                                AuthorName = item.Book?.Author?.Name ?? "Unknown Author",
+                                Price = item.Book?.Price ?? 0,
+                                AddedAt = DateTime.UtcNow // You might want to add CreatedAt to WishlistItem
+                            });
+                        }
+                    }
+                }
+
+                var response = new UserDetailsResponse
+                {
+                    User = user.Adapt<GetAllAdminResponse>(),
+                    Orders = orders.Adapt<List<OrderDetailsResponse>>(),
+                    Reviews = reviews.Adapt<List<ReviewDetailsResponse>>(),
+                    Quotes = quotes.Adapt<List<QuoteDetailsResponse>>(),
+                    Wishlist = wishlistItems
+                };
+
+                return Success(response);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting user details with orders: {ex.Message}");
+                return BadRequest<UserDetailsResponse>("Failed to retrieve user details");
+            }
         }
 
 

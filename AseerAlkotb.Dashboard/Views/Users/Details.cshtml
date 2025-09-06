@@ -1,4 +1,5 @@
-@model AseerAlkotb.Application.Features.Roles.Responses.GetAllAdminResponse
+@using AseerAlkotb.Application.Features.Roles.Responses
+@model GetAllAdminResponse
 
 @{
     ViewData["Title"] = "User Details";
@@ -30,7 +31,7 @@
                     <div class="card-body box-profile">
                         <div class="text-center">
                             <img class="profile-user-img img-fluid img-circle" 
-                                 src="/images/default-user.png" 
+                                 src="@(string.IsNullOrEmpty(Model.ProfilePictureUrl) ? "/images/default-user.png" : Model.ProfilePictureUrl)" 
                                  alt="@Model.FirstName">
                         </div>
                         <h3 class="profile-username text-center">@Model.FirstName @Model.LastName</h3>
@@ -113,7 +114,11 @@
                                         @(string.IsNullOrEmpty(Model.Nationality) ? "Not specified" : Model.Nationality)
                                     </dd>
                                     
+                                    <dt class="col-sm-4">Account Created:</dt>
+                                    <dd class="col-sm-8">@Model.CreatedAt.ToString("dd/MM/yyyy")</dd>
                                     
+                                    <dt class="col-sm-4">Last Updated:</dt>
+                                    <dd class="col-sm-8">@Model.UpdatedAt.ToString("dd/MM/yyyy")</dd>
                                 </dl>
                             </div>
                         </div>
@@ -185,6 +190,136 @@
                     </div>
                 </div>
                 
+                <!-- Orders Section -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Purchase History</h3>
+                    </div>
+                    <div class="card-body">
+                        @if (ViewBag.Orders != null && ((List<AseerAlkotb.Application.Features.Roles.Responses.OrderDetailsResponse>)ViewBag.Orders).Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Order #</th>
+                                            <th>Date</th>
+                                            <th>Items</th>
+                                            <th>Total Amount</th>
+                                            <th>Status</th>
+                                            <th>Payment Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var order in ViewBag.Orders)
+                                        {
+                                            <tr>
+                                                <td>#@order.Id</td>
+                                                <td>@order.OrderDate.ToString("dd/MM/yyyy")</td>
+                                                <td>@order.OrderItems.Count item(s)</td>
+                                                <td>@order.FinalAmount.ToString("C")</td>
+                                                <td>
+                                                    <span class="badge badge-@(order.Status == "Completed" ? "success" : order.Status == "Pending" ? "warning" : "secondary")">
+                                                        @order.Status
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span class="badge badge-@(order.PaymentStatus == "Paid" ? "success" : "warning")">
+                                                        @order.PaymentStatus
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center text-muted">
+                                <i class="fas fa-shopping-cart fa-3x mb-3"></i>
+                                <p>No orders found for this user.</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Reviews Section -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Reviews</h3>
+                    </div>
+                    <div class="card-body">
+                        @if (ViewBag.Reviews != null && ((List<AseerAlkotb.Application.Features.Roles.Responses.ReviewDetailsResponse>)ViewBag.Reviews).Any())
+                        {
+                            <div class="row">
+                                @foreach (var review in ViewBag.Reviews)
+                                {
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between">
+                                                    <h6 class="card-title">@review.BookTitle</h6>
+                                                    <div class="rating">
+                                                        @for (int i = 1; i <= 5; i++)
+                                                        {
+                                                            <i class="fas fa-star @(i <= review.Rating ? "text-warning" : "text-muted")"></i>
+                                                        }
+                                                    </div>
+                                                </div>
+                                                <p class="card-text">@review.Comment</p>
+                                                <small class="text-muted">@review.CreatedAt.ToString("dd/MM/yyyy")</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center text-muted">
+                                <i class="fas fa-star fa-3x mb-3"></i>
+                                <p>No reviews found for this user.</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Wishlist Section -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Wishlist</h3>
+                    </div>
+                    <div class="card-body">
+                        @if (ViewBag.Wishlist != null && ((List<AseerAlkotb.Application.Features.Roles.Responses.WishlistItemDetailsResponse>)ViewBag.Wishlist).Any())
+                        {
+                            <div class="row">
+                                @foreach (var item in ViewBag.Wishlist)
+                                {
+                                    <div class="col-md-4 mb-3">
+                                        <div class="card">
+                                            <img src="@item.BookCoverImageUrl" class="card-img-top" alt="@item.BookTitle" style="height: 200px; object-fit: cover;">
+                                            <div class="card-body">
+                                                <h6 class="card-title">@item.BookTitle</h6>
+                                                <p class="card-text">by @item.AuthorName</p>
+                                                <p class="card-text"><strong>@item.Price.ToString("C")</strong></p>
+                                                <small class="text-muted">Added: @item.AddedAt.ToString("dd/MM/yyyy")</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center text-muted">
+                                <i class="fas fa-heart fa-3x mb-3"></i>
+                                <p>No items in wishlist.</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+
                 <!-- Account Actions -->
                 <div class="card">
                     <div class="card-header">

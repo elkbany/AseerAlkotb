@@ -53,7 +53,7 @@ namespace AseerAlkotb.Application.Services
             var book = request.Adapt<Book>();
             if (request.CoverImageUrl != null)
             {
-                book.CoverImageUrl = await UploadImageAsync(request.CoverImageUrl, "Books");
+                book.CoverImageUrl = (await UploadImageAsync(request.CoverImageUrl, "Books")).CloudUrl;
             }
 
            
@@ -129,7 +129,7 @@ namespace AseerAlkotb.Application.Services
                 {
                     await DeleteImageAsync(book.CoverImageUrl);
                 }
-                book.CoverImageUrl = await UploadImageAsync(request.CoverImageUrl, "Books");
+                book.CoverImageUrl = (await UploadImageAsync(request.CoverImageUrl, "Books")).CloudUrl;
             }
             else
             {

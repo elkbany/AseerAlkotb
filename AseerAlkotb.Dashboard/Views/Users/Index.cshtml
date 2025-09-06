@@ -1,3 +1,4 @@
+@using AseerAlkotb.Application.Features.Roles.Responses
 @{
     ViewData["Title"] = "Users Management";
 }
@@ -117,90 +118,69 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @if (ViewBag.Admins != null)
+                                    @if (ViewBag.AllUsers != null)
                                     {
-                                        @foreach (var admin in ViewBag.Admins)
+                                        @foreach (var user in ViewBag.AllUsers)
                                         {
                                             <tr>
                                                 <td>
-                                                    <img src="@(string.IsNullOrEmpty(admin.ProfilePictureUrl) ? "/images/default-user.png" : admin.ProfilePictureUrl)" 
-                                                         alt="@admin.FirstName" class="img-circle" style="width: 40px; height: 40px;">
+                                                    <img src="@(string.IsNullOrEmpty(user.ProfilePictureUrl) ? "/images/default-user.png" : user.ProfilePictureUrl)" 
+                                                         alt="@user.FirstName" class="img-circle" style="width: 40px; height: 40px;">
                                                 </td>
                                                 <td>
                                                     <div class="d-flex flex-column">
-                                                        <strong>@admin.FirstName @admin.LastName</strong>
-                                                        <small class="text-muted">@admin.Nationality</small>
+                                                        <strong>@user.FirstName @user.LastName</strong>
+                                                        <small class="text-muted">@user.Nationality</small>
                                                     </div>
                                                 </td>
-                                                <td>@admin.UserName</td>
-                                                <td>@admin.Email</td>
-                                                <td>@(string.IsNullOrEmpty(admin.PhoneNumber) ? "N/A" : admin.PhoneNumber)</td>
+                                                <td>@user.UserName</td>
+                                                <td>@user.Email</td>
+                                                <td>@(string.IsNullOrEmpty(user.PhoneNumber) ? "N/A" : user.PhoneNumber)</td>
                                                 <td>
-                                                    <span class="badge badge-success">Admin</span>
+                                                    @{
+                                                        // Determine role based on user data or check if it's in admins list
+                                                        var isAdmin = ViewBag.Admins != null && ((List<GetAllAdminResponse>)ViewBag.Admins).Any(a => a.Id == user.Id);
+                                                        var isClient = ViewBag.Clients != null && ((List<GetAllClientResponse>)ViewBag.Clients).Any(c => c.Id == user.Id);
+                                                    }
+                                                    @if (isAdmin)
+                                                    {
+                                                        <span class="badge badge-success">Admin</span>
+                                                    }
+                                                    else if (isClient)
+                                                    {
+                                                        <span class="badge badge-warning">Client</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge badge-secondary">Unknown</span>
+                                                    }
                                                 </td>
                                                 <td>
-                                                    <span class="badge @(admin.IsActive ? "badge-success" : "badge-secondary")">
-                                                        @(admin.IsActive ? "Active" : "Inactive")
+                                                    <span class="badge @(user.IsActive ? "badge-success" : "badge-secondary")">
+                                                        @(user.IsActive ? "Active" : "Inactive")
                                                     </span>
                                                 </td>
                                                 <td>
                                                     <div class="btn-group">
-                                                        <a asp-action="Edit" asp-route-id="@admin.Id" class="btn btn-sm btn-outline-primary" title="Edit">
+                                                        <a asp-action="Edit" asp-route-id="@user.Id" class="btn btn-sm btn-outline-primary" title="Edit">
                                                             <i class="fas fa-edit"></i>
                                                         </a>
-                                                        <a asp-action="Details" asp-route-id="@admin.Id" class="btn btn-sm btn-outline-info" title="Details">
-                                                            <i class="fas fa-info-circle"></i>
-                                                        </a>
-                                                        <a asp-action="AssignRole" asp-route-id="@admin.Id" class="btn btn-sm btn-outline-warning" title="Manage Role">
+                                                        @if (isClient)
+                                                        {
+                                                            <a asp-action="ClientDetails" asp-route-id="@user.Id" class="btn btn-sm btn-outline-info" title="Client Details">
+                                                                <i class="fas fa-info-circle"></i>
+                                                            </a>
+                                                        }
+                                                        else
+                                                        {
+                                                            <a asp-action="Details" asp-route-id="@user.Id" class="btn btn-sm btn-outline-info" title="Details">
+                                                                <i class="fas fa-info-circle"></i>
+                                                            </a>
+                                                        }
+                                                        <a asp-action="AssignRole" asp-route-id="@user.Id" class="btn btn-sm btn-outline-warning" title="Manage Role">
                                                             <i class="fas fa-user-tag"></i>
                                                         </a>
-                                                        <a asp-action="Delete" asp-route-id="@admin.Id" class="btn btn-sm btn-outline-danger" title="Delete">
-                                                            <i class="fas fa-trash"></i>
-                                                        </a>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        }
-                                    }
-
-                                    @if (ViewBag.Clients != null)
-                                    {
-                                        @foreach (var client in ViewBag.Clients)
-                                        {
-                                            <tr>
-                                                <td>
-                                                    <img src="@(string.IsNullOrEmpty(client.ProfilePictureUrl) ? "/images/default-user.png" : client.ProfilePictureUrl)" 
-                                                         alt="@client.FirstName" class="img-circle" style="width: 40px; height: 40px;">
-                                                </td>
-                                                <td>
-                                                    <div class="d-flex flex-column">
-                                                        <strong>@client.FirstName @client.LastName</strong>
-                                                        <small class="text-muted">@client.Nationality</small>
-                                                    </div>
-                                                </td>
-                                                <td>@client.UserName</td>
-                                                <td>@client.Email</td>
-                                                <td>@(string.IsNullOrEmpty(client.PhoneNumber) ? "N/A" : client.PhoneNumber)</td>
-                                                <td>
-                                                    <span class="badge badge-warning">Client</span>
-                                                </td>
-                                                <td>
-                                                    <span class="badge @(client.IsActive ? "badge-success" : "badge-secondary")">
-                                                        @(client.IsActive ? "Active" : "Inactive")
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <div class="btn-group">
-                                                        <a asp-action="Edit" asp-route-id="@client.Id" class="btn btn-sm btn-outline-primary" title="Edit">
-                                                            <i class="fas fa-edit"></i>
-                                                        </a>
-                                                        <a asp-action="Details" asp-route-id="@client.Id" class="btn btn-sm btn-outline-info" title="Details">
-                                                            <i class="fas fa-info-circle"></i>
-                                                        </a>
-                                                        <a asp-action="AssignRole" asp-route-id="@client.Id" class="btn btn-sm btn-outline-warning" title="Manage Role">
-                                                            <i class="fas fa-user-tag"></i>
-                                                        </a>
-                                                        <a asp-action="Delete" asp-route-id="@client.Id" class="btn btn-sm btn-outline-danger" title="Delete">
+                                                        <a asp-action="Delete" asp-route-id="@user.Id" class="btn btn-sm btn-outline-danger" title="Delete">
                                                             <i class="fas fa-trash"></i>
                                                         </a>
                                                     </div>

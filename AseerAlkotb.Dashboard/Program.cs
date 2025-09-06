@@ -8,16 +8,11 @@ using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Contracts.External;
 using AseerAlkotb.Application.ResponseHandler;
 using AseerAlkotb.Application.Services;
-using AseerAlkotb.Application.Contracts.External;
 using AseerAlkotb.Infrastructure.ExternalServices;
 using Mapster;
-using AseerAlkotb.Infrastructure.Repositories.Base;
 using AseerAlkotb.Localization.Resources;
-using Mapster;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
-using Microsoft.AspNetCore.Identity;
-using AseerAlkotb.Domain.Entites.Models;
+using AseerAlkotb.Infrastructure.DependencyInjection;
 
 namespace AseerAlkotb.Dashboard
 {
@@ -71,13 +66,16 @@ namespace AseerAlkotb.Dashboard
             builder.Services.AddScoped<IEmailService, EmailService>();
             builder.Services.AddScoped<IAdminServices, AdminServices>();
 
+            #region Infrastructure Services
+            builder.Services.AddInfrastructure(builder.Configuration);
+            #endregion
+
             #region HttpClient Registeration
             builder.Services.AddHttpClient<IPaymobService, PaymobService>();
 
             builder.Services.AddScoped<IPublisherServices, PublisherService>();
             builder.Services.AddScoped<IReviewServices, ReviewServices>();
             builder.Services.AddScoped<IAccountServices, AccountService>();
-            builder.Services.AddScoped<IAdminServices, AdminServices>();
             // Add other services needed by the dashboard controllers
 
             #endregion

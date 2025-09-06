@@ -35,7 +35,7 @@ namespace AseerAlkotb.Application.Services
             var publisher = request.Adapt<Publisher>();
             if (request.LogoUrl != null)
             {
-                publisher.LogoUrl = await UploadImageAsync(request.LogoUrl, "Publishers");
+                publisher.LogoUrl = (await UploadImageAsync(request.LogoUrl, "Publishers")).CloudUrl;
             }
             await unitOfWork.Publishers.InsertAsync(publisher);
             await unitOfWork.CommitAsync();
@@ -121,7 +121,8 @@ namespace AseerAlkotb.Application.Services
 
             if (request.LogoUrl != null)
             {
-                publisher.LogoUrl = await UpdateImageAsync(request.LogoUrl, oldLogoUrl, "Publishers");
+                var uploadResult = await UpdateImageAsync(request.LogoUrl, oldLogoUrl ?? string.Empty, "Publishers");
+                publisher.LogoUrl = !string.IsNullOrEmpty(uploadResult.CloudUrl) ? uploadResult.CloudUrl : uploadResult.LocalUrl;
             }
             else
             {
