@@ -1,4 +1,4 @@
-﻿﻿using AseerAlkotb.Application.Contracts;
+﻿﻿﻿﻿﻿﻿using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Features.Books.DTOs;
 using AseerAlkotb.Application.Features.Orders.Filters;
 using AseerAlkotb.Application.Features.Orders.Requests;
@@ -75,8 +75,7 @@ namespace AseerAlkotb.Application.Services
             try
             {
                 // Create and populate order with current user's ID
-                var orderRequest = request.Adapt<AddOrderRequest>();
-                var order = await CreateOrderAsync(orderRequest, cart, books, currentUser);
+                var order = await CreateOrderAsync(request, cart, books, currentUser);
 
                 // Save order first to get ID
                 await unitOfWork.Orders.InsertAsync(order);
@@ -147,8 +146,17 @@ namespace AseerAlkotb.Application.Services
 
         private async Task<Order> CreateOrderAsync(AddOrderRequest request, Cart cart, List<Book> books, User user)
         {
+            // Map request to order entity first
             var order = request.Adapt<Order>();
+            
+            // Set user relationship
             order.User = user;
+            
+            // IMPORTANT: Explicitly set status AFTER mapping to override any defaults
+            order.Status = OrderStatus.Pending;  // This MUST be 1, not 0
+            order.PaymentStatus = PaymentStatus.Pending;
+            order.OrderDate = DateTime.UtcNow;
+            
             // Add order items with current prices
             AddOrderItems(order, cart.CartItems, books);
 

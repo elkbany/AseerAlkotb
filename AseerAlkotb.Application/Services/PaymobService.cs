@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using AseerAlkotb.Application.Contracts;
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Features.Payments.Requests;
 using AseerAlkotb.Application.Features.Payments.Responses;
 using AseerAlkotb.Domain.Entites;
@@ -6,6 +6,7 @@ using AseerAlkotb.Domain.Entites.Models;
 using AseerAlkotb.Domain.Enums;
 using AseerAlkotb.Domain.Interfaces.Base;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Security.Cryptography;
@@ -19,12 +20,14 @@ namespace AseerAlkotb.Application.Services
         private readonly IConfiguration _configuration;
         private readonly IUnitOfWork _unitOfWork;
         private readonly HttpClient _httpClient;
+        private readonly ILogger<PaymobService> _logger;
 
-        public PaymobService(IConfiguration configuration, IUnitOfWork unitOfWork, HttpClient httpClient)
+        public PaymobService(IConfiguration configuration, IUnitOfWork unitOfWork, HttpClient httpClient, ILogger<PaymobService> logger)
         {
             _configuration = configuration;
             _unitOfWork = unitOfWork;
             _httpClient = httpClient;
+            _logger = logger;
         }
 
         public async Task<ProcessPaymentResponse> ProcessPaymentAsync(ProcessPaymentRequest request)
@@ -334,6 +337,29 @@ namespace AseerAlkotb.Application.Services
                 return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
             }
 
+        }
+
+        public bool ValidateWebhookHmac(string body, string receivedHmac, string hmacSecret)
+        {
+            try
+            {
+                // Calculate HMAC for security validation
+                var calculatedHmac = ComputeHmacSHA512(body, hmacSecret);
+                
+                _logger.LogInformation("HMAC Security Validation:");
+                _logger.LogInformation("Calculated: {Calculated}", calculatedHmac);
+                _logger.LogInformation("Received: {Received}", receivedHmac);
+                
+                var isValid = receivedHmac.Equals(calculatedHmac, StringComparison.OrdinalIgnoreCase);
+                _logger.LogInformation("Result: {IsValid}", isValid ? "Valid ✅" : "Invalid ❌");
+                
+                return isValid;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error validating HMAC");
+                return false;
+            }
         }
     }
 }

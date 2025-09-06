@@ -1,4 +1,4 @@
-﻿﻿﻿﻿
+﻿﻿﻿﻿﻿﻿
 
 using AseerAlkotb.Application.Features.Books.DTOs;
 using AseerAlkotb.Application.Features.OrderItems.DTOs;
@@ -22,9 +22,9 @@ namespace AseerAlkotb.Application.Features.Orders.Mapping
                 .Ignore(dest => dest.DiscountAmount)
                 .Ignore(dest => dest.TrackingNumber)
                 .Ignore(dest => dest.OrderItems) // Important: Will be set in service
-                .Map(dest => dest.Status, src => OrderStatus.Pending)
-                .Map(dest => dest.OrderDate, src => DateTime.UtcNow)
-                .Map(dest => dest.PaymentStatus, src => PaymentStatus.Pending);
+                .Ignore(dest => dest.Status) // Will be set manually in service to ensure correct value
+                .Ignore(dest => dest.PaymentStatus) // Will be set manually in service
+                .Map(dest => dest.OrderDate, src => DateTime.UtcNow);
 
             // OrderItem Mapping (Book → OrderItem)
             config.NewConfig<Book, OrderItem>()

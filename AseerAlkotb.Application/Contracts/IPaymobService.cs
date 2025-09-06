@@ -1,4 +1,4 @@
-﻿using AseerAlkotb.Application.Features.Payments.Requests;
+﻿﻿using AseerAlkotb.Application.Features.Payments.Requests;
 using AseerAlkotb.Application.Features.Payments.Responses;
 using AseerAlkotb.Domain.Entites.Models;
 using System;
@@ -15,5 +15,6 @@ namespace AseerAlkotb.Application.Contracts
         public Task<Order> UpdateOrderSuccess(string specialReference);
         public Task<Order> UpdateOrderFailed(string specialReference);
         public string ComputeHmacSHA512(string data, string secret);
+        public bool ValidateWebhookHmac(string body, string receivedHmac, string hmacSecret);
     }
 }

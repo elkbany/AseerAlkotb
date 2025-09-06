@@ -12,6 +12,7 @@ namespace AseerAlkotb.Application.Contracts
         // Payment Callbacks & Notifications
         Task<ApiResponse<string>> HandlePaymentCallbackAsync(PaymentCallbackRequest request);
         Task<ApiResponse<string>> HandlePaymentNotificationAsync(Dictionary<string, string> notification);
+        Task<ApiResponse<string>> ProcessWebhookAsync(PaymentWebhookData webhookData);
         
         // Cash on Delivery
         Task<ApiResponse<InitializePaymentResponse>> ProcessCODPaymentAsync(InitializePaymentRequest request);

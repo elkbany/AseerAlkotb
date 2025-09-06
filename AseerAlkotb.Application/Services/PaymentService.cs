@@ -16,6 +16,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Net;
 using System.Text;
+using System.Text.Json;
 using static AseerAlkotb.Application.ResponseHandler.ApiResponseHandler;
 
 namespace AseerAlkotb.Application.Services
@@ -293,13 +294,22 @@ namespace AseerAlkotb.Application.Services
 
                 // Validate HMAC - temporarily disabled for debugging but log validation
                 var hmacSecret = _configuration["Paymob:HMAC"];
+                var enforceHmac = _configuration.GetValue<bool>("Paymob:EnforceHMAC", false); // Add this config setting
+                
                 if (!string.IsNullOrEmpty(hmacSecret))
                 {
                     if (!ValidatePaymobCallback(request, hmacSecret))
                     {
                         _logger.LogWarning("Invalid HMAC for callback transaction {TransactionId}", request.MerchantOrderId);
-                        // Temporarily comment out HMAC validation for testing
-                        // return BadRequest<string>("Invalid callback signature");
+                        
+                        if (enforceHmac)
+                        {
+                            return BadRequest<string>("Invalid callback signature");
+                        }
+                        else
+                        {
+                            _logger.LogWarning("HMAC enforcement disabled - continuing with callback processing");
+                        }
                     }
                     else
                     {
@@ -691,27 +701,31 @@ namespace AseerAlkotb.Application.Services
         {
             try
             {
+                // According to Paymob documentation, the HMAC concatenation should be exactly in this order:
+                // amount_cents + created_at + currency + error_occured + has_parent_transaction + id + integration_id + is_3d_secure + is_auth + is_capture + is_refunded + is_standalone_payment + is_voided + order + owner + pending + source_data.pan + source_data.sub_type + source_data.type + success
+                
+                // Important: All boolean values should be lowercase strings ("true" or "false")
                 var concatenated = new StringBuilder()
-                    .Append(request.AmountCents)
-                    .Append(request.CreatedAt)
-                    .Append(request.Currency)
-                    .Append(request.ErrorOccured)
-                    .Append(request.HasParentTransaction)
-                    .Append(request.Id)
-                    .Append(request.IntegrationId)
-                    .Append(request.Is3dSecure)
-                    .Append(request.IsAuth)
-                    .Append(request.IsCapture)
-                    .Append(request.IsRefunded)
-                    .Append(request.IsStandalonePayment)
-                    .Append(request.IsVoided)
-                    .Append(request.Order)
-                    .Append(request.Owner)
-                    .Append(request.Pending)
-                    .Append(request.SourceDataPan)
-                    .Append(request.SourceDataSubType)
-                    .Append(request.SourceDataType)
-                    .Append(request.Success)
+                    .Append(request.AmountCents ?? "")
+                    .Append(request.CreatedAt ?? "")
+                    .Append(request.Currency ?? "")
+                    .Append(request.ErrorOccured?.ToLower() ?? "")
+                    .Append(request.HasParentTransaction?.ToLower() ?? "")
+                    .Append(request.Id ?? "")
+                    .Append(request.IntegrationId ?? "")
+                    .Append(request.Is3dSecure?.ToLower() ?? "")
+                    .Append(request.IsAuth?.ToLower() ?? "")
+                    .Append(request.IsCapture?.ToLower() ?? "")
+                    .Append(request.IsRefunded?.ToLower() ?? "")
+                    .Append(request.IsStandalonePayment?.ToLower() ?? "")
+                    .Append(request.IsVoided?.ToLower() ?? "")
+                    .Append(request.Order ?? "")
+                    .Append(request.Owner ?? "")
+                    .Append(request.Pending?.ToLower() ?? "")
+                    .Append(request.SourceDataPan ?? "")
+                    .Append(request.SourceDataSubType ?? "")
+                    .Append(request.SourceDataType ?? "")
+                    .Append(request.Success?.ToLower() ?? "")
                     .ToString();
 
                 var calculatedHmac = _paymobService.ComputeHmacSHA512(concatenated, hmacSecret);
@@ -720,7 +734,16 @@ namespace AseerAlkotb.Application.Services
                 _logger.LogInformation("HMAC Validation - Calculated: {Calculated}, Received: {Received}", 
                     calculatedHmac, request.Hmac);
                 
-                return request.Hmac.Equals(calculatedHmac, StringComparison.OrdinalIgnoreCase);
+                var isValid = request.Hmac?.Equals(calculatedHmac, StringComparison.OrdinalIgnoreCase) == true;
+                _logger.LogInformation("HMAC Validation Result: {IsValid}", isValid ? "Valid ✅" : "Invalid ❌");
+                
+                if (!isValid)
+                {
+                    _logger.LogWarning("HMAC Validation Details - Expected: {Expected}, Got: {Received}, String Length: {Length}", 
+                        calculatedHmac, request.Hmac, concatenated.Length);
+                }
+                
+                return isValid;
             }
             catch (Exception ex)
             {
@@ -734,6 +757,141 @@ namespace AseerAlkotb.Application.Services
             var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             var random = new Random().Next(1000, 9999);
             return $"TXN_{orderId}_{userId}_{timestamp}_{random}";
+        }
+
+        #endregion
+
+        #region Webhook Processing
+
+        public async Task<ApiResponse<string>> ProcessWebhookAsync(PaymentWebhookData webhookData)
+        {
+            try
+            {
+                _logger.LogInformation("Processing webhook for transaction {TransactionId} - Success: {Success}", 
+                    webhookData.Obj.Id, webhookData.Obj.Success);
+
+                // Find payment in database
+                var payment = await FindPaymentForWebhook(webhookData);
+                
+                if (payment == null)
+                {
+                    _logger.LogError("Payment not found for webhook transaction {TransactionId} with amount {Amount}", 
+                        webhookData.Obj.Id, webhookData.Obj.AmountCents / 100.0);
+                    return BadRequest<string>("Payment not found for this transaction");
+                }
+
+                _logger.LogInformation("Found payment {PaymentId} for transaction {TransactionId}", 
+                    payment.Id, webhookData.Obj.Id);
+
+                // Check if payment is already processed
+                if (payment.Status == PaymentStatus.Paid || payment.Status == PaymentStatus.Failed || payment.Status == PaymentStatus.Cancelled)
+                {
+                    _logger.LogInformation("Payment {PaymentId} already processed with status {Status}", 
+                        payment.Id, payment.Status);
+                    return Success("Payment already processed");
+                }
+
+                // Update payment status
+                var newStatus = webhookData.Obj.Success ? PaymentStatus.Paid : PaymentStatus.Failed;
+                var oldStatus = payment.Status;
+
+                payment.Status = newStatus;
+                payment.PaymobOrderId = webhookData.Obj.Order.Id;
+                
+                // Save webhook data in ProviderPayload
+                payment.ProviderPayload = JsonSerializer.Serialize(webhookData, new JsonSerializerOptions 
+                { 
+                    PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower 
+                });
+
+                _unitOfWork.Payments.Update(payment);
+
+                // Update order payment status as well
+                var order = await _unitOfWork.Orders.FirstOrDefaultAsync(o => o.Id == payment.OrderId);
+                if (order != null)
+                {
+                    order.PaymentStatus = newStatus;
+                    _unitOfWork.Orders.Update(order);
+                    _logger.LogInformation("Updated order {OrderId} payment status to {Status}", 
+                        order.Id, newStatus);
+                }
+
+                await _unitOfWork.CommitAsync();
+
+                _logger.LogInformation("Payment {PaymentId} status updated from {OldStatus} to {NewStatus}", 
+                    payment.Id, oldStatus, newStatus);
+
+                // Sync order status with payment status
+                var syncResult = await _syncService.SyncOrderStatusFromPaymentAsync(payment.OrderId, newStatus, oldStatus);
+                if (!syncResult.HasValue)
+                {
+                    _logger.LogWarning("Failed to sync order status for payment {PaymentId}", payment.Id);
+                }
+
+                return Success($"Payment updated successfully to {newStatus}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error processing webhook for transaction {TransactionId}", 
+                    webhookData?.Obj?.Id);
+                return BadRequest<string>("Processing failed due to system error");
+            }
+        }
+
+        private async Task<Payment?> FindPaymentForWebhook(PaymentWebhookData webhookData)
+        {
+            // Method 1: Find by PaymobOrderId if stored
+            var payment = await _unitOfWork.Payments.FirstOrDefaultAsync(
+                p => p.PaymobOrderId == webhookData.Obj.Order.Id);
+            
+            if (payment != null)
+            {
+                _logger.LogInformation("Found payment by PaymobOrderId: {PaymobOrderId}", 
+                    webhookData.Obj.Order.Id);
+                return payment;
+            }
+
+            // Method 2: Find by amount and time
+            var amountInEGP = webhookData.Obj.AmountCents / 100m;
+            
+            DateTime webhookTime;
+            try
+            {
+                webhookTime = DateTime.Parse(webhookData.Obj.CreatedAt);
+            }
+            catch
+            {
+                webhookTime = DateTime.UtcNow; // fallback
+            }
+            
+            var timeBuffer = TimeSpan.FromHours(2); // 2 hour buffer
+
+            var candidatePayments = await _unitOfWork.Payments.GetAllAsyncByEx(p => 
+                Math.Abs(p.Amount - amountInEGP) < 0.01m && // Same amount (with small tolerance)
+                p.PaymentDate >= webhookTime.Subtract(timeBuffer) && 
+                p.PaymentDate <= webhookTime.Add(timeBuffer) &&
+                (p.Status == PaymentStatus.Pending || p.Status == PaymentStatus.Processing), 
+                0, 5)
+                .ToListAsync();
+
+            payment = candidatePayments.FirstOrDefault();
+
+            if (payment != null)
+            {
+                _logger.LogInformation("Found payment by amount {Amount} and time matching", amountInEGP);
+                
+                // Save PaymobOrderId for future reference
+                payment.PaymobOrderId = webhookData.Obj.Order.Id;
+                _unitOfWork.Payments.Update(payment);
+                await _unitOfWork.SaveChangesAsync();
+            }
+            else
+            {
+                _logger.LogWarning("No matching payment found for amount {Amount} at time {Time}", 
+                    amountInEGP, webhookTime);
+            }
+
+            return payment;
         }
 
         #endregion
