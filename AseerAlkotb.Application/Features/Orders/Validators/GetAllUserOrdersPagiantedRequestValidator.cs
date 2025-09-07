@@ -7,8 +7,7 @@ namespace AseerAlkotb.Application.Features.Orders.Validators
     {
         public GetAllUserOrdersPaginatedRequestValidator()
         {
-            RuleFor(x => x.UserId)
-                .GreaterThan(0).WithMessage("UserId must be a positive number.");
+           
 
             RuleFor(x => x.PageNumber)
                 .GreaterThan(0).WithMessage("Page number must be greater than 0.");

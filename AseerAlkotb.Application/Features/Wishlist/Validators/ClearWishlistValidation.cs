@@ -12,10 +12,7 @@ namespace AseerAlkotb.Application.Features.Wishlist.Validators
     {
         public ClearWishlistValidation()
         {
-            RuleFor(x => x.UserId)
-                .NotEmpty()
-                .GreaterThan(0)
-                .WithMessage("User ID must be greater than 0");
+           
         }
     }
 }

@@ -31,9 +31,8 @@ namespace AseerAlkotb.Application.Services
             this.unitOfWork = unitOfWork;
         }
 
-        public async Task<ApiResponse<GetUserWishlistResponse>> GetUserWishlistAsync(GetUserWishlistRequest request)
+        public async Task<ApiResponse<GetUserWishlistResponse>> GetUserWishlistAsync()
         {
-            await DoValidationAsync<GetUserWishlistValidation, GetUserWishlistRequest>(request);
 
             // Get current user from HttpContext
             var httpContext = httpContextAccessor.HttpContext;
@@ -178,9 +177,8 @@ namespace AseerAlkotb.Application.Services
             return Success(response);
         }
 
-        public async Task<ApiResponse<GetWishlistItemCountResponse>> GetWishlistItemCountAsync(GetWishlistItemCountRequest request)
+        public async Task<ApiResponse<GetWishlistItemCountResponse>> GetWishlistItemCountAsync()
         {
-            await DoValidationAsync<GetWishlistItemCountValidation, GetWishlistItemCountRequest>(request);
 
             // Get current user from HttpContext
             var httpContext = httpContextAccessor.HttpContext;
@@ -226,19 +224,38 @@ namespace AseerAlkotb.Application.Services
             {
                 return (ApiResponsePaginated<List<GetWishlistItemsResponse>>)UnAuthorized<List<GetWishlistItemsResponse>>();
             }
-            // Use current user's ID instead of request.UserId for security
-            var wishlistItems =  unitOfWork.Wishlists.GetAllAsync((request.PageNumber - 1) * request.PageSize, request.PageSize, default,wi=>wi.WishlistItems).FirstOrDefault(wi => wi.UserId == currentUser.Id);
-            var responseItems = wishlistItems.WishlistItems.Select(w => new GetWishlistItemsResponse(
-                w.Book.Title,
-                w.BookId,
-                w.Book.Author?.Name ?? string.Empty,
-                w.Book.AuthorId,
-                w.Book.CoverImageUrl,
-                w.Book.Price,
-                w.Book.DiscountedPrice
-            )).ToList();
 
-            return Success(responseItems, responseItems.Count,request.PageNumber,request.PageSize);
+            // Get the wishlist first
+            var wishlist = await unitOfWork.Wishlists.FirstOrDefaultAsync(
+                wi => wi.UserId == currentUser.Id,
+                default,
+                wi => wi.WishlistItems
+            );
+
+            if (wishlist == null)
+            {
+                return Success(new List<GetWishlistItemsResponse>(), 0, request.PageNumber, request.PageSize);
+            }
+
+            // Get total count of wishlist items
+            var totalCount = wishlist.WishlistItems.Count;
+
+            // Apply pagination to wishlist items
+            var paginatedItems = wishlist.WishlistItems
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .Select(w => new GetWishlistItemsResponse(
+                    w.Book.Title,
+                    w.BookId,
+                    w.Book.Author?.Name ?? string.Empty,
+                    w.Book.AuthorId,
+                    w.Book.CoverImageUrl,
+                    w.Book.Price,
+                    w.Book.DiscountedPrice
+                ))
+                .ToList();
+
+            return Success(paginatedItems, totalCount, request.PageNumber, request.PageSize);
         }
 
         public async Task<ApiResponse<IsBookInWishlistResponse>> IsBookInWishlistAsync(IsBookInWishlistRequest request)
@@ -247,14 +264,32 @@ namespace AseerAlkotb.Application.Services
 
             // This method can remain public or you can add authorization as needed
             // For now, keeping it public for general checking purposes
-            var exists = await unitOfWork.Wishlists.IsBookInWishlistAsync(request.UserId, request.BookId);
+            // Get current user from HttpContext
+            var httpContext = httpContextAccessor.HttpContext;
+            if (httpContext?.User?.Identity?.IsAuthenticated != true)
+            {
+                return UnAuthorized<IsBookInWishlistResponse>();
+            }
+
+            var currentUser = await userManager.GetUserAsync(httpContext.User);
+            if (currentUser == null)
+            {
+                return UnAuthorized<IsBookInWishlistResponse>();
+            }
+
+            // Check if user has "Client" role
+            var isInClientRole = await userManager.IsInRoleAsync(currentUser, "Client");
+            if (!isInClientRole)
+            {
+                return UnAuthorized<IsBookInWishlistResponse>();
+            }
+            var exists = await unitOfWork.Wishlists.IsBookInWishlistAsync(currentUser.Id, request.BookId);
             var response = new IsBookInWishlistResponse(exists);
             return Success(response);
         }
 
-        public async Task<ApiResponse<ClearWishlistResponse>> ClearWishlistAsync(ClearWishlistRequest request)
+        public async Task<ApiResponse<ClearWishlistResponse>> ClearWishlistAsync()
         {
-            await DoValidationAsync<ClearWishlistValidation, ClearWishlistRequest>(request);
 
             // Get current user from HttpContext
             var httpContext = httpContextAccessor.HttpContext;
