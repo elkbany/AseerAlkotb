@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using AseerAlkotb.Application.Contracts;
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Features.Payments.Requests;
 using AseerAlkotb.Application.Features.Payments.Responses;
 using AseerAlkotb.Domain.Entites;
@@ -120,22 +120,38 @@ namespace AseerAlkotb.Application.Services
             requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Token", secretKey);
             requestMessage.Content = JsonContent.Create(payload);
 
+            _logger.LogInformation("Sending payment request to Paymob API for Order {OrderId}, Amount: {Amount}, Special Reference: {SpecialReference}", 
+                Order.Id, amountCents, specialReference);
+
             // Send the Request and process the Response with timeout and error handling
             HttpResponseMessage response;
             string responseContent;
             
             try
             {
-                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+                // Add longer timeout for network issues
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
                 response = await _httpClient.SendAsync(requestMessage, cts.Token);
                 responseContent = await response.Content.ReadAsStringAsync();
+                
+                _logger.LogInformation("Received response from Paymob API - Status: {StatusCode}, Content Length: {ContentLength}", 
+                    response.StatusCode, responseContent?.Length ?? 0);
             }
             catch (TaskCanceledException)
             {
-                throw new TimeoutException("Paymob API request timed out after 30 seconds");
+                _logger.LogError("Paymob API request timed out after 60 seconds for Order {OrderId}", Order.Id);
+                throw new TimeoutException("Paymob API request timed out after 60 seconds");
             }
             catch (HttpRequestException httpEx)
             {
+                _logger.LogError(httpEx, "HTTP error communicating with Paymob API for Order {OrderId}. Error: {ErrorMessage}", Order.Id, httpEx.Message);
+                
+                // Check for specific network issues
+                if (httpEx.Message.Contains("No such host is known"))
+                {
+                    throw new InvalidOperationException("DNS resolution failed for Paymob API. Please check your internet connection and DNS settings.", httpEx);
+                }
+                
                 throw new InvalidOperationException($"HTTP error communicating with Paymob API: {httpEx.Message}", httpEx);
             }
 
@@ -343,21 +359,26 @@ namespace AseerAlkotb.Application.Services
         {
             try
             {
+                // For webhook validation, we validate the entire body content
+                // This is different from callback validation which uses specific fields
+                
                 // Calculate HMAC for security validation
                 var calculatedHmac = ComputeHmacSHA512(body, hmacSecret);
                 
-                _logger.LogInformation("HMAC Security Validation:");
+                _logger.LogInformation("Webhook HMAC Security Validation:");
+                _logger.LogInformation("Body length: {Length}", body?.Length ?? 0);
+                _logger.LogInformation("Body preview: {Body}", body?.Length > 200 ? body.Substring(0, 200) + "..." : body);
                 _logger.LogInformation("Calculated: {Calculated}", calculatedHmac);
                 _logger.LogInformation("Received: {Received}", receivedHmac);
                 
                 var isValid = receivedHmac.Equals(calculatedHmac, StringComparison.OrdinalIgnoreCase);
-                _logger.LogInformation("Result: {IsValid}", isValid ? "Valid ✅" : "Invalid ❌");
+                _logger.LogInformation("Webhook HMAC Result: {IsValid}", isValid ? "Valid ✅" : "Invalid ❌");
                 
                 return isValid;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error validating HMAC");
+                _logger.LogError(ex, "Error validating webhook HMAC");
                 return false;
             }
         }

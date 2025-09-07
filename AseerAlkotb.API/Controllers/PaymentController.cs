@@ -343,35 +343,26 @@ namespace AseerAlkotb.API.Controllers
                         return BadRequest(new { status = "error", message = "No request content available" });
                     }
 
-                    // Use Request.BodyReader for more reliable reading of chunked/buffered content
-                    var bodyBytes = new List<byte>();
-                    var buffer = new byte[4096];
-                    
-                    // Reset position if possible
+                    // Reset stream position if seekable
                     if (Request.Body.CanSeek)
                     {
                         Request.Body.Position = 0;
                     }
                     
-                    int bytesRead;
-                    while ((bytesRead = await Request.Body.ReadAsync(buffer, 0, buffer.Length)) > 0)
-                    {
-                        for (int i = 0; i < bytesRead; i++)
-                        {
-                            bodyBytes.Add(buffer[i]);
-                        }
-                    }
+                    // Use StreamReader for more reliable reading with proper encoding
+                    using var reader = new StreamReader(Request.Body, Encoding.UTF8, leaveOpen: true);
+                    body = await reader.ReadToEndAsync();
                     
-                    body = Encoding.UTF8.GetString(bodyBytes.ToArray());
-                    
-                    // Reset position for any subsequent reads if possible
+                    // Reset stream position for any subsequent operations
                     if (Request.Body.CanSeek)
                     {
                         Request.Body.Position = 0;
                     }
                     
-                    _logger.LogInformation("Webhook body length: {Length}, Content-Length header: {ContentLength}", body?.Length ?? 0, Request.ContentLength);
-                    _logger.LogInformation("Webhook body content: {Body}", string.IsNullOrEmpty(body) ? "<EMPTY>" : (body.Length > 500 ? body.Substring(0, 500) + "..." : body));
+                    _logger.LogInformation("Webhook body successfully read - Length: {Length}, Content-Length header: {ContentLength}", 
+                        body?.Length ?? 0, Request.ContentLength);
+                    _logger.LogInformation("Webhook body content preview: {Body}", 
+                        string.IsNullOrEmpty(body) ? "<EMPTY>" : (body.Length > 500 ? body.Substring(0, 500) + "..." : body));
                 }
                 catch (Exception bodyEx)
                 {
