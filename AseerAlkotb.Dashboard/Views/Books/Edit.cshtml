@@ -290,6 +290,7 @@
                     renderResults($('#authorResults'), data, function (item) {
                         $('#AuthorId').val(item.id);
                         $('#authorSelected').text(item.text);
+                        $('#authorSearch').val(item.text);
                         $('#authorResults').empty();
                     });
                 });
@@ -302,6 +303,7 @@
                     renderResults($('#publisherResults'), data, function (item) {
                         $('#PublisherId').val(item.id);
                         $('#publisherSelected').text(item.text);
+                        $('#publisherSearch').val(item.text);
                         $('#publisherResults').empty();
                     });
                 });
@@ -338,6 +340,7 @@
                 doSearch('@Url.Action("SearchCategories", "Books")', term, function (data) {
                     renderResults($('#categoryResults'), data, function (item) {
                         addCategoryChip(item.id, item.text);
+                        $('#categorySearch').val(item.text);
                         $('#categoryResults').empty();
                     });
                 });
