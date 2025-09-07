@@ -1,12 +1,14 @@
-﻿using AseerAlkotb.Application.Features.Publishers.Requests;
+﻿using AseerAlkotb.Application.Contracts;
+using AseerAlkotb.Application.Features.Publishers.Requests;
 using AseerAlkotb.Application.Features.Publishers.Response;
 using AseerAlkotb.Application.ResponseHandler;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using AseerAlkotb.Application.Contracts;
 using Microsoft.Extensions.Configuration;
 
 namespace AseerAlkotb.Dashboard.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class PublishersController : Controller
     {
         private readonly IPublisherServices _publisherService;

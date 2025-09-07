@@ -1,4 +1,4 @@
-﻿using AseerAlkotb.Domain.Entites.Base;
+﻿﻿﻿﻿using AseerAlkotb.Domain.Entites.Base;
 using AseerAlkotb.Domain.Entites.Models;
 using AseerAlkotb.Domain.Enums;
 using System;
@@ -19,12 +19,13 @@ namespace AseerAlkotb.Domain.Entites
 
         public long? PaymobOrderId { get; set; }
         public string? TransactionId { get; set; }
+        public string ProviderPayload { get; set; } = string.Empty;
 
         public decimal Amount { get; set; }
         public string Currency { get; set; } = "EGP";
 
-        public string Status { get; set; } = "Pending";
-        public string PaymentMethod { get; set; } 
+        public PaymentStatus Status { get; set; } = PaymentStatus.Pending;
+        public PaymentMethod Method { get; set; }
         public DateTime PaymentDate { get; set; }
     }
 }

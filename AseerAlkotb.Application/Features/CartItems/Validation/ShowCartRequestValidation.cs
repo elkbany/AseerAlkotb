@@ -13,10 +13,7 @@ namespace AseerAlkotb.Application.Features.CartItems.Validation
     {
         public ShowCartRequestValidation()
         {
-            RuleFor(x => x.UserId)
-                .NotEmpty()
-                .GreaterThan(0)
-                .WithMessage("user ID must be greater than 0");
+         
         }
     }
 }

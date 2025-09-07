@@ -17,5 +17,7 @@ namespace AseerAlkotb.Application.Contracts
         Task<ApiResponse<GetWishlistItemCountResponse>> GetWishlistItemCountAsync(GetWishlistItemCountRequest request);
         Task<ApiResponse<IsBookInWishlistResponse>> IsBookInWishlistAsync(IsBookInWishlistRequest request);
         Task<ApiResponse<ClearWishlistResponse>> ClearWishlistAsync(ClearWishlistRequest request);
+        public Task<ApiResponsePaginated<List<GetWishlistItemsResponse>>> GetwishlistItemsAsync(GetWishlistItemsRequest request);
+
     }
 }

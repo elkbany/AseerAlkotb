@@ -1,4 +1,4 @@
-﻿using AseerAlkotb.Domain.Entites;
+﻿﻿using AseerAlkotb.Domain.Entites;
 using AseerAlkotb.Domain.Entites.Models;
 using AseerAlkotb.Domain.Enums;
 using AseerAlkotb.Domain.Interfaces.Base;
@@ -16,13 +16,15 @@ namespace AseerAlkotb.Domain.Interfaces.Repositories
 
         Task<List<Payment>> GetPaymentsByUserIdAsync(int userId, CancellationToken cancellationToken = default);
 
-        Task UpdatePaymentStatusAsync(int paymentId, string status, CancellationToken cancellationToken = default);
+        Task UpdatePaymentStatusAsync(int paymentId, PaymentStatus status, CancellationToken cancellationToken = default);
 
         Task<List<Payment>> GetPaymentsAsync(
             int? userId = null,
-            string? status = null,
+            PaymentStatus? status = null,
             DateTime? fromDate = null,
             DateTime? toDate = null,
             CancellationToken cancellationToken = default);
+
+        IQueryable<Payment> GetQueryable();
     }
 }

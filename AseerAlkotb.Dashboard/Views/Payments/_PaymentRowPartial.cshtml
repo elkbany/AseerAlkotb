@@ -1,0 +1,138 @@
+@using AseerAlkotb.Dashboard.Helpers
+@model AseerAlkotb.Application.Features.Payments.Responses.GetAllPaymentsPaginatedResponse
+
+@if (Model != null)
+{
+<tr data-payment-id="@Model.Id">
+    <td class="bulk-checkbox" style="display: none;">
+        <input type="checkbox" class="payment-checkbox" value="@Model.Id" onchange="updateSelectedCount()">
+    </td>
+    <td>
+        <strong class="text-primary">#@Model.Id</strong>
+    </td>
+    <td>
+        <code class="bg-light p-1 rounded">@(Model.TransactionId ?? "N/A")</code>
+        @if (!string.IsNullOrEmpty(Model.TransactionId))
+        {
+            <button class="btn btn-sm btn-outline-secondary ms-1" onclick="copyToClipboard('@Model.TransactionId')" title="Copy Transaction ID">
+                <i class="fas fa-copy"></i>
+            </button>
+        }
+    </td>
+    <td>
+        <div class="d-flex align-items-center">
+            <div class="avatar avatar-sm bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2">
+                @if (!string.IsNullOrEmpty(Model.CustomerName))
+                {
+                    @Model.CustomerName.Substring(0, 1).ToUpper()
+                }
+                else
+                {
+                    <i class="fas fa-user"></i>
+                }
+            </div>
+            <div>
+                <div class="font-weight-bold">@(Model.CustomerName ?? "Unknown")</div>
+                <small class="text-muted">@(Model.CustomerEmail ?? "N/A")</small>
+            </div>
+        </div>
+    </td>
+    <td>
+        @if (Model.OrderId > 0)
+        {
+            <a href="@Url.Action("Details", "Orders", new { id = Model.OrderId })" class="text-decoration-none">
+                <strong>#@Model.OrderId</strong>
+                <i class="fas fa-external-link-alt ms-1 text-muted"></i>
+            </a>
+        }
+        else
+        {
+            <span class="text-muted">N/A</span>
+        }
+    </td>
+    <td>
+        <div class="d-flex align-items-center">
+            <i class="@ViewHelper.GetPaymentMethodIcon(Model.PaymentMethod) me-2 text-muted"></i>
+            <span>@ViewHelper.GetPaymentMethodDisplayName(Model.PaymentMethod)</span>
+        </div>
+    </td>
+    <td>
+        <span class="badge @ViewHelper.GetPaymentStatusBadgeClass(Model.Status) payment-status" data-status="@((int)Model.Status)">
+            <i class="@ViewHelper.GetPaymentStatusIcon(Model.Status) me-1"></i>
+            @Model.Status
+        </span>
+    </td>
+    <td>
+        <div>
+            <strong class="text-success">
+                @Model.Amount.ToString("C", new System.Globalization.CultureInfo("ar-EG"))
+            </strong>
+            <br>
+            <small class="text-muted">@(Model.Currency ?? "EGP")</small>
+        </div>
+    </td>
+    <td>
+        <div>
+            <div class="font-weight-bold">@Model.PaymentDate.ToString("MMM dd, yyyy")</div>
+            <small class="text-muted">@Model.PaymentDate.ToString("HH:mm")</small>
+        </div>
+    </td>
+    <td>
+        <div class="btn-group" role="group">
+            <a href="@Url.Action("Details", new { id = Model.Id })" 
+               class="btn btn-sm btn-outline-primary" 
+               title="View Details">
+                <i class="fas fa-eye"></i>
+            </a>
+            <button type="button" 
+                    class="btn btn-sm btn-outline-warning" 
+                    onclick="openStatusUpdateModal(@Model.Id, '@(Model.TransactionId ?? "")', '@Model.Status', '@(Model.CustomerName ?? "Unknown")')"
+                    title="Update Status">
+                <i class="fas fa-edit"></i>
+            </button>
+            <div class="btn-group" role="group">
+                <button type="button" 
+                        class="btn btn-sm btn-outline-secondary dropdown-toggle" 
+                        data-bs-toggle="dropdown" 
+                        aria-expanded="false"
+                        title="More Actions">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a class="dropdown-item" href="@Url.Action("Print", new { id = Model.Id })">
+                            <i class="fas fa-print me-2"></i>Print Receipt
+                        </a>
+                    </li>
+                    @if (!string.IsNullOrEmpty(Model.TransactionId))
+                    {
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item text-info" href="#" onclick="copyToClipboard('@Model.TransactionId')">
+                                <i class="fas fa-copy me-2"></i>Copy Transaction ID
+                            </a>
+                        </li>
+                    }
+                    @if (Model.PaymentMethod != AseerAlkotb.Domain.Enums.PaymentMethod.CashOnDelivery && Model.PaymobOrderId.HasValue)
+                    {
+                        <li>
+                            <a class="dropdown-item text-primary" href="#" onclick="viewPaymobDetails('@Model.PaymobOrderId.Value')">
+                                <i class="fas fa-external-link-alt me-2"></i>View in Paymob
+                            </a>
+                        </li>
+                    }
+                    @if (Model.Status == AseerAlkotb.Domain.Enums.PaymentStatus.Paid)
+                    {
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item text-warning" href="#" onclick="initiateRefund(@Model.Id)">
+                                <i class="fas fa-undo me-2"></i>Initiate Refund
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </td>
+</tr>
+}
