@@ -59,7 +59,7 @@ namespace AseerAlkotb.Application.Services
                     return BadRequest<InitializePaymentResponse>("Order not found");
                 }
 
-                _logger.LogInformation("Initializing payment for Order {OrderId} with method {PaymentMethod}", 
+                _logger.LogInformation("Initializing payment for Order {OrderId} with method {PaymentMethod}",
                     request.order.Id, order.PaymentMethod);
 
                 // Handle different payment methods based on order's payment method
@@ -67,11 +67,11 @@ namespace AseerAlkotb.Application.Services
                 {
                     case PaymentMethod.CashOnDelivery:
                         return await ProcessCODPaymentAsync(request);
-                    
+
                     case PaymentMethod.Card:
                     case PaymentMethod.Wallet:
                         return await ProcessOnlinePaymentAsync(request, order);
-                    
+
                     default:
                         return BadRequest<InitializePaymentResponse>("Invalid payment method in order");
                 }
@@ -130,7 +130,7 @@ namespace AseerAlkotb.Application.Services
                 order.PaymentStatus = PaymentStatus.Pending;
                 await _unitOfWork.CommitAsync();
 
-                _logger.LogInformation("COD payment created for Order {OrderId} with Transaction {TransactionId}", 
+                _logger.LogInformation("COD payment created for Order {OrderId} with Transaction {TransactionId}",
                     request.order.Id, transactionId);
 
                 var response = new InitializePaymentResponse(
@@ -177,7 +177,7 @@ namespace AseerAlkotb.Application.Services
                 // Validate payment method is supported for online payments
                 if (order.PaymentMethod != PaymentMethod.Card && order.PaymentMethod != PaymentMethod.Wallet)
                 {
-                    _logger.LogError("Unsupported payment method {PaymentMethod} for online payment on Order {OrderId}", 
+                    _logger.LogError("Unsupported payment method {PaymentMethod} for online payment on Order {OrderId}",
                         order.PaymentMethod, request.order.Id);
                     return BadRequest<InitializePaymentResponse>("Payment method not supported for online payments");
                 }
@@ -194,7 +194,7 @@ namespace AseerAlkotb.Application.Services
                 {
                     using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30)); // 30 second timeout
                     paymobResponse = await _paymobService.ProcessPaymentAsync(paymobRequest);
-                    
+
                     if (paymobResponse == null || string.IsNullOrEmpty(paymobResponse.RedirectUrl))
                     {
                         _logger.LogError("Paymob service returned invalid response for Order {OrderId}", request.order.Id);
@@ -224,9 +224,9 @@ namespace AseerAlkotb.Application.Services
                 {
                     payment = await _unitOfWork.Payments.FirstOrDefaultAsync(
                         p => p.OrderId == request.order.Id && p.Status == PaymentStatus.Pending);
-                    
+
                     if (payment != null) break;
-                    
+
                     if (i < retryCount - 1)
                     {
                         await Task.Delay(500); // Wait 500ms before retry
@@ -235,7 +235,7 @@ namespace AseerAlkotb.Application.Services
 
                 if (payment == null)
                 {
-                    _logger.LogError("Failed to retrieve payment record for Order {OrderId} after {RetryCount} attempts", 
+                    _logger.LogError("Failed to retrieve payment record for Order {OrderId} after {RetryCount} attempts",
                         request.order.Id, retryCount);
                     return BadRequest<InitializePaymentResponse>("Failed to create payment record. Please try again.");
                 }
@@ -295,13 +295,13 @@ namespace AseerAlkotb.Application.Services
                 // Validate HMAC - temporarily disabled for debugging but log validation
                 var hmacSecret = _configuration["Paymob:HMAC"];
                 var enforceHmac = _configuration.GetValue<bool>("Paymob:EnforceHMAC", false); // Add this config setting
-                
+
                 if (!string.IsNullOrEmpty(hmacSecret))
                 {
                     if (!ValidatePaymobCallback(request, hmacSecret))
                     {
                         _logger.LogWarning("Invalid HMAC for callback transaction {TransactionId}", request.MerchantOrderId);
-                        
+
                         if (enforceHmac)
                         {
                             return BadRequest<string>("Invalid callback signature");
@@ -332,7 +332,7 @@ namespace AseerAlkotb.Application.Services
                 // Check if payment is in a valid state for callback processing
                 if (payment.Status == PaymentStatus.Paid || payment.Status == PaymentStatus.Failed || payment.Status == PaymentStatus.Cancelled)
                 {
-                    _logger.LogInformation("Payment {PaymentId} already processed with status {Status}, ignoring callback", 
+                    _logger.LogInformation("Payment {PaymentId} already processed with status {Status}, ignoring callback",
                         payment.Id, payment.Status);
                     return Success("Payment already processed");
                 }
@@ -346,11 +346,11 @@ namespace AseerAlkotb.Application.Services
 
                 if (!bool.TryParse(request.Success, out var isSuccess))
                 {
-                    _logger.LogError("Invalid Success parameter value: {Success} for transaction {TransactionId}", 
+                    _logger.LogError("Invalid Success parameter value: {Success} for transaction {TransactionId}",
                         request.Success, request.MerchantOrderId);
                     return BadRequest<string>("Invalid callback: Success parameter format is invalid");
                 }
-                
+
                 // Process callback based on success status
                 try
                 {
@@ -418,7 +418,7 @@ namespace AseerAlkotb.Application.Services
 
                     if (!bool.TryParse(success, out var isSuccess))
                     {
-                        _logger.LogError("Invalid success parameter in notification: {Success} for transaction {TransactionId}", 
+                        _logger.LogError("Invalid success parameter in notification: {Success} for transaction {TransactionId}",
                             success, merchantOrderId);
                         return BadRequest<string>("Invalid notification: Success parameter format is invalid");
                     }
@@ -434,18 +434,18 @@ namespace AseerAlkotb.Application.Services
                     // Check if payment is in a valid state for notification processing
                     if (payment.Status == PaymentStatus.Paid || payment.Status == PaymentStatus.Failed || payment.Status == PaymentStatus.Cancelled)
                     {
-                        _logger.LogInformation("Payment {PaymentId} already processed with status {Status}, ignoring notification", 
+                        _logger.LogInformation("Payment {PaymentId} already processed with status {Status}, ignoring notification",
                             payment.Id, payment.Status);
                         return Success("Payment already processed");
                     }
-                    
+
                     var status = isSuccess ? PaymentStatus.Paid : PaymentStatus.Failed;
-                    
+
                     try
                     {
                         await UpdatePaymentStatusFromCallback(merchantOrderId, status);
-                        
-                        _logger.LogInformation("Payment notification processed successfully for transaction {TransactionId} with status {Status}", 
+
+                        _logger.LogInformation("Payment notification processed successfully for transaction {TransactionId} with status {Status}",
                             merchantOrderId, status);
                         return Success("Notification processed successfully");
                     }
@@ -457,7 +457,7 @@ namespace AseerAlkotb.Application.Services
                 }
                 else
                 {
-                    _logger.LogError("Required notification parameters missing. Available keys: {Keys}", 
+                    _logger.LogError("Required notification parameters missing. Available keys: {Keys}",
                         string.Join(", ", notification.Keys));
                     return BadRequest<string>("Invalid notification format: Required parameters missing");
                 }
@@ -491,18 +491,29 @@ namespace AseerAlkotb.Application.Services
                     _unitOfWork.Payments.Update(payment);
                     await _unitOfWork.CommitAsync();
 
-                    _logger.LogInformation("Payment status updated to {Status} for transaction {TransactionId}", 
+                    _logger.LogInformation("Payment status updated to {Status} for transaction {TransactionId}",
                         status, specialReference);
 
-                    // TODO: Use synchronization service to update order status (when available)
-                    /*
-                    var syncResult = await _syncService.SyncOrderStatusFromPaymentAsync(payment.OrderId, status, oldStatus);
-                    if (!syncResult)
+                    // Use synchronization service to update order status
+                    var suggestedOrderStatus = await _syncService.SyncOrderStatusFromPaymentAsync(payment.OrderId, status, oldStatus);
+                    if (suggestedOrderStatus.HasValue)
+                    {
+                        // Apply the suggested order status change
+                        var order = await _unitOfWork.Orders.FirstOrDefaultAsync(o => o.Id == payment.OrderId);
+                        if (order != null)
+                        {
+                            order.Status = suggestedOrderStatus.Value;
+                            _unitOfWork.Orders.Update(order);
+                            await _unitOfWork.CommitAsync();
+                            _logger.LogInformation("Updated order {OrderId} status to {Status} based on payment status",
+                                order.Id, suggestedOrderStatus.Value);
+                        }
+                    }
+                    else if (!suggestedOrderStatus.HasValue)
                     {
                         _logger.LogWarning("Failed to synchronize order status for callback Payment {PaymentId} status change from {OldStatus} to {NewStatus}",
                             payment.Id, oldStatus, status);
                     }
-                    */
                 }
                 else
                 {
@@ -555,8 +566,8 @@ namespace AseerAlkotb.Application.Services
                 }
 
                 // Apply sorting
-                query = request.DateAscending 
-                    ? query.OrderBy(p => p.PaymentDate) 
+                query = request.DateAscending
+                    ? query.OrderBy(p => p.PaymentDate)
                     : query.OrderByDescending(p => p.PaymentDate);
 
                 var totalCount = await query.CountAsync();
@@ -566,7 +577,7 @@ namespace AseerAlkotb.Application.Services
                     .ToListAsync();
 
                 var mappedPayments = payments.ToGetAllPaymentsPaginatedResponseList();
-                
+
                 return Success(mappedPayments, totalCount, request.PageNumber, request.PageSize);
             }
             catch (Exception ex)
@@ -585,8 +596,8 @@ namespace AseerAlkotb.Application.Services
             try
             {
                 var payment = await _unitOfWork.Payments.FirstOrDefaultAsync(
-                    p => p.Id == paymentId, 
-                    default, 
+                    p => p.Id == paymentId,
+                    default,
                     p => p.User, p => p.Order);
 
                 if (payment == null)
@@ -611,10 +622,10 @@ namespace AseerAlkotb.Application.Services
                 await DoValidationAsync<UpdatePaymentStatusRequestValidator, UpdatePaymentStatusRequest>(request);
 
                 var payment = await _unitOfWork.Payments.FirstOrDefaultAsync(
-                    p => p.Id == request.PaymentId, 
-                    default, 
+                    p => p.Id == request.PaymentId,
+                    default,
                     p => p.Order);
-                    
+
                 if (payment == null)
                 {
                     return NotFound<string>("Payment not found");
@@ -626,20 +637,27 @@ namespace AseerAlkotb.Application.Services
                 _unitOfWork.Payments.Update(payment);
                 await _unitOfWork.CommitAsync();
 
-                // TODO: Use synchronization service to update order status (when available)
-                /*
+                // Use synchronization service to update order status
                 if (payment.Order != null)
                 {
-                    var syncResult = await _syncService.SyncOrderStatusFromPaymentAsync(payment.OrderId, request.NewStatus, oldStatus);
-                    if (!syncResult)
+                    var suggestedOrderStatus = await _syncService.SyncOrderStatusFromPaymentAsync(payment.OrderId, request.NewStatus, oldStatus);
+                    if (suggestedOrderStatus.HasValue)
+                    {
+                        // Apply the suggested order status change
+                        payment.Order.Status = suggestedOrderStatus.Value;
+                        _unitOfWork.Orders.Update(payment.Order);
+                        await _unitOfWork.CommitAsync();
+                        _logger.LogInformation("Updated order {OrderId} status to {Status} based on payment status change by admin",
+                            payment.Order.Id, suggestedOrderStatus.Value);
+                    }
+                    else if (!suggestedOrderStatus.HasValue)
                     {
                         _logger.LogWarning("Failed to synchronize order status for Payment {PaymentId} status change from {OldStatus} to {NewStatus}",
                             request.PaymentId, oldStatus, request.NewStatus);
                     }
                 }
-                */
 
-                _logger.LogInformation("Payment {PaymentId} status updated from {OldStatus} to {NewStatus} by admin", 
+                _logger.LogInformation("Payment {PaymentId} status updated from {OldStatus} to {NewStatus} by admin",
                     request.PaymentId, oldStatus, request.NewStatus);
 
                 return Success("Payment status updated successfully");
@@ -703,46 +721,97 @@ namespace AseerAlkotb.Application.Services
             {
                 // According to Paymob documentation, the HMAC concatenation should be exactly in this order:
                 // amount_cents + created_at + currency + error_occured + has_parent_transaction + id + integration_id + is_3d_secure + is_auth + is_capture + is_refunded + is_standalone_payment + is_voided + order + owner + pending + source_data.pan + source_data.sub_type + source_data.type + success
-                
-                // Important: All boolean values should be lowercase strings ("true" or "false")
-                var concatenated = new StringBuilder()
-                    .Append(request.AmountCents ?? "")
-                    .Append(request.CreatedAt ?? "")
-                    .Append(request.Currency ?? "")
-                    .Append(request.ErrorOccured?.ToLower() ?? "")
-                    .Append(request.HasParentTransaction?.ToLower() ?? "")
-                    .Append(request.Id ?? "")
-                    .Append(request.IntegrationId ?? "")
-                    .Append(request.Is3dSecure?.ToLower() ?? "")
-                    .Append(request.IsAuth?.ToLower() ?? "")
-                    .Append(request.IsCapture?.ToLower() ?? "")
-                    .Append(request.IsRefunded?.ToLower() ?? "")
-                    .Append(request.IsStandalonePayment?.ToLower() ?? "")
-                    .Append(request.IsVoided?.ToLower() ?? "")
-                    .Append(request.Order ?? "")
-                    .Append(request.Owner ?? "")
-                    .Append(request.Pending?.ToLower() ?? "")
-                    .Append(request.SourceDataPan ?? "")
-                    .Append(request.SourceDataSubType ?? "")
-                    .Append(request.SourceDataType ?? "")
-                    .Append(request.Success?.ToLower() ?? "")
-                    .ToString();
 
+                // Important: All boolean values should be lowercase strings ("true" or "false")
+                // Ensure boolean values are properly formatted
+                string FormatBooleanValue(string value)
+                {
+                    if (string.IsNullOrEmpty(value))
+                        return "";
+                    
+                    // Convert to lowercase and trim
+                    var lowerValue = value.ToLowerInvariant().Trim();
+                    
+                    // Ensure it's either "true" or "false"
+                    if (lowerValue == "true" || lowerValue == "false")
+                        return lowerValue;
+                    
+                    // If it's not a valid boolean string, return as is
+                    return lowerValue;
+                }
+
+                var fields = new[]
+                {
+                    request.AmountCents ?? "",
+                    request.CreatedAt ?? "",
+                    request.Currency ?? "",
+                    FormatBooleanValue(request.ErrorOccured),
+                    FormatBooleanValue(request.HasParentTransaction),
+                    request.Id ?? "",
+                    request.IntegrationId ?? "",
+                    FormatBooleanValue(request.Is3dSecure),
+                    FormatBooleanValue(request.IsAuth),
+                    FormatBooleanValue(request.IsCapture),
+                    FormatBooleanValue(request.IsRefunded),
+                    FormatBooleanValue(request.IsStandalonePayment),
+                    FormatBooleanValue(request.IsVoided),
+                    request.Order ?? "",
+                    request.Owner ?? "",
+                    FormatBooleanValue(request.Pending),
+                    request.SourceDataPan ?? "",
+                    request.SourceDataSubType ?? "",
+                    request.SourceDataType ?? "",
+                    FormatBooleanValue(request.Success)
+                };
+
+                var concatenated = string.Join("", fields);
                 var calculatedHmac = _paymobService.ComputeHmacSHA512(concatenated, hmacSecret);
-                
-                _logger.LogInformation("HMAC Validation - Concatenated: {Concatenated}", concatenated);
-                _logger.LogInformation("HMAC Validation - Calculated: {Calculated}, Received: {Received}", 
+
+                _logger.LogInformation("HMAC Validation - Concatenated String: {Concatenated}", concatenated);
+                _logger.LogInformation("HMAC Validation - Concatenated Length: {Length}", concatenated.Length);
+                _logger.LogInformation("HMAC Validation - Calculated: {Calculated}, Received: {Received}",
                     calculatedHmac, request.Hmac);
-                
+
                 var isValid = request.Hmac?.Equals(calculatedHmac, StringComparison.OrdinalIgnoreCase) == true;
                 _logger.LogInformation("HMAC Validation Result: {IsValid}", isValid ? "Valid ✅" : "Invalid ❌");
-                
+
                 if (!isValid)
                 {
-                    _logger.LogWarning("HMAC Validation Details - Expected: {Expected}, Got: {Received}, String Length: {Length}", 
+                    _logger.LogWarning("HMAC Validation Details - Expected: {Expected}, Got: {Received}, String Length: {Length}",
                         calculatedHmac, request.Hmac, concatenated.Length);
+                    
+                    // Additional debugging for field-by-field analysis
+                    _logger.LogWarning("HMAC Field Values:");
+                    _logger.LogWarning("  AmountCents: '{AmountCents}'", request.AmountCents ?? "");
+                    _logger.LogWarning("  CreatedAt: '{CreatedAt}'", request.CreatedAt ?? "");
+                    _logger.LogWarning("  Currency: '{Currency}'", request.Currency ?? "");
+                    _logger.LogWarning("  ErrorOccured: '{ErrorOccured}' (Formatted: '{FormattedErrorOccured}')", request.ErrorOccured ?? "", FormatBooleanValue(request.ErrorOccured));
+                    _logger.LogWarning("  HasParentTransaction: '{HasParentTransaction}' (Formatted: '{FormattedHasParentTransaction}')", request.HasParentTransaction ?? "", FormatBooleanValue(request.HasParentTransaction));
+                    _logger.LogWarning("  Id: '{Id}'", request.Id ?? "");
+                    _logger.LogWarning("  IntegrationId: '{IntegrationId}'", request.IntegrationId ?? "");
+                    _logger.LogWarning("  Is3dSecure: '{Is3dSecure}' (Formatted: '{FormattedIs3dSecure}')", request.Is3dSecure ?? "", FormatBooleanValue(request.Is3dSecure));
+                    _logger.LogWarning("  IsAuth: '{IsAuth}' (Formatted: '{FormattedIsAuth}')", request.IsAuth ?? "", FormatBooleanValue(request.IsAuth));
+                    _logger.LogWarning("  IsCapture: '{IsCapture}' (Formatted: '{FormattedIsCapture}')", request.IsCapture ?? "", FormatBooleanValue(request.IsCapture));
+                    _logger.LogWarning("  IsRefunded: '{IsRefunded}' (Formatted: '{FormattedIsRefunded}')", request.IsRefunded ?? "", FormatBooleanValue(request.IsRefunded));
+                    _logger.LogWarning("  IsStandalonePayment: '{IsStandalonePayment}' (Formatted: '{FormattedIsStandalonePayment}')", request.IsStandalonePayment ?? "", FormatBooleanValue(request.IsStandalonePayment));
+                    _logger.LogWarning("  IsVoided: '{IsVoided}' (Formatted: '{FormattedIsVoided}')", request.IsVoided ?? "", FormatBooleanValue(request.IsVoided));
+                    _logger.LogWarning("  Order: '{Order}'", request.Order ?? "");
+                    _logger.LogWarning("  Owner: '{Owner}'", request.Owner ?? "");
+                    _logger.LogWarning("  Pending: '{Pending}' (Formatted: '{FormattedPending}')", request.Pending ?? "", FormatBooleanValue(request.Pending));
+                    _logger.LogWarning("  SourceDataPan: '{SourceDataPan}'", request.SourceDataPan ?? "");
+                    _logger.LogWarning("  SourceDataSubType: '{SourceDataSubType}'", request.SourceDataSubType ?? "");
+                    _logger.LogWarning("  SourceDataType: '{SourceDataType}'", request.SourceDataType ?? "");
+                    _logger.LogWarning("  Success: '{Success}' (Formatted: '{FormattedSuccess}')", request.Success ?? "", FormatBooleanValue(request.Success));
+                    
+                    // Log field-by-field breakdown
+                    for (int i = 0; i < fields.Length; i++)
+                    {
+                        _logger.LogWarning("  Field {Index}: '{Value}'", i, fields[i]);
+                    }
+                    
+                    _logger.LogWarning("  Full Concatenated String: '{Concatenated}'", concatenated);
                 }
-                
+
                 return isValid;
             }
             catch (Exception ex)
@@ -767,26 +836,26 @@ namespace AseerAlkotb.Application.Services
         {
             try
             {
-                _logger.LogInformation("Processing webhook for transaction {TransactionId} - Success: {Success}", 
+                _logger.LogInformation("Processing webhook for transaction {TransactionId} - Success: {Success}",
                     webhookData.Obj.Id, webhookData.Obj.Success);
 
                 // Find payment in database
                 var payment = await FindPaymentForWebhook(webhookData);
-                
+
                 if (payment == null)
                 {
-                    _logger.LogError("Payment not found for webhook transaction {TransactionId} with amount {Amount}", 
+                    _logger.LogError("Payment not found for webhook transaction {TransactionId} with amount {Amount}",
                         webhookData.Obj.Id, webhookData.Obj.AmountCents / 100.0);
                     return BadRequest<string>("Payment not found for this transaction");
                 }
 
-                _logger.LogInformation("Found payment {PaymentId} for transaction {TransactionId}", 
+                _logger.LogInformation("Found payment {PaymentId} for transaction {TransactionId}",
                     payment.Id, webhookData.Obj.Id);
 
                 // Check if payment is already processed
                 if (payment.Status == PaymentStatus.Paid || payment.Status == PaymentStatus.Failed || payment.Status == PaymentStatus.Cancelled)
                 {
-                    _logger.LogInformation("Payment {PaymentId} already processed with status {Status}", 
+                    _logger.LogInformation("Payment {PaymentId} already processed with status {Status}",
                         payment.Id, payment.Status);
                     return Success("Payment already processed");
                 }
@@ -797,11 +866,11 @@ namespace AseerAlkotb.Application.Services
 
                 payment.Status = newStatus;
                 payment.PaymobOrderId = webhookData.Obj.Order.Id;
-                
+
                 // Save webhook data in ProviderPayload
-                payment.ProviderPayload = JsonSerializer.Serialize(webhookData, new JsonSerializerOptions 
-                { 
-                    PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower 
+                payment.ProviderPayload = JsonSerializer.Serialize(webhookData, new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
                 });
 
                 _unitOfWork.Payments.Update(payment);
@@ -812,18 +881,30 @@ namespace AseerAlkotb.Application.Services
                 {
                     order.PaymentStatus = newStatus;
                     _unitOfWork.Orders.Update(order);
-                    _logger.LogInformation("Updated order {OrderId} payment status to {Status}", 
+                    _logger.LogInformation("Updated order {OrderId} payment status to {Status}",
                         order.Id, newStatus);
                 }
 
                 await _unitOfWork.CommitAsync();
 
-                _logger.LogInformation("Payment {PaymentId} status updated from {OldStatus} to {NewStatus}", 
+                _logger.LogInformation("Payment {PaymentId} status updated from {OldStatus} to {NewStatus}",
                     payment.Id, oldStatus, newStatus);
 
                 // Sync order status with payment status
-                var syncResult = await _syncService.SyncOrderStatusFromPaymentAsync(payment.OrderId, newStatus, oldStatus);
-                if (!syncResult.HasValue)
+                var suggestedOrderStatus = await _syncService.SyncOrderStatusFromPaymentAsync(payment.OrderId, newStatus, oldStatus);
+                if (suggestedOrderStatus.HasValue)
+                {
+                    // Apply the suggested order status change
+                    if (order != null)
+                    {
+                        order.Status = suggestedOrderStatus.Value;
+                        _unitOfWork.Orders.Update(order);
+                        await _unitOfWork.CommitAsync();
+                        _logger.LogInformation("Updated order {OrderId} status to {Status} based on payment status",
+                            order.Id, suggestedOrderStatus.Value);
+                    }
+                }
+                else if (!suggestedOrderStatus.HasValue)
                 {
                     _logger.LogWarning("Failed to sync order status for payment {PaymentId}", payment.Id);
                 }
@@ -832,7 +913,7 @@ namespace AseerAlkotb.Application.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error processing webhook for transaction {TransactionId}", 
+                _logger.LogError(ex, "Error processing webhook for transaction {TransactionId}",
                     webhookData?.Obj?.Id);
                 return BadRequest<string>("Processing failed due to system error");
             }
@@ -843,17 +924,17 @@ namespace AseerAlkotb.Application.Services
             // Method 1: Find by PaymobOrderId if stored
             var payment = await _unitOfWork.Payments.FirstOrDefaultAsync(
                 p => p.PaymobOrderId == webhookData.Obj.Order.Id);
-            
+
             if (payment != null)
             {
-                _logger.LogInformation("Found payment by PaymobOrderId: {PaymobOrderId}", 
+                _logger.LogInformation("Found payment by PaymobOrderId: {PaymobOrderId}",
                     webhookData.Obj.Order.Id);
                 return payment;
             }
 
             // Method 2: Find by amount and time
             var amountInEGP = webhookData.Obj.AmountCents / 100m;
-            
+
             DateTime webhookTime;
             try
             {
@@ -863,14 +944,14 @@ namespace AseerAlkotb.Application.Services
             {
                 webhookTime = DateTime.UtcNow; // fallback
             }
-            
+
             var timeBuffer = TimeSpan.FromHours(2); // 2 hour buffer
 
-            var candidatePayments = await _unitOfWork.Payments.GetAllAsyncByEx(p => 
+            var candidatePayments = await _unitOfWork.Payments.GetAllAsyncByEx(p =>
                 Math.Abs(p.Amount - amountInEGP) < 0.01m && // Same amount (with small tolerance)
-                p.PaymentDate >= webhookTime.Subtract(timeBuffer) && 
+                p.PaymentDate >= webhookTime.Subtract(timeBuffer) &&
                 p.PaymentDate <= webhookTime.Add(timeBuffer) &&
-                (p.Status == PaymentStatus.Pending || p.Status == PaymentStatus.Processing), 
+                (p.Status == PaymentStatus.Pending || p.Status == PaymentStatus.Processing),
                 0, 5)
                 .ToListAsync();
 
@@ -879,7 +960,7 @@ namespace AseerAlkotb.Application.Services
             if (payment != null)
             {
                 _logger.LogInformation("Found payment by amount {Amount} and time matching", amountInEGP);
-                
+
                 // Save PaymobOrderId for future reference
                 payment.PaymobOrderId = webhookData.Obj.Order.Id;
                 _unitOfWork.Payments.Update(payment);
@@ -887,7 +968,7 @@ namespace AseerAlkotb.Application.Services
             }
             else
             {
-                _logger.LogWarning("No matching payment found for amount {Amount} at time {Time}", 
+                _logger.LogWarning("No matching payment found for amount {Amount} at time {Time}",
                     amountInEGP, webhookTime);
             }
 

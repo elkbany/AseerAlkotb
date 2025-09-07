@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using AseerAlkotb.Application.Contracts;
+﻿using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Features.Payments.Requests;
 using AseerAlkotb.Application.Features.Payments.Responses;
 using AseerAlkotb.Domain.Entites;
@@ -120,21 +120,21 @@ namespace AseerAlkotb.Application.Services
             requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Token", secretKey);
             requestMessage.Content = JsonContent.Create(payload);
 
-            _logger.LogInformation("Sending payment request to Paymob API for Order {OrderId}, Amount: {Amount}, Special Reference: {SpecialReference}", 
+            _logger.LogInformation("Sending payment request to Paymob API for Order {OrderId}, Amount: {Amount}, Special Reference: {SpecialReference}",
                 Order.Id, amountCents, specialReference);
 
             // Send the Request and process the Response with timeout and error handling
             HttpResponseMessage response;
             string responseContent;
-            
+
             try
             {
                 // Add longer timeout for network issues
                 using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
                 response = await _httpClient.SendAsync(requestMessage, cts.Token);
                 responseContent = await response.Content.ReadAsStringAsync();
-                
-                _logger.LogInformation("Received response from Paymob API - Status: {StatusCode}, Content Length: {ContentLength}", 
+
+                _logger.LogInformation("Received response from Paymob API - Status: {StatusCode}, Content Length: {ContentLength}",
                     response.StatusCode, responseContent?.Length ?? 0);
             }
             catch (TaskCanceledException)
@@ -145,17 +145,17 @@ namespace AseerAlkotb.Application.Services
             catch (HttpRequestException httpEx)
             {
                 _logger.LogError(httpEx, "HTTP error communicating with Paymob API for Order {OrderId}. Error: {ErrorMessage}", Order.Id, httpEx.Message);
-                
+
                 // Check for specific network issues
                 if (httpEx.Message.Contains("No such host is known"))
                 {
                     throw new InvalidOperationException("DNS resolution failed for Paymob API. Please check your internet connection and DNS settings.", httpEx);
                 }
-                
+
                 throw new InvalidOperationException($"HTTP error communicating with Paymob API: {httpEx.Message}", httpEx);
             }
 
-            if(!response.IsSuccessStatusCode)
+            if (!response.IsSuccessStatusCode)
             {
                 throw new InvalidOperationException($"Paymob API Error: {response.StatusCode}: {responseContent}");
             }
@@ -163,11 +163,11 @@ namespace AseerAlkotb.Application.Services
             // Parse the Response to get the client_secret with error handling
             JsonDocument resultJson;
             string clientSecret;
-            
+
             try
             {
                 resultJson = JsonDocument.Parse(responseContent);
-                clientSecret = resultJson.RootElement.GetProperty("client_secret").GetString() 
+                clientSecret = resultJson.RootElement.GetProperty("client_secret").GetString()
                     ?? throw new InvalidOperationException("Client secret is null in Paymob response");
             }
             catch (JsonException jsonEx)
@@ -181,7 +181,7 @@ namespace AseerAlkotb.Application.Services
 
             // Create the payment record in our database
             var payment = new Payment
-                {
+            {
                 Amount = Order.TotalAmount,
                 Method = request.PaymentMethod.ToLower() == "card" ? PaymentMethod.Card : PaymentMethod.Wallet,
                 UserId = Order.UserId,
@@ -190,7 +190,7 @@ namespace AseerAlkotb.Application.Services
                 TransactionId = specialReference.ToString(),
                 PaymentDate = DateTime.UtcNow,
                 ProviderPayload = responseContent
-                };
+            };
 
 
             await _unitOfWork.Payments.InsertAsync(payment);
@@ -361,19 +361,19 @@ namespace AseerAlkotb.Application.Services
             {
                 // For webhook validation, we validate the entire body content
                 // This is different from callback validation which uses specific fields
-                
+
                 // Calculate HMAC for security validation
                 var calculatedHmac = ComputeHmacSHA512(body, hmacSecret);
-                
+
                 _logger.LogInformation("Webhook HMAC Security Validation:");
                 _logger.LogInformation("Body length: {Length}", body?.Length ?? 0);
                 _logger.LogInformation("Body preview: {Body}", body?.Length > 200 ? body.Substring(0, 200) + "..." : body);
                 _logger.LogInformation("Calculated: {Calculated}", calculatedHmac);
                 _logger.LogInformation("Received: {Received}", receivedHmac);
-                
+
                 var isValid = receivedHmac.Equals(calculatedHmac, StringComparison.OrdinalIgnoreCase);
                 _logger.LogInformation("Webhook HMAC Result: {IsValid}", isValid ? "Valid ✅" : "Invalid ❌");
-                
+
                 return isValid;
             }
             catch (Exception ex)

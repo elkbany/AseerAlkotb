@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using AseerAlkotb.API.Helpers;
+﻿﻿﻿﻿﻿﻿﻿﻿using AseerAlkotb.API.Helpers;
 using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Features.Payments.Requests;
 using AseerAlkotb.Application.Features.Payments.Responses;
@@ -26,7 +26,7 @@ namespace AseerAlkotb.API.Controllers
 
         public PaymentController(
             IPaymentService paymentService,
-            IPaymobService paymobService, 
+            IPaymobService paymobService,
             IConfiguration configuration,
             ILogger<PaymentController> logger)
         {
@@ -49,21 +49,21 @@ namespace AseerAlkotb.API.Controllers
 
 
                 var response = await _paymentService.InitializePaymentAsync(request);
-                
+
                 if (response.Succeeded)
                 {
                     _logger.LogInformation("Payment initialized successfully for Order {OrderId}", request.order.Id);
                     return Ok(response);
                 }
-                
-                _logger.LogWarning("Payment initialization failed for Order {OrderId}: {Message}", 
+
+                _logger.LogWarning("Payment initialization failed for Order {OrderId}: {Message}",
                     request.order.Id, response.Message);
                 return BadRequest(response);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error initializing payment for Order {OrderId}", request.order.Id);
-                return StatusCode(StatusCodes.Status500InternalServerError, 
+                return StatusCode(StatusCodes.Status500InternalServerError,
                     BadRequest<string>("An error occurred while initializing payment"));
             }
         }
@@ -78,22 +78,22 @@ namespace AseerAlkotb.API.Controllers
         {
             try
             {
-                _logger.LogInformation("Fetching payments - Page {PageNumber}, Size {PageSize}", 
+                _logger.LogInformation("Fetching payments - Page {PageNumber}, Size {PageSize}",
                     request.PageNumber, request.PageSize);
 
                 var response = await _paymentService.GetAllPaymentsPaginatedAsync(request);
-                
+
                 if (response.Succeeded)
                 {
                     return Ok(response);
                 }
-                
+
                 return BadRequest(response);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error fetching payments");
-                return StatusCode(StatusCodes.Status500InternalServerError, 
+                return StatusCode(StatusCodes.Status500InternalServerError,
                     BadRequest<string>("An error occurred while fetching payments"));
             }
         }
@@ -111,18 +111,18 @@ namespace AseerAlkotb.API.Controllers
                 _logger.LogInformation("Fetching payment details for Payment {PaymentId}", id);
 
                 var response = await _paymentService.GetPaymentByIdAsync(id);
-                
+
                 if (response.Succeeded)
                 {
                     return Ok(response);
                 }
-                
+
                 return NotFound(response);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error fetching payment {PaymentId}", id);
-                return StatusCode(StatusCodes.Status500InternalServerError, 
+                return StatusCode(StatusCodes.Status500InternalServerError,
                     BadRequest<string>("An error occurred while fetching payment details"));
             }
         }
@@ -137,23 +137,23 @@ namespace AseerAlkotb.API.Controllers
         {
             try
             {
-                _logger.LogInformation("Updating payment status for Payment {PaymentId} to {Status}", 
+                _logger.LogInformation("Updating payment status for Payment {PaymentId} to {Status}",
                     request.PaymentId, request.NewStatus);
 
                 var response = await _paymentService.UpdatePaymentStatusAsync(request);
-                
+
                 if (response.Succeeded)
                 {
                     _logger.LogInformation("Payment status updated successfully for Payment {PaymentId}", request.PaymentId);
                     return Ok(response);
                 }
-                
+
                 return BadRequest(response);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error updating payment status for Payment {PaymentId}", request.PaymentId);
-                return StatusCode(StatusCodes.Status500InternalServerError, 
+                return StatusCode(StatusCodes.Status500InternalServerError,
                     BadRequest<string>("An error occurred while updating payment status"));
             }
         }
@@ -173,13 +173,13 @@ namespace AseerAlkotb.API.Controllers
                 _logger.LogInformation("Method: {Method}, URL: {Url}", Request.Method, Request.GetDisplayUrl());
                 _logger.LogInformation("Headers: {Headers}", string.Join(", ", Request.Headers.Select(h => $"{h.Key}={h.Value}")));
                 _logger.LogInformation("Query: {Query}", Request.QueryString);
-                
-                _logger.LogInformation("Handling Paymob callback with method {Method}, query: {Query}", 
+
+                _logger.LogInformation("Handling Paymob callback with method {Method}, query: {Query}",
                     Request.Method, Request.QueryString);
 
                 // Create a unified way to access data from both form and query
                 Dictionary<string, string> data = new();
-                
+
                 if (Request.Method == "POST" && Request.HasFormContentType)
                 {
                     // For POST requests with form data
@@ -200,11 +200,43 @@ namespace AseerAlkotb.API.Controllers
                 }
 
                 // Log all received data for debugging
-                _logger.LogInformation("Received callback data: {Data}", 
+                _logger.LogInformation("Received callback data: {Data}",
                     string.Join(", ", data.Select(kvp => $"{kvp.Key}={kvp.Value}")));
 
+                // Extract source_data fields properly - Paymob sends them as separate parameters
+                var sourceDataPan = data.ContainsKey("source_data.pan") ? data["source_data.pan"] : 
+                                   (data.ContainsKey("source_data_pan") ? data["source_data_pan"] : "");
+                var sourceDataSubType = data.ContainsKey("source_data.sub_type") ? data["source_data.sub_type"] : 
+                                       (data.ContainsKey("source_data_sub_type") ? data["source_data_sub_type"] : "");
+                var sourceDataType = data.ContainsKey("source_data.type") ? data["source_data.type"] : 
+                                    (data.ContainsKey("source_data_type") ? data["source_data_type"] : "");
+
+                // Enhanced logging for critical fields
+                _logger.LogInformation("Critical HMAC Fields:");
+                _logger.LogInformation("  amount_cents: '{AmountCents}'", data.GetValueOrDefault("amount_cents", ""));
+                _logger.LogInformation("  created_at: '{CreatedAt}'", data.GetValueOrDefault("created_at", ""));
+                _logger.LogInformation("  currency: '{Currency}'", data.GetValueOrDefault("currency", ""));
+                _logger.LogInformation("  error_occured: '{ErrorOccured}'", data.GetValueOrDefault("error_occured", ""));
+                _logger.LogInformation("  has_parent_transaction: '{HasParentTransaction}'", data.GetValueOrDefault("has_parent_transaction", ""));
+                _logger.LogInformation("  id: '{Id}'", data.GetValueOrDefault("id", ""));
+                _logger.LogInformation("  integration_id: '{IntegrationId}'", data.GetValueOrDefault("integration_id", ""));
+                _logger.LogInformation("  is_3d_secure: '{Is3dSecure}'", data.GetValueOrDefault("is_3d_secure", ""));
+                _logger.LogInformation("  is_auth: '{IsAuth}'", data.GetValueOrDefault("is_auth", ""));
+                _logger.LogInformation("  is_capture: '{IsCapture}'", data.GetValueOrDefault("is_capture", ""));
+                _logger.LogInformation("  is_refunded: '{IsRefunded}'", data.GetValueOrDefault("is_refunded", ""));
+                _logger.LogInformation("  is_standalone_payment: '{IsStandalonePayment}'", data.GetValueOrDefault("is_standalone_payment", ""));
+                _logger.LogInformation("  is_voided: '{IsVoided}'", data.GetValueOrDefault("is_voided", ""));
+                _logger.LogInformation("  order: '{Order}'", data.GetValueOrDefault("order", ""));
+                _logger.LogInformation("  owner: '{Owner}'", data.GetValueOrDefault("owner", ""));
+                _logger.LogInformation("  pending: '{Pending}'", data.GetValueOrDefault("pending", ""));
+                _logger.LogInformation("  source_data.pan: '{SourceDataPan}'", sourceDataPan);
+                _logger.LogInformation("  source_data.sub_type: '{SourceDataSubType}'", sourceDataSubType);
+                _logger.LogInformation("  source_data.type: '{SourceDataType}'", sourceDataType);
+                _logger.LogInformation("  success: '{Success}'", data.GetValueOrDefault("success", ""));
+                _logger.LogInformation("  hmac: '{Hmac}'", data.GetValueOrDefault("hmac", ""));
+
                 var callbackRequest = new PaymentCallbackRequest(
-                    data.GetValueOrDefault("merchant_order_id", ""), // Use merchant_order_id as TransactionId
+                    data.GetValueOrDefault("id", ""), // TransactionId
                     data.GetValueOrDefault("success", ""),
                     data.GetValueOrDefault("amount_cents", ""),
                     data.GetValueOrDefault("created_at", ""),
@@ -222,29 +254,29 @@ namespace AseerAlkotb.API.Controllers
                     data.GetValueOrDefault("order", ""),
                     data.GetValueOrDefault("owner", ""),
                     data.GetValueOrDefault("pending", ""),
-                    data.GetValueOrDefault("source_data_pan", ""),
-                    data.GetValueOrDefault("source_data_sub_type", ""),
-                    data.GetValueOrDefault("source_data_type", ""),
+                    sourceDataPan,
+                    sourceDataSubType,
+                    sourceDataType,
                     data.GetValueOrDefault("merchant_order_id", ""),
                     data.GetValueOrDefault("hmac", "")
                 );
 
                 _logger.LogInformation("=== PAYMENT LOOKUP ===");
                 _logger.LogInformation("Looking for payment with TransactionId: {TransactionId}", callbackRequest.MerchantOrderId);
-                
+
                 var response = await _paymentService.HandlePaymentCallbackAsync(callbackRequest);
-                
+
                 _logger.LogInformation("=== RESPONSE GENERATION ===");
                 _logger.LogInformation("Service Response - Success: {Success}, Message: {Message}", response.Succeeded, response.Message);
                 _logger.LogInformation("Callback Success Parameter: {CallbackSuccess}", callbackRequest.Success);
-                
+
                 string htmlContent;
                 // SUCCESS DETERMINATION: Payment is successful ONLY if the Paymob success parameter is "true"
                 // The service response being successful just means we processed the callback correctly
                 bool isPaymentSuccessful = callbackRequest.Success.ToLower() == "true";
-                
+
                 _logger.LogInformation("Final Payment Success Determination: {IsSuccessful} (based on success={SuccessParam})", isPaymentSuccessful, callbackRequest.Success);
-                
+
                 if (isPaymentSuccessful)
                 {
                     _logger.LogInformation("Payment callback handled successfully - payment succeeded");
@@ -252,14 +284,14 @@ namespace AseerAlkotb.API.Controllers
                 }
                 else
                 {
-                    _logger.LogWarning("Payment callback - payment was unsuccessful. Success Parameter: {PaymentSuccess}, Service Message: {Message}", 
+                    _logger.LogWarning("Payment callback - payment was unsuccessful. Success Parameter: {PaymentSuccess}, Service Message: {Message}",
                         callbackRequest.Success, response.Message);
                     htmlContent = HtmlGenerator.GenerateFailureHtml();
                 }
 
                 _logger.LogInformation("=== HTML RESPONSE ===");
                 _logger.LogInformation("Generated HTML length: {Length}", htmlContent.Length);
-                _logger.LogInformation("Payment Result - Service Success: {ServiceSuccess}, Payment Success: {PaymentSuccess}, Final Result: {FinalResult}", 
+                _logger.LogInformation("Payment Result - Service Success: {ServiceSuccess}, Payment Success: {PaymentSuccess}, Final Result: {FinalResult}",
                     response.Succeeded, callbackRequest.Success, isPaymentSuccessful);
 
                 // Return proper HTML response with explicit headers for ngrok compatibility
@@ -267,13 +299,13 @@ namespace AseerAlkotb.API.Controllers
                 Response.Headers["Content-Length"] = contentBytes.Length.ToString();
                 Response.Headers["Cache-Control"] = "no-cache";
                 Response.Headers["X-Content-Type-Options"] = "nosniff";
-                
+
                 _logger.LogInformation("=== FINAL RESPONSE ===");
                 _logger.LogInformation("Content-Type: text/html; charset=utf-8");
                 _logger.LogInformation("Content-Length: {Length}", contentBytes.Length);
                 _logger.LogInformation("Status: 200");
                 _logger.LogInformation("=== CALLBACK DEBUG END ===");
-                
+
                 return new ContentResult
                 {
                     Content = htmlContent,
@@ -285,14 +317,14 @@ namespace AseerAlkotb.API.Controllers
             {
                 _logger.LogError(ex, "Error handling payment callback");
                 var securityHtml = HtmlGenerator.GenerateSecurityHtml();
-                
+
                 // Return proper error HTML response with explicit headers
                 var errorBytes = Encoding.UTF8.GetBytes(securityHtml);
                 Response.Headers["Content-Length"] = errorBytes.Length.ToString();
                 Response.Headers["Cache-Control"] = "no-cache";
-                
+
                 _logger.LogError("Returning error HTML response, length: {Length}", errorBytes.Length);
-                
+
                 return new ContentResult
                 {
                     Content = securityHtml,
@@ -314,7 +346,7 @@ namespace AseerAlkotb.API.Controllers
             try
             {
                 _logger.LogInformation("=== WEBHOOK DEBUG START ===");
-                _logger.LogInformation("Method: {Method}, Headers: {Headers}", 
+                _logger.LogInformation("Method: {Method}, Headers: {Headers}",
                     Request.Method, string.Join(", ", Request.Headers.Select(h => $"{h.Key}={h.Value}")));
 
                 // Read raw body for HMAC validation with enhanced error handling
@@ -330,7 +362,7 @@ namespace AseerAlkotb.API.Controllers
 
                     // Enable buffering FIRST to allow multiple reads
                     Request.EnableBuffering();
-                    
+
                     // Check if there's actually content to read
                     if (Request.ContentLength == 0 || Request.ContentLength == null)
                     {
@@ -343,38 +375,47 @@ namespace AseerAlkotb.API.Controllers
                         return BadRequest(new { status = "error", message = "No request content available" });
                     }
 
-                    // Reset stream position if seekable
+                    // Use Request.BodyReader for more reliable reading of chunked/buffered content
+                    var bodyBytes = new List<byte>();
+                    var buffer = new byte[4096];
+
+                    // Reset position if possible
                     if (Request.Body.CanSeek)
                     {
                         Request.Body.Position = 0;
                     }
-                    
-                    // Use StreamReader for more reliable reading with proper encoding
-                    using var reader = new StreamReader(Request.Body, Encoding.UTF8, leaveOpen: true);
-                    body = await reader.ReadToEndAsync();
-                    
-                    // Reset stream position for any subsequent operations
+
+                    int bytesRead;
+                    while ((bytesRead = await Request.Body.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                    {
+                        for (int i = 0; i < bytesRead; i++)
+                        {
+                            bodyBytes.Add(buffer[i]);
+                        }
+                    }
+
+                    body = Encoding.UTF8.GetString(bodyBytes.ToArray());
+
+                    // Reset position for any subsequent reads if possible
                     if (Request.Body.CanSeek)
                     {
                         Request.Body.Position = 0;
                     }
-                    
-                    _logger.LogInformation("Webhook body successfully read - Length: {Length}, Content-Length header: {ContentLength}", 
-                        body?.Length ?? 0, Request.ContentLength);
-                    _logger.LogInformation("Webhook body content preview: {Body}", 
-                        string.IsNullOrEmpty(body) ? "<EMPTY>" : (body.Length > 500 ? body.Substring(0, 500) + "..." : body));
+
+                    _logger.LogInformation("Webhook body length: {Length}, Content-Length header: {ContentLength}", body?.Length ?? 0, Request.ContentLength);
+                    _logger.LogInformation("Webhook body content: {Body}", string.IsNullOrEmpty(body) ? "<EMPTY>" : (body.Length > 500 ? body.Substring(0, 500) + "..." : body));
                 }
                 catch (Exception bodyEx)
                 {
                     _logger.LogError(bodyEx, "Error reading webhook body: {Message}", bodyEx.Message);
-                    
+
                     // If we can't read the body, try to handle it as a GET request or query parameters
                     if (Request.Query.Any())
                     {
                         _logger.LogInformation("Body read failed - treating as GET request with query parameters");
                         return await HandleWebhookAsCallback();
                     }
-                    
+
                     _logger.LogError("Unable to read request body and no query parameters available");
                     return BadRequest(new { status = "error", message = "Unable to read request content" });
                 }
@@ -396,8 +437,8 @@ namespace AseerAlkotb.API.Controllers
                 PaymentWebhookData? webhookData;
                 try
                 {
-                    webhookData = JsonSerializer.Deserialize<PaymentWebhookData>(body, new JsonSerializerOptions 
-                    { 
+                    webhookData = JsonSerializer.Deserialize<PaymentWebhookData>(body, new JsonSerializerOptions
+                    {
                         PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
                         PropertyNameCaseInsensitive = true
                     });
@@ -417,7 +458,7 @@ namespace AseerAlkotb.API.Controllers
                 // Validate HMAC if configured
                 var hmacSecret = _configuration["Paymob:HMAC"];
                 var enforceHmac = _configuration.GetValue<bool>("Paymob:EnforceHMAC", false); // Add this config setting
-                
+
                 if (!string.IsNullOrEmpty(hmacSecret))
                 {
                     var queryHmac = Request.Query["hmac"].FirstOrDefault();
@@ -426,7 +467,7 @@ namespace AseerAlkotb.API.Controllers
                         if (!_paymobService.ValidateWebhookHmac(body, queryHmac, hmacSecret))
                         {
                             _logger.LogWarning("Invalid HMAC for webhook transaction {TransactionId}", webhookData.Obj.Id);
-                            
+
                             if (enforceHmac)
                             {
                                 return Unauthorized(new { status = "error", message = "Invalid signature" });
@@ -445,21 +486,21 @@ namespace AseerAlkotb.API.Controllers
 
                 // Process the webhook
                 var result = await _paymentService.ProcessWebhookAsync(webhookData);
-                
+
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation("Webhook processed successfully for transaction {TransactionId}", 
+                    _logger.LogInformation("Webhook processed successfully for transaction {TransactionId}",
                         webhookData.Obj.Id);
                     return Ok(new { status = "success" });
                 }
-                
+
                 _logger.LogWarning("Webhook processing failed: {Message}", result.Message);
                 return BadRequest(new { status = "error", message = result.Message });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Critical error processing webhook");
-                return StatusCode(StatusCodes.Status500InternalServerError, 
+                return StatusCode(StatusCodes.Status500InternalServerError,
                     new { status = "error", message = "Internal server error" });
             }
         }
@@ -480,23 +521,23 @@ namespace AseerAlkotb.API.Controllers
                 // Try to parse as webhook first
                 try
                 {
-                    var webhookData = JsonSerializer.Deserialize<PaymentWebhookData>(json, new JsonSerializerOptions 
-                    { 
+                    var webhookData = JsonSerializer.Deserialize<PaymentWebhookData>(json, new JsonSerializerOptions
+                    {
                         PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
                         PropertyNameCaseInsensitive = true
                     });
-                    
+
                     if (webhookData?.Obj != null)
                     {
                         // Use the new webhook handler
                         var result = await _paymentService.ProcessWebhookAsync(webhookData);
-                        
+
                         if (result.Succeeded)
                         {
                             _logger.LogInformation("Payment notification handled successfully via webhook format");
                             return Ok(new { status = "success" });
                         }
-                        
+
                         _logger.LogWarning("Payment notification failed: {Message}", result.Message);
                         return BadRequest(new { status = "failed", message = result.Message });
                     }
@@ -510,7 +551,7 @@ namespace AseerAlkotb.API.Controllers
                 // Legacy notification handling (kept for backward compatibility)
                 var notificationDict = new Dictionary<string, string>();
                 var notification = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
-                
+
                 if (notification != null)
                 {
                     foreach (var kvp in notification)
@@ -518,22 +559,22 @@ namespace AseerAlkotb.API.Controllers
                         notificationDict[kvp.Key] = kvp.Value?.ToString() ?? string.Empty;
                     }
                 }
-                
+
                 var response = await _paymentService.HandlePaymentNotificationAsync(notificationDict);
-                
+
                 if (response.Succeeded)
                 {
                     _logger.LogInformation("Payment notification handled successfully via legacy format");
                     return Ok(new { status = "success" });
                 }
-                
+
                 _logger.LogWarning("Payment notification failed: {Message}", response.Message);
                 return BadRequest(new { status = "failed", message = response.Message });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error handling payment notification");
-                return StatusCode(StatusCodes.Status500InternalServerError, 
+                return StatusCode(StatusCodes.Status500InternalServerError,
                     new { status = "error", message = "Internal server error" });
             }
         }
@@ -559,7 +600,7 @@ namespace AseerAlkotb.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error fetching payment methods");
-                return StatusCode(StatusCodes.Status500InternalServerError, 
+                return StatusCode(StatusCodes.Status500InternalServerError,
                     BadRequest<string>("An error occurred while fetching payment methods"));
             }
         }
@@ -572,7 +613,7 @@ namespace AseerAlkotb.API.Controllers
             try
             {
                 _logger.LogInformation("Processing webhook as callback-style GET request");
-                
+
                 // Extract data from query parameters
                 var data = new Dictionary<string, string>();
                 foreach (var item in Request.Query)
@@ -581,7 +622,7 @@ namespace AseerAlkotb.API.Controllers
                 }
 
                 // Log received data
-                _logger.LogInformation("Webhook GET data: {Data}", 
+                _logger.LogInformation("Webhook GET data: {Data}",
                     string.Join(", ", data.Select(kvp => $"{kvp.Key}={kvp.Value}")));
 
                 if (!data.ContainsKey("merchant_order_id") || !data.ContainsKey("success"))
@@ -617,20 +658,20 @@ namespace AseerAlkotb.API.Controllers
                 );
 
                 var response = await _paymentService.HandlePaymentCallbackAsync(callbackRequest);
-                
+
                 if (response.Succeeded)
                 {
                     _logger.LogInformation("Webhook processed successfully via GET method");
                     return Ok(new { status = "success" });
                 }
-                
+
                 _logger.LogWarning("Webhook processing failed: {Message}", response.Message);
                 return BadRequest(new { status = "error", message = response.Message });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error processing webhook as GET request");
-                return StatusCode(StatusCodes.Status500InternalServerError, 
+                return StatusCode(StatusCodes.Status500InternalServerError,
                     new { status = "error", message = "Internal server error" });
             }
         }
