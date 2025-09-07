@@ -13,10 +13,10 @@ namespace AseerAlkotb.Application.Contracts
     {
         Task<ApiResponse<AddWishlistItemResponse>> AddToWishlistAsync(AddWishlistItemRequest request);
         Task<ApiResponse<DeleteWishlistItemResponse>> RemoveFromWishlistAsync(DeleteWishlistItemRequest request);
-        Task<ApiResponse<GetUserWishlistResponse>> GetUserWishlistAsync(GetUserWishlistRequest request);
-        Task<ApiResponse<GetWishlistItemCountResponse>> GetWishlistItemCountAsync(GetWishlistItemCountRequest request);
+        Task<ApiResponse<GetUserWishlistResponse>> GetUserWishlistAsync();
+        Task<ApiResponse<GetWishlistItemCountResponse>> GetWishlistItemCountAsync();
         Task<ApiResponse<IsBookInWishlistResponse>> IsBookInWishlistAsync(IsBookInWishlistRequest request);
-        Task<ApiResponse<ClearWishlistResponse>> ClearWishlistAsync(ClearWishlistRequest request);
+        Task<ApiResponse<ClearWishlistResponse>> ClearWishlistAsync();
         public Task<ApiResponsePaginated<List<GetWishlistItemsResponse>>> GetwishlistItemsAsync(GetWishlistItemsRequest request);
 
     }

@@ -19,7 +19,6 @@ namespace AseerAlkotb.Application.Features.Roles.Requests
       string? Nationality,
       Gender Gender,
       string? PhoneNumber,
-      string? Nationality,
       IFormFile? ProfilePictureUrl,
       string UserRole
     );

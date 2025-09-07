@@ -20,14 +20,14 @@ namespace AseerAlkotb.API.Controllers
             this.wishlistServices = wishlistServices;
         }
 
-        [HttpPost]
+        [HttpPost("Add")]
         [Authorize(Roles = "Client")]
         public async Task<IActionResult> Add([FromBody] AddWishlistItemRequest request)
         {
             var result = await wishlistServices.AddToWishlistAsync(request);
             return ApiResult(result);
         }
-        [HttpDelete("DeleteItem")]
+        [HttpDelete("Remove")]
         [Authorize(Roles = "Client")]
         public async Task<IActionResult> Delete([FromQuery] DeleteWishlistItemRequest request)
         {
@@ -37,25 +37,25 @@ namespace AseerAlkotb.API.Controllers
 
         [HttpGet]
         [Authorize(Roles = "Client")]
-        public async Task<IActionResult> GetUserWishlist([FromQuery] GetUserWishlistRequest request)
+        public async Task<IActionResult> GetUserWishlist()
         {
-            var result = await wishlistServices.GetUserWishlistAsync(request);
+            var result = await wishlistServices.GetUserWishlistAsync();
             return ApiResult(result);
         }
 
-        [HttpDelete("ClearWishlist")]
+        [HttpDelete("Clear")]
         [Authorize(Roles = "Client")]
-        public async Task<IActionResult> ClearWishlist([FromQuery] ClearWishlistRequest request)
+        public async Task<IActionResult> ClearWishlist()
         {
-            var result = await wishlistServices.ClearWishlistAsync(request);
+            var result = await wishlistServices.ClearWishlistAsync();
             return ApiResult(result);
         }
 
         [HttpGet("Count")]
         [Authorize(Roles = "Client")]
-        public async Task<IActionResult> GetWishlistItemCount([FromQuery] GetWishlistItemCountRequest request)
+        public async Task<IActionResult> GetWishlistItemCount()
         {
-            var result = await wishlistServices.GetWishlistItemCountAsync(request);
+            var result = await wishlistServices.GetWishlistItemCountAsync();
             return ApiResult(result);
         }
 

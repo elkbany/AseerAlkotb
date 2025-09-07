@@ -348,18 +348,18 @@ namespace AseerAlkotb.Application.Services
             var httpContext = httpContextAccessor.HttpContext;
             if (httpContext?.User?.Identity?.IsAuthenticated != true)
             {
-                return (ApiResponsePaginated<List<GetAllUserOrdersPaginatedResponse>>)UnAuthorized<List<GetAllUserOrdersPaginatedResponse>>();
+                return UnAuthorizedList<GetAllUserOrdersPaginatedResponse>();
             }
             var currentUser = await userManager.GetUserAsync(httpContext.User);
             if (currentUser == null)
             {
-                return (ApiResponsePaginated<List<GetAllUserOrdersPaginatedResponse>>)UnAuthorized<List<GetAllUserOrdersPaginatedResponse>>();
+                return UnAuthorizedList<GetAllUserOrdersPaginatedResponse>();
             }
             // Check if user has "Client" role
             var isInClientRole = await userManager.IsInRoleAsync(currentUser, "Client");
             if (!isInClientRole)
             {
-                return (ApiResponsePaginated<List<GetAllUserOrdersPaginatedResponse>>)UnAuthorized<List<GetAllUserOrdersPaginatedResponse>>();
+                return UnAuthorizedList<GetAllUserOrdersPaginatedResponse>();
             }
             // Use current user's ID for security instead of request.UserId
             var orders =  unitOfWork.Orders.GetAllAsyncByEx(o => o.UserId == currentUser.Id, (request.PageNumber - 1) * request.PageSize, request.PageSize, default, o => o.OrderItems);
