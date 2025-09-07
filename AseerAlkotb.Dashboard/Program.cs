@@ -41,6 +41,7 @@ namespace AseerAlkotb.Dashboard
             // Add Identity
             builder.Services.AddIdentity<User, IdentityRole<int>>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
+                // Gnerates the default token providers for password reset, email confirmation, etc.
                 .AddDefaultTokenProviders();
 
 
@@ -53,10 +54,6 @@ namespace AseerAlkotb.Dashboard
             //.AddEntityFrameworkStores<ApplicationDbContext>()
             //.AddDefaultTokenProviders();
 
-            builder.Services.AddIdentity<User, IdentityRole<int>>()
-                .AddEntityFrameworkStores<ApplicationDbContext>()
-                // Gnerates the default token providers for password reset, email confirmation, etc.
-                .AddDefaultTokenProviders();
 
             #endregion
 
