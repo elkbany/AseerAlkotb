@@ -1,23 +1,33 @@
-﻿using AseerAlkotb.Application.Features.Payments.Requests;
+using AseerAlkotb.Application.Features.Payments.Requests;
 using AseerAlkotb.Application.Features.Payments.Responses;
-using AseerAlkotb.Domain.Entites;
-using AseerAlkotb.Domain.Entites.Models;
-using AseerAlkotb.Domain.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using AseerAlkotb.Application.ResponseHandler;
 
 namespace AseerAlkotb.Application.Contracts
 {
     public interface IPaymentService
     {
-        Task<Payment> CreatePaymentAsync(int userId, int orderId, decimal amount, PaymentMethod method);
-        Task<Payment?> GetPaymentByIdAsync(int paymentId);
-        Task<IEnumerable<Payment>> GetPaymentsByUserAsync(int userId);
-        Task<bool> UpdatePaymentStatusAsync(int paymentId, PaymentStatus status);
+        // Payment Initialization
+        Task<ApiResponse<InitializePaymentResponse>> InitializePaymentAsync(InitializePaymentRequest request);
+        
+        // Payment Callbacks & Notifications
+        Task<ApiResponse<string>> HandlePaymentCallbackAsync(PaymentCallbackRequest request);
+        Task<ApiResponse<string>> HandlePaymentNotificationAsync(Dictionary<string, string> notification);
+        Task<ApiResponse<string>> ProcessWebhookAsync(PaymentWebhookData webhookData);
+        
+        // Cash on Delivery
+        Task<ApiResponse<InitializePaymentResponse>> ProcessCODPaymentAsync(InitializePaymentRequest request);
+        
+        // Admin Management
+        Task<ApiResponsePaginated<List<GetAllPaymentsPaginatedResponse>>> GetAllPaymentsPaginatedAsync(GetAllPaymentsPaginatedRequest request);
+        Task<ApiResponse<GetPaymentByIdResponse>> GetPaymentByIdAsync(int paymentId);
+        Task<ApiResponse<string>> UpdatePaymentStatusAsync(UpdatePaymentStatusRequest request);
+        
+        // Utility Methods
+        Task<ApiResponse<List<GetAllPaymentsPaginatedResponse>>> GetPaymentsByOrderIdAsync(int orderId);
+        Task<ApiResponse<List<GetAllPaymentsPaginatedResponse>>> GetPaymentsByUserIdAsync(int userId);
+        
+        // Validation & Security
+        bool ValidatePaymobCallback(PaymentCallbackRequest request, string hmacSecret);
+        string GenerateTransactionId(int orderId, int userId);
     }
-
 }
-

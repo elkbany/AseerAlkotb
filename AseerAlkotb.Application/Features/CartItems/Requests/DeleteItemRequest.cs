@@ -6,6 +6,6 @@ using System.Threading.Tasks;
 
 namespace AseerAlkotb.Application.Features.CartItems.Requests
 {
-    public record DeleteItemRequest(int UserId, int bookId);
+    public record DeleteItemRequest(int bookId);
    
 }

@@ -1,4 +1,5 @@
-﻿using AseerAlkotb.Domain.Entites;
+﻿﻿using AseerAlkotb.Domain.Entites;
+using AseerAlkotb.Domain.Entites.Base;
 using AseerAlkotb.Domain.Entites.Models;
 using AseerAlkotb.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
@@ -31,6 +32,14 @@ namespace AseerAlkotb.Infrastructure.Context
                 r.HasCheckConstraint("CK_Review_OneTarget",
                     "(BookId IS NOT NULL AND AuthorId IS NULL) OR (BookId IS NULL AND AuthorId IS NOT NULL)"));
 
+            // Payment-Order relationship is configured in OrderConfiguration.cs
+            // No need to configure it here to avoid conflicts
+
+            //modelBuilder.Entity<Cart>()
+            //    .HasOne(c => c.User)
+            //    .WithOne(u => u.Cart).HasForeignKey<User>("CartId")
+            //    .OnDelete(DeleteBehavior.Cascade);
+            //modelBuilder.Entity<WishlistItem>().HasKey(wi => new { wi.BookId, wi.WishlistId });
             modelBuilder.Entity<Payment>()
                 .HasOne(p => p.Order)
                 .WithOne(o => o.Payment)
@@ -74,5 +83,61 @@ namespace AseerAlkotb.Infrastructure.Context
         public DbSet<BookEmbedding> BookEmbeddings { get; set; }
         public DbSet<RagQuery> RagQueries { get; set; }
         public override DbSet<User> Users { get; set; }
+        public override int SaveChanges()
+        {
+            UpdateTimestamps();
+            return base.SaveChanges();
+        }
+
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            UpdateTimestamps();
+            return await base.SaveChangesAsync(cancellationToken);
+        }
+        #region Commented int version 
+        //private void UpdateTimestamps()
+        //{
+        //    var entries = ChangeTracker.Entries<Entity<int>>();
+
+        //    foreach (var entry in entries)
+        //    {
+        //        switch (entry.State)
+        //        {
+        //            case EntityState.Added:
+        //                entry.Entity.CreatedAt = DateTime.UtcNow;
+        //                entry.Entity.UpdatedAt = DateTime.UtcNow;
+        //                break;
+
+        //            case EntityState.Modified:
+        //                entry.Entity.UpdatedAt = DateTime.UtcNow;
+        //                // Prevent CreatedAt from being updated
+        //                entry.Property(nameof(Entity<int>.CreatedAt)).IsModified = false;
+        //                break;
+        //        }
+        //    }
+        //} 
+        #endregion
+        private void UpdateTimestamps()
+        {
+            var entries = ChangeTracker.Entries()
+                .Where(e => e.Entity.GetType().BaseType?.IsGenericType == true &&
+                           e.Entity.GetType().BaseType.GetGenericTypeDefinition() == typeof(Entity<>));
+
+            foreach (var entry in entries)
+            {
+                var entity = (dynamic)entry.Entity;
+                switch (entry.State)
+                {
+                    case EntityState.Added:
+                        entity.CreatedAt = DateTime.UtcNow;
+                        entity.UpdatedAt = DateTime.UtcNow;
+                        break;
+                    case EntityState.Modified:
+                        entity.UpdatedAt = DateTime.UtcNow;
+                        entry.Property("CreatedAt").IsModified = false;
+                        break;
+                }
+            }
+        }
     }
 }

@@ -9,6 +9,7 @@ namespace AseerAlkotb.Application.Features.Books.DTOs
     public record BookDTO
     (
         string Title,
-        decimal Price
+        decimal Price,
+        int Quantity
     );
 }

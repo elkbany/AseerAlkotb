@@ -6,6 +6,6 @@ using System.Threading.Tasks;
 
 namespace AseerAlkotb.Application.Features.CartItems.Requests
 {
-    public record UpdateItemQuantityRequest(int UserId,int BookId, int NewQuantity);
+    public record UpdateItemQuantityRequest(int BookId, int NewQuantity);
     
 }

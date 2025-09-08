@@ -1,4 +1,5 @@
 ﻿using AseerAlkotb.Domain.Entites;
+using AseerAlkotb.Domain.Entites.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
@@ -23,6 +24,20 @@ namespace AseerAlkotb.Infrastructure.Configurations
             //    builder.Property(e => e.Method)
             //          .HasConversion<string>()
             //          .IsRequired();
+
+                        // Configure decimal precision for Amount property
+            builder.Property(p => p.Amount)
+                .HasPrecision(18, 2);
+
+            // Configure ProviderPayload as required
+            builder.Property(p => p.ProviderPayload)
+                .IsRequired()
+                .HasDefaultValue(string.Empty);
+
+            //builder.HasOne(p => p.Order)
+            //   .WithOne(o => o.Payment)
+            //   .HasForeignKey<Order>(o => o.PayId);
+
 
         }
     }

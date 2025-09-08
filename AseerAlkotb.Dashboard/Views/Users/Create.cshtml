@@ -1,0 +1,243 @@
+@model AseerAlkotb.Application.Features.Roles.Requests.CreateAdminAccountRequest
+
+@{
+    ViewData["Title"] = "Create New User";
+}
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">Create New User</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a asp-action="Index">Users</a></li>
+                    <li class="breadcrumb-item active">Create</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">User Information</h3>
+                        <div class="card-tools">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to List
+                            </a>
+                        </div>
+                    </div>
+                    <form asp-action="Create" method="post" enctype="multipart/form-data" id="createUserForm">
+                        <div class="card-body">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            
+                            <!-- Personal Information -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="FirstName" class="control-label">First Name *</label>
+                                        <input asp-for="FirstName" class="form-control" placeholder="Enter first name" />
+                                        <span asp-validation-for="FirstName" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="LastName" class="control-label">Last Name *</label>
+                                        <input asp-for="LastName" class="form-control" placeholder="Enter last name" />
+                                        <span asp-validation-for="LastName" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="UserName" class="control-label">Username *</label>
+                                        <input asp-for="UserName" class="form-control" placeholder="Enter username" />
+                                        <span asp-validation-for="UserName" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="Email" class="control-label">Email *</label>
+                                        <input asp-for="Email" type="email" class="form-control" placeholder="Enter email address" />
+                                        <span asp-validation-for="Email" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="Password" class="control-label">Password *</label>
+                                        <div class="input-group">
+                                            <input asp-for="Password" type="password" class="form-control" id="password" placeholder="Enter password" />
+                                            <div class="input-group-append">
+                                                <button type="button" class="btn btn-outline-secondary" id="togglePassword">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <span asp-validation-for="Password" class="text-danger"></span>
+                                        <small class="form-text text-muted">
+                                            Password must be at least 8 characters with uppercase, lowercase, number, and special character.
+                                        </small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="ConfirmPassword" class="control-label">Confirm Password *</label>
+                                        <input asp-for="ConfirmPassword" type="password" class="form-control" id="confirmPassword" placeholder="Confirm password" />
+                                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                                        <div id="passwordMatch" class="mt-1"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="Gender" class="control-label">Gender *</label>
+                                        <select asp-for="Gender" class="form-control" asp-items="Html.GetEnumSelectList<AseerAlkotb.Domain.Enums.Gender>()">
+                                            <option value="">Select Gender</option>
+                                        </select>
+                                        <span asp-validation-for="Gender" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="PhoneNumber" class="control-label">Phone Number</label>
+                                        <input asp-for="PhoneNumber" class="form-control" placeholder="Enter phone number (optional)" />
+                                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="Nationality" class="control-label">Nationality</label>
+                                        <input asp-for="Nationality" class="form-control" placeholder="Enter nationality (optional)" />
+                                        <span asp-validation-for="Nationality" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="UserRole" class="control-label">User Role *</label>
+                                        <select asp-for="UserRole" class="form-control">
+                                            <option value="">Select Role</option>
+                                            <option value="Admin">Administrator</option>
+                                            <option value="Client">Client</option>
+                                        </select>
+                                        <span asp-validation-for="UserRole" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label asp-for="ProfilePictureUrl" class="control-label">Profile Picture</label>
+                                        <div class="custom-file">
+                                            <input asp-for="ProfilePictureUrl" type="file" class="custom-file-input" id="profilePicture" accept="image/*" />
+                                            <label class="custom-file-label" for="profilePicture">Choose profile picture (optional)</label>
+                                        </div>
+                                        <span asp-validation-for="ProfilePictureUrl" class="text-danger"></span>
+                                        <small class="form-text text-muted">
+                                            Supported formats: JPG, PNG, GIF. Max size: 5MB.
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Create User
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        $(function () {
+            // Password visibility toggle
+            $('#togglePassword').click(function() {
+                const passwordField = $('#password');
+                const icon = $(this).find('i');
+                
+                if (passwordField.attr('type') === 'password') {
+                    passwordField.attr('type', 'text');
+                    icon.removeClass('fa-eye').addClass('fa-eye-slash');
+                } else {
+                    passwordField.attr('type', 'password');
+                    icon.removeClass('fa-eye-slash').addClass('fa-eye');
+                }
+            });
+
+            // Password confirmation check
+            $('#confirmPassword').on('input', function() {
+                const password = $('#password').val();
+                const confirmPassword = $(this).val();
+                const matchDiv = $('#passwordMatch');
+                
+                if (confirmPassword === '') {
+                    matchDiv.html('');
+                    return;
+                }
+                
+                if (password === confirmPassword) {
+                    matchDiv.html('<small class="text-success"><i class="fas fa-check"></i> Passwords match</small>');
+                } else {
+                    matchDiv.html('<small class="text-danger"><i class="fas fa-times"></i> Passwords do not match</small>');
+                }
+            });
+
+            // File input label update
+            $('#profilePicture').on('change', function() {
+                const fileName = $(this).val().split('\\').pop();
+                $(this).next('.custom-file-label').html(fileName || 'Choose profile picture (optional)');
+            });
+
+            // Form validation
+            $('#createUserForm').submit(function(e) {
+                const password = $('#password').val();
+                const confirmPassword = $('#confirmPassword').val();
+                const userRole = $('#UserRole').val();
+                
+                if (password !== confirmPassword) {
+                    e.preventDefault();
+                    alert('Passwords do not match!');
+                    return false;
+                }
+                
+                if (!userRole) {
+                    e.preventDefault();
+                    alert('Please select a user role!');
+                    return false;
+                }
+            });
+        });
+    </script>
+}
+
+
+
+

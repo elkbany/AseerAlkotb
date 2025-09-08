@@ -3,6 +3,7 @@ using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Features.Wishlist.Requests;
 using AseerAlkotb.Application.Features.Wishlist.Responses;
 using AseerAlkotb.Application.ResponseHandler;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,12 +21,14 @@ namespace AseerAlkotb.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Client")]
         public async Task<IActionResult> Add([FromBody] AddWishlistItemRequest request)
         {
             var result = await wishlistServices.AddToWishlistAsync(request);
             return ApiResult(result);
         }
         [HttpDelete("DeleteItem")]
+        [Authorize(Roles = "Client")]
         public async Task<IActionResult> Delete([FromQuery] DeleteWishlistItemRequest request)
         {
             var result = await wishlistServices.RemoveFromWishlistAsync(request);
@@ -33,6 +36,7 @@ namespace AseerAlkotb.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Client")]
         public async Task<IActionResult> GetUserWishlist([FromQuery] GetUserWishlistRequest request)
         {
             var result = await wishlistServices.GetUserWishlistAsync(request);
@@ -40,6 +44,7 @@ namespace AseerAlkotb.API.Controllers
         }
 
         [HttpDelete("ClearWishlist")]
+        [Authorize(Roles = "Client")]
         public async Task<IActionResult> ClearWishlist([FromQuery] ClearWishlistRequest request)
         {
             var result = await wishlistServices.ClearWishlistAsync(request);
@@ -47,6 +52,7 @@ namespace AseerAlkotb.API.Controllers
         }
 
         [HttpGet("Count")]
+        [Authorize(Roles = "Client")]
         public async Task<IActionResult> GetWishlistItemCount([FromQuery] GetWishlistItemCountRequest request)
         {
             var result = await wishlistServices.GetWishlistItemCountAsync(request);
@@ -57,6 +63,13 @@ namespace AseerAlkotb.API.Controllers
         public async Task<IActionResult> IsBookInWishlist([FromQuery] IsBookInWishlistRequest request)
         {
             var result = await wishlistServices.IsBookInWishlistAsync(request);
+            return ApiResult(result);
+        }
+        [HttpGet("GetAll")]
+        [Authorize(Roles ="Client")]
+        public async Task<IActionResult> GetWishlistItems([FromQuery]GetWishlistItemsRequest request)
+        {
+            var result =await wishlistServices.GetwishlistItemsAsync(request);
             return ApiResult(result);
         }
     }

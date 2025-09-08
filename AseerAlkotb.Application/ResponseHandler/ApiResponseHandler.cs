@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AseerAlkotb.Application.ResponseHandler
 {
@@ -60,6 +61,21 @@ namespace AseerAlkotb.Application.ResponseHandler
             return new ApiResponse<T>()
             {
                 StatusCode = System.Net.HttpStatusCode.Unauthorized,
+            };
+        }
+        public static ApiResponse<T> UnAuthorized<T>(string Message)
+        {
+            return new ApiResponse<T>()
+            {
+                StatusCode = System.Net.HttpStatusCode.Unauthorized,
+                Message = Message
+            };
+        }
+        public static ApiResponsePaginated<T> UnAutherized<T>() where T : ICollection
+        {
+            return new ApiResponsePaginated<T>()
+            {
+                StatusCode = System.Net.HttpStatusCode.OK,
             };
         }
         public static ApiResponse<T> BadRequest<T>(string Message = null)

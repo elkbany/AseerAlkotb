@@ -355,7 +355,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     PaymentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     TransactionId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ProviderPayload = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    //ProviderPayload = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },

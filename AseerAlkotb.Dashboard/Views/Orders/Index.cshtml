@@ -1,3 +1,4 @@
+@using AseerAlkotb.Dashboard.Helpers
 @model List<AseerAlkotb.Application.Features.Orders.Responses.GetAllOrdersPaginatedResponse>
 @{
     ViewData["Title"] = "Order Management";
@@ -57,7 +58,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Orders</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">@ViewBag.TotalCount</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@(ViewBag.TotalCount ?? 0)</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-shopping-cart fa-2x text-gray-300"></i>
@@ -72,7 +73,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Delivered</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.Count(o => o.OrderStatus == AseerAlkotb.Domain.Enums.OrderStatus.Delivered)</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@(Model?.Count(o => o.OrderStatus == AseerAlkotb.Domain.Enums.OrderStatus.Delivered) ?? 0)</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-check-circle fa-2x text-gray-300"></i>
@@ -87,7 +88,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Pending</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.Count(o => o.OrderStatus == AseerAlkotb.Domain.Enums.OrderStatus.Pending)</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@(Model?.Count(o => o.OrderStatus == AseerAlkotb.Domain.Enums.OrderStatus.Pending) ?? 0)</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-clock fa-2x text-gray-300"></i>
@@ -102,7 +103,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Cancelled</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.Count(o => o.OrderStatus == AseerAlkotb.Domain.Enums.OrderStatus.Cancelled)</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@(Model?.Count(o => o.OrderStatus == AseerAlkotb.Domain.Enums.OrderStatus.Cancelled) ?? 0)</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-times-circle fa-2x text-gray-300"></i>
@@ -162,29 +163,35 @@
                     </div>
 
                     <!-- Pagination -->
-                    @if (ViewBag.TotalPages > 1)
+                    @if ((ViewBag.TotalPages ?? 0) > 1)
                     {
                         <nav aria-label="Orders pagination" class="mt-4">
                             <ul class="pagination justify-content-center">
-                                <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
-                                    <a class="page-link" href="@Url.Action("Index", new { pageNumber = ViewBag.CurrentPage - 1, pageSize = ViewBag.PageSize, search = ViewBag.SearchTerm, orderStatus = ViewBag.SelectedOrderStatus, governorate = ViewBag.SelectedGovernorate, dateAscending = ViewBag.DateAscending })">
+                                <li class="page-item @((ViewBag.CurrentPage ?? 1) == 1 ? "disabled" : "")">
+                                    <a class="page-link" href="@Url.Action("Index", new { pageNumber = (ViewBag.CurrentPage ?? 1) - 1, pageSize = ViewBag.PageSize, search = ViewBag.SearchTerm, orderStatus = ViewBag.SelectedOrderStatus, governorate = ViewBag.SelectedGovernorate, dateAscending = ViewBag.DateAscending })">
                                         <i class="fas fa-chevron-left"></i>
                                     </a>
                                 </li>
 
-                                @for (int i = Math.Max(1, ViewBag.CurrentPage - 2); i <= Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 2); i++)
+                                @for (int i = Math.Max(1, (ViewBag.CurrentPage ?? 1) - 2); i <= Math.Min((ViewBag.TotalPages ?? 1), (ViewBag.CurrentPage ?? 1) + 2); i++)
                                 {
-                                    <li class="page-item @(ViewBag.CurrentPage == i ? "active" : "")">
+                                    <li class="page-item @((ViewBag.CurrentPage ?? 1) == i ? "active" : "")">
                                         <a class="page-link" href="@Url.Action("Index", new { pageNumber = i, pageSize = ViewBag.PageSize, search = ViewBag.SearchTerm, orderStatus = ViewBag.SelectedOrderStatus, governorate = ViewBag.SelectedGovernorate, dateAscending = ViewBag.DateAscending })">@i</a>
                                     </li>
                                 }
 
-                                <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
-                                    <a class="page-link" href="@Url.Action("Index", new { pageNumber = ViewBag.CurrentPage + 1, pageSize = ViewBag.PageSize, search = ViewBag.SearchTerm, orderStatus = ViewBag.SelectedOrderStatus, governorate = ViewBag.SelectedGovernorate, dateAscending = ViewBag.DateAscending })">
+                                <li class="page-item @((ViewBag.CurrentPage ?? 1) == (ViewBag.TotalPages ?? 1) ? "disabled" : "")">
+                                    <a class="page-link" href="@Url.Action("Index", new { pageNumber = (ViewBag.CurrentPage ?? 1) + 1, pageSize = ViewBag.PageSize, search = ViewBag.SearchTerm, orderStatus = ViewBag.SelectedOrderStatus, governorate = ViewBag.SelectedGovernorate, dateAscending = ViewBag.DateAscending })">
                                         <i class="fas fa-chevron-right"></i>
                                     </a>
                                 </li>
                             </ul>
+                            <div class="text-center mt-2">
+                                <small class="text-muted">
+                                    Showing page @(ViewBag.CurrentPage ?? 1) of @(ViewBag.TotalPages ?? 1) 
+                                    (@(ViewBag.TotalCount ?? 0) total orders)
+                                </small>
+                            </div>
                         </nav>
                     }
                 </div>
@@ -218,12 +225,22 @@
                         <label for="newStatus" class="form-label">New Status <span class="text-danger">*</span></label>
                         <select class="form-select" id="newStatus" required>
                             <option value="">Select new status...</option>
-                            @foreach (var status in ViewBag.OrderStatuses as AseerAlkotb.Domain.Enums.OrderStatus[])
+                            @if (ViewBag.OrderStatuses != null)
                             {
-                                var statusValue = (int)status;
-                                <option value="@statusValue">@status</option>
+                                @foreach (var status in ViewBag.OrderStatuses as AseerAlkotb.Domain.Enums.OrderStatus[])
+                                {
+                                    var statusValue = (int)status;
+                                    <option value="@statusValue">@status</option>
+                                }
                             }
                         </select>
+                        <div class="invalid-feedback">
+                            Please select a new status.
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="statusChangeReason" class="form-label">Reason for Change</label>
+                        <textarea class="form-control" id="statusChangeReason" rows="3" placeholder="Optional: Enter reason for status change..."></textarea>
                     </div>
                 </form>
             </div>
@@ -238,5 +255,6 @@
 </div>
 
 @section Scripts {
+    @Html.AntiForgeryToken()
     <script src="~/js/orders.js"></script>
 }
