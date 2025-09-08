@@ -29,6 +29,8 @@ using AseerAlkotb.Infrastructure.Data;
 using AseerAlkotb.Application.BackgroundJobs;
 using AseerAlkotb.Infrastructure.Background;
 using AseerAlkotb.Infrastructure.AI;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
 namespace AseerAlkotb.API
 {
     public class Program
