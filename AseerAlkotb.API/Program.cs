@@ -19,6 +19,7 @@ using Mapster;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Localization;
@@ -191,6 +192,42 @@ namespace AseerAlkotb.API
             builder.Services.AddHttpClient();
             #endregion
 
+            #region Rate Limiting
+            builder.Services.AddRateLimiter(options =>
+            {
+                // Callback endpoint rate limiting - 10 requests per minute per IP
+                options.AddFixedWindowLimiter("CallbackPolicy", opt =>
+                {
+                    opt.PermitLimit = 10;
+                    opt.Window = TimeSpan.FromMinutes(1);
+                    opt.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
+                    opt.QueueLimit = 0; // No queuing, reject immediately when limit exceeded
+                });
+
+                // Webhook endpoint rate limiting - 20 requests per minute per IP
+                options.AddFixedWindowLimiter("WebhookPolicy", opt =>
+                {
+                    opt.PermitLimit = 20;
+                    opt.Window = TimeSpan.FromMinutes(1);
+                    opt.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
+                    opt.QueueLimit = 0;
+                });
+
+                // Global rate limiting fallback
+                options.GlobalLimiter = System.Threading.RateLimiting.PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+                    System.Threading.RateLimiting.RateLimitPartition.GetFixedWindowLimiter(
+                        partitionKey: httpContext.User.Identity?.Name ?? httpContext.Request.Headers.Host.ToString(),
+                        factory: partition => new System.Threading.RateLimiting.FixedWindowRateLimiterOptions
+                        {
+                            AutoReplenishment = true,
+                            PermitLimit = 100,
+                            Window = TimeSpan.FromMinutes(1)
+                        }));
+
+                options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+            });
+            #endregion
+
             #region Cors
             builder.Services.AddCors(options =>
             {
@@ -286,6 +323,9 @@ namespace AseerAlkotb.API
             }
 
             app.UseHttpsRedirection();
+
+            // Add rate limiting middleware
+            app.UseRateLimiter();
 
             // IMPORTANT: Order matters - Authentication before Authorization
             app.UseAuthentication();

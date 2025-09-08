@@ -15,6 +15,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Net;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using static AseerAlkotb.Application.ResponseHandler.ApiResponseHandler;
@@ -292,9 +293,10 @@ namespace AseerAlkotb.Application.Services
                     return BadRequest<string>("Invalid callback: MerchantOrderId is missing");
                 }
 
-                // Validate HMAC - temporarily disabled for debugging but log validation
+                // Validate HMAC - enforce by default in production
                 var hmacSecret = _configuration["Paymob:HMAC"];
-                var enforceHmac = _configuration.GetValue<bool>("Paymob:EnforceHMAC", false); // Add this config setting
+                var isProduction = _configuration.GetValue<string>("ASPNETCORE_ENVIRONMENT") == "Production";
+                var enforceHmac = _configuration.GetValue<bool>("Paymob:EnforceHMAC", isProduction); // Default TRUE in production
 
                 if (!string.IsNullOrEmpty(hmacSecret))
                 {
@@ -772,7 +774,10 @@ namespace AseerAlkotb.Application.Services
                 _logger.LogInformation("HMAC Validation - Calculated: {Calculated}, Received: {Received}",
                     calculatedHmac, request.Hmac);
 
-                var isValid = request.Hmac?.Equals(calculatedHmac, StringComparison.OrdinalIgnoreCase) == true;
+                var isValid = CryptographicOperations.FixedTimeEquals(
+                    Encoding.UTF8.GetBytes(request.Hmac ?? ""),
+                    Encoding.UTF8.GetBytes(calculatedHmac)
+                );
                 _logger.LogInformation("HMAC Validation Result: {IsValid}", isValid ? "Valid ✅" : "Invalid ❌");
 
                 if (!isValid)

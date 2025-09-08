@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿using AseerAlkotb.API.Helpers;
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using AseerAlkotb.API.Helpers;
 using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Features.Payments.Requests;
 using AseerAlkotb.Application.Features.Payments.Responses;
@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.AspNetCore.RateLimiting;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
@@ -165,6 +166,7 @@ namespace AseerAlkotb.API.Controllers
         /// <returns>HTML response for user</returns>
         [HttpGet("callback")]
         [HttpPost("callback")]
+        [EnableRateLimiting("CallbackPolicy")]
         public async Task<IActionResult> HandleCallback()
         {
             try
@@ -211,7 +213,7 @@ namespace AseerAlkotb.API.Controllers
                 var sourceDataType = data.ContainsKey("source_data.type") ? data["source_data.type"] : 
                                     (data.ContainsKey("source_data_type") ? data["source_data_type"] : "");
 
-                // Enhanced logging for critical fields
+                // Enhanced logging for critical fields with validation
                 _logger.LogInformation("Critical HMAC Fields:");
                 _logger.LogInformation("  amount_cents: '{AmountCents}'", data.GetValueOrDefault("amount_cents", ""));
                 _logger.LogInformation("  created_at: '{CreatedAt}'", data.GetValueOrDefault("created_at", ""));
@@ -222,6 +224,35 @@ namespace AseerAlkotb.API.Controllers
                 _logger.LogInformation("  integration_id: '{IntegrationId}'", data.GetValueOrDefault("integration_id", ""));
                 _logger.LogInformation("  is_3d_secure: '{Is3dSecure}'", data.GetValueOrDefault("is_3d_secure", ""));
                 _logger.LogInformation("  is_auth: '{IsAuth}'", data.GetValueOrDefault("is_auth", ""));
+
+                // Validate required parameters
+                if (!ValidateRequiredParameters(data))
+                {
+                    _logger.LogError("Missing required callback parameters");
+                    string errorHtml = GenerateErrorResponse("Missing required parameters", "callback");
+                    return new ContentResult
+                    {
+                        Content = errorHtml,
+                        ContentType = "text/html; charset=utf-8",
+                        StatusCode = 400
+                    };
+                }
+
+                // Sanitize input parameters
+                data = SanitizeParameters(data);
+
+                // Validate timestamp to prevent replay attacks
+                if (!ValidateTimestamp(data.GetValueOrDefault("created_at", "")))
+                {
+                    _logger.LogError("Invalid or expired timestamp in callback");
+                    string errorHtml = GenerateErrorResponse("Request timestamp is invalid or expired", "callback");
+                    return new ContentResult
+                    {
+                        Content = errorHtml,
+                        ContentType = "text/html; charset=utf-8",
+                        StatusCode = 400
+                    };
+                }
                 _logger.LogInformation("  is_capture: '{IsCapture}'", data.GetValueOrDefault("is_capture", ""));
                 _logger.LogInformation("  is_refunded: '{IsRefunded}'", data.GetValueOrDefault("is_refunded", ""));
                 _logger.LogInformation("  is_standalone_payment: '{IsStandalonePayment}'", data.GetValueOrDefault("is_standalone_payment", ""));
@@ -271,16 +302,26 @@ namespace AseerAlkotb.API.Controllers
                 _logger.LogInformation("Callback Success Parameter: {CallbackSuccess}", callbackRequest.Success);
 
                 string htmlContent;
-                // SUCCESS DETERMINATION: Payment is successful ONLY if the Paymob success parameter is "true"
-                // The service response being successful just means we processed the callback correctly
-                bool isPaymentSuccessful = callbackRequest.Success.ToLower() == "true";
+                // SECURITY-FIRST SUCCESS DETERMINATION: Payment is successful ONLY if:
+                // 1. Service response succeeded (includes HMAC validation)
+                // 2. Paymob success parameter is "true"
+                bool isServiceSuccessful = response.Succeeded;
+                bool isPaymobSuccessful = callbackRequest.Success.ToLower() == "true";
+                bool isPaymentSuccessful = isServiceSuccessful && isPaymobSuccessful;
 
-                _logger.LogInformation("Final Payment Success Determination: {IsSuccessful} (based on success={SuccessParam})", isPaymentSuccessful, callbackRequest.Success);
+                _logger.LogInformation("Final Payment Success Determination: Service={ServiceSuccess}, Paymob={PaymobSuccess}, Final={FinalSuccess}", 
+                    isServiceSuccessful, isPaymobSuccessful, isPaymentSuccessful);
 
                 if (isPaymentSuccessful)
                 {
                     _logger.LogInformation("Payment callback handled successfully - payment succeeded");
                     htmlContent = HtmlGenerator.GenerateSuccessHtml();
+                }
+                else if (!isServiceSuccessful)
+                {
+                    _logger.LogError("Payment callback - service validation failed (likely HMAC). Success Parameter: {PaymentSuccess}, Service Message: {Message}",
+                        callbackRequest.Success, response.Message);
+                    htmlContent = HtmlGenerator.GenerateSecurityHtml();
                 }
                 else
                 {
@@ -291,8 +332,8 @@ namespace AseerAlkotb.API.Controllers
 
                 _logger.LogInformation("=== HTML RESPONSE ===");
                 _logger.LogInformation("Generated HTML length: {Length}", htmlContent.Length);
-                _logger.LogInformation("Payment Result - Service Success: {ServiceSuccess}, Payment Success: {PaymentSuccess}, Final Result: {FinalResult}",
-                    response.Succeeded, callbackRequest.Success, isPaymentSuccessful);
+                _logger.LogInformation("Payment Result - Service Success: {ServiceSuccess}, Paymob Success: {PaymobSuccess}, Final Result: {FinalResult}",
+                    isServiceSuccessful, isPaymobSuccessful, isPaymentSuccessful);
 
                 // Return proper HTML response with explicit headers for ngrok compatibility
                 var contentBytes = Encoding.UTF8.GetBytes(htmlContent);
@@ -341,6 +382,7 @@ namespace AseerAlkotb.API.Controllers
         /// <returns>Acknowledgment response</returns>
         [HttpPost("webhook")]
         [HttpGet("webhook")]
+        [EnableRateLimiting("WebhookPolicy")]
         public async Task<IActionResult> HandleWebhook()
         {
             try
@@ -348,6 +390,13 @@ namespace AseerAlkotb.API.Controllers
                 _logger.LogInformation("=== WEBHOOK DEBUG START ===");
                 _logger.LogInformation("Method: {Method}, Headers: {Headers}",
                     Request.Method, string.Join(", ", Request.Headers.Select(h => $"{h.Key}={h.Value}")));
+
+                // Validate source IP address
+                if (!ValidateSourceIP())
+                {
+                    _logger.LogWarning("Webhook request from unauthorized IP address: {IP}", GetClientIPAddress());
+                    return Unauthorized(new { status = "error", message = "Unauthorized IP address" });
+                }
 
                 // Read raw body for HMAC validation with enhanced error handling
                 string body = string.Empty;
@@ -455,9 +504,10 @@ namespace AseerAlkotb.API.Controllers
                     return BadRequest(new { status = "error", message = "Invalid webhook structure - missing 'obj' property" });
                 }
 
-                // Validate HMAC if configured
+                // Validate HMAC if configured - enforce by default in production
                 var hmacSecret = _configuration["Paymob:HMAC"];
-                var enforceHmac = _configuration.GetValue<bool>("Paymob:EnforceHMAC", false); // Add this config setting
+                var isProduction = _configuration.GetValue<string>("ASPNETCORE_ENVIRONMENT") == "Production";
+                var enforceHmac = _configuration.GetValue<bool>("Paymob:EnforceHMAC", isProduction); // Default TRUE in production
 
                 if (!string.IsNullOrEmpty(hmacSecret))
                 {
@@ -674,6 +724,224 @@ namespace AseerAlkotb.API.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     new { status = "error", message = "Internal server error" });
             }
+        }
+
+        /// <summary>
+        /// Validate source IP address against whitelist
+        /// </summary>
+        private bool ValidateSourceIP()
+        {
+            try
+            {
+                var clientIP = GetClientIPAddress();
+                var whitelistedIPs = _configuration.GetSection("Paymob:WhitelistedIPs").Get<string[]>();
+                
+                // If no whitelist configured, allow all (for development)
+                if (whitelistedIPs == null || whitelistedIPs.Length == 0)
+                {
+                    _logger.LogWarning("No IP whitelist configured - allowing all IPs (not recommended for production)");
+                    return true;
+                }
+                
+                var isWhitelisted = whitelistedIPs.Contains(clientIP, StringComparer.OrdinalIgnoreCase);
+                
+                _logger.LogInformation("IP validation - Client: {ClientIP}, Whitelisted: {IsWhitelisted}", 
+                    clientIP, isWhitelisted);
+                
+                return isWhitelisted;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error validating source IP");
+                return false; // Fail secure
+            }
+        }
+
+        /// <summary>
+        /// Get client IP address from request
+        /// </summary>
+        private string GetClientIPAddress()
+        {
+            try
+            {
+                // Check for X-Forwarded-For header (common with proxies/load balancers)
+                var forwardedFor = Request.Headers["X-Forwarded-For"].FirstOrDefault();
+                if (!string.IsNullOrEmpty(forwardedFor))
+                {
+                    // Take the first IP if multiple are present
+                    return forwardedFor.Split(',')[0].Trim();
+                }
+
+                // Check for X-Real-IP header (nginx)
+                var realIP = Request.Headers["X-Real-IP"].FirstOrDefault();
+                if (!string.IsNullOrEmpty(realIP))
+                {
+                    return realIP.Trim();
+                }
+
+                // Fall back to connection remote IP
+                return Request.HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting client IP address");
+                return "Unknown";
+            }
+        }
+
+        /// <summary>
+        /// Validate timestamp to prevent replay attacks (5-minute window)
+        /// </summary>
+        private bool ValidateTimestamp(string timestamp)
+        {
+            if (string.IsNullOrEmpty(timestamp))
+            {
+                _logger.LogWarning("Timestamp is missing from request");
+                return true; // Allow if timestamp is missing for backward compatibility
+            }
+
+            try
+            {
+                // Try parsing different timestamp formats
+                DateTime callbackTime;
+                
+                // Try parsing with multiple formats to handle timezone issues
+                if (DateTimeOffset.TryParse(timestamp, out var callbackTimeOffset))
+                {
+                    // Use DateTimeOffset to properly handle timezone information
+                    callbackTime = callbackTimeOffset.UtcDateTime;
+                }
+                else if (DateTime.TryParse(timestamp, out callbackTime))
+                {
+                    // Fallback to DateTime parsing
+                    // For Paymob timestamps, assume they are UTC if unspecified
+                    if (callbackTime.Kind == DateTimeKind.Unspecified)
+                    {
+                        callbackTime = DateTime.SpecifyKind(callbackTime, DateTimeKind.Utc);
+                    }
+                    else if (callbackTime.Kind == DateTimeKind.Local)
+                    {
+                        callbackTime = callbackTime.ToUniversalTime();
+                    }
+                }
+                else
+                {
+                    _logger.LogError("Failed to parse timestamp: {Timestamp}", timestamp);
+                    return false;
+                }
+
+                var currentTime = DateTime.UtcNow;
+                var age = currentTime - callbackTime;
+                
+                // Get timestamp validation window from configuration (default 5 minutes)
+                var validationWindowMinutes = _configuration.GetValue<int>("Paymob:TimestampValidationWindowMinutes", 5);
+                var isValid = Math.Abs(age.TotalMinutes) <= validationWindowMinutes;
+                
+                _logger.LogInformation("Timestamp validation - Current: {CurrentTime}, Callback: {CallbackTime}, Age: {Age} minutes, Window: {Window} minutes", 
+                    currentTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"), callbackTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"), age.TotalMinutes, validationWindowMinutes);
+                
+                if (!isValid)
+                {
+                    _logger.LogWarning("Timestamp outside valid window: {Timestamp}, Age: {Age} minutes", 
+                        timestamp, age.TotalMinutes);
+                }
+                else
+                {
+                    _logger.LogInformation("Timestamp validation passed for: {Timestamp}", timestamp);
+                }
+                
+                return isValid;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error validating timestamp: {Timestamp}", timestamp);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Validate required parameters according to security specifications
+        /// </summary>
+        private bool ValidateRequiredParameters(Dictionary<string, string> data)
+        {
+            var requiredParams = new[] { "merchant_order_id", "success" };
+            
+            foreach (var param in requiredParams)
+            {
+                if (!data.ContainsKey(param) || string.IsNullOrWhiteSpace(data[param]))
+                {
+                    _logger.LogError("Missing required parameter: {Parameter}", param);
+                    return false;
+                }
+            }
+
+            // Validate parameter formats
+            if (data.ContainsKey("amount_cents") && !string.IsNullOrEmpty(data["amount_cents"]))
+            {
+                if (!decimal.TryParse(data["amount_cents"], out _))
+                {
+                    _logger.LogError("Invalid amount_cents format: {Value}", data["amount_cents"]);
+                    return false;
+                }
+            }
+
+            if (!bool.TryParse(data["success"], out _))
+            {
+                _logger.LogError("Invalid success format: {Value}", data["success"]);
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Sanitize input parameters to prevent injection attacks
+        /// </summary>
+        private Dictionary<string, string> SanitizeParameters(Dictionary<string, string> data)
+        {
+            var sanitized = new Dictionary<string, string>();
+            
+            foreach (var kvp in data)
+            {
+                var key = kvp.Key?.Trim();
+                var value = kvp.Value?.Trim();
+                
+                // Remove potential malicious content
+                if (!string.IsNullOrEmpty(key) && !string.IsNullOrEmpty(value))
+                {
+                    // Basic sanitization - remove script tags and SQL injection attempts
+                    value = value.Replace("<script", "", StringComparison.OrdinalIgnoreCase)
+                                .Replace("</script>", "", StringComparison.OrdinalIgnoreCase)
+                                .Replace("javascript:", "", StringComparison.OrdinalIgnoreCase)
+                                .Replace("'; DROP TABLE", "", StringComparison.OrdinalIgnoreCase)
+                                .Replace("'; DELETE FROM", "", StringComparison.OrdinalIgnoreCase);
+                    
+                    sanitized[key] = value;
+                }
+            }
+            
+            return sanitized;
+        }
+
+        /// <summary>
+        /// Generate error response HTML
+        /// </summary>
+        private string GenerateErrorResponse(string error, string type)
+        {
+            return $@"
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Payment Error</title>
+                <meta charset='utf-8'>
+            </head>
+            <body>
+                <h1>Payment Processing Error</h1>
+                <p>Error: {error}</p>
+                <p>Type: {type}</p>
+                <p>Please contact support if this issue persists.</p>
+            </body>
+            </html>";
         }
 
     }

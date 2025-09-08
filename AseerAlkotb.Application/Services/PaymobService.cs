@@ -1,4 +1,4 @@
-﻿using AseerAlkotb.Application.Contracts;
+﻿﻿using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Features.Payments.Requests;
 using AseerAlkotb.Application.Features.Payments.Responses;
 using AseerAlkotb.Domain.Entites;
@@ -371,7 +371,10 @@ namespace AseerAlkotb.Application.Services
                 _logger.LogInformation("Calculated: {Calculated}", calculatedHmac);
                 _logger.LogInformation("Received: {Received}", receivedHmac);
 
-                var isValid = receivedHmac.Equals(calculatedHmac, StringComparison.OrdinalIgnoreCase);
+                var isValid = CryptographicOperations.FixedTimeEquals(
+                    Encoding.UTF8.GetBytes(receivedHmac ?? ""),
+                    Encoding.UTF8.GetBytes(calculatedHmac)
+                );
                 _logger.LogInformation("Webhook HMAC Result: {IsValid}", isValid ? "Valid ✅" : "Invalid ❌");
 
                 return isValid;
