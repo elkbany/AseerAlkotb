@@ -1,4 +1,7 @@
-﻿using AseerAlkotb.Domain.Entites.Models;
+﻿using AseerAlkotb.Application.Contracts.External;
+using AseerAlkotb.Application.Features.UploadImages.Dto;
+using AseerAlkotb.Application.ResponseHandler;
+using AseerAlkotb.Domain.Entites.Models;
 using AseerAlkotb.Localization.Resources;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
@@ -7,7 +10,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Localization;
-using AseerAlkotb.Application.ResponseHandler;
 
 namespace AseerAlkotb.Application.Services
 {
@@ -15,6 +17,8 @@ namespace AseerAlkotb.Application.Services
     {
         private readonly IServiceProvider serviceProvider;
         private readonly IHostEnvironment _environment;
+        protected readonly ICloudinaryService? _cloudinaryService;
+
 
         private IStringLocalizer<SharedResources>? _localizer;
 
@@ -25,6 +29,7 @@ namespace AseerAlkotb.Application.Services
         {
             this.serviceProvider = serviceProvider;
             _environment = environment;
+            _cloudinaryService = serviceProvider.GetService<ICloudinaryService>();
         }
 
         #region Validate Async
@@ -42,78 +47,157 @@ namespace AseerAlkotb.Application.Services
         #endregion
 
         #region Uploading Files
-        public async Task<string> UploadImageAsync(IFormFile imageFile, string folder)
+        public async Task<UploadResultDto> UploadImageAsync(IFormFile imageFile, string folder)
         {
-            var allowedContentTypes = new[] { "image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp" };
-            if (!allowedContentTypes.Contains(imageFile.ContentType.ToLowerInvariant()))
-                throw new ArgumentException("Invalid image file");
-
-            // Generate unique filename
-            var fileName = GenerateUniqueFileName(imageFile.FileName);
-
-            // Get wwwroot path using current directory
-            var currentDirectory = Directory.GetCurrentDirectory();
-            var wwwrootPath = Path.Combine(currentDirectory, "wwwroot");
-            var uploadsFolder = Path.Combine(wwwrootPath, "uploads", folder);
-
-            // Create directory if it doesn't exist
-            Directory.CreateDirectory(uploadsFolder);
-
-            // Full file path
-            var filePath = Path.Combine(uploadsFolder, fileName);
-
-            // Save file
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await imageFile.CopyToAsync(stream);
-            }
-
-            // Return URL path
-            return $"/uploads/{folder}/{fileName}";
-        }
-
-        public async Task<bool> DeleteImageAsync(string imageUrl)
-        {
-            if (string.IsNullOrEmpty(imageUrl))
-                return false;
-
             try
             {
-                // Get wwwroot path
+                if (imageFile == null || imageFile.Length == 0)
+                    throw new ArgumentException("No image file provided");
+
+                var allowedContentTypes = new[] { "image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp" };
+                if (!allowedContentTypes.Contains(imageFile.ContentType.ToLowerInvariant()))
+                    throw new ArgumentException("Invalid image file type");
+
+                // ✅ Generate unique filename
+                var fileName = GenerateUniqueFileName(imageFile.FileName);
+
+                // ✅ Local Save
                 var currentDirectory = Directory.GetCurrentDirectory();
                 var wwwrootPath = Path.Combine(currentDirectory, "wwwroot");
+                var uploadsFolder = Path.Combine(wwwrootPath, "uploads", folder);
 
-                // Convert URL to physical path
-                var relativePath = imageUrl.TrimStart('/');
-                var filePath = Path.Combine(wwwrootPath, relativePath);
+                Directory.CreateDirectory(uploadsFolder);
 
-                if (File.Exists(filePath))
+                var filePath = Path.Combine(uploadsFolder, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
                 {
-                    File.Delete(filePath);
-                    return true;
+                    await imageFile.CopyToAsync(stream);
                 }
+
+                var localUrl = $"/uploads/{folder}/{fileName}";
+
+                // ✅ Cloudinary Upload (if available)
+                string cloudUrl = string.Empty;
+                if (_cloudinaryService != null)
+                {
+                    try
+                    {
+                        cloudUrl = await _cloudinaryService.UploadImageAsync(imageFile, folder);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Warning: Cloudinary upload failed: {ex.Message}. Using local URL only.");
+                        cloudUrl = localUrl; // Fallback to local URL
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Warning: Cloudinary service is not available. Using local URL only.");
+                    cloudUrl = localUrl; // Fallback to local URL
+                }
+
+                // ✅ Return both (or local only if cloudinary fails)
+                return new UploadResultDto
+                {
+                    LocalUrl = localUrl,
+                    CloudUrl = cloudUrl
+                };
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // Log exception
-                return false;
+                Console.WriteLine($"Error in UploadImageAsync: {ex.Message}");
+                throw;
             }
-            return false;
         }
 
-        public async Task<string> UpdateImageAsync(IFormFile newImage, string oldImageUrl, string folder)
+        public async Task<bool> DeleteImageAsync(string localImageUrl, string? cloudPublicId = null)
         {
-            // Upload new image
-            var newImageUrl = await UploadImageAsync(newImage, folder);
+            var deletedLocal = false;
 
-            // Delete old image
-            if (!string.IsNullOrEmpty(oldImageUrl))
+            // ✅ Delete Local
+            if (!string.IsNullOrEmpty(localImageUrl))
             {
-                await DeleteImageAsync(oldImageUrl);
+                try
+                {
+                    var currentDirectory = Directory.GetCurrentDirectory();
+                    var wwwrootPath = Path.Combine(currentDirectory, "wwwroot");
+
+                    var relativePath = localImageUrl.TrimStart('/');
+                    var filePath = Path.Combine(wwwrootPath, relativePath);
+
+                    if (File.Exists(filePath))
+                    {
+                        File.Delete(filePath);
+                        deletedLocal = true;
+                    }
+                }
+                catch { deletedLocal = false; }
             }
 
-            return newImageUrl;
+            // ✅ Delete Cloud
+            var deletedCloud = true;
+            if (!string.IsNullOrEmpty(cloudPublicId))
+            {
+                deletedCloud = await _cloudinaryService.DeleteImageAsync(cloudPublicId);
+            }
+
+            return deletedLocal && deletedCloud;
         }
+
+        public async Task<UploadResultDto> UpdateImageAsync(IFormFile newImage, string? oldImageUrl, string folder)
+        {
+            try
+            {
+                // Upload الجديدة
+                var newUpload = await UploadImageAsync(newImage, folder);
+
+                // استخرج الـ public ID من الـ URL القديمة وامسحها (إذا كان Cloudinary متاح)
+                if (!string.IsNullOrEmpty(oldImageUrl) && _cloudinaryService != null)
+                {
+                    try
+                    {
+                        var oldCloudPublicId = ExtractPublicIdFromUrl(oldImageUrl);
+                        if (!string.IsNullOrEmpty(oldCloudPublicId))
+                        {
+                            await DeleteImageAsync(oldImageUrl, oldCloudPublicId);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Warning: Failed to delete old image: {ex.Message}");
+                    }
+                }
+
+                return newUpload;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in UpdateImageAsync: {ex.Message}");
+                throw;
+            }
+        }
+
+        private string? ExtractPublicIdFromUrl(string cloudinaryUrl)
+        {
+            if (string.IsNullOrEmpty(cloudinaryUrl) || !cloudinaryUrl.Contains("cloudinary.com"))
+                return null;
+
+            var parts = cloudinaryUrl.Split('/');
+            var uploadIndex = Array.IndexOf(parts, "upload");
+
+            if (uploadIndex >= 0 && uploadIndex + 2 < parts.Length)
+            {
+                var publicIdParts = parts.Skip(uploadIndex + 2).ToArray();
+                var lastPart = publicIdParts.Last();
+                publicIdParts[publicIdParts.Length - 1] = Path.GetFileNameWithoutExtension(lastPart);
+                return string.Join("/", publicIdParts);
+            }
+
+            return null;
+        }
+
+
 
         private string GenerateUniqueFileName(string originalFileName)
         {

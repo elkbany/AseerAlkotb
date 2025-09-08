@@ -22,5 +22,8 @@ namespace AseerAlkotb.Application.Contracts
         Task<ApiResponse<UpdateAdminAccountResponse>> UpdateAdminAccount(int Id, UpdateAdminAccountRequest request);
         Task<ApiResponse<List<GetAllClientResponse>>> GetAllClients();
         Task<ApiResponse<List<GetAllAdminResponse>>> GetAllAdmins();
+        Task<ApiResponse<List<GetAllAdminResponse>>> GetAllUsers();
+        Task<ApiResponse<GetAllAdminResponse>> GetClientDetails(int clientId);
+        Task<ApiResponse<UserDetailsResponse>> GetUserDetailsWithOrders(int userId);
     }
 }

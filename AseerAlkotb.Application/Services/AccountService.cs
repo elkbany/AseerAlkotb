@@ -64,8 +64,6 @@ namespace AseerAlkotb.Application.Services
 
                 // 4- Map request to User entity
                 var newAccount = request.Adapt<User>();
-                newAccount.CreatedAt = DateTime.UtcNow;
-                newAccount.UpdatedAt = DateTime.UtcNow;
                 newAccount.IsActive = true;//??????
 
                 // 5- Create user
@@ -86,9 +84,8 @@ namespace AseerAlkotb.Application.Services
                 //add cart for the new user
                 var cart = new Cart()
                 {
-                    UserId = newAccount.Id,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
+                    UserId = newAccount.Id
+                   
                 };
                 await _unitOfWork.Carts.InsertAsync(cart);
                 await _unitOfWork.CommitAsync();

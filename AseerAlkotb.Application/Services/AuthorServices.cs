@@ -32,7 +32,7 @@ namespace AseerAlkotb.Application.Services
             var author = request.Adapt<Author>();
             if (request.Image != null)
             {
-                author.ImageUrl = await UploadImageAsync(request.Image, "authors");
+                author.ImageUrl = (await UploadImageAsync(request.Image, "authors")).CloudUrl;
             }
             await unitOfWork.Authors.InsertAsync(author);
             await unitOfWork.CommitAsync();
@@ -69,11 +69,13 @@ namespace AseerAlkotb.Application.Services
             request.Adapt(author); 
             if (request.Image != null)
             {
-                author.ImageUrl = await UpdateImageAsync(
-                    request.Image,
-                    author.ImageUrl,
-                    "authors"
+                var uploadResult = await UpdateImageAsync(
+                   request.Image,
+                   author.ImageUrl ?? string.Empty,
+                   "authors"
                );
+
+                author.ImageUrl = !string.IsNullOrEmpty(uploadResult.CloudUrl) ? uploadResult.CloudUrl : uploadResult.LocalUrl;
             }
                 unitOfWork.Authors.Update(author);
             await unitOfWork.CommitAsync();

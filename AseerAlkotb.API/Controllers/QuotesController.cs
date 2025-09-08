@@ -1,6 +1,7 @@
 ﻿using AseerAlkotb.API.Bases;
 using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Features.Quotes.Requests;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,6 +19,7 @@ namespace AseerAlkotb.API.Controllers
         }
 
         [HttpPost("AddQuote")]
+        [Authorize(Roles = "Client")]
         public async Task<IActionResult> AddQuote([FromBody] AddQuoteRequest request)
         {
             var response = await quoteService.AddQuoteAsync(request);
@@ -39,14 +41,16 @@ namespace AseerAlkotb.API.Controllers
         }
 
         [HttpPut("UpdateQuote")]
+        [Authorize(Roles = "Client")]
         public async Task<IActionResult> UpdateQuote(UpdateQuoteRequest request)
         {
             var response = await quoteService.UpdateQuoteAsync(request);
             return ApiResult(response);
         }
 
-        [HttpDelete("DeleteQuote")]
-        public async Task<IActionResult> DeleteQuote(DeleteQuoteRequest request)
+        [HttpDelete("DeleteQuote/{id}")]
+        [Authorize(Roles = "Client")]
+        public async Task<IActionResult> DeleteQuote([FromRoute] DeleteQuoteRequest request)
         {
             var response = await quoteService.DeleteQuoteAsync(request);
             return ApiResult(response);

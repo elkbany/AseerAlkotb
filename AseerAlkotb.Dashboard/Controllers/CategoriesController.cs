@@ -2,11 +2,13 @@ using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Features.Categories.Requests;
 using AseerAlkotb.Application.Features.Categories.Responses;
 using AseerAlkotb.Application.ResponseHandler;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace AseerAlkotb.Dashboard.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class CategoriesController : Controller
     {
         private readonly ICategoryServices _categoryServices;

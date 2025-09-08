@@ -10,6 +10,6 @@ namespace AseerAlkotb.Domain.Enums
     {
         CashOnDelivery = 1,
         Card = 2,
-        MobileWallet = 3
+        Wallet = 3
     }
 }

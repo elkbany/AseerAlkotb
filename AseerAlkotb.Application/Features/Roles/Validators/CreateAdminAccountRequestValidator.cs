@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AseerAlkotb.Application.Features.Roles.Requests;
 using FluentValidation;
+using Microsoft.AspNetCore.Http;
 
 namespace AseerAlkotb.Application.Features.Roles.Validators
 {
@@ -60,6 +61,28 @@ namespace AseerAlkotb.Application.Features.Roles.Validators
                 .Matches(@"^\+?[1-9]\d{1,14}$").WithMessage("Please provide a valid international phone number.")
                 .When(x => !string.IsNullOrEmpty(x.PhoneNumber)); ////my be need to change
 
+            // Rule for Nationality
+            RuleFor(x => x.Nationality)
+                .Length(2, 50).WithMessage("Nationality must be between {MinLength} and {MaxLength} characters.")
+                .Matches(@"^[a-zA-Z\s]+$").WithMessage("Nationality can only contain letters and spaces.")
+                .When(x => !string.IsNullOrEmpty(x.Nationality));
+
+            // Rule for UserRole
+            RuleFor(x => x.UserRole)
+                .NotEmpty().WithMessage("User role is required.")
+                .Must(role => role == "Admin" || role == "Client").WithMessage("User role must be either 'Admin' or 'Client'.");
+
+            // Rule for ProfilePictureUrl (file validation)
+            RuleFor(x => x.ProfilePictureUrl)
+                .Must(file => file == null || file.Length <= 5 * 1024 * 1024).WithMessage("Profile picture size cannot exceed 5MB.")
+                .Must(file => file == null || IsValidImageType(file)).WithMessage("Profile picture must be a valid image file (JPG, PNG, GIF).")
+                .When(x => x.ProfilePictureUrl != null);
+        }
+
+        private bool IsValidImageType(IFormFile file)
+        {
+            var allowedTypes = new[] { "image/jpeg", "image/jpg", "image/png", "image/gif" };
+            return allowedTypes.Contains(file.ContentType.ToLower());
         }
     }
     

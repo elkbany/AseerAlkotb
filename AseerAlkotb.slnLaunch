@@ -1,0 +1,17 @@
+[
+  {
+    "Name": "Api & Dashboard",
+    "Projects": [
+      {
+        "Path": "AseerAlkotb.API\\AseerAlkotb.API.csproj",
+        "Action": "Start",
+        "DebugTarget": "https"
+      },
+      {
+        "Path": "AseerAlkotb.Dashboard\\AseerAlkotb.Dashboard.csproj",
+        "Action": "Start",
+        "DebugTarget": "https"
+      }
+    ]
+  }
+]

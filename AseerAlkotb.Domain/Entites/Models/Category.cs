@@ -16,8 +16,7 @@ namespace AseerAlkotb.Domain.Entites.Models
 
         public Category()
         {
-            CreatedAt = DateTime.UtcNow;
-            UpdatedAt = DateTime.UtcNow;
+            
         }
     }
 }

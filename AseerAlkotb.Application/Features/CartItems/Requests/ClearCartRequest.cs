@@ -6,6 +6,6 @@ using System.Threading.Tasks;
 
 namespace AseerAlkotb.Application.Features.CartItems.Requests
 {
-    public record ClearCartRequest(int UserId);
+    public record ClearCartRequest();
     
 }
