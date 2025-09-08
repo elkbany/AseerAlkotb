@@ -10,8 +10,7 @@ using AseerAlkotb.Application.ResponseHandler;
 using AseerAlkotb.Application.Services;
 using AseerAlkotb.Application.Contracts.External;
 using AseerAlkotb.Infrastructure.ExternalServices;
-<<<<<<< HEAD
-=======
+
 using Mapster;
 using AseerAlkotb.Infrastructure.Repositories.Base;
 using AseerAlkotb.Localization.Resources;
@@ -65,7 +64,6 @@ namespace AseerAlkotb.Dashboard
             // Add other services needed by the dashboard controllers
             #endregion
 
-            #region Other Configurations
             // Configure Mapster for object mapping
             #region Localization
             builder.Services.AddLocalization();

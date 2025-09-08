@@ -1,4 +1,4 @@
-using AseerAlkotb.API.DependencyInjection;
+﻿using AseerAlkotb.API.DependencyInjection;
 using AseerAlkotb.API.Extensions;
 using AseerAlkotb.API.Middlewares;
 using AseerAlkotb.Application.Contracts;
@@ -23,13 +23,14 @@ using Microsoft.Extensions.Localization;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 using System.Reflection;
 using AseerAlkotb.Infrastructure.Data;
+using AseerAlkotb.Application.BackgroundJobs;
+using AseerAlkotb.Infrastructure.Background;
+using AseerAlkotb.Infrastructure.AI;
 namespace AseerAlkotb.API
 {
     public class Program
@@ -118,11 +119,11 @@ namespace AseerAlkotb.API
             builder.Services.AddScoped<IOrderServices, OrderServices>();
             builder.Services.AddScoped<IEmailService, EmailService>();
 
-            builder.Services.AddScoped<IChatService, ChatService>();
-            builder.Services.AddSingleton<IChatLogStore, API.DependencyInjection.InMemoryChatLogStore>();
-
             builder.Services.AddScoped<IAccountServices, AccountService>();
             builder.Services.AddScoped<IAdminServices, AdminServices>();
+            
+            // RAG Services
+            builder.Services.AddScoped<IRagService, RagService>();
             builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -165,6 +166,26 @@ namespace AseerAlkotb.API
                                     .AllowAnyMethod());
             });
             #endregion
+
+            // HttpClient لِـ Gemini
+            builder.Services.AddHttpClient("gemini", c =>
+            {
+                c.BaseAddress = new Uri("https://generativelanguage.googleapis.com");
+            });
+
+            // Embeddings + Synthesis على Gemini
+            builder.Services.AddScoped<IEmbeddingService, GeminiEmbeddingService>();
+            builder.Services.AddScoped<IAnswerSynthesisService, GeminiAnswerSynthesisService>();
+
+            // لو هتوقفي الـ ExternalBookService (اختياري):
+            // builder.Services.Remove(...)
+            // أو ببساطة ما تستخدمهوش في Ask، وخلّيه للـ endpoint المخصص book-summary فقط.
+
+            // الـ Background job (لو مش مسجل):
+            builder.Services.AddSingleton<EmbeddingRefreshBackgroundService>();
+            builder.Services.AddSingleton<IEmbeddingRefreshJob>(sp => sp.GetRequiredService<EmbeddingRefreshBackgroundService>());
+            builder.Services.AddHostedService(sp => sp.GetRequiredService<EmbeddingRefreshBackgroundService>());
+
 
             #region Swagger
             builder.Services.AddEndpointsApiExplorer();
@@ -209,6 +230,7 @@ namespace AseerAlkotb.API
             #region Localization
             app.UseLocalizationConfiguration();
             #endregion
+
 
             // Initialize LocalizerProvider correctly
             using (var scope = app.Services.CreateScope())
