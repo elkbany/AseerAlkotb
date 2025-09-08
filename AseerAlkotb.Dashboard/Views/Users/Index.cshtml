@@ -1,4 +1,5 @@
 @using AseerAlkotb.Application.Features.Roles.Responses
+@using System.Linq
 @{
     ViewData["Title"] = "Users Management";
 }
@@ -177,9 +178,7 @@
                                                                 <i class="fas fa-info-circle"></i>
                                                             </a>
                                                         }
-                                                        <a asp-action="AssignRole" asp-route-id="@user.Id" class="btn btn-sm btn-outline-warning" title="Manage Role">
-                                                            <i class="fas fa-user-tag"></i>
-                                                        </a>
+
                                                         <a asp-action="Delete" asp-route-id="@user.Id" class="btn btn-sm btn-outline-danger" title="Delete">
                                                             <i class="fas fa-trash"></i>
                                                         </a>
@@ -209,13 +208,14 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @if (ViewBag.Admins != null)
+                                    @{ var admins = ViewBag.Admins as List<GetAllAdminResponse>; }
+                                    @if (admins != null && admins.Any())
                                     {
-                                        @foreach (var admin in ViewBag.Admins)
+                                        @foreach (var admin in admins)
                                         {
                                             <tr>
                                                 <td>
-                                                    <img src="@(string.IsNullOrEmpty(admin.ProfilePictureUrl) ? "/images/default-user.png" : admin.ProfilePictureUrl)" 
+                                                    <img src="@(string.IsNullOrEmpty(admin.ProfilePictureUrl) ? "/images/default-user.png" : admin.ProfilePictureUrl)"
                                                          alt="@admin.FirstName" class="img-circle" style="width: 40px; height: 40px;">
                                                 </td>
                                                 <td>
@@ -240,9 +240,6 @@
                                                         <a asp-action="Details" asp-route-id="@admin.Id" class="btn btn-sm btn-outline-info" title="Details">
                                                             <i class="fas fa-info-circle"></i>
                                                         </a>
-                                                        <a asp-action="AssignRole" asp-route-id="@admin.Id" class="btn btn-sm btn-outline-warning" title="Manage Role">
-                                                            <i class="fas fa-user-tag"></i>
-                                                        </a>
                                                         <a asp-action="Delete" asp-route-id="@admin.Id" class="btn btn-sm btn-outline-danger" title="Delete">
                                                             <i class="fas fa-trash"></i>
                                                         </a>
@@ -250,6 +247,12 @@
                                                 </td>
                                             </tr>
                                         }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="7" class="text-center">No administrators found.</td>
+                                        </tr>
                                     }
                                 </tbody>
                             </table>
@@ -272,13 +275,14 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @if (ViewBag.Clients != null)
+                                    @{ var clients = ViewBag.Clients as List<GetAllClientResponse>; }
+                                    @if (clients != null && clients.Any())
                                     {
-                                        @foreach (var client in ViewBag.Clients)
+                                        @foreach (var client in clients)
                                         {
                                             <tr>
                                                 <td>
-                                                    <img src="@(string.IsNullOrEmpty(client.ProfilePictureUrl) ? "/images/default-user.png" : client.ProfilePictureUrl)" 
+                                                    <img src="@(string.IsNullOrEmpty(client.ProfilePictureUrl) ? "/images/default-user.png" : client.ProfilePictureUrl)"
                                                          alt="@client.FirstName" class="img-circle" style="width: 40px; height: 40px;">
                                                 </td>
                                                 <td>
@@ -300,11 +304,8 @@
                                                         <a asp-action="Edit" asp-route-id="@client.Id" class="btn btn-sm btn-outline-primary" title="Edit">
                                                             <i class="fas fa-edit"></i>
                                                         </a>
-                                                        <a asp-action="Details" asp-route-id="@client.Id" class="btn btn-sm btn-outline-info" title="Details">
+                                                        <a asp-action="ClientDetails" asp-route-id="@client.Id" class="btn btn-sm btn-outline-info" title="Details">
                                                             <i class="fas fa-info-circle"></i>
-                                                        </a>
-                                                        <a asp-action="AssignRole" asp-route-id="@client.Id" class="btn btn-sm btn-outline-warning" title="Manage Role">
-                                                            <i class="fas fa-user-tag"></i>
                                                         </a>
                                                         <a asp-action="Delete" asp-route-id="@client.Id" class="btn btn-sm btn-outline-danger" title="Delete">
                                                             <i class="fas fa-trash"></i>
@@ -313,6 +314,12 @@
                                                 </td>
                                             </tr>
                                         }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="7" class="text-center">No clients found.</td>
+                                        </tr>
                                     }
                                 </tbody>
                             </table>
@@ -330,20 +337,43 @@
             // Enable tooltips
             $('[data-toggle="tooltip"]').tooltip();
 
-            // Enable DataTable for better table functionality
-            $('.table').DataTable({
-                "paging": false,
-                "ordering": true,
-                "info": false,
-                "searching": false,
-                "responsive": true
-            });
+            // Enable DataTable for better table functionality (guard if plugin missing)
+            if ($.fn && $.fn.DataTable) {
+                $('.table').DataTable({
+                    "paging": false,
+                    "ordering": true,
+                    "info": false,
+                    "searching": false,
+                    "responsive": true
+                });
+            }
 
-            // Tab functionality
+            // Tab functionality (works with Bootstrap 4 or 5 or without BS JS)
+            function activateTab(targetSelector) {
+                var $link = $('#usersTab a[href="' + targetSelector + '"]');
+                if ($link.length === 0) return;
+                $('#usersTab a').removeClass('active');
+                $link.addClass('active');
+                $('.tab-content .tab-pane').removeClass('show active');
+                $(targetSelector).addClass('show active');
+            }
+
             $('#usersTab a').on('click', function (e) {
                 e.preventDefault();
-                $(this).tab('show');
+                var target = $(this).attr('href');
+                activateTab(target);
+                if (history && history.replaceState) {
+                    history.replaceState(null, null, target);
+                } else {
+                    window.location.hash = target;
+                }
             });
+
+            // Activate tab from URL hash on load
+            var initialHash = window.location.hash;
+            if (initialHash && $(initialHash).length) {
+                activateTab(initialHash);
+            }
         });
     </script>
 }
