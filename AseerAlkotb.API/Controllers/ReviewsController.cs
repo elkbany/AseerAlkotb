@@ -19,7 +19,7 @@ namespace AseerAlkotb.API.Controllers
         }
         [HttpPost]
         [Authorize(Roles = "Client")]
-        public async Task<IActionResult> AddReviewAsync(AddReviewRequest request)
+        public async Task<IActionResult> AddReviewAsync([FromBody]AddReviewRequest request)
         {
             var response = await reviewServices.AddReviewAsync(request);
             return ApiResult(response);
@@ -40,7 +40,7 @@ namespace AseerAlkotb.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetReviewByIdAsync(GetReviewByIdRequest request)
+        public async Task<IActionResult> GetReviewByIdAsync([FromQuery]GetReviewByIdRequest request)
         {
             var response = await reviewServices.GetReviewByIdAsync(request);
             return ApiResult(response);
