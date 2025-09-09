@@ -24,23 +24,16 @@ namespace AseerAlkotb.Dashboard.Controllers
         {
             try
             {
-                // Get all users (Admins + Clients)
                 var allUsersResult = await _adminServices.GetAllUsers();
                 var allUsers = allUsersResult.Data ?? new List<GetAllAdminResponse>();
-
-                // Get admins only
                 var adminsResult = await _adminServices.GetAllAdmins();
                 var admins = adminsResult.Data ?? new List<GetAllAdminResponse>();
-
-                // Get clients only
                 var clientsResult = await _adminServices.GetAllClients();
                 var clients = clientsResult.Data ?? new List<GetAllClientResponse>();
-
                 ViewBag.Admins = admins;
                 ViewBag.Clients = clients;
                 ViewBag.AllUsers = allUsers;
                 ViewBag.TotalUsers = allUsers.Count;
-
                 return View();
             }
             catch (Exception ex)
