@@ -1,4 +1,5 @@
 using AseerAlkotb.Application.Contracts;
+using AseerAlkotb.Application.Features.Governorates.DTOs;
 using AseerAlkotb.Application.Features.Orders.Requests;
 using AseerAlkotb.Application.Features.Orders.Responses;
 using AseerAlkotb.Domain.Enums;
@@ -11,10 +12,14 @@ namespace AseerAlkotb.Dashboard.Controllers
     public class OrdersController : Controller
     {
         private readonly IOrderServices _orderServices;
+        private readonly IGovernorateServices _governorateServices;
+        private readonly ICityServices _cityServices;
 
-        public OrdersController(IOrderServices orderServices)
+        public OrdersController(IOrderServices orderServices, IGovernorateServices governorateServices, ICityServices cityServices)
         {
             _orderServices = orderServices;
+            _governorateServices = governorateServices;
+            _cityServices = cityServices;
         }
 
         // GET: Orders
@@ -23,7 +28,7 @@ namespace AseerAlkotb.Dashboard.Controllers
             int pageSize = 10, 
             string search = "", 
             OrderStatus? orderStatus = null,
-            EgyptGovernorates? governorate = null,
+            int? governorateId = null,
             bool dateAscending = false)
         {
             try
@@ -35,13 +40,17 @@ namespace AseerAlkotb.Dashboard.Controllers
 
                 var request = new GetAllOrdersPaginatedRequest(
                     orderStatus, 
-                    governorate, 
+                    governorateId, 
                     dateAscending, 
                     pageNumber, 
                     pageSize, 
                     search);
 
                 var result = await _orderServices.GetAllOrdersPaginatedByAdminAsync(request);
+
+                // Load governorates for dropdown
+                var governoratesResult = await _governorateServices.GetAllGovernoratesAsync();
+                var governorates = governoratesResult.Succeeded ? governoratesResult.Data : new List<GovernorateDto>();
 
                 // Set default values and handle null cases
                 ViewBag.CurrentPage = pageNumber;
@@ -50,12 +59,12 @@ namespace AseerAlkotb.Dashboard.Controllers
                 ViewBag.TotalCount = result.Succeeded ? result.TotalCount : 0;
                 ViewBag.SearchTerm = search;
                 ViewBag.SelectedOrderStatus = orderStatus;
-                ViewBag.SelectedGovernorate = governorate;
+                ViewBag.SelectedGovernorate = governorateId;
                 ViewBag.DateAscending = dateAscending;
                 
                 // Pass enum values for dropdowns
                 ViewBag.OrderStatuses = Enum.GetValues<OrderStatus>();
-                ViewBag.Governorates = Enum.GetValues<EgyptGovernorates>();
+                ViewBag.Governorates = governorates;
 
                 if (!result.Succeeded)
                 {
@@ -74,10 +83,10 @@ namespace AseerAlkotb.Dashboard.Controllers
                 ViewBag.TotalCount = 0;
                 ViewBag.SearchTerm = search;
                 ViewBag.SelectedOrderStatus = orderStatus;
-                ViewBag.SelectedGovernorate = governorate;
+                ViewBag.SelectedGovernorate = governorateId;
                 ViewBag.DateAscending = dateAscending;
                 ViewBag.OrderStatuses = Enum.GetValues<OrderStatus>();
-                ViewBag.Governorates = Enum.GetValues<EgyptGovernorates>();
+                ViewBag.Governorates = new List<AseerAlkotb.Domain.Entites.Models.Governorate>();
                 
                 return View(new List<GetAllOrdersPaginatedResponse>());
             }
@@ -205,6 +214,26 @@ namespace AseerAlkotb.Dashboard.Controllers
             // This can be implemented later for printing order details
             TempData["Info"] = "Print functionality will be implemented soon";
             return RedirectToAction(nameof(Details), new { id });
+        }
+
+        // API endpoint to get cities by governorate
+        [HttpGet]
+        public async Task<IActionResult> GetCitiesByGovernorate(int governorateId)
+        {
+            try
+            {
+                var result = await _cityServices.GetCitiesByGovernorateAsync(governorateId);
+                if (result.Succeeded)
+                {
+                    var cities = result.Data.Select(c => new { id = c.Id, name = c.Name }).ToList();
+                    return Json(cities);
+                }
+                return Json(new List<object>());
+            }
+            catch (Exception ex)
+            {
+                return Json(new List<object>());
+            }
         }
     }
 }

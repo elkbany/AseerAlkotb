@@ -23,6 +23,8 @@ namespace AseerAlkotb.Domain.Interfaces.Base
         public IPaymentRepository Payments { get; }
         public INotificationRepository Notifications { get; }
         public IAccountRepository Account { get;}
+        public IGovernorateRepository Governorates { get; }
+        public ICityRepository Cities { get; }
         
         // Transaction support
         Task<IDbContextTransaction> BeginTransactionAsync();

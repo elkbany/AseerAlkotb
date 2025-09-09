@@ -1,4 +1,4 @@
-﻿﻿﻿using AseerAlkotb.Domain.Interfaces.Base;
+﻿﻿﻿﻿﻿﻿﻿using AseerAlkotb.Domain.Interfaces.Base;
 using AseerAlkotb.Domain.Interfaces.Repositories;
 using AseerAlkotb.Infrastructure.Context;
 using AseerAlkotb.Infrastructure.Repositories.Implementations;
@@ -31,6 +31,8 @@ namespace AseerAlkotb.Infrastructure.Repositories.Base
         public IPaymentRepository Payments { get; private set; }
         public INotificationRepository Notifications { get; private set; }
         public IAccountRepository Account { get; private set; }
+        public IGovernorateRepository Governorates { get; private set; }
+        public ICityRepository Cities { get; private set; }
 
         public UnitOfWork(ApplicationDbContext dbContext)
         {
@@ -49,6 +51,8 @@ namespace AseerAlkotb.Infrastructure.Repositories.Base
             Payments = new PaymentRepository(dbContext);
             Notifications = new NotificationRepository(dbContext);
             Account = new AccountRepository(dbContext);
+            Governorates = new GovernorateRepository(dbContext);
+            Cities = new CityRepository(dbContext);
             //Users = new UserStore(dbContext);
 
         }

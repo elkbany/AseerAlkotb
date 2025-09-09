@@ -71,6 +71,8 @@ namespace AseerAlkotb.Dashboard
             builder.Services.AddScoped<IAuthorServices, AuthorServices>();
             builder.Services.AddScoped<IBookServices, BookServices>();
             builder.Services.AddScoped<ICategoryServices, CategoryServices>();
+            builder.Services.AddScoped<IGovernorateServices, GovernorateServices>();
+            builder.Services.AddScoped<ICityServices, CityServices>();
             builder.Services.AddScoped<IOrderServices, OrderServices>();
             builder.Services.AddScoped<IAdminServices, AdminServices>();
 

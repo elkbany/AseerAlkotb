@@ -1,4 +1,4 @@
-﻿using AseerAlkotb.API.DependencyInjection;
+﻿﻿using AseerAlkotb.API.DependencyInjection;
 using AseerAlkotb.API.Extensions;
 using AseerAlkotb.API.Middlewares;
 using AseerAlkotb.Application.Contracts;
@@ -162,6 +162,8 @@ namespace AseerAlkotb.API
     });
             builder.Services.AddScoped<IWishlistServices, WishlistServices>();
             builder.Services.AddScoped<ICategoryServices, CategoryServices>();
+            builder.Services.AddScoped<IGovernorateServices, GovernorateServices>();
+            builder.Services.AddScoped<ICityServices, CityServices>();
             
             // New services for improved Order and Payment flow
             builder.Services.AddScoped<IOrderPaymentSyncService, OrderPaymentSyncService>();
