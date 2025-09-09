@@ -24,14 +24,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Localization;
 using Microsoft.IdentityModel.Tokens;
-<<<<<<< HEAD
 using System.Reflection;
 using AseerAlkotb.Infrastructure.Data;
 using AseerAlkotb.Application.BackgroundJobs;
 using AseerAlkotb.Infrastructure.Background;
 using AseerAlkotb.Infrastructure.AI;
-=======
->>>>>>> origin/master
 using Microsoft.OpenApi.Models;
 using System.Text;
 namespace AseerAlkotb.API
