@@ -4,6 +4,8 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <!-- Disable static web asset compression to avoid duplicate key issues -->
+    <GenerateStaticWebAssetsCompressionManifest>false</GenerateStaticWebAssetsCompressionManifest>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,6 +20,8 @@
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.4" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.3" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -25,11 +29,6 @@
     <ProjectReference Include="..\AseerAlkotb.Domain\AseerAlkotb.Domain.csproj" />
     <ProjectReference Include="..\AseerAlkotb.Infrastructure\AseerAlkotb.Infrastructure.csproj" />
     <ProjectReference Include="..\AseerAlkotb.Localization\AseerAlkotb.Localization.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="wwwroot\uploads\Books\6fdbe335-1a34-4564-9564-e30dc38cf6ea.webp" />
-    <None Include="wwwroot\uploads\Books\94147f51-d713-47a3-86dd-f88eef6198d4.webp" />
   </ItemGroup>
 
 </Project>

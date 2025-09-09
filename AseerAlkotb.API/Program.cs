@@ -1,4 +1,4 @@
-using AseerAlkotb.API.DependencyInjection;
+﻿using AseerAlkotb.API.DependencyInjection;
 using AseerAlkotb.API.Extensions;
 using AseerAlkotb.API.Middlewares;
 using AseerAlkotb.Application.Contracts;
@@ -16,19 +16,23 @@ using AseerAlkotb.Infrastructure.Repositories.Base;
 using AseerAlkotb.Infrastructure.Repositories.Implementations;
 using AseerAlkotb.Localization.Resources;
 using Mapster;
-using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.FileProviders;
+
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Localization;
 using Microsoft.IdentityModel.Tokens;
-using System.Reflection;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using AseerAlkotb.Infrastructure.Data;
+using AseerAlkotb.Application.BackgroundJobs;
+using AseerAlkotb.Infrastructure.Background;
+using AseerAlkotb.Infrastructure.AI;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
 namespace AseerAlkotb.API
 {
     public class Program
@@ -141,9 +145,6 @@ namespace AseerAlkotb.API
             builder.Services.AddScoped<IOrderServices, OrderServices>();
             builder.Services.AddScoped<IEmailService, EmailService>();
 
-            builder.Services.AddScoped<IChatService, ChatService>();
-            builder.Services.AddSingleton<IChatLogStore, API.DependencyInjection.InMemoryChatLogStore>();
-
             builder.Services.AddScoped<IAccountServices, AccountService>();
             builder.Services.AddScoped<IAdminServices, AdminServices>();
 
@@ -151,6 +152,9 @@ namespace AseerAlkotb.API
             builder.Services.AddInfrastructure(builder.Configuration);
 
 
+            
+            // RAG Services
+            builder.Services.AddScoped<IRagService, RagService>();
             builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -195,6 +199,42 @@ namespace AseerAlkotb.API
             builder.Services.AddHttpClient();
             #endregion
 
+            #region Rate Limiting
+            builder.Services.AddRateLimiter(options =>
+            {
+                // Callback endpoint rate limiting - 10 requests per minute per IP
+                options.AddFixedWindowLimiter("CallbackPolicy", opt =>
+                {
+                    opt.PermitLimit = 10;
+                    opt.Window = TimeSpan.FromMinutes(1);
+                    opt.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
+                    opt.QueueLimit = 0; // No queuing, reject immediately when limit exceeded
+                });
+
+                // Webhook endpoint rate limiting - 20 requests per minute per IP
+                options.AddFixedWindowLimiter("WebhookPolicy", opt =>
+                {
+                    opt.PermitLimit = 20;
+                    opt.Window = TimeSpan.FromMinutes(1);
+                    opt.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
+                    opt.QueueLimit = 0;
+                });
+
+                // Global rate limiting fallback
+                options.GlobalLimiter = System.Threading.RateLimiting.PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+                    System.Threading.RateLimiting.RateLimitPartition.GetFixedWindowLimiter(
+                        partitionKey: httpContext.User.Identity?.Name ?? httpContext.Request.Headers.Host.ToString(),
+                        factory: partition => new System.Threading.RateLimiting.FixedWindowRateLimiterOptions
+                        {
+                            AutoReplenishment = true,
+                            PermitLimit = 100,
+                            Window = TimeSpan.FromMinutes(1)
+                        }));
+
+                options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+            });
+            #endregion
+
             #region Cors
             builder.Services.AddCors(options =>
             {
@@ -205,6 +245,26 @@ namespace AseerAlkotb.API
                                     .AllowCredentials()); // Added for authentication support
             });
             #endregion
+
+            // HttpClient لِـ Gemini
+            builder.Services.AddHttpClient("gemini", c =>
+            {
+                c.BaseAddress = new Uri("https://generativelanguage.googleapis.com");
+            });
+
+            // Embeddings + Synthesis على Gemini
+            builder.Services.AddScoped<IEmbeddingService, GeminiEmbeddingService>();
+            builder.Services.AddScoped<IAnswerSynthesisService, GeminiAnswerSynthesisService>();
+
+            // لو هتوقفي الـ ExternalBookService (اختياري):
+            // builder.Services.Remove(...)
+            // أو ببساطة ما تستخدمهوش في Ask، وخلّيه للـ endpoint المخصص book-summary فقط.
+
+            // الـ Background job (لو مش مسجل):
+            builder.Services.AddSingleton<EmbeddingRefreshBackgroundService>();
+            builder.Services.AddSingleton<IEmbeddingRefreshJob>(sp => sp.GetRequiredService<EmbeddingRefreshBackgroundService>());
+            builder.Services.AddHostedService(sp => sp.GetRequiredService<EmbeddingRefreshBackgroundService>());
+
 
             #region Swagger
             builder.Services.AddEndpointsApiExplorer();
@@ -281,6 +341,7 @@ namespace AseerAlkotb.API
             app.UseLocalizationConfiguration();
             #endregion
 
+
             // Initialize LocalizerProvider correctly
             using (var scope = app.Services.CreateScope())
             {
@@ -290,6 +351,9 @@ namespace AseerAlkotb.API
             }
 
             app.UseHttpsRedirection();
+
+            // Add rate limiting middleware
+            app.UseRateLimiter();
 
             // IMPORTANT: Order matters - Authentication before Authorization
             app.UseAuthentication();
