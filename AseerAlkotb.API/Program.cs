@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Localization;
 using Microsoft.IdentityModel.Tokens;
@@ -31,6 +32,12 @@ using AseerAlkotb.Infrastructure.Background;
 using AseerAlkotb.Infrastructure.AI;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using AseerAlkotb.Infrastructure.Data;
+using AseerAlkotb.Application.BackgroundJobs;
+using AseerAlkotb.Infrastructure.Background;
+using AseerAlkotb.Infrastructure.AI;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
 namespace AseerAlkotb.API
 {
     public class Program
@@ -153,6 +160,9 @@ namespace AseerAlkotb.API
             builder.Services.AddInfrastructure(builder.Configuration);
 
 
+            
+            // RAG Services
+            builder.Services.AddScoped<IRagService, RagService>();
             builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
