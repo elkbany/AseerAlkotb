@@ -8,6 +8,7 @@ namespace AseerAlkotb.Application.Features.Reviews.Responses
       int? BookId,
       int? AuthorId,
       int UserId,
+      string UserName,
       int Rating,
       string Comment
    );

@@ -193,7 +193,17 @@ namespace AseerAlkotb.Application.Services
                 return NotFound<GetReviewByIdResponse>($"{_stringLocalizer["Review"]} {_stringLocalizer["NotFound"]}");
             }
 
-            var revMap = review.Adapt<GetReviewByIdResponse>();
+            var revMap =new GetReviewByIdResponse
+                (
+                    review.Id,
+                    review.BookId,
+                    review.AuthorId,
+                    review.UserId,
+                    review.User.FirstName + ' ' + review.User.LastName,
+                    review.Rating,
+                    review.Comment?? string.Empty
+
+                );
             return Success(revMap);
         }
 
@@ -211,7 +221,16 @@ namespace AseerAlkotb.Application.Services
                 );
 
             var totalCount = reviews.Count;
-            var revMap = reviews.Adapt<List<GetAllReviewsPaginatedResponse>>();
+            var revMap = reviews.Select(r => new GetAllReviewsPaginatedResponse
+            (
+                r.Id,
+                r.BookId,
+                r.AuthorId,
+                r.UserId,
+                r.User.FirstName+' '+r.User.LastName,
+                r.Rating,
+                r.Comment?? string.Empty
+            )).ToList();
             return Success(revMap, totalCount, request.PageNumber, request.PageSize);
         }
 

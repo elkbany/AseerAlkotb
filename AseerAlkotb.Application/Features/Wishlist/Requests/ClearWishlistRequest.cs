@@ -6,6 +6,6 @@ using System.Threading.Tasks;
 
 namespace AseerAlkotb.Application.Features.Wishlist.Requests
 {
-    public record ClearWishlistRequest(int UserId);
+    public record ClearWishlistRequest();
 
 }

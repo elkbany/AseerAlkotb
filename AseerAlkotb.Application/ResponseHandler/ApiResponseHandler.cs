@@ -71,11 +71,22 @@ namespace AseerAlkotb.Application.ResponseHandler
                 Message = Message
             };
         }
-        public static ApiResponsePaginated<T> UnAutherized<T>() where T : ICollection
+        //public static ApiResponsePaginated<T> UnAutherized<T>() where T : ICollection
+        //{
+        //    return new ApiResponsePaginated<T>()
+        //    {
+        //        StatusCode = System.Net.HttpStatusCode.OK,
+        //    };
+        //}
+        public static ApiResponsePaginated<List<T>> UnAuthorizedList<T>()
         {
-            return new ApiResponsePaginated<T>()
+            return new ApiResponsePaginated<List<T>>()
             {
-                StatusCode = System.Net.HttpStatusCode.OK,
+                StatusCode = System.Net.HttpStatusCode.Unauthorized,
+                Data = new List<T>(), // Empty list
+                Message = "Unauthorized access",
+                TotalCount = 0,
+                PageSize = 0
             };
         }
         public static ApiResponse<T> BadRequest<T>(string Message = null)
