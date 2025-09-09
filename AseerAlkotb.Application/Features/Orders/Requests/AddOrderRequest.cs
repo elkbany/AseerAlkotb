@@ -1,4 +1,4 @@
-﻿
+﻿﻿
 using AseerAlkotb.Domain.Enums;
 
 
@@ -10,8 +10,8 @@ namespace AseerAlkotb.Application.Features.Orders.Requests
         String LastName,
         String StreetAddress,
         String PhoneNumber,
-        EgyptGovernorates Governorate,
-        EgyptCities City,
+        int GovernorateId,
+        int CityId,
         PaymentMethod PaymentMethod
         );
   

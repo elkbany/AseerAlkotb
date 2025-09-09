@@ -129,15 +129,8 @@
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label asp-for="UserRole" class="control-label">User Role *</label>
-                                        <select asp-for="UserRole" class="form-control">
-                                            <option value="">Select Role</option>
-                                            <option value="Admin">Administrator</option>
-                                            <option value="Client">Client</option>
-                                        </select>
-                                        <span asp-validation-for="UserRole" class="text-danger"></span>
-                                    </div>
+                                    <!-- Hidden input for UserRole set to Admin -->
+                                    <input asp-for="UserRole" type="hidden" value="Admin" />
                                 </div>
                             </div>
 

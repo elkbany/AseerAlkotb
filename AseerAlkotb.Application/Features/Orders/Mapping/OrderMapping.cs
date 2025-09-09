@@ -18,7 +18,6 @@ namespace AseerAlkotb.Application.Features.Orders.Mapping
             config.NewConfig<AddOrderRequest, Order>()
                 .Ignore(dest => dest.Id)
                 .Ignore(dest => dest.ShippingCost)
-                .Ignore(dest => dest.TaxAmount)
                 .Ignore(dest => dest.DiscountAmount)
                 .Ignore(dest => dest.TrackingNumber)
                 .Ignore(dest => dest.OrderItems) // Important: Will be set in service
@@ -29,7 +28,7 @@ namespace AseerAlkotb.Application.Features.Orders.Mapping
             // OrderItem Mapping (Book → OrderItem)
             config.NewConfig<Book, OrderItem>()
                 .Ignore(dest => dest.Order)
-                .Map(dest => dest.UnitPrice, src => src.Price) // Always from current Book price
+                .Map(dest => dest.UnitPrice, src => src.DiscountedPrice) // Always from current Book price
                 .Map(dest => dest.Quantity, _ => 1); // Quantity set in service based on cart
 
             // Add Order Response (Entity → Response)
@@ -53,7 +52,6 @@ namespace AseerAlkotb.Application.Features.Orders.Mapping
                   .Map(dest => dest.OrderStatus, src => src.Status)
                   .Map(dest => dest.TotalAmount, src => src.TotalAmount)
                   .Map(dest => dest.ShippingCost, src => src.ShippingCost)
-                  .Map(dest => dest.TaxAmount, src => src.TaxAmount)
                   .Map(dest => dest.DiscountAmount, src => src.DiscountAmount)
                   .Map(dest => dest.FinalAmount, src => src.FinalAmount)
                   .Map(dest => dest.Books, src => src.OrderItems

@@ -1,8 +1,9 @@
-﻿using AseerAlkotb.API.Bases;
+﻿﻿﻿﻿﻿using AseerAlkotb.API.Bases;
 using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Features.Orders.Requests;
 using AseerAlkotb.Application.Services;
 using AseerAlkotb.Domain.Enums;
+using AseerAlkotb.Domain.Interfaces.Base;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -13,10 +14,12 @@ namespace AseerAlkotb.API.Controllers
     public class OrdersController : AppControllerBase
     {
         private readonly IOrderServices orderServices;
+        private readonly IUnitOfWork unitOfWork;
 
-        public OrdersController(IOrderServices orderServices)
+        public OrdersController(IOrderServices orderServices, IUnitOfWork unitOfWork)
         {
             this.orderServices = orderServices;
+            this.unitOfWork = unitOfWork;
         }
 
         [HttpPost("Checkout")]
@@ -61,9 +64,9 @@ namespace AseerAlkotb.API.Controllers
             return ApiResult(result);
         }
         [HttpGet("GetShippingCost")]
-        public async Task<decimal> GetShippingCost([FromQuery] EgyptGovernorates Governorate)
+        public async Task<decimal> GetShippingCost([FromQuery] int governorateId)
         {
-             var result = ShippingServices.GetShippingCostForAGovernorate(Governorate);
+             var result = await ShippingServices.GetShippingCostForAGovernorateAsync(governorateId, unitOfWork);
              return result;
         }
     }

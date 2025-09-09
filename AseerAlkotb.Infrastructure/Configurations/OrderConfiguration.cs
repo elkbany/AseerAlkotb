@@ -1,4 +1,4 @@
-﻿﻿using AseerAlkotb.Domain.Entites;
+﻿﻿﻿﻿﻿﻿﻿﻿using AseerAlkotb.Domain.Entites;
 using AseerAlkotb.Domain.Entites.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -23,15 +23,14 @@ namespace AseerAlkotb.Infrastructure.Configurations
             builder.Property(o => o.ShippingCost)
                 .HasColumnType("decimal(18,2)");
 
-            builder.Property(o => o.TaxAmount)
-                .HasColumnType("decimal(18,2)");
-
             builder.Property(o => o.DiscountAmount)
                 .HasColumnType("decimal(18,2)");
 
-            builder.Property(o => o.Governorate)
-                .IsRequired()
-                .HasMaxLength(500);
+            builder.Property(o => o.GovernorateId)
+                .IsRequired();
+
+            builder.Property(o => o.CityId)
+                .IsRequired();
 
             builder.Property(o => o.TrackingNumber)
                 .HasMaxLength(100);
@@ -49,16 +48,24 @@ namespace AseerAlkotb.Infrastructure.Configurations
                 .WithMany(u => u.Orders)
                 .HasForeignKey(o => o.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // Many-to-One: Order --> Governorate
+            builder.HasOne(o => o.Governorate)
+                .WithMany()
+                .HasForeignKey(o => o.GovernorateId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Many-to-One: Order --> City
+            builder.HasOne(o => o.City)
+                .WithMany()
+                .HasForeignKey(o => o.CityId)
+                .OnDelete(DeleteBehavior.Restrict);
           
                       builder.Property(o => o.DiscountAmount)
                 .HasColumnType("decimal(18,2)");
 
             builder.Property(o => o.FinalAmount)
                 .HasColumnType("decimal(18,2)");
-
-            builder.Property(o => o.Governorate)
-                .IsRequired()
-                .HasMaxLength(500);
 
             // One-to-One: Order --> Payment
             // Payment takes PaymentMethod from Order (per project specification)

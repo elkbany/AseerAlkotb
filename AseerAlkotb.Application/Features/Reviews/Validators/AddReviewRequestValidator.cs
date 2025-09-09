@@ -16,12 +16,12 @@ namespace AseerAlkotb.Application.Features.Reviews.Validators
             RuleFor(x => x.Rating)
                 .InclusiveBetween(1, 5)
                 .L("Rating", "Range", "1", "5");
-
+            //comment can be empty
             RuleFor(x => x.Comment)
-                .NotEmpty()
-                .L("Comment", "Required")
-                .MaximumLength(2000)
-                .L("Comment", "MaxLength", "2000");
+                .MaximumLength(1000)
+                .L("Comment", "MaxLength", "1000");
+
+
         }
     }
 }

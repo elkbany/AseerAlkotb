@@ -12,7 +12,7 @@ using AseerAlkotb.Domain.Interfaces.Base;
 using AseerAlkotb.Infrastructure.Context;
 using AseerAlkotb.Infrastructure.ExternalServices;
 using AseerAlkotb.Infrastructure.Repositories.Base;
-using Mapster;  
+using Mapster;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
@@ -28,7 +28,7 @@ namespace AseerAlkotb.Dashboard
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
-           
+
             #region Context and Identity
             // Add DbContext
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -71,6 +71,8 @@ namespace AseerAlkotb.Dashboard
             builder.Services.AddScoped<IAuthorServices, AuthorServices>();
             builder.Services.AddScoped<IBookServices, BookServices>();
             builder.Services.AddScoped<ICategoryServices, CategoryServices>();
+            builder.Services.AddScoped<IGovernorateServices, GovernorateServices>();
+            builder.Services.AddScoped<ICityServices, CityServices>();
             builder.Services.AddScoped<IOrderServices, OrderServices>();
             builder.Services.AddScoped<IAdminServices, AdminServices>();
 
@@ -91,7 +93,7 @@ namespace AseerAlkotb.Dashboard
             #region HttpClient Registeration
             builder.Services.AddHttpClient<IPaymobService, PaymobService>();
             #endregion
-            builder.Services.AddScoped<IAccountServices, AccountService>();            
+            builder.Services.AddScoped<IAccountServices, AccountService>();
             // New services for improved Order and Payment flow
             builder.Services.AddScoped<IOrderPaymentSyncService, OrderPaymentSyncService>();
             builder.Services.AddScoped<IPaymentRetryService, PaymentRetryService>();
