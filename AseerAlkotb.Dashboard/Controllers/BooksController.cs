@@ -6,13 +6,10 @@ using AseerAlkotb.Application.Features.Books.Responses;
 using AseerAlkotb.Application.Features.Categories.Requests;
 using AseerAlkotb.Application.Features.Publishers.Requests;
 using AseerAlkotb.Application.Features.Reviews.Requests;
-using AseerAlkotb.Application.Services;
-using AseerAlkotb.Domain.Entites.Models;
 using AseerAlkotb.Domain.Enums;
-using Azure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Routing;
+using Microsoft.EntityFrameworkCore;
 namespace AseerAlkotb.Dashboard.Controllers
 {
     [Authorize(Roles = "Admin")]
@@ -22,20 +19,24 @@ namespace AseerAlkotb.Dashboard.Controllers
         private readonly IAuthorServices _authorServices;
         private readonly ICategoryServices _categoryServices;
         private readonly IPublisherServices _publisherServices;
-        private readonly IReviewServices _reviewServices; // Add this
+        private readonly IReviewServices _reviewServices;
+
+
 
         public BooksController(
             IBookServices bookServices,
             IAuthorServices authorServices,
             ICategoryServices categoryServices,
             IPublisherServices publisherServices,
-            IReviewServices reviewServices) // Add this parameter
+            IReviewServices reviewServices)
+
         {
             _bookServices = bookServices;
             _authorServices = authorServices;
             _categoryServices = categoryServices;
             _publisherServices = publisherServices;
-            _reviewServices = reviewServices; // Add this
+            _reviewServices = reviewServices;
+
         }
 
         public async Task<IActionResult> Index(
@@ -159,7 +160,7 @@ namespace AseerAlkotb.Dashboard.Controllers
             ViewBag.Publisher = publisher.Data;
             ViewBag.Categories = selectedCategories;
             ViewBag.Reviews = reviews; // Pass reviews to the view
-
+      
             return View(result.Data);
         }
 
@@ -296,5 +297,7 @@ namespace AseerAlkotb.Dashboard.Controllers
 
             return Json(publishers.Data.Select(p => new { id = p.Id, text = p.Name }));
         }
+       
+
     }
 }

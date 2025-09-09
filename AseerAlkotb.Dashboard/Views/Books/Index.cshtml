@@ -5,6 +5,15 @@
     ViewData["Title"] = "Books Management";
     var egp = CultureInfo.GetCultureInfo("en-EG");
 }
+@if (TempData["Success"] != null)
+{
+     <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+     <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
 @functions {
     string ResolveImg(string? url)
     {

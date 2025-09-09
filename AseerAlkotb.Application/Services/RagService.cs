@@ -52,10 +52,10 @@ namespace AseerAlkotb.Application.Services
                                         ? $"أريد تلخيص كتاب \"{titleGuess}\". {request.Question}"
                                         : request.Question;
 
-                var answer = await _synth.SynthesizeAsync(enrichedQuestion, new List<ChatSource>());
+                var Summary = await _synth.SynthesizeAsync(enrichedQuestion, new List<ChatSource>());
                 return Success(new RagAskResponse
                 {
-                    Answer = string.IsNullOrWhiteSpace(answer) ? "لم أستطع توليد ملخص حالياً." : answer,
+                    Answer = string.IsNullOrWhiteSpace(Summary) ? "لم أستطع توليد ملخص حالياً." : Summary,
                     Sources = new List<ChatSource>()
                 });
             }
@@ -115,7 +115,31 @@ namespace AseerAlkotb.Application.Services
                 ? $"بناءً على سؤالك، أنصحك بالاطلاع على: {string.Join("، ", top.Data!.Select(x => x.Title))}."
                 : "لم أجد كتباً متعلقة مباشرة بسؤالك. جرّب كلمات مفتاحية مختلفة أو تصنيفاً آخر.";
 
-            return Success(new RagAskResponse { Answer = reply, Sources = ToSources(top.Data!) });
+            // ⚠️ فول-باك لو الرد ضعيف/غير مفيد
+            var answer = reply;
+            if (string.IsNullOrWhiteSpace(answer) || answer.Trim() == "لا أعرف")
+            {
+                var fallbackPrompt = BuildWebsiteFallbackPrompt(request.Question);
+
+                // نمرّر أي سياق متاح كمصادر (لو عندك سياق إضافي حطه هنا)
+                var fallbackAnswer = await _synth.SynthesizeAsync(fallbackPrompt, ToSources(top.Data ?? new List<BookBriefDto>(), request.Question));
+
+                if (!string.IsNullOrWhiteSpace(fallbackAnswer))
+                {
+                    return Success(new RagAskResponse
+                    {
+                        Answer = fallbackAnswer!,
+                        Sources = ToSources(top.Data ?? new List<BookBriefDto>(), request.Question)
+                    });
+                }
+            }
+
+            // الرد الافتراضي إن مااحتجناش فول-باك أو الفول-باك رجّع فاضي
+            return Success(new RagAskResponse
+            {
+                Answer = reply,
+                Sources = ToSources(top.Data ?? new List<BookBriefDto>(), request.Question)
+            });
         }
 
         public async Task<ApiResponse<string>> GetBookAvailabilityAsync(string bookTitle)
@@ -333,6 +357,16 @@ namespace AseerAlkotb.Application.Services
             var bad = new[] { "string", "undefined", "null", "-" };
             return bad.Contains(v, StringComparer.OrdinalIgnoreCase) ? null : v;
         }
+
+
+        private static string BuildWebsiteFallbackPrompt(string question) => $@"
+            You are a helpful assistant for Aseer Alkotb (https://aseeralkotb.com).
+            Answer in Arabic. If the user asks about books or general info, rely on the website context and the provided sources/snippets.
+
+            ❓ Question:
+            {question}
+
+            ✅ Answer:";
 
     }
 }

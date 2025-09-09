@@ -1,4 +1,4 @@
-/*html {
+﻿/*html {
   font-size: 14px;
 }
 
@@ -42,6 +42,85 @@ body {
     --font-color: #2c323f;
     --bg-color: #f8f5fd;
 }
+/* Custom rounded outline buttons */
+/* ========== Embeddings quick-actions styles ========== */
+.btn-action {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: left;
+    font-weight: 500;
+}
+
+    .btn-action i {
+        width: 1.25rem;
+        text-align: center;
+        margin-right: .5rem;
+    }
+
+.btn-stack .btn + .btn {
+    margin-top: .5rem;
+}
+
+.last-update {
+    font-size: .85rem;
+    color: #6c757d;
+    margin-top: .5rem;
+    display: block;
+}
+
+/* ألوان خاصة بأزرار الـ Embeddings (تقدر تغيّرها بحرّية) */
+:root {
+    --embed-primary-color: var(--info-color); /* Rebuild */
+    --embed-danger-color: var(--danger-color); /* Delete  */
+    --embed-secondary-color: #6c757d; /* View    */
+}
+
+/* Filled buttons (زي الأزرار الثلاثة الأول) */
+.btn-embed {
+    background-color: var(--embed-primary-color);
+    border-color: var(--embed-primary-color);
+    color: #fff;
+}
+
+    .btn-embed:hover,
+    .btn-embed:focus {
+        filter: brightness(0.92);
+        color: #fff;
+    }
+
+.btn-embed-danger {
+    background-color: var(--embed-danger-color);
+    border-color: var(--embed-danger-color);
+    color: #fff;
+}
+
+    .btn-embed-danger:hover,
+    .btn-embed-danger:focus {
+        filter: brightness(0.92);
+        color: #fff;
+    }
+
+.btn-embed-secondary {
+    background-color: var(--embed-secondary-color);
+    border-color: var(--embed-secondary-color);
+    color: #fff;
+}
+
+    .btn-embed-secondary:hover,
+    .btn-embed-secondary:focus {
+        filter: brightness(0.92);
+        color: #fff;
+    }
+
+    /* تحسين فوكس موحّد */
+    .btn-embed:focus,
+    .btn-embed-danger:focus,
+    .btn-embed-secondary:focus {
+        box-shadow: 0 0 0 .2rem rgba(0,0,0,.08);
+        outline: 0;
+    }
+
 
 body {
     background-color: var(--bg-color);

@@ -1,0 +1,177 @@
+﻿@model List<AseerAlkotb.Domain.Entites.Models.BookEmbedding>
+@{
+    ViewData["Title"] = "Smart Search – Book Chunks";
+
+    var total = Model?.Count ?? 0;
+    var dim = Model?.FirstOrDefault()?.Embedding?.Length ?? 0;
+    var lastIndexed = Model != null && Model.Count > 0
+        ? Model.Max(x => x.LastUpdated)
+        : (DateTime?)null;
+
+    string FormatUtc(DateTime dt) => dt.ToString("yyyy-MM-dd HH:mm:ss");
+}
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">Smart Search – Book Chunks</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="/EmbeddingsAdmin">Smart Search</a></li>
+                    <li class="breadcrumb-item active">Book Chunks</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+
+        <!-- Quick stats -->
+        <div class="row">
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-info">
+                    <div class="inner">
+                        <h3>@total</h3>
+                        <p>Total Chunks</p>
+                    </div>
+                    <div class="icon"><i class="fas fa-layer-group"></i></div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-secondary">
+                    <div class="inner">
+                        <h3>@dim</h3>
+                        <p>Vector Dim</p>
+                    </div>
+                    <div class="icon"><i class="fas fa-ruler-combined"></i></div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-success">
+                    <div class="inner">
+                        <h3>@(lastIndexed != null ? FormatUtc(lastIndexed.Value) : "-")</h3>
+                        <p>Last Indexed (UTC)</p>
+                    </div>
+                    <div class="icon"><i class="fas fa-clock"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main card -->
+        <div class="card">
+            <div class="card-header border-0 d-flex justify-content-between align-items-center">
+                <h3 class="card-title">Indexed Chunks</h3>
+                <div class="btn-group">
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Indexing
+                    </a>
+                    <button class="btn btn-outline-dark ms-1" type="button" onclick="location.reload()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
+
+            <div class="card-body">
+
+                <!-- Search/filter -->
+                <div class="row mb-3">
+                    <div class="col-md-8">
+                        <div class="input-group">
+                            <input id="chunkFilter" type="text" class="form-control" placeholder="Filter by type or content...">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="button" onclick="filterChunks()">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <small class="text-muted">Tip: use keywords like <code>title</code>, <code>description</code>, <code>author</code>, <code>category</code></small>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped" id="chunksTable">
+                        <thead class="thead-light">
+                            <tr>
+                                <th style="width:140px;">Chunk Type</th>
+                                <th>Content</th>
+                                <th style="width:190px;">Indexed (UTC)</th>
+                                <th style="width:120px;">Vector Dim</th>
+                                <th style="width:110px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var e in Model)
+                            {
+                                var id = $"c_{e.BookId}_{e.Id}";
+                                <tr>
+                                    <td>
+                                        <span class="badge badge-info text-uppercase">@e.ContentType</span>
+                                    </td>
+                                    <td>
+                                        <details>
+                                            <summary class="text-primary" style="cursor:pointer;">Show / Hide</summary>
+                                            <pre class="mb-0 mt-2" style="white-space:pre-wrap" id="content-@id">@e.Content</pre>
+                                        </details>
+                                    </td>
+                                    <td>@e.LastUpdated.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                    <td>@(e.Embedding?.Length ?? 0)</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-secondary" type="button"
+                                                onclick="copyContent('@id')" title="Copy content">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        function filterChunks(){
+            const q = (document.getElementById('chunkFilter').value || '').toLowerCase();
+            const rows = document.querySelectorAll('#chunksTable tbody tr');
+            rows.forEach(r => {
+                const type = r.children[0].innerText.toLowerCase();
+                const content = r.children[1].innerText.toLowerCase();
+                r.style.display = (type.includes(q) || content.includes(q)) ? '' : 'none';
+            });
+        }
+        document.getElementById('chunkFilter').addEventListener('keyup', filterChunks);
+
+        async function copyContent(id){
+            try{
+                const text = document.getElementById('content-' + id).innerText;
+                await navigator.clipboard.writeText(text);
+                toast('Content copied');
+            }catch(e){
+                toast('Copy failed', true);
+            }
+        }
+
+        function toast(msg, isErr){
+            const el = document.createElement('div');
+            el.className = 'alert ' + (isErr ? 'alert-danger' : 'alert-success');
+            el.style.position = 'fixed';
+            el.style.bottom = '20px';
+            el.style.right = '20px';
+            el.style.zIndex = 1050;
+            el.innerText = msg;
+            document.body.appendChild(el);
+            setTimeout(()=> el.remove(), 2000);
+        }
+    </script>
+}
