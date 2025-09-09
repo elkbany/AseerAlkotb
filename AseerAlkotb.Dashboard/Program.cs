@@ -33,7 +33,7 @@ namespace AseerAlkotb.Dashboard
             // Add DbContext
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             {
-                var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+                var connectionString = builder.Configuration.GetConnectionString("Shared");
                 options.UseSqlServer(connectionString);
             });
 
