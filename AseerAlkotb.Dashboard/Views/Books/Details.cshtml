@@ -1,8 +1,9 @@
 @model AseerAlkotb.Application.Features.Books.Responses.GetBookByIdResponse
+@using System.Globalization
 
 @{
     ViewData["Title"] = "Book Details";
-
+    var egp = CultureInfo.GetCultureInfo("en-EG");
     // Get all reviews for this book to calculate rating distribution
     var reviews = ViewBag.Reviews as List<AseerAlkotb.Application.Features.Reviews.Responses.GetAllReviewsPaginatedResponse> ?? new List<AseerAlkotb.Application.Features.Reviews.Responses.GetAllReviewsPaginatedResponse>();
 
@@ -22,6 +23,27 @@
     for (int i = 1; i <= 5; i++)
     {
         starPercentages[i] = totalReviews > 0 ? (decimal)starDistribution[i] / totalReviews * 100 : 0;
+    }
+}
+@functions {
+    string ResolveImg(string? url)
+    {
+        if (string.IsNullOrWhiteSpace(url))
+            return Url.Content("~/images/default-book.png");
+
+        // already absolute (http/https)
+        if (url.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+            return url;
+
+        // normalize relative to app
+        if (url.StartsWith("~/"))
+            return Url.Content(url);
+
+        if (url.StartsWith("/"))
+            return Url.Content("~" + url);
+
+        // fallback
+        return Url.Content("~/" + url);
     }
 }
 
@@ -48,11 +70,15 @@
             <div class="col-md-3">
                 <div class="card card-outline card-primary">
                     <div class="card-body box-profile">
-                        <div class="text-center position-relative mb-3">
-                            <img src="@($"http://localhost:5234{Model.CoverImageUrl}")" alt="@Model.Title" class="img-fluid rounded shadow-sm" style="max-height: 300px;" />
+                        <div class="text-center position-relative mb-3 cover-wrap">
+                            <img src="@ResolveImg(Model.CoverImageUrl)"
+                                 alt="@Model.Title"
+                                 class="cover-img"
+                                 loading="lazy"
+                                 onerror="this.onerror=null;this.src='@Url.Content("~/images/default-book.png")';" />
                             @if (Model.DiscountPercentage > 0)
                             {
-                                <div class="position-absolute badge badge-danger" style="top: 10px; right: 10px; font-size: 1rem;">
+                                <div class="badge badge-danger cover-badge">
                                     -@(Model.DiscountPercentage)%
                                 </div>
                             }
@@ -74,7 +100,7 @@
                             @if (Model.DiscountPercentage > 0)
                             {
                                 <p class="text-muted text-sm">
-                                    Original Price: <strike>@((Model.Price / (1 - Model.DiscountPercentage / 100m)).ToString("C"))</strike>
+                                    Original Price: <strike>@((Model.Price / (1 - Model.DiscountPercentage / 100m)).ToString("C", egp))</strike>
                                 </p>
                             }
                         </div>
