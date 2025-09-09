@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace AseerAlkotb.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class AddRagTables : Migration
+    public partial class RagSystemAndItsRelatedTables : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
