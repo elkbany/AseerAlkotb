@@ -5,12 +5,12 @@
       {
         "Path": "AseerAlkotb.API\\AseerAlkotb.API.csproj",
         "Action": "Start",
-        "DebugTarget": "https"
+        "DebugTarget": "http"
       },
       {
         "Path": "AseerAlkotb.Dashboard\\AseerAlkotb.Dashboard.csproj",
         "Action": "Start",
-        "DebugTarget": "https"
+        "DebugTarget": "http"
       }
     ]
   }
