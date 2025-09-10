@@ -12,6 +12,7 @@ namespace AseerAlkotb.Application.Features.Orders.Responses
     (
         int Id,
        string UserName,
+       int UserId,
        PaymentMethod PaymentMethod,
        PaymentStatus PaymentStatus,
        int GovernorateId,
@@ -21,6 +22,9 @@ namespace AseerAlkotb.Application.Features.Orders.Responses
        OrderStatus OrderStatus,
        string TrackingNumber,
        decimal FinalAmount,
+       decimal ShippingCost,
+       decimal DiscountedAmount,
+       decimal TotalAmount,
        DateTime OrderDate,
        List<BookDTO> Books
     );

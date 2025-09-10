@@ -336,7 +336,9 @@ namespace AseerAlkotb.Application.Services
                     .Select(oi => new BookDTO(
                         oi.Book.Title,
                         oi.UnitPrice,
-                        oi.Quantity
+                        oi.Quantity,
+                        oi.BookId,
+                        oi.Book.CoverImageUrl
                     ))
                     .ToList()
             )).ToList();
@@ -387,7 +389,9 @@ namespace AseerAlkotb.Application.Services
                     .Select(oi => new BookDTO(
                         oi.Book.Title,
                         oi.UnitPrice,
-                        oi.Quantity
+                        oi.Quantity,
+                        oi.BookId,
+                        oi.Book.CoverImageUrl
                     ))
                     .ToList()
             )).ToList();
@@ -434,7 +438,9 @@ namespace AseerAlkotb.Application.Services
          .Select(oi => new BookDTO(
              oi.Book.Title,
             oi.UnitPrice,
-            oi.Quantity
+            oi.Quantity,
+            oi.BookId,
+            oi.Book.CoverImageUrl
          ))
          .ToList()
  );
@@ -480,6 +486,7 @@ namespace AseerAlkotb.Application.Services
             var ordMap = new GetUserOrderByTrackingNumberResponse(
                 order.Id,
                 order.User?.UserName ?? string.Empty,
+                order.UserId,
                 order.PaymentMethod,
                 order.PaymentStatus,
                 order.GovernorateId,
@@ -489,13 +496,18 @@ namespace AseerAlkotb.Application.Services
                 order.Status,
                 order.TrackingNumber,
                 order.FinalAmount,
+                order.ShippingCost,
+                order.DiscountAmount,
+                order.TotalAmount,
                 order.OrderDate,
                 order.OrderItems
                     .Where(oi => oi.Book != null)
                     .Select(oi => new BookDTO(
                         oi.Book.Title,
                         oi.UnitPrice,
-                        oi.Quantity
+                        oi.Quantity,
+                        oi.BookId,
+                        oi.Book.CoverImageUrl
                     ))
                     .ToList()
             );

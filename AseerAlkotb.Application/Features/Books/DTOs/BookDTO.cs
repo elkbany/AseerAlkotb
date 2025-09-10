@@ -10,6 +10,9 @@ namespace AseerAlkotb.Application.Features.Books.DTOs
     (
         string Title,
         decimal Price,
-        int Quantity
+        int Quantity,
+        int Id,
+        string ImageUrl
+
     );
 }
