@@ -3,7 +3,22 @@
 @{
     ViewData["Title"] = "Publishers Management";
 }
-
+@functions {
+    string ResolveImg(string? url)
+    {
+        if (string.IsNullOrWhiteSpace(url))
+            return Url.Content("~/images/default-publisher.png");
+        if (url.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+            return url;
+        if (url.StartsWith("~/")) return Url.Content(url);
+        if (url.StartsWith("/")) return Url.Content("~" + url);
+        return Url.Content("~/" + url);
+    }
+}
+@functions {
+    string Trunc(string? s, int n = 120)
+        => string.IsNullOrEmpty(s) ? "" : (s.Length <= n ? s : s.Substring(0, n) + "…");
+}
 <div class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
@@ -79,11 +94,11 @@
                                 {
                                     <tr>
                                         <td>
-                                            <img src="@item.LogoUrl" alt="@item.Name Logo" class="img-thumbnail" style="width: 50px;" />
+                                              <img src="@ResolveImg(item.LogoUrl)" alt="@item.Name Logo" class="img-thumbnail" style="width:50px;" />
                                         </td>
                                         <td>@item.Name</td>
-                                        <td>@item.ContactEmail</td>
-                                        <td>@item.Description</td>
+                                        <td>@(string.IsNullOrWhiteSpace(item.ContactEmail) ? "-" : item.ContactEmail)</td>
+                                        <td title="@item.Description">@Trunc(item.Description)</td>
                                         <td>
                                             <div class="btn-group">
                                                 <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary" title="Edit">

@@ -64,7 +64,7 @@ namespace AseerAlkotb.Infrastructure.AI
                       .Take(topK)
                       .ToList();
         }
-
+         
         public async Task<List<BookEmbedding>> GetBookEmbeddingsAsync(int bookId)
             => await _db.BookEmbeddings.Where(e => e.BookId == bookId).ToListAsync();
 

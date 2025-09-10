@@ -25,6 +25,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Localization;
 using Microsoft.IdentityModel.Tokens;
+using System.Reflection;
+using AseerAlkotb.Infrastructure.Data;
+using AseerAlkotb.Application.BackgroundJobs;
+using AseerAlkotb.Infrastructure.Background;
+using AseerAlkotb.Infrastructure.AI;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using AseerAlkotb.Infrastructure.Data;
@@ -147,6 +152,9 @@ namespace AseerAlkotb.API
 
             builder.Services.AddScoped<IAccountServices, AccountService>();
             builder.Services.AddScoped<IAdminServices, AdminServices>();
+            
+            // RAG Services
+            builder.Services.AddScoped<IRagService, RagService>();
 
 
             builder.Services.AddInfrastructure(builder.Configuration);
