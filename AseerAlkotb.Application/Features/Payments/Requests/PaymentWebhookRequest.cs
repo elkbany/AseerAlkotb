@@ -19,7 +19,16 @@ namespace AseerAlkotb.Application.Features.Payments.Requests
         string CreatedAt,
         string Currency,
         PaymentWebhookSourceData? SourceData,
-        bool ErrorOccured
+        bool ErrorOccured,
+        bool? HasParentTransaction = null,
+        string? IntegrationId = null,
+        bool? Is3dSecure = null,
+        bool? IsAuth = null,
+        bool? IsCapture = null,
+        bool? IsRefunded = null,
+        bool? IsStandalonePayment = null,
+        bool? IsVoided = null,
+        string? Owner = null
     );
 
     public record PaymentWebhookOrder( 

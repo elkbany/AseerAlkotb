@@ -36,7 +36,7 @@ namespace AseerAlkotb.Dashboard
             // Add DbContext
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             {
-                var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+                var connectionString = builder.Configuration.GetConnectionString("Shared");
                 options.UseSqlServer(connectionString);
             });
 
@@ -74,6 +74,8 @@ namespace AseerAlkotb.Dashboard
             builder.Services.AddScoped<IAuthorServices, AuthorServices>();
             builder.Services.AddScoped<IBookServices, BookServices>();
             builder.Services.AddScoped<ICategoryServices, CategoryServices>();
+            builder.Services.AddScoped<IGovernorateServices, GovernorateServices>();
+            builder.Services.AddScoped<ICityServices, CityServices>();
             builder.Services.AddScoped<IOrderServices, OrderServices>();
             builder.Services.AddScoped<IAdminServices, AdminServices>();
 

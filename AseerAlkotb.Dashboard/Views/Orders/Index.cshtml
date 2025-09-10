@@ -168,7 +168,7 @@
                         <nav aria-label="Orders pagination" class="mt-4">
                             <ul class="pagination justify-content-center">
                                 <li class="page-item @((ViewBag.CurrentPage ?? 1) == 1 ? "disabled" : "")">
-                                    <a class="page-link" href="@Url.Action("Index", new { pageNumber = (ViewBag.CurrentPage ?? 1) - 1, pageSize = ViewBag.PageSize, search = ViewBag.SearchTerm, orderStatus = ViewBag.SelectedOrderStatus, governorate = ViewBag.SelectedGovernorate, dateAscending = ViewBag.DateAscending })">
+                                    <a class="page-link" href="@Url.Action("Index", new { pageNumber = (ViewBag.CurrentPage ?? 1) - 1, pageSize = ViewBag.PageSize, search = ViewBag.SearchTerm, orderStatus = ViewBag.SelectedOrderStatus, governorateId = ViewBag.SelectedGovernorate, dateAscending = ViewBag.DateAscending })">
                                         <i class="fas fa-chevron-left"></i>
                                     </a>
                                 </li>
@@ -176,12 +176,12 @@
                                 @for (int i = Math.Max(1, (ViewBag.CurrentPage ?? 1) - 2); i <= Math.Min((ViewBag.TotalPages ?? 1), (ViewBag.CurrentPage ?? 1) + 2); i++)
                                 {
                                     <li class="page-item @((ViewBag.CurrentPage ?? 1) == i ? "active" : "")">
-                                        <a class="page-link" href="@Url.Action("Index", new { pageNumber = i, pageSize = ViewBag.PageSize, search = ViewBag.SearchTerm, orderStatus = ViewBag.SelectedOrderStatus, governorate = ViewBag.SelectedGovernorate, dateAscending = ViewBag.DateAscending })">@i</a>
+                                        <a class="page-link" href="@Url.Action("Index", new { pageNumber = i, pageSize = ViewBag.PageSize, search = ViewBag.SearchTerm, orderStatus = ViewBag.SelectedOrderStatus, governorateId = ViewBag.SelectedGovernorate, dateAscending = ViewBag.DateAscending })">@i</a>
                                     </li>
                                 }
 
                                 <li class="page-item @((ViewBag.CurrentPage ?? 1) == (ViewBag.TotalPages ?? 1) ? "disabled" : "")">
-                                    <a class="page-link" href="@Url.Action("Index", new { pageNumber = (ViewBag.CurrentPage ?? 1) + 1, pageSize = ViewBag.PageSize, search = ViewBag.SearchTerm, orderStatus = ViewBag.SelectedOrderStatus, governorate = ViewBag.SelectedGovernorate, dateAscending = ViewBag.DateAscending })">
+                                    <a class="page-link" href="@Url.Action("Index", new { pageNumber = (ViewBag.CurrentPage ?? 1) + 1, pageSize = ViewBag.PageSize, search = ViewBag.SearchTerm, orderStatus = ViewBag.SelectedOrderStatus, governorateId = ViewBag.SelectedGovernorate, dateAscending = ViewBag.DateAscending })">
                                         <i class="fas fa-chevron-right"></i>
                                     </a>
                                 </li>

@@ -1,4 +1,4 @@
-﻿using AseerAlkotb.API.DependencyInjection;
+﻿﻿using AseerAlkotb.API.DependencyInjection;
 using AseerAlkotb.API.Extensions;
 using AseerAlkotb.API.Middlewares;
 using AseerAlkotb.Application.Contracts;
@@ -49,7 +49,7 @@ namespace AseerAlkotb.API
             #region Context Registeration
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             {
-                var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+                var connectionString = builder.Configuration.GetConnectionString("Shared");
                 options.UseSqlServer(connectionString).UseLazyLoadingProxies();
             });
             #endregion
@@ -170,6 +170,8 @@ namespace AseerAlkotb.API
     });
             builder.Services.AddScoped<IWishlistServices, WishlistServices>();
             builder.Services.AddScoped<ICategoryServices, CategoryServices>();
+            builder.Services.AddScoped<IGovernorateServices, GovernorateServices>();
+            builder.Services.AddScoped<ICityServices, CityServices>();
             
             // New services for improved Order and Payment flow
             builder.Services.AddScoped<IOrderPaymentSyncService, OrderPaymentSyncService>();
@@ -246,11 +248,16 @@ namespace AseerAlkotb.API
             #region Cors
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AllowLocalhost4200",
-                    policy => policy.WithOrigins("http://localhost:4200")
-                                    .AllowAnyHeader()
-                                    .AllowAnyMethod()
-                                    .AllowCredentials()); // Added for authentication support
+                //options.AddPolicy("AllowLocalhost4200",
+                //    policy => policy.WithOrigins("http://localhost:4200")
+                //                    .AllowAnyHeader()
+                //                    .AllowAnyMethod()
+                //                    .AllowCredentials()); // Added for authentication support
+                // Allow For All Origins - Use with Caution
+                options.AddPolicy("AllowAll", policy =>
+                    policy.AllowAnyOrigin()
+                          .AllowAnyHeader()
+                          .AllowAnyMethod());
             });
             #endregion
 
@@ -330,7 +337,8 @@ namespace AseerAlkotb.API
             #endregion
 
             // IMPORTANT: CORS must be before Authentication and Authorization
-            app.UseCors("AllowLocalhost4200");
+            //app.UseCors("AllowLocalhost4200");
+            app.UseCors("AllowAll");
 
             #region Swagger
             if (app.Environment.IsDevelopment())

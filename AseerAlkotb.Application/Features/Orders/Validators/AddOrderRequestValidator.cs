@@ -10,8 +10,10 @@ namespace AseerAlkotb.Application.Features.Orders.Validators
             //RuleFor(x => x.UserId)
             //    .GreaterThan(0).WithMessage("UserId must be a positive number.");
 
-            RuleFor(x => x.Governorate)
-                .IsInEnum().WithMessage("Invalid governorate.");
+            RuleFor(x => x.GovernorateId)
+                .NotEmpty().WithMessage("Invalid governorate.");
+            RuleFor(x => x.CityId)
+                .NotEmpty().WithMessage("Invalid city.");
 
             RuleFor(x => x.PaymentMethod)
                 .IsInEnum().WithMessage("Invalid payment method.");

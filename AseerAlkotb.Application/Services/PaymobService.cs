@@ -1,33 +1,47 @@
-﻿﻿using AseerAlkotb.Application.Contracts;
+﻿﻿﻿﻿﻿﻿﻿﻿using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Features.Payments.Requests;
 using AseerAlkotb.Application.Features.Payments.Responses;
-using AseerAlkotb.Domain.Entites;
 using AseerAlkotb.Domain.Entites.Models;
-using AseerAlkotb.Domain.Enums;
-using AseerAlkotb.Domain.Interfaces.Base;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Cryptography;
+using System.Text;
+using AseerAlkotb.Domain.Interfaces.Base;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using AseerAlkotb.Domain.Enums;
+using AseerAlkotb.Domain.Entites;
 
 namespace AseerAlkotb.Application.Services
 {
     public class PaymobService : IPaymobService
     {
         private readonly IConfiguration _configuration;
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly HttpClient _httpClient;
         private readonly ILogger<PaymobService> _logger;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly UserManager<User> _userManager;
+        private readonly HttpClient _httpClient;
 
-        public PaymobService(IConfiguration configuration, IUnitOfWork unitOfWork, HttpClient httpClient, ILogger<PaymobService> logger)
+        public PaymobService(
+            IConfiguration configuration,
+            ILogger<PaymobService> logger,
+            IUnitOfWork unitOfWork,
+            UserManager<User> userManager,
+            HttpClient httpClient)
         {
             _configuration = configuration;
-            _unitOfWork = unitOfWork;
-            _httpClient = httpClient;
             _logger = logger;
+            _unitOfWork = unitOfWork;
+            _userManager = userManager;
+            _httpClient = httpClient;
         }
 
         public async Task<ProcessPaymentResponse> ProcessPaymentAsync(ProcessPaymentRequest request)
@@ -355,33 +369,91 @@ namespace AseerAlkotb.Application.Services
 
         }
 
-        public bool ValidateWebhookHmac(string body, string receivedHmac, string hmacSecret)
+        public bool ValidateWebhookHmac(PaymentWebhookData webhookData, string receivedHmac, string hmacSecret)
         {
             try
             {
-                // For webhook validation, we validate the entire body content
-                // This is different from callback validation which uses specific fields
+                // For webhooks, we use the same field concatenation method as callbacks
+                // According to Paymob documentation, the HMAC concatenation should be exactly in this order:
+                // amount_cents + created_at + currency + error_occured + has_parent_transaction + id + integration_id + is_3d_secure + is_auth + is_capture + is_refunded + is_standalone_payment + is_voided + order + owner + pending + source_data.pan + source_data.sub_type + source_data.type + success
 
-                // Calculate HMAC for security validation
-                var calculatedHmac = ComputeHmacSHA512(body, hmacSecret);
+                // Important: All boolean values should be lowercase strings ("true" or "false")
+                string FormatBooleanValue(bool value)
+                {
+                    return value.ToString().ToLowerInvariant();
+                }
 
-                _logger.LogInformation("Webhook HMAC Security Validation:");
-                _logger.LogInformation("Body length: {Length}", body?.Length ?? 0);
-                _logger.LogInformation("Body preview: {Body}", body?.Length > 200 ? body.Substring(0, 200) + "..." : body);
-                _logger.LogInformation("Calculated: {Calculated}", calculatedHmac);
-                _logger.LogInformation("Received: {Received}", receivedHmac);
+                string FormatNullableBooleanValue(bool? value)
+                {
+                    return value.HasValue ? value.Value.ToString().ToLowerInvariant() : "";
+                }
+
+                var fields = new[]
+                {
+                    webhookData.Obj.AmountCents.ToString(),                    // amount_cents: 0
+                    webhookData.Obj.CreatedAt ?? "",                           // created_at: 1
+                    webhookData.Obj.Currency ?? "",                            // currency: 2
+                    FormatBooleanValue(webhookData.Obj.ErrorOccured),          // error_occured: 3
+                    FormatNullableBooleanValue(webhookData.Obj.HasParentTransaction), // has_parent_transaction: 4
+                    webhookData.Obj.Id.ToString(),                             // id: 5
+                    webhookData.Obj.IntegrationId ?? "",                       // integration_id: 6
+                    FormatNullableBooleanValue(webhookData.Obj.Is3dSecure),   // is_3d_secure: 7
+                    FormatNullableBooleanValue(webhookData.Obj.IsAuth),        // is_auth: 8
+                    FormatNullableBooleanValue(webhookData.Obj.IsCapture),     // is_capture: 9
+                    FormatNullableBooleanValue(webhookData.Obj.IsRefunded),   // is_refunded: 10
+                    FormatNullableBooleanValue(webhookData.Obj.IsStandalonePayment), // is_standalone_payment: 11
+                    FormatNullableBooleanValue(webhookData.Obj.IsVoided),      // is_voided: 12
+                    webhookData.Obj.Order.Id.ToString(),                       // order: 13
+                    webhookData.Obj.Owner ?? "",                              // owner: 14
+                    FormatBooleanValue(webhookData.Obj.Pending),               // pending: 15
+                    webhookData.Obj.SourceData?.Pan ?? "",                     // source_data.pan: 16
+                    webhookData.Obj.SourceData?.SubType ?? "",                 // source_data.sub_type: 17
+                    webhookData.Obj.SourceData?.Type ?? "",                    // source_data.type: 18
+                    FormatBooleanValue(webhookData.Obj.Success)                // success: 19
+                };
+
+                var concatenated = string.Join("", fields);
+                var calculatedHmac = ComputeHmacSHA512(concatenated, hmacSecret);
+
+                _logger.LogInformation("Webhook HMAC Validation - Concatenated String: {Concatenated}", concatenated);
+                _logger.LogInformation("Webhook HMAC Validation - Concatenated Length: {Length}", concatenated.Length);
+                _logger.LogInformation("Webhook HMAC Validation - Calculated: {Calculated}, Received: {Received}",
+                    calculatedHmac, receivedHmac);
 
                 var isValid = CryptographicOperations.FixedTimeEquals(
                     Encoding.UTF8.GetBytes(receivedHmac ?? ""),
                     Encoding.UTF8.GetBytes(calculatedHmac)
                 );
-                _logger.LogInformation("Webhook HMAC Result: {IsValid}", isValid ? "Valid ✅" : "Invalid ❌");
+                
+                _logger.LogInformation("Webhook HMAC Validation Result: {IsValid}", isValid ? "Valid ✅" : "Invalid ❌");
+
+                if (!isValid)
+                {
+                    _logger.LogWarning("Webhook HMAC Validation Details - Expected: {Expected}, Got: {Received}, String Length: {Length}",
+                        calculatedHmac, receivedHmac, concatenated.Length);
+                    
+                    // Additional debugging for field-by-field analysis
+                    _logger.LogWarning("Webhook HMAC Field Values:");
+                    string[] fieldNames = {
+                        "amount_cents", "created_at", "currency", "error_occured", "has_parent_transaction",
+                        "id", "integration_id", "is_3d_secure", "is_auth", "is_capture",
+                        "is_refunded", "is_standalone_payment", "is_voided", "order", "owner",
+                        "pending", "source_data.pan", "source_data.sub_type", "source_data.type", "success"
+                    };
+                    
+                    for (int i = 0; i < fields.Length; i++)
+                    {
+                        _logger.LogWarning("  {FieldName} ({Index}): '{Value}'", fieldNames[i], i, fields[i]);
+                    }
+                    
+                    _logger.LogWarning("  Full Concatenated String: '{Concatenated}'", concatenated);
+                }
 
                 return isValid;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error validating webhook HMAC");
+                _logger.LogError(ex, "Error validating webhook HMAC using field concatenation");
                 return false;
             }
         }
