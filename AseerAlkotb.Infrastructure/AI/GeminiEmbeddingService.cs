@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Json;
 using System.Text.Json;
 using AseerAlkotb.Application.Contracts;
+using AseerAlkotb.Application.Utils;
 using AseerAlkotb.Domain.Entites.Models;
 using AseerAlkotb.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
@@ -77,15 +78,21 @@ namespace AseerAlkotb.Infrastructure.AI
 
             if (book == null) return;
 
-            var chunks = new List<(string Type, string Content)>
-            {
-                ("title", book.Title ?? ""),
-                ("description", book.Description ?? ""),
-                ("author", book.Author?.Name ?? ""),
-                ("category", string.Join(", ", book.Categories?.Select(c => c.Name) ?? Enumerable.Empty<string>()))
-            }
-            .Where(x => !string.IsNullOrWhiteSpace(x.Content))
-            .ToList();
+    //        var chunks = new List<(string Type, string Content)>
+    //{
+    //    ("title", book.Title ?? ""),
+    //    ("description", book.Description ?? ""),
+    //    ("author", book.Author?.Name ?? ""),
+    //    ("category", string.Join(", ", book.Categories?.Select(c => c.Name) ?? Enumerable.Empty<string>()))
+    //}
+    //        .Where(x => !string.IsNullOrWhiteSpace(x.Content))
+    //        .ToList();
+
+            // ⬇️ أضف الـBio لو موجود
+            //if (!string.IsNullOrWhiteSpace(book.Author?.Bio))
+            //    chunks.Add(("author_bio", book.Author!.Bio));
+
+            var chunks = ChunkFactory.BuildBookChunks(book);
 
             var existing = await _db.BookEmbeddings.Where(e => e.BookId == bookId).ToListAsync();
             _db.BookEmbeddings.RemoveRange(existing);
@@ -105,6 +112,7 @@ namespace AseerAlkotb.Infrastructure.AI
 
             await _db.SaveChangesAsync();
         }
+
 
         public async Task DeleteBookEmbeddingsAsync(int bookId)
         {
