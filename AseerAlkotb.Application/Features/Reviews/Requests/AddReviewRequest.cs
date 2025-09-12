@@ -12,7 +12,7 @@ namespace AseerAlkotb.Application.Features.Reviews.Requests
         int? BookId,
         int UserId,
         int Rating,
-        string Comment
+        string? Comment
     );
 
 }
