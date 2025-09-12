@@ -21,7 +21,7 @@ namespace AseerAlkotb.Infrastructure.Context
         {
             base.OnModelCreating(modelBuilder);
 
-            DataSeeder.SeedData(modelBuilder);
+            //DataSeeder.SeedData(modelBuilder);
             LocationSeeder.SeedLocations(modelBuilder);
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
