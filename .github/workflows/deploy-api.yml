@@ -40,4 +40,5 @@ jobs:
           cp -r published/* .
           git add .
           git commit -m "Deploy API" || echo "No changes to commit"
-          git push origin deploy --force
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} deploy --force
+
