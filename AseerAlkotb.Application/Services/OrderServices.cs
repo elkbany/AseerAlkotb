@@ -509,7 +509,11 @@ namespace AseerAlkotb.Application.Services
                         oi.BookId,
                         oi.Book.CoverImageUrl
                     ))
-                    .ToList()
+                    .ToList(),
+                order.PhoneNumber ?? string.Empty,
+                order.StreetAddress ?? string.Empty,
+                order.FirstName ?? string.Empty,
+                order.LastName ?? string.Empty
             );
 
             return Success(ordMap);
