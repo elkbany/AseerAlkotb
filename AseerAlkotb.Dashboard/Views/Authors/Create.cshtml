@@ -36,16 +36,25 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="form-group">
-                                        <label asp-for="Name"></label>
-                                        <input asp-for="Name" class="form-control" placeholder="Enter author name" />
+                                        <label class="form-label">Author Name (Arabic)</label>
+                                        <input asp-for="Name" id="Name" class="form-control" placeholder="أدخل اسم المؤلف بالعربي" />
                                         <span asp-validation-for="Name" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Author Name (English)</label>
+                                        <input name="EnglishName" id="EnglishName" class="form-control" placeholder="Enter author name in English" />
                                     </div>
 
                                     <div class="form-group">
-                                        <label asp-for="Bio"></label>
-                                        <textarea asp-for="Bio" class="form-control" rows="4"
-                                            placeholder="Enter author biography"></textarea>
+                                        <label class="form-label">Biography (Arabic)</label>
+                                        <textarea asp-for="Bio" id="Bio" class="form-control" rows="4"
+                                            placeholder="أدخل السيرة الذاتية بالعربي"></textarea>
                                         <span asp-validation-for="Bio" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Biography (English)</label>
+                                        <textarea name="EnglishBio" id="EnglishBio" class="form-control" rows="4"
+                                            placeholder="Enter author biography in English"></textarea>
                                     </div>
 
                                     <div class="form-group">

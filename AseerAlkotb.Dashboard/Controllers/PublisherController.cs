@@ -63,6 +63,26 @@ namespace AseerAlkotb.Dashboard.Controllers
                 var result = await _publisherService.AddPublisherAsync(request);
                 if (result.Succeeded)
                 {
+                    try
+                    {
+                        var id = result.Data.Id;
+                        var nameAr = Request.Form["Name"].ToString();
+                        var nameEn = Request.Form["EnglishName"].ToString();
+                        if (string.IsNullOrWhiteSpace(nameEn)) nameEn = nameAr;
+                        AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Publisher_{id}_Name", nameAr, "ar");
+                        AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Publisher_{id}_Name", nameEn, "en");
+
+                        var descAr = Request.Form["Description"].ToString();
+                        var descEn = Request.Form["EnglishDescription"].ToString();
+                        if (!string.IsNullOrWhiteSpace(descAr) || !string.IsNullOrWhiteSpace(descEn))
+                        {
+                            if (string.IsNullOrWhiteSpace(descEn)) descEn = descAr;
+                            if (string.IsNullOrWhiteSpace(descAr)) descAr = descEn;
+                            AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Publisher_{id}_Description", descAr ?? string.Empty, "ar");
+                            AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Publisher_{id}_Description", descEn ?? string.Empty, "en");
+                        }
+                    }
+                    catch { }
                     TempData["Success"] = "Publisher created successfully.";
                     return RedirectToAction(nameof(Index));
                 }

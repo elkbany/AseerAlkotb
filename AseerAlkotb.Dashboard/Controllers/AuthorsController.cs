@@ -62,8 +62,32 @@ namespace AseerAlkotb.Dashboard.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _authorServices.AddAuthorAsync(request);
-                return RedirectToAction(nameof(Index));
+                var result = await _authorServices.AddAuthorAsync(request);
+                if (result.Succeeded)
+                {
+                    try
+                    {
+                        var id = result.Data.Id;
+                        var nameAr = Request.Form["Name"].ToString();
+                        var nameEn = Request.Form["EnglishName"].ToString();
+                        if (string.IsNullOrWhiteSpace(nameEn)) nameEn = nameAr;
+                        AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Author_{id}_Name", nameAr, "ar");
+                        AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Author_{id}_Name", nameEn, "en");
+
+                        var bioAr = Request.Form["Bio"].ToString();
+                        var bioEn = Request.Form["EnglishBio"].ToString();
+                        if (!string.IsNullOrWhiteSpace(bioAr) || !string.IsNullOrWhiteSpace(bioEn))
+                        {
+                            if (string.IsNullOrWhiteSpace(bioEn)) bioEn = bioAr;
+                            if (string.IsNullOrWhiteSpace(bioAr)) bioAr = bioEn;
+                            AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Author_{id}_Bio", bioAr ?? string.Empty, "ar");
+                            AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Author_{id}_Bio", bioEn ?? string.Empty, "en");
+                        }
+                    }
+                    catch { }
+                    return RedirectToAction(nameof(Index));
+                }
+                TempData["Error"] = result.Message ?? "Failed to create author";
             }
             return View(request);
         }
