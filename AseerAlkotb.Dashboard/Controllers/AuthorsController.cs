@@ -27,12 +27,22 @@ namespace AseerAlkotb.Dashboard.Controllers
             if (!result.Succeeded)
             {
                 TempData["Error"] = result.Message ?? "Failed to load authors";
+
+                // Set ViewBag values even for error case to prevent null reference
+                ViewBag.TotalPages = 0;
+                ViewBag.CurrentPage = pageNumber;
+                ViewBag.TotalCount = 0;
+                ViewBag.SearchTerm = search ?? "";
+
                 return View(new List<GetAllAuthorsPaginatedResponse>());
             }
 
+            // Set all required ViewBag values
             ViewBag.TotalPages = (int)Math.Ceiling((double)result.TotalCount / pageSize);
             ViewBag.CurrentPage = pageNumber;
-            ViewBag.SearchTerm = search;
+            ViewBag.TotalCount = result.TotalCount; // This was missing!
+            ViewBag.SearchTerm = search ?? "";
+
             return View(result.Data);
         }
 

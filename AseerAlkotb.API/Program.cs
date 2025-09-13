@@ -21,31 +21,24 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
-
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Localization;
 using Microsoft.IdentityModel.Tokens;
-using System.Reflection;
-using AseerAlkotb.Infrastructure.Data;
 using AseerAlkotb.Application.BackgroundJobs;
 using AseerAlkotb.Infrastructure.Background;
 using AseerAlkotb.Infrastructure.AI;
 using Microsoft.OpenApi.Models;
 using System.Text;
-using AseerAlkotb.Infrastructure.Data;
-using AseerAlkotb.Application.BackgroundJobs;
-using AseerAlkotb.Infrastructure.Background;
-using AseerAlkotb.Infrastructure.AI;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Mvc;
 namespace AseerAlkotb.API
 {
     public class Program
     {
         public static async Task Main(string[] args)
         {
-            var builder = WebApplication.CreateBuilder(args);
-
+            var builder = WebApplication.CreateBuilder(new WebApplicationOptions
+            {
+                Args = args,
+                WebRootPath = null // Disable wwwroot requirement
+            });
             #region Context Registeration
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             {
@@ -318,15 +311,7 @@ namespace AseerAlkotb.API
 
             var app = builder.Build();
 
-            #region Access Images
-            app.UseStaticFiles();
-            app.UseStaticFiles(new StaticFileOptions
-            {
-                FileProvider = new PhysicalFileProvider(
-                    Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads")),
-                RequestPath = "/uploads"
-            });
-            #endregion
+            
 
             #region seed roles
             using (var scope = app.Services.CreateScope())

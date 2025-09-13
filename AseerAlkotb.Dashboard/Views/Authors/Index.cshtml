@@ -158,43 +158,45 @@
                 </div>
 
                 <!-- Pagination -->
-                @if (ViewBag.TotalPages > 1)
+                @{
+                    int currentPage = ViewBag.CurrentPage ?? 1;
+                    int totalPages = ViewBag.TotalPages ?? 0;
+                    int totalCount = ViewBag.TotalCount ?? 0;
+                    string searchTerm = ViewBag.SearchTerm ?? "";
+                }
+
+                @if (totalPages > 1)
                 {
                     <div class="d-flex justify-content-between align-items-center mt-4">
                         <div class="text-muted">
-                            Showing @((ViewBag.CurrentPage - 1) * 10 + 1) to @(Math.Min(ViewBag.CurrentPage * 10, ViewBag.TotalCount)) of @ViewBag.TotalCount entries
+                            Showing @((currentPage - 1) * 10 + 1) to @(Math.Min(currentPage * 10, totalCount)) of @totalCount entries
                         </div>
                         <nav>
                             <ul class="pagination mb-0">
-                                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                                @for (int i = 1; i <= totalPages; i++)
                                 {
-                                    <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                                        <a class="page-link" href="@Url.Action("Index", new { pageNumber = i, search = ViewBag.SearchTerm })">@i</a>
+                                    <li class="page-item @(i == currentPage ? "active" : "")">
+                                        <a class="page-link" href="@Url.Action("Index", new { pageNumber = i, search = searchTerm })">@i</a>
                                     </li>
                                 }
                             </ul>
                         </nav>
                     </div>
                 }
-            </div>
-        </div>
-    </div>
-</section>
 
-@section Scripts {
-    <script>
-        $(function () {
-            // Enable tooltips
-            $('[data-toggle="tooltip"]').tooltip();
-
-            // Enable DataTable for better table functionality
-            $('.table').DataTable({
-                "paging": false,
-                "ordering": true,
-                "info": false,
-                "searching": false,
-                "responsive": true
-            });
-        });
-    </script>
-}
+                @section Scripts {
+                    <script>
+                        $(function () {
+                            // Enable tooltips
+                            $('[data-toggle="tooltip"]').tooltip();
+                            // Enable DataTable for better table functionality
+                            $('.table').DataTable({
+                                "paging": false,
+                                "ordering": true,
+                                "info": false,
+                                "searching": false,
+                                "responsive": true
+                            });
+                        });
+                    </script>
+                }
