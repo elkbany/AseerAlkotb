@@ -31,4 +31,8 @@
     <ProjectReference Include="..\AseerAlkotb.Localization\AseerAlkotb.Localization.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\uploads\" />
+  </ItemGroup>
+
 </Project>

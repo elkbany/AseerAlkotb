@@ -21,19 +21,36 @@ namespace AseerAlkotb.Dashboard.Controllers
         // GET: Authors
         public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 10, string search = "")
         {
+            // حد أدنى وأقصى عشان pageNumber و pageSize ميبقوش حمير
+            pageNumber = Math.Max(1, pageNumber);
+            pageSize = Math.Max(1, Math.Min(100, pageSize)); // مثلاً مش أكتر من 100 عشان الداتا بيس ميتعبش
+
             var request = new GetAllAuthorsPaginatedRequest(pageNumber, pageSize, search);
             var result = await _authorServices.GetAllAuthorsPaginatedAsync(request);
 
             if (!result.Succeeded)
             {
                 TempData["Error"] = result.Message ?? "Failed to load authors";
+                // هنا رجع list فاضية، بس ضيف TotalCount = 0 عشان الـ view ميقعش
+                ViewBag.TotalCount = 0;
+                ViewBag.TotalPages = 1;
+                ViewBag.CurrentPage = 1;
                 return View(new List<GetAllAuthorsPaginatedResponse>());
             }
 
-            ViewBag.TotalPages = (int)Math.Ceiling((double)result.TotalCount / pageSize);
+            // هنا المهم: خد TotalCount كـ long عشان ميحصلش overflow، وبعدين cast لـ int
+            long totalCountLong = result.TotalCount; // لو هو int أو long، تمام
+            int totalCount = (int)totalCountLong;
+            int totalPages = (int)Math.Ceiling((double)totalCountLong / pageSize);
+
+            // حدث الـ ViewBag كله بأنواع واضحة
+            ViewBag.TotalPages = totalPages;
             ViewBag.CurrentPage = pageNumber;
+            ViewBag.TotalCount = totalCount; // ده هيخليها int مش byte
             ViewBag.SearchTerm = search;
-            return View(result.Data);
+
+            var data = result.Data ?? new List<GetAllAuthorsPaginatedResponse>();
+            return View(data);
         }
 
         // GET: Authors/Details/5
