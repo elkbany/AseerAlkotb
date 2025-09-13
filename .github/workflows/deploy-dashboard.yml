@@ -19,7 +19,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: '9.0.x'
 
       - name: Restore dependencies
         run: dotnet restore AseerAlkotb.Dashboard/AseerAlkotb.Dashboard.csproj
@@ -40,4 +40,4 @@ jobs:
           cp -r published/* .
           git add .
           git commit -m "Deploy Dashboard" || echo "No changes to commit"
-          git push origin dashboard-deploy --force
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} dashboard-deploy --force
