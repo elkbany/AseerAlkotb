@@ -97,11 +97,11 @@
                         </div>
 
                         <div class="text-center">
-                            <h3 class="profile-username">@Model.Price..ToString("C", egp)</h3>
+                            <h3 class="profile-username">@((Model.Price - (Model.Price * Model.DiscountPercentage / 100m)).ToString("C", egp))</h3>
                             @if (Model.DiscountPercentage > 0)
                             {
                                 <p class="text-muted text-sm">
-                                    Original Price: <strike>@((Model.Price / (1 - Model.DiscountPercentage / 100m)).ToString("C", egp))</strike>
+                                    Original Price: <strike>@(Model.Price.ToString("C", egp))</strike>
                                 </p>
                             }
                         </div>

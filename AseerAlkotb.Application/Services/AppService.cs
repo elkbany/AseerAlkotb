@@ -58,49 +58,15 @@ namespace AseerAlkotb.Application.Services
                 if (!allowedContentTypes.Contains(imageFile.ContentType.ToLowerInvariant()))
                     throw new ArgumentException("Invalid image file type");
 
-                // ✅ Generate unique filename
-                var fileName = GenerateUniqueFileName(imageFile.FileName);
+                // ✅ Cloudinary Upload only
+                if (_cloudinaryService == null)
+                    throw new InvalidOperationException("Cloudinary service is not available");
 
-                // ✅ Local Save
-                var currentDirectory = Directory.GetCurrentDirectory();
-                var wwwrootPath = Path.Combine(currentDirectory, "wwwroot");
-                var uploadsFolder = Path.Combine(wwwrootPath, "uploads", folder);
+                string cloudUrl = await _cloudinaryService.UploadImageAsync(imageFile, folder);
 
-                Directory.CreateDirectory(uploadsFolder);
-
-                var filePath = Path.Combine(uploadsFolder, fileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await imageFile.CopyToAsync(stream);
-                }
-
-                var localUrl = $"/uploads/{folder}/{fileName}";
-
-                // ✅ Cloudinary Upload (if available)
-                string cloudUrl = string.Empty;
-                if (_cloudinaryService != null)
-                {
-                    try
-                    {
-                        cloudUrl = await _cloudinaryService.UploadImageAsync(imageFile, folder);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Warning: Cloudinary upload failed: {ex.Message}. Using local URL only.");
-                        cloudUrl = localUrl; // Fallback to local URL
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Warning: Cloudinary service is not available. Using local URL only.");
-                    cloudUrl = localUrl; // Fallback to local URL
-                }
-
-                // ✅ Return both (or local only if cloudinary fails)
+                // ✅ Return Cloudinary URL only
                 return new UploadResultDto
                 {
-                    LocalUrl = localUrl,
                     CloudUrl = cloudUrl
                 };
             }
@@ -115,25 +81,7 @@ namespace AseerAlkotb.Application.Services
         {
             var deletedLocal = false;
 
-            // ✅ Delete Local
-            if (!string.IsNullOrEmpty(localImageUrl))
-            {
-                try
-                {
-                    var currentDirectory = Directory.GetCurrentDirectory();
-                    var wwwrootPath = Path.Combine(currentDirectory, "wwwroot");
 
-                    var relativePath = localImageUrl.TrimStart('/');
-                    var filePath = Path.Combine(wwwrootPath, relativePath);
-
-                    if (File.Exists(filePath))
-                    {
-                        File.Delete(filePath);
-                        deletedLocal = true;
-                    }
-                }
-                catch { deletedLocal = false; }
-            }
 
             // ✅ Delete Cloud
             var deletedCloud = true;
@@ -199,12 +147,12 @@ namespace AseerAlkotb.Application.Services
 
 
 
-        private string GenerateUniqueFileName(string originalFileName)
-        {
-            var extension = Path.GetExtension(originalFileName);
-            var uniqueName = $"{Guid.NewGuid()}{extension}";
-            return uniqueName;
-        }
+        //private string GenerateUniqueFileName(string originalFileName)
+        //{
+        //    var extension = Path.GetExtension(originalFileName);
+        //    var uniqueName = $"{Guid.NewGuid()}{extension}";
+        //    return uniqueName;
+        //}
         #endregion
 
         #region Localization Helpers
