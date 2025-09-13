@@ -8,6 +8,8 @@ using AseerAlkotb.Domain.Entites.Models;
 using AseerAlkotb.Domain.Interfaces.Base;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using static AseerAlkotb.Application.ResponseHandler.ApiResponseHandler;
 
 namespace AseerAlkotb.Application.Services
@@ -17,394 +19,216 @@ namespace AseerAlkotb.Application.Services
         private readonly IUnitOfWork _uow;
         private readonly IEmbeddingService _emb;
         private readonly IAnswerSynthesisService _synth;
-
-        private const int MIN_DESC_CHARS = 160;
+        private readonly IQuestionRouterService _router;
+        private readonly IConfiguration _cfg;
 
         public RagService(
             IUnitOfWork uow,
             IEmbeddingService emb,
             IAnswerSynthesisService synth,
+            IQuestionRouterService router,
             IServiceProvider sp,
-            Microsoft.Extensions.Hosting.IHostEnvironment env) : base(sp, env)
+            Microsoft.Extensions.Hosting.IHostEnvironment env
+        ) : base(sp, env)
         {
-            _uow = uow;
-            _emb = emb;
-            _synth = synth;
+            _uow = uow; _emb = emb; _synth = synth; _router = router;
+            _cfg = sp.GetRequiredService<IConfiguration>();
         }
 
-        #region Public API
         public async Task<ApiResponse<RagAskResponse>> AskAsync(RagAskRequest request)
         {
             await DoValidationAsync<Application.Features.Rag.Validators.RagAskRequestValidator, RagAskRequest>(request);
-
-            // Language detection (Arabic/English) from the user's question
-            var lang = DetectLanguage(request.Question);
-            var L = new Localizer(lang);
-
-            var sanitizedCategory = SanitizeCategory(request.Category);
-            var (titleGuess, authorGuess) = QueryExtractor.Extract(request.Question);
-            var qNorm = Normalize(request.Question);
-            var showIntro = LooksLikeGreeting(qNorm);
-
-            var asksAuthorBio =
-                   ContainsAny(qNorm, AuthorBioKeys)
-                || Regex.IsMatch(qNorm, @"\b(about\s+the\s+author|author\s+bio|who\s+is)\b", RegexOptions.IgnoreCase)
-                || Regex.IsMatch(qNorm, @"\b(نبذة|سيرة)\s+عن\s+ال?(?:كاتب|مؤلف)\b");
-
-            var asksSummary = !asksAuthorBio && (
-                   ContainsAny(qNorm, SummaryKeys)
-                || Regex.IsMatch(qNorm, @"\b(?:تلخيص|ملخص|summary|tl;dr)\b", RegexOptions.IgnoreCase)
-                || Regex.IsMatch(qNorm, @"\bنبذة\s+عن\s+(?:كتاب|رواية)\b")
-            );
-
-            var asksAvailability = ContainsAny(qNorm, AvailabilityKeys);
-            var asksCategory = ContainsAny(qNorm, CategoryKeys) || !string.IsNullOrWhiteSpace(sanitizedCategory);
-            var asksAuthor = !asksSummary && (ContainsAny(qNorm, AuthorMoreKeysLoose) || HasByAuthorPattern(qNorm) || HasArabicAuthorL(qNorm));
-
-            // Friendly short intro if it looks like a greeting with a very short message
-            if (showIntro && qNorm.Replace(" ", "").Length <= 12)
+            var lang = LangUtils.Detect(request.Question);
+            if (IsGreeting(request.Question))
             {
-                var greet = L.T(
-                    "👋 أهلاً بك! أنا مساعد عصير الكُتُب — أقدر أساعدك في الترشيحات، الملخصات، وتوفر الكتب.\n\nأمثلة:\n- ترشيحات في تصنيف «روايات»\n- ملخص كتاب «الخيميائي»\n- هل «العادات الذرية» متاح؟\n- نبذة عن نجيب محفوظ",
-                    "Hi! I’m the Aseer Alkotb assistant — I can help with recommendations, summaries, and availability.\n\nExamples:\n- Recommendations in the 'Novels' genre\n- Summary of “The Alchemist”\n- Is “Atomic Habits” in stock?\n- Short bio of Naguib Mahfouz"
-                );
-
-                // لا نضيف Outro مع الترحيب القصير
                 return Success(new RagAskResponse
                 {
-                    Answer = greet,
-                    Sources = new List<ChatSource>()
+                    Answer = Intro(lang)
                 });
             }
+            // 1) استخرج Hints محليًا (عنوان/مؤلف)
+            var (titleHint, authorHint) = QueryExtractor.Extract(request.Question);
 
-            // SUMMARY
-            // داخل AskAsync – فرع SUMMARY استبدل الكود بالكامل بهذا:
-            if (asksSummary)
+            // 2) ابنِ نسخة موجّهة للـ Router فيها الـ Hints بشكل صريح
+            var routerInput = BuildRouterInput(request.Question, titleHint, authorHint);
+
+            // 3) اسأل Gemini دائمًا أولًا عن النية والكيانات
+            var route = await _router.RouteAsync(routerInput);
+            var _ = route.confidence < 0.55; // للعلم فقط
+
+            // 4) دمج الكيانات: Gemini أولاً ثم fallback محلي للـ title فقط
+            string? title = route.entities.title ?? titleHint ?? ExtractTitleLoose(request.Question);
+            string? author = route.entities.author ?? authorHint;
+            string? category = SanitizeCategory(request.Category) ?? route.entities.category;
+
+            // 5) النية: اعتماد كامل على Gemini (بدون أي تخمين محلي)
+            static string? NormalizeRouterIntent(string? x)
             {
-                var titleToken = !string.IsNullOrWhiteSpace(titleGuess) ? titleGuess! : request.Question;
-
-                var book = await _uow.Books.GetQueryable(
-                                b => b.IsActive && ((b.Title ?? "").ToLower().Contains(titleToken.ToLower())),
-                                q => q.Include(b => b.Author))
-                            .OrderByDescending(b => b.SalesCount)
-                            .FirstOrDefaultAsync();
-
-                if (book is null)
+                if (string.IsNullOrWhiteSpace(x)) return null;
+                var allowed = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
                 {
-                    var msg = L.T(
-                        "لم أجد كتابًا بعنوان واضح في كتالوجنا. جرّب كتابة الاسم بدقة أكبر (مثال: اسم الكتاب + اسم المؤلف).",
-                        "I couldn't find a clear title in our catalog. Please try a more precise title (e.g., book title + author)."
-                    );
-                    return Success(new RagAskResponse { Answer = FriendlyWrap(msg, lang, false) });
-                }
-
-                var baseSource = new ChatSource
-                {
-                    BookId = book.Id,
-                    Title = book.Title,
-                    CoverImageUrl = book.CoverImageUrl,
-                    Snippet = book.Description
+                    "summary","availability","price","author_bio",
+                    "more_by_author","category_recs","similar_to_title","general_recs"
                 };
-
-                string summaryText;
-
-                if (ChunkFactory.HasRichDescription(book))
-                {
-                    var prompt = L.T(
-                        $"لخّص كتاب \"{book.Title}\" للمؤلف {book.Author?.Name} في 3–5 نقاط بالاعتماد على الوصف المرفق فقط.",
-                        $"Summarize the book \"{book.Title}\" by {book.Author?.Name} in 3–5 bullet points using ONLY the attached description."
-                    );
-                    summaryText = await _synth.SynthesizeAsync(prompt, new List<ChatSource> { baseSource }) ?? string.Empty;
-
-                    if (string.IsNullOrWhiteSpace(summaryText))
-                        summaryText = book.Description!.Trim().Length > 0 ? book.Description! : L.T("لا تتوفر لدينا نبذة كافية لهذا الكتاب حاليًا.", "We don't have enough info for this book yet.");
-                }
-                else
-                {
-                    var prompt = L.T(
-                        $"أعطني ملخصًا موجزًا وواضحًا لكتاب \"{book.Title}\" للمؤلف {book.Author?.Name}.",
-                        $"Give me a brief and clear summary of \"{book.Title}\" by {book.Author?.Name}."
-                    );
-                    summaryText = await _synth.SynthesizeAsync(prompt, new List<ChatSource>()) ?? string.Empty;
-
-                    if (string.IsNullOrWhiteSpace(summaryText))
-                        summaryText = L.T("لا تتوفر لدينا نبذة كافية لهذا الكتاب حاليًا.", "We don't have enough info for this book yet.");
-                }
-
-                return Success(new RagAskResponse
-                {
-                    Answer = FriendlyWrap(summaryText, lang, false),
-                    Sources = new List<ChatSource> { baseSource },
-                    PrimaryBookId = book.Id,
-                    PrimaryBookTitle = book.Title
-                });
+                return allowed.Contains(x) ? x : null;
             }
+            string intent = NormalizeRouterIntent(route.intent) ?? "general_recs";
 
-
-            // AVAILABILITY
-            // داخل AskAsync – فرع AVAILABILITY بدّل الكود بالكامل بهذا:
-            if (asksAvailability)
+            switch (intent)
             {
-                var titleTokenRaw = !string.IsNullOrWhiteSpace(titleGuess) ? titleGuess! : ExtractTitleForAvailability(request.Question);
-                var tokenCandidate = !string.IsNullOrWhiteSpace(titleTokenRaw) ? titleTokenRaw : CleanForTitle(request.Question);
-
-                if (string.IsNullOrWhiteSpace(tokenCandidate) || tokenCandidate.Length < 2)
-                {
-                    var msg = L.T(
-                        "علشان أقدر أحدد التوفّر، اكتب اسم الكتاب (مثال: هل \"أولاد حارتنا\" متاح؟).",
-                        "To check availability, please provide a book title (e.g., Is \"The Alchemist\" available?)."
-                    );
-                    return Success(new RagAskResponse { Answer = FriendlyWrap(msg, lang, false), Sources = new List<ChatSource>() });
-                }
-
-                var core = CleanForTitle(tokenCandidate);
-                var alt = core.StartsWith("ال") ? core[2..] : core;
-
-                var match = await _uow.Books.GetQueryable(
-                                b => b.IsActive && (EF.Functions.Like(b.Title!, $"%{core}%") || EF.Functions.Like(b.Title!, $"%{alt}%")),
-                                q => q.Include(b => b.Author))
-                            .OrderByDescending(b => b.SalesCount)
-                            .FirstOrDefaultAsync();
-
-                // فَزّة Embedding لو مفيش نتيجة نصّية
-                if (match is null)
-                {
-                    var hit = (await _emb.SearchSimilarBooksAsync(core, 1)).FirstOrDefault();
-                    match = hit?.Book;
-                }
-
-                if (match is null)
-                {
-                    var notFound = L.T(
-                        $"ملقتش عنوان مطابق لـ \"{titleTokenRaw}\". اكتب الاسم بدقة أكبر (مثال: الاسم + المؤلف).",
-                        $"Couldn't find a title matching \"{titleTokenRaw}\". Try a more precise title (e.g., title + author)."
-                    );
-                    return Success(new RagAskResponse { Answer = FriendlyWrap(notFound, lang, false) });
-                }
-
-                var available = match.StockQuantity > 0;
-                var ans = available
-                    ? L.T($"\"{match.Title}\" متاح للشراء الآن.", $"\"{match.Title}\" is available to buy now.")
-                    : L.T($"\"{match.Title}\" غير متاح حاليًا.", $"\"{match.Title}\" is currently unavailable.");
-
-                var src = ToSources(new List<BookBriefDto> {
-        new BookBriefDto(
-            Id: match.Id,
-            Title: match.Title,
-            AuthorName: match.Author?.Name,
-            Price: match.Price,
-            DiscountedPrice: match.DiscountedPrice,
-            CoverImageUrl: match.CoverImageUrl,
-            Description: match.Description)
-    }, request.Question);
-
-                return Success(new RagAskResponse
-                {
-                    Answer = FriendlyWrap(ans, lang, true),
-                    Sources = src,
-                    IsAvailable = available,
-                    PrimaryBookId = match.Id,
-                    PrimaryBookTitle = match.Title,
-                    CanAddToCart = available
-                });
-            }
-
-
-            // MORE BY AUTHOR
-            if (asksAuthor || !string.IsNullOrWhiteSpace(authorGuess))
-            {
-                var authorName = !string.IsNullOrWhiteSpace(authorGuess) ? authorGuess! : request.Question;
-                var list = await GetAuthorBooksAsync(authorName);
-                var names = list.Data!.Select(b => b.Title).ToList();
-
-                var ans = names.Any()
-                    ? L.T($"كتب أخرى لنفس المؤلف المقترحة: {string.Join("، ", names)}.",
-                          $"Other suggested books by the same author: {string.Join(", ", names)}.")
-                    : L.T("لم أجد كتبًا مناسبة لنفس المؤلف.", "I couldn't find suitable books for the same author.");
-
-                return Success(new RagAskResponse { Answer = FriendlyWrap(ans, lang, true), Sources = ToSources(list.Data!) });
-            }
-
-            // BY CATEGORY
-            if (asksCategory)
-            {
-                var cat = sanitizedCategory ?? ExtractCategory(request.Question);
-                if (!string.IsNullOrWhiteSpace(cat))
-                {
-                    var take = (request.Limit > 0 ? request.Limit : 8);
-                    var list = await GetCategoryBooksAsync(cat!, take);
-                    var dedup = list.Data!.GroupBy(b => b.Title.Trim()).Select(g => g.First()).Take(take).ToList();
-
-                    var ans = dedup.Any()
-                        ? L.T($"ترشيحات لكتب ضمن التصنيف \"{cat}\": {string.Join("، ", dedup.Select(b => b.Title))}.",
-                              $"Recommended books in the \"{cat}\" category: {string.Join(", ", dedup.Select(b => b.Title))}.")
-                        : L.T($"لا توجد نتائج ضمن التصنيف \"{cat}\" حالياً.",
-                              $"No current results in the \"{cat}\" category.");
-
-                    return Success(new RagAskResponse { Answer = FriendlyWrap(ans, lang, false), Sources = ToSources(dedup, request.Question) });
-                }
-            }
-
-            // AUTHOR BIO
-            if (asksAuthorBio)
-            {
-                var authorName = !string.IsNullOrWhiteSpace(authorGuess)
-                    ? authorGuess!
-                    : (ExtractAuthorNameForBio(request.Question) ?? request.Question);
-
-                var token = authorName.Trim();
-                var token2 = token.StartsWith("ال") ? token[2..] : token;
-
-                var author = await _uow.Authors.GetQueryable(a =>
-                                    a.Name.ToLower().Contains(token.ToLower()) ||
-                                    a.Name.ToLower().Contains(token2.ToLower()))
-                                .Include(a => a.Books)
-                                .FirstOrDefaultAsync();
-
-                if (author is null)
-                {
-                    var msg = L.T(
-                        "مش لاقي مؤلف بالاسم المطلوب في كتالوجنا. جرّب تكتب الاسم كامل أو كتاب مشهور له.",
-                        "I couldn't find an author with that name in our catalog. Try the full name or a well-known book by them."
-                    );
-                    return Success(new RagAskResponse { Answer = FriendlyWrap(msg, lang, false) });
-                }
-
-                var bio = author.Bio;
-
-                if (!ChunkFactory.HasGoodBio(bio))
-                {
-                    var prompt = L.T(
-                        $"اكتب نبذة قصيرة وواضحة عن المؤلف {author.Name}.",
-                        $"Write a short, clear bio for the author {author.Name}."
-                    );
-                    var synth = await _synth.SynthesizeAsync(prompt, new List<ChatSource>()) ?? string.Empty;
-
-                    if (ChunkFactory.HasGoodBio(synth))
+                case "summary":
                     {
-                        // حفظ الـ Bio مرة واحدة
-                        author.Bio = synth.Trim();
-                        await _uow.SaveAsync();
-                        bio = author.Bio;
+                        var t = title ?? request.Question;
+                        var book = await FindBookByTitleAsync(t);
+                        if (book != null)
+                        {
+                            bool preferDesc = string.Equals(_cfg["Rag:SummarizeFromDescription"], "true", StringComparison.OrdinalIgnoreCase);
+                            if (preferDesc && !string.IsNullOrWhiteSpace(book.Description) && book.Description!.Length >= 160)
+                            {
+                                return Success(new RagAskResponse
+                                {
+                                    Answer = book.Description!,
+                                    Sources = ToSources(new List<BookBriefDto> {
+                                        new BookBriefDto(book.Id, book.Title, book.Author?.Name, book.Price, book.DiscountedPrice, book.CoverImageUrl, book.Description)
+                                    }, request.Question),
+                                    PrimaryBookId = book.Id,
+                                    PrimaryBookTitle = book.Title
+                                });
+                            }
+
+                            var src = new ChatSource { BookId = book.Id, Title = book.Title, CoverImageUrl = book.CoverImageUrl, Snippet = book.Description };
+                            string prompt = !string.IsNullOrWhiteSpace(book.Description) && book.Description!.Trim().Length >= 120
+                                ? $"لخّص كتاب \"{book.Title}\" للمؤلف {book.Author?.Name} في 3–5 نقاط بالاعتماد على الوصف أدناه."
+                                : $"أعطني ملخصًا موجزًا وواضحًا لكتاب \"{book.Title}\" للمؤلف {book.Author?.Name}.";
+
+                            var summary = await _synth.SynthesizeAsync(prompt, new List<ChatSource> { src });
+                            var answer = string.IsNullOrWhiteSpace(summary) ? (book.Description ?? "لا تتوفر لدينا نبذة كافية لهذا الكتاب حاليًا.") : summary;
+
+                            return Success(new RagAskResponse
+                            {
+                                Answer = answer,
+                                Sources = new List<ChatSource> { src },
+                                PrimaryBookId = book.Id,
+                                PrimaryBookTitle = book.Title
+                            });
+                        }
+
+                        var gen = await _synth.SynthesizeAsync(request.Question, new List<ChatSource>());
+                        return Success(new RagAskResponse { Answer = string.IsNullOrWhiteSpace(gen) ? $"ملقتش كتاب بعنوان «{t}»." : gen });
                     }
-                    else
+
+                case "availability":
                     {
-                        bio = L.T($"لا تتوفر لدينا نبذة كافية عن {author.Name} حاليًا.", $"We don't have a sufficient bio for {author.Name} yet.");
+                        var t = title ?? request.Question;
+                        var r = await GetAvailabilityAnswerAsync(t, includePrice: false);
+                        return Success(r);
                     }
-                }
 
-                var src = new List<ChatSource> {
-        new ChatSource {
-            BookId = 0,
-            Title = L.T($"نبذة عن {author.Name}", $"About {author.Name}"),
-            Snippet = bio
-        }
-    };
-
-                return Success(new RagAskResponse { Answer = FriendlyWrap(bio!, lang, false), Sources = src });
-            }
-            //if (asksAuthorBio)
-            //{
-            //    var authorName = !string.IsNullOrWhiteSpace(authorGuess) ? authorGuess! : (ExtractAuthorNameForBio(request.Question) ?? request.Question);
-
-            //    var token = authorName.Trim();
-            //    var token2 = token.StartsWith("ال") ? token[2..] : token;
-
-            //    var author = await _uow.Authors.GetQueryable(a =>
-            //                        a.Name.ToLower().Contains(token.ToLower()) ||
-            //                        a.Name.ToLower().Contains(token2.ToLower()))
-            //                    .Include(a => a.Books)
-            //                    .FirstOrDefaultAsync();
-
-            //    if (author is null)
-            //    {
-            //        var msg = L.T(
-            //            "مش لاقي مؤلف بالاسم المطلوب في كتالوجنا. جرّب تكتب الاسم كامل أو كتاب مشهور له.",
-            //            "I couldn't find an author with that name in our catalog. Try the full name or a well-known book by them."
-            //        );
-            //        return Success(new RagAskResponse { Answer = FriendlyWrap(msg, lang, false), Sources = new List<ChatSource>() });
-            //    }
-
-            //    var bio = author.GetType().GetProperty("Bio")?.GetValue(author) as string;
-
-            //    var src = new List<ChatSource> {
-            //        new ChatSource {
-            //            BookId = 0,
-            //            Title = L.T($"نبذة عن {author.Name}", $"About {author.Name}"),
-            //            CoverImageUrl = null,
-            //            Snippet = string.IsNullOrWhiteSpace(bio) ? L.T(
-            //                $"لدى {author.Name} {author.Books?.Count ?? 0} كتابًا في كتالوجنا.",
-            //                $"{author.Name} has {author.Books?.Count ?? 0} book(s) in our catalog."
-            //            ) : bio
-            //        }
-            //    };
-
-            //    if (!string.IsNullOrWhiteSpace(bio))
-            //        return Success(new RagAskResponse { Answer = FriendlyWrap(bio!, lang, false), Sources = src });
-
-            //    var enriched = L.T(
-            //        $"اكتب نبذة قصيرة وواضحة عن المؤلف {author.Name}.",
-            //        $"Write a short, clear bio for the author {author.Name}."
-            //    );
-
-            //    var synth = await _synth.SynthesizeAsync(enriched, new List<ChatSource>());
-            //    var ans = string.IsNullOrWhiteSpace(synth)
-            //        ? L.T($"لا تتوفر لدينا نبذة كافية عن {author.Name} حاليًا.", $"We don't have a sufficient bio for {author.Name} yet.")
-            //        : synth!;
-
-            //    return Success(new RagAskResponse { Answer = FriendlyWrap(ans, lang, false), Sources = src });
-            //}
-
-            // FALLBACK: Recommendations (vector → keyword), then website-style answer if needed
-            var top = await GetRecommendationsAsync(request.Question);
-            var reply = top.Data!.Any()
-                ? L.T($"بناءً على سؤالك، أنصحك بالاطلاع على: {string.Join("، ", top.Data!.Select(x => x.Title))}.",
-                      $"Based on your question, consider: {string.Join(", ", top.Data!.Select(x => x.Title))}.")
-                : L.T("لم أجد كتباً متعلقة مباشرة بسؤالك. جرّب كلمات مفتاحية مختلفة أو تصنيفاً آخر.",
-                      "I couldn't find books directly related to your question. Try different keywords or another category.");
-
-            if (string.IsNullOrWhiteSpace(reply) || reply.Trim() == "لا أعرف")
-            {
-                var fallbackPrompt = lang == Language.English ? BuildWebsiteFallbackPromptEn(request.Question) : BuildWebsiteFallbackPrompt(request.Question);
-                var fallbackAnswer = await _synth.SynthesizeAsync(fallbackPrompt, ToSources(top.Data ?? new List<BookBriefDto>(), request.Question));
-                if (!string.IsNullOrWhiteSpace(fallbackAnswer))
-                    return Success(new RagAskResponse
+                case "price":
                     {
-                        Answer = FriendlyWrap(fallbackAnswer!, lang, true),
-                        Sources = ToSources(top.Data ?? new List<BookBriefDto>(), request.Question)
-                    });
+                        var t = title ?? request.Question;
+                        var r = await GetAvailabilityAnswerAsync(t, includePrice: true);
+                        return Success(r);
+                    }
+
+                case "author_bio":
+                    {
+                        var a = author ?? (title != null ? await ResolveAuthorByTitleAsync(title) : null);
+                        if (string.IsNullOrWhiteSpace(a))
+                            return Success(new RagAskResponse { Answer = "اكتب اسم المؤلف أو اسم كتاب له علشان أجيب لك نبذة عنه." });
+
+                        var authorRow = await _uow.Authors.GetQueryable(x => ((x.Name ?? "").ToLower()).Contains(a.ToLower()))
+                                                          .Include(x => x.Books)
+                                                          .FirstOrDefaultAsync();
+                        if (authorRow == null)
+                            return Success(new RagAskResponse { Answer = $"مش لاقي مؤلف بالاسم: {a}" });
+
+                        string? bio = authorRow.Bio;
+                        if (string.IsNullOrWhiteSpace(bio) || bio.Trim().Length < 80)
+                        {
+                            bio = await _synth.SynthesizeAsync($"اكتب نبذة قصيرة وواضحة عن المؤلف {authorRow.Name}.", new List<ChatSource>())
+                                  ?? $"لا تتوفر لدينا نبذة كافية عن {authorRow.Name} حاليًا.";
+                        }
+
+                        return Success(new RagAskResponse { Answer = bio });
+                    }
+
+                case "more_by_author":
+                    {
+                        var a = author ?? (title != null ? await ResolveAuthorByTitleAsync(title) : null);
+                        if (string.IsNullOrWhiteSpace(a))
+                            return Success(new RagAskResponse { Answer = "محتاج اسم المؤلف أو اسم كتاب له علشان أرشّح مؤلفات أخرى." });
+
+                        var list = await GetAuthorBooksAsync(a);
+                        var names = list.Data!.Select(b => b.Title).ToList();
+                        var ans = names.Any()
+                            ? $"كتب أخرى لنفس المؤلف: {string.Join("، ", names)}."
+                            : "لم أجد كتبًا لنفس المؤلف.";
+                        return Success(new RagAskResponse { Answer = ans, Sources = ToSources(list.Data!) });
+                    }
+
+                case "category_recs":
+                    {
+                        var cat = category ?? ExtractCategory(request.Question);
+                        if (string.IsNullOrWhiteSpace(cat))
+                            return Success(new RagAskResponse { Answer = "اذكر اسم التصنيف (مثال: روايات/تطوير ذات)." });
+
+                        var take = request.Limit > 0 ? request.Limit : 8;
+                        var list = await GetCategoryBooksAsync(cat, take);
+                        var dedup = list.Data!.GroupBy(b => b.Title.Trim()).Select(g => g.First()).Take(take).ToList();
+
+                        var ans = dedup.Any()
+                            ? $"ترشيحات ضمن «{cat}»: {string.Join("، ", dedup.Select(b => b.Title))}."
+                            : $"لا توجد نتائج ضمن التصنيف «{cat}».";
+                        return Success(new RagAskResponse { Answer = ans, Sources = ToSources(dedup, request.Question) });
+                    }
+
+                case "similar_to_title":
+                    {
+                        if (string.IsNullOrWhiteSpace(title))
+                            return Success(new RagAskResponse { Answer = "اذكر اسم الكتاب اللي عايز ترشيحات شبهه." });
+
+                        var take = request.Limit > 0 ? request.Limit : 8;
+                        var recs = await SimilarByTitleAsync(title, take);
+                        var ans = recs.Any()
+                            ? $"كتب تشبه «{title}»: {string.Join("، ", recs.Select(b => b.Title))}."
+                            : $"ملقتش ترشيحات قريبة من «{title}».";
+                        return Success(new RagAskResponse { Answer = ans, Sources = ToSources(recs, request.Question) });
+                    }
+
+                default:
+                    {
+                        var top = await GetRecommendationsAsync(request.Question);
+                        var reply = top.Data!.Any()
+                            ? $"بناءً على سؤالك، أنصحك بالاطلاع على: {string.Join("، ", top.Data!.Select(x => x.Title))}."
+                            : "لم أجد كتباً متعلقة مباشرة بسؤالك. جرّب كلمات مفتاحية مختلفة أو تصنيفاً آخر.";
+                        return Success(new RagAskResponse { Answer = reply, Sources = ToSources(top.Data ?? new List<BookBriefDto>(), request.Question) });
+                    }
             }
-
-            return Success(new RagAskResponse
-            {
-                Answer = FriendlyWrap(reply, lang, true),
-                Sources = ToSources(top.Data ?? new List<BookBriefDto>(), request.Question)
-            });
         }
-        #endregion
 
-        #region Queries
-        private async Task<ApiResponse<string>> GetBookAvailabilityAsync(string bookTitle)
+        // ====== Public Queries ======
+        public async Task<ApiResponse<string>> GetBookAvailabilityAsync(string bookTitle)
         {
-            var lower = bookTitle.ToLower();
-
+            var lower = (bookTitle ?? "").ToLower();
             var b = await _uow.Books.GetQueryable(
                         x => x.IsActive && ((x.Title ?? "").ToLower().Contains(lower)),
                         q => q.Include(x => x.Author))
                     .OrderByDescending(x => x.SalesCount)
                     .FirstOrDefaultAsync();
 
-            if (b == null) return Success<string>($"لم يتم العثور على كتاب بعنوان: {bookTitle}");
+            if (b == null)
+                return Success<string>($"لم يتم العثور على كتاب بعنوان: {bookTitle}");
 
             var available = b.StockQuantity > 0;
             var ans = available ? $"\"{b.Title}\" متاح للشراء الآن." : $"\"{b.Title}\" غير متاح حاليًا.";
             return Success(ans);
         }
 
-        private async Task<ApiResponse<List<BookBriefDto>>> GetAuthorBooksAsync(string authorName)
+        public async Task<ApiResponse<List<BookBriefDto>>> GetAuthorBooksAsync(string authorName)
         {
             var items = await _uow.Books.GetQueryable(
-                    x => x.IsActive && x.Author != null && x.Author.Name.ToLower().Contains(authorName.ToLower()),
+                    x => x.IsActive && x.Author != null && ((x.Author.Name ?? "").ToLower()).Contains(authorName.ToLower()),
                     q => q.Include(b => b.Author))
                 .OrderByDescending(b => b.SalesCount).ThenByDescending(b => b.ViewCount)
                 .Take(20)
@@ -413,7 +237,10 @@ namespace AseerAlkotb.Application.Services
             return Success(items.Adapt<List<BookBriefDto>>());
         }
 
-        private async Task<ApiResponse<List<BookBriefDto>>> GetCategoryBooksAsync(string categoryName, int take)
+        public async Task<ApiResponse<List<BookBriefDto>>> GetCategoryBooksAsync(string categoryName)
+            => await GetCategoryBooksAsync(categoryName, 20);
+
+        public async Task<ApiResponse<List<BookBriefDto>>> GetCategoryBooksAsync(string categoryName, int take)
         {
             categoryName = categoryName?.Trim() ?? "";
             var q1 = categoryName;
@@ -421,9 +248,9 @@ namespace AseerAlkotb.Application.Services
 
             var items = await _uow.Books.GetQueryable(
                 x => x.IsActive && x.Categories.Any(c =>
-                    EF.Functions.Like(c.Name, $"%{q1}%")
-                    || EF.Functions.Like(c.Name, $"%{q2}%")
-                    || EF.Functions.Like("ال" + c.Name, $"%{q1}%")),
+                    EF.Functions.Like(c.Name, $"%{q1}%") ||
+                    EF.Functions.Like(c.Name, $"%{q2}%") ||
+                    EF.Functions.Like("ال" + c.Name, $"%{q1}%")),
                 q => q.Include(b => b.Author).Include(b => b.Categories))
             .OrderByDescending(b => b.SalesCount)
             .ThenByDescending(b => b.ViewCount)
@@ -433,7 +260,7 @@ namespace AseerAlkotb.Application.Services
             return Success(items.Adapt<List<BookBriefDto>>());
         }
 
-        private async Task<ApiResponse<List<BookBriefDto>>> GetRecommendationsAsync(string query)
+        public async Task<ApiResponse<List<BookBriefDto>>> GetRecommendationsAsync(string query)
         {
             var vecHits = await _emb.SearchSimilarBooksAsync(query, 10);
             if (vecHits?.Any() == true)
@@ -454,32 +281,40 @@ namespace AseerAlkotb.Application.Services
 
             return Success(items.Adapt<List<BookBriefDto>>());
         }
-        #endregion
 
-        #region Helpers (Parsing / Text)
-        private static string CleanForTitle(string? s)
+        // ====== Helpers ======
+        private static string BuildRouterInput(string question, string? titleHint, string? authorHint)
         {
-            if (string.IsNullOrWhiteSpace(s)) return string.Empty;
-            var v = s.Trim();
-
-            string[] stop = {
-                "كتاب","الكتاب","كتب","رواية","الرواية","روايات",
-                "ملخص","تلخيص","عن","حول",
-                "عايز","عاوز","أريد","اريد","محتاج",
-                "هل","موجود","متاح","متوفر",
-                "available","in","stock","book","novel"
-            };
-
-            foreach (var w in stop)
-                v = Regex.Replace(v, $@"\b{Regex.Escape(w)}\b", "", RegexOptions.IgnoreCase);
-
-            v = v.Replace("“", "\"").Replace("”", "\"")
-                 .Trim('\"', '«', '»', '\'', '`', ' ', ':', '-', '–', '—', '.', '،', '؛', '?', '؟', '!');
-            v = Normalize(v);
-            return v.Trim();
+            // بنضيف HINTS واضحة للسؤال علشان Gemini يلقط العنوان/المؤلف بسهولة
+            var sb = new System.Text.StringBuilder();
+            sb.AppendLine(question?.Trim() ?? string.Empty);
+            if (!string.IsNullOrWhiteSpace(titleHint)) sb.AppendLine($"[TITLE_HINT]: {titleHint}");
+            if (!string.IsNullOrWhiteSpace(authorHint)) sb.AppendLine($"[AUTHOR_HINT]: {authorHint}");
+            return sb.ToString();
         }
 
-        private static string? ExtractTitleForAvailability(string text)
+        // لم نعد نستخدم أي Fallback محلي للنية — Gemini هو المصدر الوحيد
+        private static string DetectIntentFallback(string q) => "general_recs";
+
+        private static string? SanitizeCategory(string? cat)
+        {
+            if (string.IsNullOrWhiteSpace(cat)) return null;
+            var v = cat.Trim().Trim('"', '“', '”');
+            var bad = new[] { "string", "undefined", "null", "-" };
+            return bad.Contains(v, StringComparer.OrdinalIgnoreCase) ? null : v;
+        }
+
+        private static string Normalize(string? x)
+        {
+            if (string.IsNullOrWhiteSpace(x)) return string.Empty;
+            var s = x.Trim().ToLowerInvariant();
+            s = s.Replace("ـ", "")
+                 .Replace('أ', 'ا').Replace('إ', 'ا').Replace('آ', 'ا')
+                 .Replace('ى', 'ي').Replace('ؤ', 'و').Replace('ئ', 'ي');
+            return s;
+        }
+
+        private static string? ExtractTitleLoose(string text)
         {
             if (string.IsNullOrWhiteSpace(text)) return null;
             var s = text.Trim();
@@ -487,86 +322,120 @@ namespace AseerAlkotb.Application.Services
             var q = Regex.Match(s, "[\"«»“”'`]{1}(?<t>[^\"«»“”'`]{2,})[\"«»“”'`]{1}");
             if (q.Success) return q.Groups["t"].Value.Trim();
 
-            var m = Regex.Match(
-                s,
-                @"(?:هل)?\s*(?:ال)?(?:كتاب|كتب|رواية|روايات)\s+(?<t>[^\.،:;!\?؟]{2,})\s+(?:موجود|متاح|متوفر)",
-                RegexOptions.IgnoreCase);
+            var m = Regex.Match(s, @"(?:نبذة|نبذه|ملخص)\s+عن\s+(?<t>[^\.،:;!\?؟]{2,})", RegexOptions.IgnoreCase);
             if (m.Success) return m.Groups["t"].Value.Trim();
 
-            m = Regex.Match(s, @"(?<t>[^\.،:;!\?؟]{2,})\s+(?:موجود|متاح|متوفر)", RegexOptions.IgnoreCase);
+            m = Regex.Match(s, @"(?:ال)?(?:كتاب|كتب|رواية|الرواية)\s+(?<t>[^\.،:;!\?؟]{2,})", RegexOptions.IgnoreCase);
             if (m.Success) return m.Groups["t"].Value.Trim();
-
-            var e = Regex.Match(s, @"(?:is|book|novel)\s+(?<t>[^\.,:;!\?]{2,})\s+(?:available|in\s+stock)", RegexOptions.IgnoreCase);
-            if (e.Success) return e.Groups["t"].Value.Trim();
 
             return null;
         }
 
-        // Helpers (Parsing / Text) — add this method
-        private static string? ExtractAuthorNameForBio(string text)
+        private async Task<Domain.Entites.Models.Book?> FindBookByTitleAsync(string rawTitle)
         {
-            if (string.IsNullOrWhiteSpace(text)) return null;
+            if (string.IsNullOrWhiteSpace(rawTitle)) return null;
 
-            var s = text.Trim()
-                        .Replace("؟", "")
-                        .Replace("?", "")
-                        .Replace("“", "\"")
-                        .Replace("”", "\"")
-                        .Trim('"', '«', '»', '\'', '`');
+            var coreOriginal = rawTitle.Trim();
+            var lower = coreOriginal.ToLower();
+            var lowerAlt = lower.StartsWith("ال") ? lower[2..] : lower;
 
-            // Arabic & English patterns to catch "about the author …", "نبذة عن …", etc.
-            var patterns = new[]
+            IQueryable<Domain.Entites.Models.Book> baseQuery =
+                _uow.Books.GetQueryable(b => b.IsActive && b.Title != null, q => q.Include(b => b.Author));
+
+            // تطابق دقيق بعد ToLower
+            var exactDb = await baseQuery
+                .Where(b => ((b.Title ?? "").ToLower()) == lower || ((b.Title ?? "").ToLower()) == lowerAlt)
+                .OrderByDescending(b => b.SalesCount).ThenByDescending(b => b.ViewCount)
+                .FirstOrDefaultAsync();
+            if (exactDb != null) return exactDb;
+
+            // مرشّحين بـ LIKE
+            var candidates = await baseQuery
+                .Where(b => EF.Functions.Like(b.Title!, $"%{coreOriginal}%") ||
+                            EF.Functions.Like(b.Title!, $"%{lowerAlt}%"))
+                .OrderByDescending(b => b.SalesCount).ThenByDescending(b => b.ViewCount)
+                .Take(80)
+                .AsNoTracking()
+                .ToListAsync();
+
+            // تطبيع ومطابقة دقيقة بعد الجلب
+            static string Norm(string s)
+                => s.Trim().ToLowerInvariant()
+                    .Replace("ـ", "")
+                    .Replace('أ', 'ا').Replace('إ', 'ا').Replace('آ', 'ا')
+                    .Replace('ى', 'ي').Replace('ؤ', 'و').Replace('ئ', 'ي');
+
+            var coreNorm = Norm(coreOriginal);
+            var altNorm = coreNorm.StartsWith("ال") ? coreNorm[2..] : coreNorm;
+
+            var exactish = candidates.FirstOrDefault(b =>
             {
-        // Arabic
-        @"نبذة\s+عن\s+(?<name>[\p{L}\s\.\-']{2,})",
-        @"عن\s+ال?كاتب\s+(?<name>[\p{L}\s\.\-']{2,})",
-        @"عن\s+ال?مؤلف\s+(?<name>[\p{L}\s\.\-']{2,})",
-        @"من\s+هو\s+(?<name>[\p{L}\s\.\-']{2,})",
+                var tn = Norm(b.Title ?? "");
+                return tn == coreNorm || tn == altNorm;
+            });
+            if (exactish != null) return exactish;
 
-        // English
-        @"about\s+the\s+author\s+(?<name>[A-Za-z\.\-'\s]{2,})",
-        @"author\s+bio\s+of\s+(?<name>[A-Za-z\.\-'\s]{2,})",
-        @"bio\s+of\s+(?<name>[A-Za-z\.\-'\s]{2,})"
-    };
-
-            foreach (var pat in patterns)
+            // اختياري: embeddings بشرط تطابق الاسم بعد التطبيع
+            var hit = (await _emb.SearchSimilarBooksAsync(coreOriginal, 1)).FirstOrDefault();
+            if (hit?.Book != null)
             {
-                var m = Regex.Match(s, pat, RegexOptions.IgnoreCase);
-                if (m.Success)
-                {
-                    var name = m.Groups["name"].Value.Trim();
-
-                    // tidy up trailing punctuation
-                    name = Regex.Replace(name, @"[\.,;:!\?؟،\-]+$", "");
-
-                    // remove leading “الكاتب/المؤلف …” if captured as part of the name
-                    name = Regex.Replace(name, @"^(?:ال)?(?:كاتب|مؤلف)\s+", "", RegexOptions.IgnoreCase);
-
-                    return string.IsNullOrWhiteSpace(name) ? null : name;
-                }
+                var tn = Norm(hit.Book.Title ?? "");
+                if (tn == coreNorm || tn == altNorm) return hit.Book;
             }
 
             return null;
         }
 
-        private static string Normalize(string? x)
+        private async Task<string?> ResolveAuthorByTitleAsync(string title)
         {
-            if (string.IsNullOrWhiteSpace(x)) return string.Empty;
-            var s = x.Trim().ToLowerInvariant();
-            s = s.Replace("ـ", "").Replace('أ', 'ا').Replace('إ', 'ا').Replace('آ', 'ا').Replace('ى', 'ي').Replace('ؤ', 'و').Replace('ئ', 'ي');
-            var diacritics = new[] { '\u064B', '\u064C', '\u064D', '\u064E', '\u064F', '\u0650', '\u0651', '\u0652' };
-            foreach (var d in diacritics) s = s.Replace(d.ToString(), "");
-            return s;
+            var b = await FindBookByTitleAsync(title);
+            return b?.Author?.Name;
         }
 
-        private static bool ContainsAny(string haystack, string[] needles)
-            => needles.Any(k => haystack.Contains(k, StringComparison.OrdinalIgnoreCase));
+        private async Task<RagAskResponse> GetAvailabilityAnswerAsync(string rawTitle, bool includePrice)
+        {
+            var match = await FindBookByTitleAsync(rawTitle);
+            if (match == null)
+            {
+                var msgAr = $"ملقتش كتاب بعنوان: «{rawTitle}». تأكّد من كتابة الاسم صح أو جرّب صيغة تانية (مثال: من غير «ال» في البداية).";
+                var msgEn = $"I couldn’t find a book titled “{rawTitle}”. Please double-check the spelling or try a slightly different title.";
+                var lang = LangUtils.Detect(rawTitle);
+                return new RagAskResponse { Answer = lang == Lang.English ? msgEn : msgAr, IsAvailable = false };
+            }
 
-        private static bool HasByAuthorPattern(string qNorm)
-            => Regex.IsMatch(qNorm, @"\bby\s+[a-z][a-z\.\-'\s]{1,60}\b", RegexOptions.IgnoreCase);
+            bool available = match.StockQuantity > 0;
+            var price = (match.DiscountedPrice > 0m && match.DiscountedPrice < match.Price) ? match.DiscountedPrice : match.Price;
 
-        private static bool HasArabicAuthorL(string qNorm)
-            => Regex.IsMatch(qNorm, @"\bل\s*[اأإآء-ي][\p{L}\s\.\-']{1,60}\b", RegexOptions.IgnoreCase);
+            var ansAr = available
+                ? $"\"{match.Title}\" متاح للشراء الآن{(includePrice ? $" — السعر: {price:F2}" : "")}."
+                : $"\"{match.Title}\" غير متاح حاليًا{(includePrice ? $" — آخر سعر معروف: {price:F2}" : "")}.";
+
+            var ansEn = available
+                ? $"“{match.Title}” is available now{(includePrice ? $" — Price: {price:F2}" : "")}."
+                : $"“{match.Title}” is currently unavailable{(includePrice ? $" — Last known price: {price:F2}" : "")}.";
+
+            var lang2 = LangUtils.Detect(rawTitle);
+            return new RagAskResponse
+            {
+                Answer = lang2 == Lang.English ? ansEn : ansAr,
+                IsAvailable = available,
+                PrimaryBookId = match.Id,
+                PrimaryBookTitle = match.Title,
+                CanAddToCart = available,
+                Sources = ToSources(new List<BookBriefDto> {
+                    new(match.Id, match.Title, match.Author?.Name, match.Price, match.DiscountedPrice, match.CoverImageUrl, match.Description)
+                }, rawTitle)
+            };
+        }
+
+        private async Task<List<BookBriefDto>> SimilarByTitleAsync(string title, int take = 8)
+        {
+            var hits = await _emb.SearchSimilarBooksAsync($"العنوان: {title}", take);
+            var books = hits.Where(h => h.Book != null).Select(h => h.Book!)
+                            .GroupBy(b => b.Id).Select(g => g.First())
+                            .Take(take).ToList();
+            return books.Adapt<List<BookBriefDto>>();
+        }
 
         private static List<ChatSource> ToSources(List<BookBriefDto> books, string? question = null) =>
             books.Select(b => new ChatSource
@@ -583,27 +452,29 @@ namespace AseerAlkotb.Application.Services
             return description.Length > 240 ? description[..240] + "..." : description;
         }
 
+        // ====== Helpers: ExtractCategory ======
         private static string? ExtractCategory(string text)
         {
             if (string.IsNullOrWhiteSpace(text)) return null;
+
             var q = text.Trim();
-            var qLower = q.ToLower();
+            var qLower = q.ToLowerInvariant();
             var markers = new[] { "نوع", "تصنيف", "genre", "category" };
 
             foreach (var m in markers)
             {
-                var idx = qLower.IndexOf(m, StringComparison.Ordinal);
+                var idx = qLower.IndexOf(m);
                 if (idx >= 0)
                 {
                     var start = idx + m.Length;
-                    var tail = q.Substring(start).Trim(' ', ':', '：', '-', '،');
+                    var tail = q.Substring(start).Trim(' ', ':', '：', '-', '—', '،', '"', '«', '»', '“', '”', '\'', '`');
                     var stops = new[] { "،", ",", ";", "؛", ".", ":", "—", "-", "!", "؟", "?" };
                     foreach (var s in stops)
                     {
                         var cut = tail.IndexOf(s, StringComparison.Ordinal);
                         if (cut >= 0) { tail = tail[..cut]; break; }
                     }
-                    tail = tail.Trim().Trim('\"', '“', '”', '«', '»', '\'', '`');
+                    tail = tail.Trim();
                     if (tail.StartsWith("ال")) tail = tail[2..];
                     return string.IsNullOrWhiteSpace(tail) ? null : tail;
                 }
@@ -611,110 +482,31 @@ namespace AseerAlkotb.Application.Services
 
             var likePatterns = new[]
             {
-                @"بحب\s ال?(?:نوع|تصنيف)\s+(?<cat>[^\.,;:!\?؟،\-]{2,})",
+                @"بحب\s+ال?(?:نوع|تصنيف)\s+(?<cat>[^\.,;:!\?؟،\-]{2,})",
                 @"i\s+like\s+the\s+(?:genre|category)\s+(?<cat>[^\.,;:!\?،\-]{2,})"
             };
-
             foreach (var pat in likePatterns)
             {
-                var m = Regex.Match(q, pat, RegexOptions.IgnoreCase);
+                var m = System.Text.RegularExpressions.Regex.Match(q, pat, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
                 if (m.Success) return m.Groups["cat"].Value.Trim();
             }
+
             return null;
         }
 
-        private static string? SanitizeCategory(string? cat)
+        private static bool IsGreeting(string q)
         {
-            if (string.IsNullOrWhiteSpace(cat)) return null;
-            var v = cat.Trim().Trim('"', '“', '”');
-            var bad = new[] { "string", "undefined", "null", "-" };
-            return bad.Contains(v, StringComparer.OrdinalIgnoreCase) ? null : v;
+            if (string.IsNullOrWhiteSpace(q)) return false;
+            var n = q.Trim().ToLowerInvariant();
+            return new[]
+            {
+                "hi","hello","hey","good morning","good evening","salam","salām",
+                "اهلا","أهلًا","مرحبا","مرحباً","السلام عليكم","ازيك","ازاى","هاي","هلا"
+            }.Any(w => n.Contains(w));
         }
 
-        private static string BuildWebsiteFallbackPrompt(string question) => $@"
-أنت مساعد ودود لمنصّة أسير الكُتب (https://aseeralkotb.com).
-- أجب بالعربية المبسطة وباختصار.
-- إن كان السؤال عن الكتب (ترشيحات/ملخص/توافر)، اعتمد على المقتطفات/المصادر المرافقة فقط.
-- إن لم تكن المقتطفات كافية، اذكر ذلك بلطف واقترح صياغات بحث بديلة.
-
-❓ السؤال:
-{question}
-
-✅ الجواب:";
-
-        private static string BuildWebsiteFallbackPromptEn(string question) => $@"
-You are a friendly assistant for Aseer Alkotb (https://aseeralkotb.com).
-- Answer briefly in simple English.
-- If the question is about books (recommendations/summary/availability), rely on provided snippets/sources only.
-- If snippets are not enough, say so politely and suggest better search wording.
-
-❓ Question:
-{question}
-
-✅ Answer:";
-
-        private static readonly string[] GreetingKeys = { "hi", "hello", "hey", "السلام", "مرحبا", "ازيك", "أهلاً", "اهلا", "هاي", "هلو" };
-
-        private static bool LooksLikeGreeting(string qNorm)
-            => GreetingKeys.Any(k => qNorm.Contains(k, StringComparison.OrdinalIgnoreCase));
-        #endregion
-
-        #region Localization & Language
-        private enum Language { Arabic, English }
-
-        private static Language DetectLanguage(string? text)
-        {
-            if (string.IsNullOrWhiteSpace(text)) return Language.Arabic;
-            // count Arabic vs Latin letters
-            int ar = Regex.Matches(text, "[\\u0600-\\u06FF]").Count;
-            int en = Regex.Matches(text, "[A-Za-z]").Count;
-            return en > ar ? Language.English : Language.Arabic;
-        }
-
-        private static string FriendlyWrap(string answer, Language lang, bool addOutro)
-        {
-            if (!addOutro) return answer;
-
-            var outro = lang == Language.English
-                ? "— If you want to change the genre or search by title/author, just tell me in simple words 🙂"
-                : "— لو حابب تغيّر التصنيف أو تبحث بعنوان/مؤلف، قلّي بكلمات بسيطة وأنا أظبطه لك 😊";
-
-            return $"{answer}\n\n{outro}";
-        }
-
-        private readonly struct Localizer
-        {
-            private readonly Language _lang;
-            public Localizer(Language lang) { _lang = lang; }
-            public string T(string ar, string en) => _lang == Language.Arabic ? ar : en;
-        }
-        #endregion
-
-        #region Keyword Buckets
-        private static readonly string[] SummaryKeys = {
-            "تلخيص","ملخص","لخص","خلاصة","شرح مختصر","ملخص سريع",
-            "summary","summarize","brief","overview","tl;dr"
-        };
-
-        private static readonly string[] AvailabilityKeys = {
-            "متاح","متوفر","موجود","أقدر أشتري","اقدر اشتري","اشتري","شراء",
-            "in stock","available","buy","purchase","order",
-            "غير متاح","غير متوفر","نفد","خلص","out of stock"
-        };
-
-        private static readonly string[] CategoryKeys = {
-            "نوع","تصنيف","فئة","قسم","مجال","موضوع",
-            "genre","category","kind","type","topic","subject"
-        };
-
-        private static readonly string[] AuthorMoreKeysLoose = {
-            "كتب أخرى","له كتب","مؤلفات أخرى","نفس المؤلف","نفس الكاتب",
-            "more books by","other books by","from the same author","works of"
-        };
-
-        private static readonly string[] AuthorBioKeys = {
-            "سيرة","نبذة","من هو","عن المؤلف","عن الكاتب","bio","biography","about the author","who is"
-        };
-        #endregion
+        private static string Intro(Lang lang) => lang == Lang.English
+            ? "Hi! I’m Aseer Alkotb assistant 🤖. I can help you with book summaries, availability, prices, author bios, and recommendations."
+            : "أهلاً! أنا مساعد عصير الكتب 🤖. أقدر أساعدك في ملخصات الكتب، التوافر، الأسعار، نبذات المؤلفين، والترشيحات.";
     }
 }

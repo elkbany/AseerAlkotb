@@ -32,13 +32,13 @@ namespace AseerAlkotb.Infrastructure.AI
 
 أمثلة:
 - ""نبذة عن أولاد حارتنا"" → summary + title
+- ""نبذة عن زقاق المدق"" → summary + title
 - ""نبذة عن كاتب أولاد حارتنا"" → author_bio + title
 - ""كتب أخرى لنفس الكاتب نجيب محفوظ"" → more_by_author + author
 - ""كتب نفس مؤلف كتاب الخيميائي"" → more_by_author + title
 - ""رشّح كتب شبه كتاب أولاد حارتنا"" → similar_to_title + title
 - ""هل العادات الذرية متاح؟"" → availability + title
 - ""سعر كتاب العادات الذرية"" → price + title
-- ""ترشيحات في تصنيف روايات"" → category_recs + category
 
 أعد JSON فقط بهذا الشكل:
 {{
@@ -50,36 +50,66 @@ namespace AseerAlkotb.Infrastructure.AI
 
 السؤال:
 {question}";
+
             var payload = new
             {
                 contents = new[] { new { role = "user", parts = new[] { new { text = prompt } } } },
-                generationConfig = new { temperature = 0.0, maxOutputTokens = 200 }
+                generationConfig = new
+                {
+                    temperature = 0.0,
+                    maxOutputTokens = 200,
+                    // نطلب JSON فقط لتسهيل الـ parsing
+                    responseMimeType = "application/json"
+                }
             };
 
             await GeminiConcurrencyGate.Gate.WaitAsync();
             try
             {
                 var client = _http.CreateClient("gemini");
-                using var resp = await client.PostAsJsonAsync($"/v1beta/models/{model}:generateContent?key={key}", payload);
-                var sc = (int)resp.StatusCode;
+                const int maxAttempts = 3;
 
-                if (!resp.IsSuccessStatusCode)
+                for (int attempt = 1; attempt <= maxAttempts; attempt++)
                 {
+                    using var resp = await client.PostAsJsonAsync($"/v1beta/models/{model}:generateContent?key={key}", payload);
+                    var sc = (int)resp.StatusCode;
+
+                    // retries على الـ transient errors
+                    if ((sc == 429 || sc == 500 || sc == 502 || sc == 503 || sc == 504) && attempt < maxAttempts)
+                    {
+                        await Task.Delay(TimeSpan.FromMilliseconds(500 * attempt * attempt));
+                        continue;
+                    }
+
                     var body = await resp.Content.ReadAsStringAsync();
-                    throw new HttpRequestException($"Gemini failed: {sc} {resp.StatusCode}. Body: {body}");
+                    if (!resp.IsSuccessStatusCode)
+                        throw new HttpRequestException($"Gemini route failed: {sc} {resp.StatusCode}. Body: {body}");
+
+                    using var doc = JsonDocument.Parse(body);
+                    var text = doc.RootElement.GetProperty("candidates")[0]
+                                              .GetProperty("content")
+                                              .GetProperty("parts")[0]
+                                              .GetProperty("text").GetString() ?? "{}";
+
+                    // بما أننا طلبنا JSON صِرف، نقدر نعمل Deserialize مباشرة
+                    var result = System.Text.Json.JsonSerializer.Deserialize<RouteResult>(text) ?? new RouteResult();
+
+                    // طبّع intent على اللائحة المسموحة
+                    string? Normalize(string? x)
+                    {
+                        if (string.IsNullOrWhiteSpace(x)) return null;
+                        var ok = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                        {
+                            "summary","availability","price","author_bio",
+                            "more_by_author","category_recs","similar_to_title","general_recs"
+                        };
+                        return ok.Contains(x) ? x : null;
+                    }
+                    result.intent = Normalize(result.intent) ?? "general_recs";
+                    return result;
                 }
 
-
-                using var doc = JsonDocument.Parse(await resp.Content.ReadAsStringAsync());
-                var text = doc.RootElement.GetProperty("candidates")[0]
-                                          .GetProperty("content")
-                                          .GetProperty("parts")[0]
-                                          .GetProperty("text").GetString() ?? "{}";
-
-                var start = text.IndexOf('{'); var end = text.LastIndexOf('}');
-                var json = (start >= 0 && end >= start) ? text.Substring(start, end - start + 1) : "{}";
-
-                return System.Text.Json.JsonSerializer.Deserialize<RouteResult>(json) ?? new RouteResult();
+                return new RouteResult(); // shouldn't reach
             }
             catch
             {

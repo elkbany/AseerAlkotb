@@ -110,10 +110,7 @@ namespace AseerAlkotb.Dashboard
             builder.Services.AddScoped<IEmbeddingService, GeminiEmbeddingService>();
             builder.Services.AddScoped<IQuestionRouterService, GeminiQuestionRouterService>();
 
-            // Background job for embeddings (Dashboard فقط)
-            builder.Services.AddSingleton<EmbeddingRefreshBackgroundService>();
-            builder.Services.AddSingleton<IEmbeddingRefreshJob>(sp => sp.GetRequiredService<EmbeddingRefreshBackgroundService>());
-            builder.Services.AddHostedService(sp => sp.GetRequiredService<EmbeddingRefreshBackgroundService>());
+         
             // HttpClient (Gemini) مع Polly
             static IAsyncPolicy<HttpResponseMessage> ResilientPolicy() =>
                 HttpPolicyExtensions.HandleTransientHttpError()
