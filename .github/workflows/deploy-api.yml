@@ -1,0 +1,44 @@
+name: Build and Deploy API
+
+on:
+  push:
+    branches:
+      - master
+      
+permissions:
+  contents: write
+  
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore AseerAlkotb.API/AseerAlkotb.API.csproj
+
+      - name: Build
+        run: dotnet build AseerAlkotb.API/AseerAlkotb.API.csproj --configuration Release --no-restore
+
+      - name: Publish
+        run: dotnet publish AseerAlkotb.API/AseerAlkotb.API.csproj -c Release -o published
+
+      - name: Deploy to branch
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git fetch
+          git checkout deploy || git checkout -b deploy
+          git rm -rf .
+          cp -r published/* .
+          git add .
+          git commit -m "Deploy API" || echo "No changes to commit"
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} deploy --force
+
