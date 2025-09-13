@@ -12,7 +12,9 @@ namespace AseerAlkotb.Application.Features.Books.DTOs
         decimal Price,
         int Quantity,
         int Id,
-        string ImageUrl
+        string ImageUrl,
+        decimal discountPercentage,
+        decimal DiscountedPrice
 
     );
 }
