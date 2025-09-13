@@ -20,6 +20,9 @@ using AseerAlkotb.Infrastructure.DependencyInjection;
 using AseerAlkotb.Infrastructure.AI;
 using AseerAlkotb.Infrastructure.Background;
 using AseerAlkotb.Application.BackgroundJobs;
+using Polly.Extensions.Http;
+using Polly;
+using System.Net;
 
 namespace AseerAlkotb.Dashboard
 {
@@ -103,21 +106,25 @@ namespace AseerAlkotb.Dashboard
 
             // Add other services needed by the dashboard controllers
 
-            // 1) HttpClient مخصص لـ Gemini
-            builder.Services.AddHttpClient("gemini", c =>
-            {
-                c.BaseAddress = new Uri("https://generativelanguage.googleapis.com");
-            });
-
-            // 2) تسجيل خدمة الـ Embeddings
+            // RAG deps (Embedding + Router)
             builder.Services.AddScoped<IEmbeddingService, GeminiEmbeddingService>();
+            //builder.Services.AddScoped<IQuestionRouterService, GeminiQuestionRouterService>();
 
-            // الـ Background job (لو مش مسجل):
+            // Background job for embeddings (Dashboard فقط)
             builder.Services.AddSingleton<EmbeddingRefreshBackgroundService>();
             builder.Services.AddSingleton<IEmbeddingRefreshJob>(sp => sp.GetRequiredService<EmbeddingRefreshBackgroundService>());
             builder.Services.AddHostedService(sp => sp.GetRequiredService<EmbeddingRefreshBackgroundService>());
+            // HttpClient (Gemini) مع Polly
+            static IAsyncPolicy<HttpResponseMessage> ResilientPolicy() =>
+                HttpPolicyExtensions.HandleTransientHttpError()
+                .OrResult(r => r.StatusCode == HttpStatusCode.TooManyRequests)
+                .WaitAndRetryAsync(3, attempt => TimeSpan.FromMilliseconds(400 * attempt * attempt));
 
-
+            builder.Services.AddHttpClient("gemini", c =>
+            {
+                c.BaseAddress = new Uri("https://g...content-available-to-author-only...s.com");
+                c.Timeout = TimeSpan.FromSeconds(30);
+            }).AddPolicyHandler(ResilientPolicy());
 
 
             // Configure Mapster for object mapping

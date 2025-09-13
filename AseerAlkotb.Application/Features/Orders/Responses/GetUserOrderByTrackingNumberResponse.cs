@@ -30,6 +30,8 @@ namespace AseerAlkotb.Application.Features.Orders.Responses
        string PhoneNumber,//added
        string StreetAddress,//added
        string FirstName,//added
-       string LastName//added
+       string LastName,//added
+       string email//added
+
     );
 }
