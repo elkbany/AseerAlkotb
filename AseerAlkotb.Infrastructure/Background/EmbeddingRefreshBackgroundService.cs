@@ -17,14 +17,12 @@ namespace AseerAlkotb.Infrastructure.Background
 
         private readonly Channel<WorkItem> _queue = Channel.CreateUnbounded<WorkItem>();
 
-        // volatile OK on primitive/reference types
         private volatile bool _isRunning;
         private volatile int _processed;
         private volatile int _total;
         private volatile string? _phase;
         private volatile string? _lastError;
 
-        // NOT volatile: guard with a lock
         private readonly object _statusLock = new();
         private DateTimeOffset? _lastStartUtc;
         private DateTimeOffset? _lastFinishUtc;
@@ -54,7 +52,6 @@ namespace AseerAlkotb.Infrastructure.Background
 
         public EmbeddingRefreshStatus GetStatus()
         {
-            // Take a consistent snapshot
             lock (_statusLock)
             {
                 return new EmbeddingRefreshStatus(
@@ -72,52 +69,28 @@ namespace AseerAlkotb.Infrastructure.Background
         // ===== Worker Loop =====
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _ = Task.Run(async () =>
-            {
-                // كل 24 ساعة شغّل FullRebuild (عدّلها حسب احتياجك)
-                var delay = TimeSpan.FromHours(24);
-                while (!stoppingToken.IsCancellationRequested)
-                {
-                    try
-                    {
-                        if (!_isRunning)
-                            TriggerFullRebuild();
-                    }
-                    catch { /* ignore */ }
-                    await Task.Delay(delay, stoppingToken);
-                }
-            }, stoppingToken);
-
+            // مفيش تريجر تلقائي هنا. شغّله من الأدمن بس.
             await foreach (var item in _queue.Reader.ReadAllAsync(stoppingToken))
             {
                 try
                 {
                     _isRunning = true;
                     _lastError = null;
-                    lock (_statusLock)
-                    {
-                        _lastStartUtc = DateTimeOffset.UtcNow;
-                    }
+                    lock (_statusLock) { _lastStartUtc = DateTimeOffset.UtcNow; }
 
                     if (item.IsFullRebuild)
                         await HandleFullRebuildAsync(stoppingToken);
                     else
                         await HandleSingleAsync(item.BookId!.Value, stoppingToken);
 
-                    lock (_statusLock)
-                    {
-                        _lastFinishUtc = DateTimeOffset.UtcNow;
-                    }
+                    lock (_statusLock) { _lastFinishUtc = DateTimeOffset.UtcNow; }
                 }
-                catch (OperationCanceledException) { /* graceful */ }
+                catch (OperationCanceledException) { }
                 catch (Exception ex)
                 {
                     _log.LogError(ex, "EmbeddingRefresh failed");
                     _lastError = ex.Message;
-                    lock (_statusLock)
-                    {
-                        _lastFinishUtc = DateTimeOffset.UtcNow;
-                    }
+                    lock (_statusLock) { _lastFinishUtc = DateTimeOffset.UtcNow; }
                 }
                 finally
                 {
@@ -134,9 +107,7 @@ namespace AseerAlkotb.Infrastructure.Background
             var emb = scope.ServiceProvider.GetRequiredService<IEmbeddingService>();
 
             _phase = "enumerating-books";
-            var ids = await db.Books
-                .AsNoTracking()
-                .Where(b => b.IsActive)
+            var ids = await db.Books.AsNoTracking()
                 .Select(b => b.Id)
                 .ToListAsync(ct);
 
@@ -147,9 +118,41 @@ namespace AseerAlkotb.Infrastructure.Background
             foreach (var id in ids)
             {
                 ct.ThrowIfCancellationRequested();
-                await emb.UpdateBookEmbeddingsAsync(id);
-                _processed++;
+
+                try
+                {
+                    const int maxAttempts = 5;
+                    for (int attempt = 1; attempt <= maxAttempts; attempt++)
+                    {
+                        try
+                        {
+                            await emb.UpdateBookEmbeddingsAsync(id);
+                            break; // success
+                        }
+                        catch (HttpRequestException ex) when (ex.Message.Contains("429") || ex.Message.Contains("502") || ex.Message.Contains("503"))
+                        {
+                            if (attempt == maxAttempts) throw;
+                            await Task.Delay(TimeSpan.FromMilliseconds(500 * attempt * attempt), ct);
+                        }
+                    }
+
+                    _processed++;
+
+                    // تهدئة عامة
+                    await Task.Delay(300, ct);
+
+                    // Pause كل 25 كتاب
+                    if (_processed % 25 == 0) await Task.Delay(2000, ct);
+                }
+                catch (Exception ex)
+                {
+                    _log.LogWarning(ex, "Embedding rebuild failed for book {BookId}", id);
+                    _lastError = $"Book {id}: {ex.Message}";
+                    _processed++;
+                    continue;
+                }
             }
+
             _phase = "done";
         }
 
@@ -159,8 +162,7 @@ namespace AseerAlkotb.Infrastructure.Background
             var emb = scope.ServiceProvider.GetRequiredService<IEmbeddingService>();
 
             _phase = $"updating-book:{bookId}";
-            _total = 1;
-            _processed = 0;
+            _total = 1; _processed = 0;
 
             await emb.UpdateBookEmbeddingsAsync(bookId);
             _processed = 1;
