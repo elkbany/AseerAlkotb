@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using AseerAlkotb.API.Helpers;
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using AseerAlkotb.API.Helpers;
 using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Features.Payments.Requests;
 using AseerAlkotb.Application.Features.Payments.Responses;
@@ -166,7 +166,7 @@ namespace AseerAlkotb.API.Controllers
         /// <returns>HTML response for user</returns>
         [HttpGet("callback")]
         [HttpPost("callback")]
-        [EnableRateLimiting("CallbackPolicy")]
+        //[EnableRateLimiting("CallbackPolicy")]
         public async Task<IActionResult> HandleCallback()
         {
             try
@@ -242,17 +242,17 @@ namespace AseerAlkotb.API.Controllers
                 data = SanitizeParameters(data);
 
                 // Validate timestamp to prevent replay attacks
-                if (!ValidateTimestamp(data.GetValueOrDefault("created_at", "")))
-                {
-                    _logger.LogError("Invalid or expired timestamp in callback");
-                    string errorHtml = GenerateErrorResponse("Request timestamp is invalid or expired", "callback");
-                    return new ContentResult
-                    {
-                        Content = errorHtml,
-                        ContentType = "text/html; charset=utf-8",
-                        StatusCode = 400
-                    };
-                }
+                //if (!ValidateTimestamp(data.GetValueOrDefault("created_at", "")))
+                //{
+                //    _logger.LogError("Invalid or expired timestamp in callback");
+                //    string errorHtml = GenerateErrorResponse("Request timestamp is invalid or expired", "callback");
+                //    return new ContentResult
+                //    {
+                //        Content = errorHtml,
+                //        ContentType = "text/html; charset=utf-8",
+                //        StatusCode = 400
+                //    };
+                //}
                 _logger.LogInformation("  is_capture: '{IsCapture}'", data.GetValueOrDefault("is_capture", ""));
                 _logger.LogInformation("  is_refunded: '{IsRefunded}'", data.GetValueOrDefault("is_refunded", ""));
                 _logger.LogInformation("  is_standalone_payment: '{IsStandalonePayment}'", data.GetValueOrDefault("is_standalone_payment", ""));
@@ -382,7 +382,7 @@ namespace AseerAlkotb.API.Controllers
         /// <returns>Acknowledgment response</returns>
         [HttpPost("webhook")]
         [HttpGet("webhook")]
-        [EnableRateLimiting("WebhookPolicy")]
+        //[EnableRateLimiting("WebhookPolicy")]
         public async Task<IActionResult> HandleWebhook()
         {
             try
@@ -392,11 +392,11 @@ namespace AseerAlkotb.API.Controllers
                     Request.Method, string.Join(", ", Request.Headers.Select(h => $"{h.Key}={h.Value}")));
 
                 // Validate source IP address
-                if (!ValidateSourceIP())
-                {
-                    _logger.LogWarning("Webhook request from unauthorized IP address: {IP}", GetClientIPAddress());
-                    return Unauthorized(new { status = "error", message = "Unauthorized IP address" });
-                }
+                //if (!ValidateSourceIP())
+                //{
+                //    _logger.LogWarning("Webhook request from unauthorized IP address: {IP}", GetClientIPAddress());
+                //    return Unauthorized(new { status = "error", message = "Unauthorized IP address" });
+                //}
 
                 // Read raw body for HMAC validation with enhanced error handling
                 string body = string.Empty;
@@ -511,10 +511,19 @@ namespace AseerAlkotb.API.Controllers
 
                 if (!string.IsNullOrEmpty(hmacSecret))
                 {
+                    // Try to get HMAC from query parameters first
                     var queryHmac = Request.Query["hmac"].FirstOrDefault();
+                    
+                    // Log HMAC extraction for debugging
+                    _logger.LogInformation("HMAC Extraction - Query Count: {QueryCount}, Query HMAC: {QueryHmac}", 
+                        Request.Query.Count(), queryHmac ?? "NULL");
+                    
                     if (!string.IsNullOrEmpty(queryHmac))
                     {
-                        if (!_paymobService.ValidateWebhookHmac(body, queryHmac, hmacSecret))
+                        _logger.LogInformation("Attempting HMAC validation for transaction {TransactionId}", webhookData.Obj.Id);
+                        
+                        // Use the field-based validation method for webhooks (same as callbacks)
+                        if (!_paymobService.ValidateWebhookHmac(webhookData, queryHmac, hmacSecret))
                         {
                             _logger.LogWarning("Invalid HMAC for webhook transaction {TransactionId}", webhookData.Obj.Id);
 
@@ -531,6 +540,11 @@ namespace AseerAlkotb.API.Controllers
                         {
                             _logger.LogInformation("HMAC validation successful");
                         }
+                    }
+                    else if (enforceHmac)
+                    {
+                        _logger.LogWarning("HMAC required but not provided in webhook for transaction {TransactionId}", webhookData.Obj.Id);
+                        return Unauthorized(new { status = "error", message = "HMAC signature missing" });
                     }
                 }
 
@@ -729,135 +743,135 @@ namespace AseerAlkotb.API.Controllers
         /// <summary>
         /// Validate source IP address against whitelist
         /// </summary>
-        private bool ValidateSourceIP()
-        {
-            try
-            {
-                var clientIP = GetClientIPAddress();
-                var whitelistedIPs = _configuration.GetSection("Paymob:WhitelistedIPs").Get<string[]>();
+        //private bool ValidateSourceIP()
+        //{
+        //    try
+        //    {
+        //        var clientIP = GetClientIPAddress();
+        //        var whitelistedIPs = _configuration.GetSection("Paymob:WhitelistedIPs").Get<string[]>();
                 
-                // If no whitelist configured, allow all (for development)
-                if (whitelistedIPs == null || whitelistedIPs.Length == 0)
-                {
-                    _logger.LogWarning("No IP whitelist configured - allowing all IPs (not recommended for production)");
-                    return true;
-                }
+        //        // If no whitelist configured, allow all (for development)
+        //        if (whitelistedIPs == null || whitelistedIPs.Length == 0)
+        //        {
+        //            _logger.LogWarning("No IP whitelist configured - allowing all IPs (not recommended for production)");
+        //            return true;
+        //        }
                 
-                var isWhitelisted = whitelistedIPs.Contains(clientIP, StringComparer.OrdinalIgnoreCase);
+        //        var isWhitelisted = whitelistedIPs.Contains(clientIP, StringComparer.OrdinalIgnoreCase);
                 
-                _logger.LogInformation("IP validation - Client: {ClientIP}, Whitelisted: {IsWhitelisted}", 
-                    clientIP, isWhitelisted);
+        //        _logger.LogInformation("IP validation - Client: {ClientIP}, Whitelisted: {IsWhitelisted}", 
+        //            clientIP, isWhitelisted);
                 
-                return isWhitelisted;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error validating source IP");
-                return false; // Fail secure
-            }
-        }
+        //        return isWhitelisted;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Error validating source IP");
+        //        return false; // Fail secure
+        //    }
+        //}
 
         /// <summary>
         /// Get client IP address from request
         /// </summary>
-        private string GetClientIPAddress()
-        {
-            try
-            {
-                // Check for X-Forwarded-For header (common with proxies/load balancers)
-                var forwardedFor = Request.Headers["X-Forwarded-For"].FirstOrDefault();
-                if (!string.IsNullOrEmpty(forwardedFor))
-                {
-                    // Take the first IP if multiple are present
-                    return forwardedFor.Split(',')[0].Trim();
-                }
+        //private string GetClientIPAddress()
+        //{
+        //    try
+        //    {
+        //        // Check for X-Forwarded-For header (common with proxies/load balancers)
+        //        var forwardedFor = Request.Headers["X-Forwarded-For"].FirstOrDefault();
+        //        if (!string.IsNullOrEmpty(forwardedFor))
+        //        {
+        //            // Take the first IP if multiple are present
+        //            return forwardedFor.Split(',')[0].Trim();
+        //        }
 
-                // Check for X-Real-IP header (nginx)
-                var realIP = Request.Headers["X-Real-IP"].FirstOrDefault();
-                if (!string.IsNullOrEmpty(realIP))
-                {
-                    return realIP.Trim();
-                }
+        //        // Check for X-Real-IP header (nginx)
+        //        var realIP = Request.Headers["X-Real-IP"].FirstOrDefault();
+        //        if (!string.IsNullOrEmpty(realIP))
+        //        {
+        //            return realIP.Trim();
+        //        }
 
-                // Fall back to connection remote IP
-                return Request.HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error getting client IP address");
-                return "Unknown";
-            }
-        }
+        //        // Fall back to connection remote IP
+        //        return Request.HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Error getting client IP address");
+        //        return "Unknown";
+        //    }
+        //}
 
         /// <summary>
         /// Validate timestamp to prevent replay attacks (5-minute window)
         /// </summary>
-        private bool ValidateTimestamp(string timestamp)
-        {
-            if (string.IsNullOrEmpty(timestamp))
-            {
-                _logger.LogWarning("Timestamp is missing from request");
-                return true; // Allow if timestamp is missing for backward compatibility
-            }
+        //private bool ValidateTimestamp(string timestamp)
+        //{
+        //    if (string.IsNullOrEmpty(timestamp))
+        //    {
+        //        _logger.LogWarning("Timestamp is missing from request");
+        //        return true; // Allow if timestamp is missing for backward compatibility
+        //    }
 
-            try
-            {
-                // Try parsing different timestamp formats
-                DateTime callbackTime;
+        //    try
+        //    {
+        //        // Try parsing different timestamp formats
+        //        DateTime callbackTime;
                 
-                // Try parsing with multiple formats to handle timezone issues
-                if (DateTimeOffset.TryParse(timestamp, out var callbackTimeOffset))
-                {
-                    // Use DateTimeOffset to properly handle timezone information
-                    callbackTime = callbackTimeOffset.UtcDateTime;
-                }
-                else if (DateTime.TryParse(timestamp, out callbackTime))
-                {
-                    // Fallback to DateTime parsing
-                    // For Paymob timestamps, assume they are UTC if unspecified
-                    if (callbackTime.Kind == DateTimeKind.Unspecified)
-                    {
-                        callbackTime = DateTime.SpecifyKind(callbackTime, DateTimeKind.Utc);
-                    }
-                    else if (callbackTime.Kind == DateTimeKind.Local)
-                    {
-                        callbackTime = callbackTime.ToUniversalTime();
-                    }
-                }
-                else
-                {
-                    _logger.LogError("Failed to parse timestamp: {Timestamp}", timestamp);
-                    return false;
-                }
+        //        // Try parsing with multiple formats to handle timezone issues
+        //        if (DateTimeOffset.TryParse(timestamp, out var callbackTimeOffset))
+        //        {
+        //            // Use DateTimeOffset to properly handle timezone information
+        //            callbackTime = callbackTimeOffset.UtcDateTime;
+        //        }
+        //        else if (DateTime.TryParse(timestamp, out callbackTime))
+        //        {
+        //            // Fallback to DateTime parsing
+        //            // For Paymob timestamps, assume they are UTC if unspecified
+        //            if (callbackTime.Kind == DateTimeKind.Unspecified)
+        //            {
+        //                callbackTime = DateTime.SpecifyKind(callbackTime, DateTimeKind.Utc);
+        //            }
+        //            else if (callbackTime.Kind == DateTimeKind.Local)
+        //            {
+        //                callbackTime = callbackTime.ToUniversalTime();
+        //            }
+        //        }
+        //        else
+        //        {
+        //            _logger.LogError("Failed to parse timestamp: {Timestamp}", timestamp);
+        //            return false;
+        //        }
 
-                var currentTime = DateTime.UtcNow;
-                var age = currentTime - callbackTime;
+        //        var currentTime = DateTime.UtcNow;
+        //        var age = currentTime - callbackTime;
                 
-                // Get timestamp validation window from configuration (default 5 minutes)
-                var validationWindowMinutes = _configuration.GetValue<int>("Paymob:TimestampValidationWindowMinutes", 5);
-                var isValid = Math.Abs(age.TotalMinutes) <= validationWindowMinutes;
+        //        // Get timestamp validation window from configuration (default 5 minutes)
+        //        var validationWindowMinutes = _configuration.GetValue<int>("Paymob:TimestampValidationWindowMinutes", 5);
+        //        var isValid = Math.Abs(age.TotalMinutes) <= validationWindowMinutes;
                 
-                _logger.LogInformation("Timestamp validation - Current: {CurrentTime}, Callback: {CallbackTime}, Age: {Age} minutes, Window: {Window} minutes", 
-                    currentTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"), callbackTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"), age.TotalMinutes, validationWindowMinutes);
+        //        _logger.LogInformation("Timestamp validation - Current: {CurrentTime}, Callback: {CallbackTime}, Age: {Age} minutes, Window: {Window} minutes", 
+        //            currentTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"), callbackTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"), age.TotalMinutes, validationWindowMinutes);
                 
-                if (!isValid)
-                {
-                    _logger.LogWarning("Timestamp outside valid window: {Timestamp}, Age: {Age} minutes", 
-                        timestamp, age.TotalMinutes);
-                }
-                else
-                {
-                    _logger.LogInformation("Timestamp validation passed for: {Timestamp}", timestamp);
-                }
+        //        if (!isValid)
+        //        {
+        //            _logger.LogWarning("Timestamp outside valid window: {Timestamp}, Age: {Age} minutes", 
+        //                timestamp, age.TotalMinutes);
+        //        }
+        //        else
+        //        {
+        //            _logger.LogInformation("Timestamp validation passed for: {Timestamp}", timestamp);
+        //        }
                 
-                return isValid;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error validating timestamp: {Timestamp}", timestamp);
-                return false;
-            }
-        }
+        //        return isValid;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Error validating timestamp: {Timestamp}", timestamp);
+        //        return false;
+        //    }
+        //}
 
         /// <summary>
         /// Validate required parameters according to security specifications

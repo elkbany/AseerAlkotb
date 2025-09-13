@@ -138,7 +138,7 @@
                                                 <input type="hidden" asp-for="AuthorId" id="AuthorId" />
                                                 <div class="small mt-2">
                                                     Selected: <span id="authorSelected" class="font-weight-bold text-primary">
-                                                        @(Model.AuthorId > 0 ? Model.AuthorId.ToString() : "None")
+                                                             @(Model.AuthorId > 0 ? (ViewBag.AuthorName as string ?? "Unknown author") : "None")
                                                     </span>
                                                 </div>
                                                 <ul id="authorResults" class="list-group mt-2"></ul>
@@ -159,7 +159,7 @@
                                                 <input type="hidden" asp-for="PublisherId" id="PublisherId" />
                                                 <div class="small mt-2">
                                                     Selected: <span id="publisherSelected" class="font-weight-bold text-primary">
-                                                        @(Model.PublisherId > 0 ? Model.PublisherId.ToString() : "None")
+                                                             @(Model.PublisherId > 0 ? (ViewBag.PublisherName as string ?? "Unknown publisher") : "None")
                                                     </span>
                                                 </div>
                                                 <ul id="publisherResults" class="list-group mt-2"></ul>

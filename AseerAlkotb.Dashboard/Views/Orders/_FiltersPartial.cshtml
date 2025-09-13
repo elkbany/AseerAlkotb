@@ -1,6 +1,8 @@
+@using AseerAlkotb.Application.Features.Governorates.DTOs
+@using AseerAlkotb.Domain.Entites.Models
 <form method="get" action="@Url.Action("Index")" class="row g-3">
     <!-- Search Input -->
-    <div class="col-md-3">
+    <div class="col-md-2">
         <label for="search" class="form-label">
             <i class="fas fa-search me-1"></i>Search
         </label>
@@ -35,15 +37,17 @@
         <label for="governorate" class="form-label">
             <i class="fas fa-map-marker-alt me-1"></i>Governorate
         </label>
-        <select class="form-select" id="governorate" name="governorate">
+        <select class="form-select" id="governorate" name="governorateId">
             <option value="">All Governorates</option>
-            @foreach (var gov in ViewBag.Governorates as AseerAlkotb.Domain.Enums.EgyptGovernorates[])
+            @if (ViewBag.Governorates != null)
             {
-                var govValue = (int)gov;
-                var isSelected = ViewBag.SelectedGovernorate?.Equals(gov) == true;
-                <option value="@govValue" selected="@isSelected">
-                    @gov.ToString().Replace("_", " ")
-                </option>
+                @foreach (var gov in ViewBag.Governorates as List<GovernorateDto>)
+                {
+                    var isSelected = ViewBag.SelectedGovernorate?.Equals(gov.Id) == true;
+                    <option value="@gov.Id" selected="@isSelected">
+                        @gov.Nmae
+                    </option>
+                }
             }
         </select>
     </div>
@@ -60,7 +64,7 @@
     </div>
 
     <!-- Page Size -->
-    <div class="col-md-2">
+    <div class="col-md-1">
         <label for="pageSize" class="form-label">
             <i class="fas fa-list me-1"></i>Per Page
         </label>
@@ -113,3 +117,48 @@
         </div>
     </div>
 </div>
+
+<script>
+$(document).ready(function() {
+    // Handle governorate change for city cascade
+    $('#governorate').on('change', function() {
+        var governorateId = $(this).val();
+        var citySelect = $('#city');
+        
+        // Reset city dropdown
+        citySelect.html('<option value="">Loading...</option>').prop('disabled', true);
+        
+        if (governorateId) {
+            // Load cities for selected governorate
+            $.ajax({
+                url: '@Url.Action("GetCitiesByGovernorate", "Orders")',
+                type: 'GET',
+                data: { governorateId: governorateId },
+                success: function(cities) {
+                    citySelect.html('<option value="">All Cities</option>');
+                    
+                    if (cities && cities.length > 0) {
+                        $.each(cities, function(index, city) {
+                            citySelect.append('<option value="' + city.id + '">' + city.name + '</option>');
+                        });
+                    }
+                    
+                    citySelect.prop('disabled', false);
+                },
+                error: function() {
+                    citySelect.html('<option value="">Error loading cities</option>');
+                    citySelect.prop('disabled', false);
+                }
+            });
+        } else {
+            // No governorate selected
+            citySelect.html('<option value="">Select Governorate First</option>').prop('disabled', true);
+        }
+    });
+    
+    // Initialize city dropdown based on current governorate selection
+    if ($('#governorate').val()) {
+        $('#governorate').trigger('change');
+    }
+});
+</script>

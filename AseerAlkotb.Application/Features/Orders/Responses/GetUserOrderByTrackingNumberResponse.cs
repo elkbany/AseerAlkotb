@@ -1,4 +1,4 @@
-﻿using AseerAlkotb.Application.Features.Books.DTOs;
+﻿﻿using AseerAlkotb.Application.Features.Books.DTOs;
 using AseerAlkotb.Domain.Enums;
 using System;
 using System.Collections.Generic;
@@ -12,14 +12,24 @@ namespace AseerAlkotb.Application.Features.Orders.Responses
     (
         int Id,
        string UserName,
+       int UserId,
        PaymentMethod PaymentMethod,
        PaymentStatus PaymentStatus,
-       EgyptGovernorates Governorate,
-       EgyptCities City,
+       int GovernorateId,
+       string GovernorateName,
+       int CityId,
+       string CityName,
        OrderStatus OrderStatus,
        string TrackingNumber,
        decimal FinalAmount,
+       decimal ShippingCost,
+       decimal DiscountedAmount,
+       decimal TotalAmount,
        DateTime OrderDate,
-       List<BookDTO> Books
+       List<BookDTO> Books,
+       string PhoneNumber,//added
+       string StreetAddress,//added
+       string FirstName,//added
+       string LastName//added
     );
 }

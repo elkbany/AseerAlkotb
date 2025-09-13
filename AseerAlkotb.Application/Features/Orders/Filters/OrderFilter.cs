@@ -12,9 +12,9 @@ namespace AseerAlkotb.Application.Features.Orders.Filters
             {
                 query = query.Where(o => o.Status == request.OrderStatus);
             }
-            if (request.Governorate != null)
+            if (request.GovernorateId != null)
             {
-                query=query.Where(o=>o.Governorate == request.Governorate);
+                query=query.Where(o=>o.GovernorateId == request.GovernorateId);
             }
             if (!request.DateAscending)
             {

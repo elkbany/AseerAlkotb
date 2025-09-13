@@ -1,4 +1,4 @@
-﻿﻿using AseerAlkotb.Domain.Entites;
+﻿﻿﻿﻿﻿﻿using AseerAlkotb.Domain.Entites;
 using AseerAlkotb.Domain.Entites.Base;
 using AseerAlkotb.Domain.Entites.Models;
 using AseerAlkotb.Infrastructure.Data;
@@ -21,7 +21,8 @@ namespace AseerAlkotb.Infrastructure.Context
         {
             base.OnModelCreating(modelBuilder);
 
-            DataSeeder.SeedData(modelBuilder);
+            //DataSeeder.SeedData(modelBuilder);
+            LocationSeeder.SeedLocations(modelBuilder);
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
             // ----- Constraints / Relations (once) -----
@@ -82,6 +83,8 @@ namespace AseerAlkotb.Infrastructure.Context
         public DbSet<LikeDisLike> LikeDisLikes { get; set; }
         public DbSet<BookEmbedding> BookEmbeddings { get; set; }
         public DbSet<RagQuery> RagQueries { get; set; }
+        public DbSet<Governorate> Governorates { get; set; }
+        public DbSet<City> Cities { get; set; }
         public override DbSet<User> Users { get; set; }
         public override int SaveChanges()
         {

@@ -1,4 +1,4 @@
-using AseerAlkotb.Application.Contracts;
+﻿using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Contracts.External;
 using AseerAlkotb.Application.ResponseHandler;
 using AseerAlkotb.Application.Services;
@@ -17,6 +17,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using AseerAlkotb.Infrastructure.DependencyInjection;
+using AseerAlkotb.Infrastructure.AI;
+using AseerAlkotb.Infrastructure.Background;
+using AseerAlkotb.Application.BackgroundJobs;
 
 namespace AseerAlkotb.Dashboard
 {
@@ -33,7 +36,7 @@ namespace AseerAlkotb.Dashboard
             // Add DbContext
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             {
-                var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+                var connectionString = builder.Configuration.GetConnectionString("Shared");
                 options.UseSqlServer(connectionString);
             });
 
@@ -71,6 +74,8 @@ namespace AseerAlkotb.Dashboard
             builder.Services.AddScoped<IAuthorServices, AuthorServices>();
             builder.Services.AddScoped<IBookServices, BookServices>();
             builder.Services.AddScoped<ICategoryServices, CategoryServices>();
+            builder.Services.AddScoped<IGovernorateServices, GovernorateServices>();
+            builder.Services.AddScoped<ICityServices, CityServices>();
             builder.Services.AddScoped<IOrderServices, OrderServices>();
             builder.Services.AddScoped<IAdminServices, AdminServices>();
 
@@ -97,6 +102,22 @@ namespace AseerAlkotb.Dashboard
             builder.Services.AddScoped<IPaymentRetryService, PaymentRetryService>();
 
             // Add other services needed by the dashboard controllers
+
+            // 1) HttpClient مخصص لـ Gemini
+            builder.Services.AddHttpClient("gemini", c =>
+            {
+                c.BaseAddress = new Uri("https://generativelanguage.googleapis.com");
+            });
+
+            // 2) تسجيل خدمة الـ Embeddings
+            builder.Services.AddScoped<IEmbeddingService, GeminiEmbeddingService>();
+
+            // الـ Background job (لو مش مسجل):
+            builder.Services.AddSingleton<EmbeddingRefreshBackgroundService>();
+            builder.Services.AddSingleton<IEmbeddingRefreshJob>(sp => sp.GetRequiredService<EmbeddingRefreshBackgroundService>());
+            builder.Services.AddHostedService(sp => sp.GetRequiredService<EmbeddingRefreshBackgroundService>());
+
+
 
 
             // Configure Mapster for object mapping

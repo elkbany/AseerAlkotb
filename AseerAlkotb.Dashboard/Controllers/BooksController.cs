@@ -6,12 +6,10 @@ using AseerAlkotb.Application.Features.Books.Responses;
 using AseerAlkotb.Application.Features.Categories.Requests;
 using AseerAlkotb.Application.Features.Publishers.Requests;
 using AseerAlkotb.Application.Features.Reviews.Requests;
-using AseerAlkotb.Application.Services;
-using AseerAlkotb.Domain.Entites.Models;
-using Azure;
+using AseerAlkotb.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
+using Microsoft.EntityFrameworkCore;
 namespace AseerAlkotb.Dashboard.Controllers
 {
     [Authorize(Roles = "Admin")]
@@ -21,41 +19,94 @@ namespace AseerAlkotb.Dashboard.Controllers
         private readonly IAuthorServices _authorServices;
         private readonly ICategoryServices _categoryServices;
         private readonly IPublisherServices _publisherServices;
-        private readonly IReviewServices _reviewServices; // Add this
+        private readonly IReviewServices _reviewServices;
+
+
 
         public BooksController(
             IBookServices bookServices,
             IAuthorServices authorServices,
             ICategoryServices categoryServices,
             IPublisherServices publisherServices,
-            IReviewServices reviewServices) // Add this parameter
+            IReviewServices reviewServices)
+
         {
             _bookServices = bookServices;
             _authorServices = authorServices;
             _categoryServices = categoryServices;
             _publisherServices = publisherServices;
-            _reviewServices = reviewServices; // Add this
+            _reviewServices = reviewServices;
+
         }
 
-        public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 10, string Search = "")
+        public async Task<IActionResult> Index(
+    int pageNumber = 1,
+    int pageSize = 10,
+    string? search = "",
+    BookLanguage? language = null,
+    List<int>? categoryIds = null,
+    List<int>? publisherIds = null,
+    BookSortOption? sortBy = null)
         {
+            // نجيب ليستات للفلاتر (مرة واحدة لكل عرض)
+            var cats = await _categoryServices.GetAllCategoriesPaginatedAsync(
+                new GetAllCategoriesPaginatedRequest { PageSize = 100 });
+            var pubs = await _publisherServices.GetAllPublishersPaginatedAsync(
+                new GetAllPublishersPaginatedRequest { PageSize = 100 });
+
+            ViewBag.Categories = cats.Data.Select(c => new { c.Id, c.Name }).ToList();
+            ViewBag.Publishers = pubs.Data.Select(p => new { p.Id, p.Name }).ToList();
+
+            // نخزّن نفس قيم الفلاتر عشان نرجّعها في الواجهة
+            ViewBag.SearchTerm = search;
+            ViewBag.Language = language;
+            ViewBag.CategoryIds = categoryIds ?? new List<int>();
+            ViewBag.PublisherIds = publisherIds ?? new List<int>();
+            ViewBag.SortBy = sortBy;
+
+            // لو فيه أي فلتر غير البحث أو فيه ترتيب معيّن -> استخدم FilterBooksAsync
+            bool hasAdvancedFilters =
+                (language != null) ||
+                (categoryIds != null && categoryIds.Any()) ||
+                (publisherIds != null && publisherIds.Any()) ||
+                (sortBy != null);
+
+            if (hasAdvancedFilters || !string.IsNullOrWhiteSpace(search))
+            {
+                var req = new FilterBooksRequest(
+                    SearchTerm: search ?? "",
+                    CategoryIds: categoryIds,
+                    PublisherIds: publisherIds,
+                    Language: language,
+                    SortBy: sortBy,
+                    PageNumber: pageNumber,
+                    PageSize: pageSize
+                );
+
+                var result = await _bookServices.FilterBooksAsync(req);
+
+                ViewBag.TotalPages = (int)Math.Ceiling((double)result.TotalCount / pageSize);
+                ViewBag.TotalCount = result.TotalCount;
+                ViewBag.CurrentPage = pageNumber;
+                ViewBag.PageSize = pageSize;
+                return View(result);
+            }
+
+            // الحالة الافتراضية (من غير فلاتر) – نفس القديم
             var request = new GetAllBooksPaginatedRequest
             {
                 PageNumber = pageNumber,
                 PageSize = pageSize,
-                Search = Search
+                Search = search ?? ""
             };
-
-            var result = await _bookServices.GetAllBooksPaginatedAsync(request);
-
-            if (result != null)
-            {
-                ViewBag.TotalPages = (int)Math.Ceiling((double)result.TotalCount / pageSize);
-                ViewBag.CurrentPage = pageNumber;
-                ViewBag.SearchTerm = Search;
-            }
-            return View(result);
+            var res = await _bookServices.GetAllBooksPaginatedAsync(request);
+            ViewBag.TotalPages = (int)Math.Ceiling((double)res.TotalCount / pageSize);
+            ViewBag.TotalCount = res.TotalCount;
+            ViewBag.CurrentPage = pageNumber;
+            ViewBag.PageSize = pageSize;
+            return View(res);
         }
+
 
         public async Task<IActionResult> Details(int id)
         {
@@ -109,7 +160,7 @@ namespace AseerAlkotb.Dashboard.Controllers
             ViewBag.Publisher = publisher.Data;
             ViewBag.Categories = selectedCategories;
             ViewBag.Reviews = reviews; // Pass reviews to the view
-
+      
             return View(result.Data);
         }
 
@@ -189,6 +240,12 @@ namespace AseerAlkotb.Dashboard.Controllers
                 response.Data.IsActive
             );
 
+            var author = await _authorServices.GetAuthorByIdAsync(new GetAuthorByIdRequest(response.Data.AuthorId));
+            var publisher = await _publisherServices.GetPublisherByIdAsync(new GetPublisherByIdRequest(response.Data.PublisherId));
+
+            ViewBag.AuthorName = author?.Data?.Name;
+            ViewBag.PublisherName = publisher?.Data?.Name; 
+
             ViewBag.CategoryIds = response.Data.CategoryIds;
             ViewBag.CategoryNames = response.Data.CategoryNames;
 
@@ -265,5 +322,7 @@ namespace AseerAlkotb.Dashboard.Controllers
 
             return Json(publishers.Data.Select(p => new { id = p.Id, text = p.Name }));
         }
+       
+
     }
 }

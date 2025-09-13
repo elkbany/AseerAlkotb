@@ -224,10 +224,6 @@
                                     <span class="text-muted">Shipping:</span>
                                     <span class="float-end">@Model.ShippingCost.ToString("C", new System.Globalization.CultureInfo("ar-EG"))</span>
                                 </div>
-                                <div class="mb-2">
-                                    <span class="text-muted">Tax:</span>
-                                    <span class="float-end">@Model.TaxAmount.ToString("C", new System.Globalization.CultureInfo("ar-EG"))</span>
-                                </div>
                                 @if (Model.DiscountAmount > 0)
                                 {
                                     <div class="mb-2 text-success">
@@ -284,7 +280,7 @@
                 <div class="card-body">
                     <address class="mb-0">
                         <i class="fas fa-map-marker-alt text-muted me-2"></i>
-                        @Model.City, @Model.Governorate.ToString().Replace("_", " ")<br>
+                        @Model.CityName, @Model.GovernorateName.ToString().Replace("_", " ")<br>
                         <small class="text-muted">Egypt</small>
                     </address>
                 </div>

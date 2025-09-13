@@ -1,7 +1,49 @@
-@model AseerAlkotb.Application.ResponseHandler.ApiResponsePaginated<List<AseerAlkotb.Application.Features.Books.Responses.GetAllBooksPaginatedResponse>>
-
+﻿@model AseerAlkotb.Application.ResponseHandler.ApiResponsePaginated<List<AseerAlkotb.Application.Features.Books.Responses.GetAllBooksPaginatedResponse>>
+@using System.Globalization
 @{
     ViewData["Title"] = "Books Management";
+    var egp = CultureInfo.GetCultureInfo("en-EG");
+
+    // حراسة ضد null من الـ ViewBags
+    var pageSize = (int?)ViewBag.PageSize ?? 10;
+    var totalPages = (int?)ViewBag.TotalPages ?? (int)Math.Ceiling(((double)(Model?.TotalCount ?? 0)) / pageSize);
+    var currentPage = (int?)ViewBag.CurrentPage ?? 1;
+    var searchTerm = (string?)ViewBag.SearchTerm ?? string.Empty;
+    var languageSel = (AseerAlkotb.Domain.Enums.BookLanguage?)ViewBag.Language;
+    var sortSel = (AseerAlkotb.Domain.Enums.BookSortOption?)ViewBag.SortBy;
+
+    var selectedCats = ViewBag.CategoryIds as List<int> ?? new List<int>();
+    var selectedPubs = ViewBag.PublisherIds as List<int> ?? new List<int>();
+
+    var categories = (IEnumerable<dynamic>)(ViewBag.Categories ?? Enumerable.Empty<dynamic>());
+    var publishers = (IEnumerable<dynamic>)(ViewBag.Publishers ?? Enumerable.Empty<dynamic>());
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@functions {
+    string ResolveImg(string? url)
+    {
+        if (string.IsNullOrWhiteSpace(url))
+            return Url.Content("~/images/default-book.png");
+
+        if (url.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+            return url;
+
+        if (url.StartsWith("~/"))
+            return Url.Content(url);
+
+        if (url.StartsWith("/"))
+            return Url.Content("~" + url);
+
+        return Url.Content("~/" + url);
+    }
 }
 
 <div class="content-header">
@@ -22,17 +64,16 @@
 
 <section class="content">
     <div class="container-fluid">
+
         <!-- Statistics Cards -->
         <div class="row">
             <div class="col-lg-3 col-6">
                 <div class="small-box bg-info">
                     <div class="inner">
-                        <h3>@Model.TotalCount</h3>
+                        <h3>@(Model?.TotalCount ?? 0)</h3>
                         <p>Total Books</p>
                     </div>
-                    <div class="icon">
-                        <i class="fas fa-book"></i>
-                    </div>
+                    <div class="icon"><i class="fas fa-book"></i></div>
                 </div>
             </div>
         </div>
@@ -44,13 +85,15 @@
                     <h3 class="card-title">Books List</h3>
                 </div>
             </div>
+
             <div class="card-body">
                 <!-- Search and Filter -->
                 <div class="row mb-3">
                     <div class="col-md-8">
                         <form asp-action="Index" method="get" class="form-inline">
                             <div class="input-group w-100">
-                                <input type="text" name="Search" class="form-control" placeholder="Search by title,...">
+                                <input type="text" name="search" class="form-control"
+                                       placeholder="Search by title..." value="@searchTerm" />
                                 <div class="input-group-append">
                                     <button type="submit" class="btn btn-primary">
                                         <i class="fas fa-search"></i>
@@ -59,15 +102,82 @@
                             </div>
                         </form>
                     </div>
-                    <div class="col-md-4 text-right">
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-outline-secondary dropdown-toggle " data-toggle="dropdown">
+
+                    <div class="col-md-4 @(Html.Raw("text-end"))">
+                        <div class="dropdown">
+                            <button type="button"
+                                    class="btn btn-outline-secondary dropdown-toggle filter-toggle"
+                                    data-bs-toggle="dropdown" data-toggle="dropdown" aria-expanded="false">
                                 <i class="fas fa-filter"></i> Filter
                             </button>
-                            <div class="dropdown-menu dropdown-menu-right">
-                                <a class="dropdown-item" href="#">Active Books</a>
-                                <a class="dropdown-item" href="#">Out of Stock</a>
-                                <a class="dropdown-item" href="#">Recently Added</a>
+
+                            <div class="dropdown-menu dropdown-menu-right dropdown-menu-end p-3 shadow" style="min-width:420px;">
+                                <form asp-action="Index" method="get" id="filtersForm">
+                                    <input type="hidden" name="pageNumber" value="1" />
+                                    <input type="hidden" name="pageSize" value="@pageSize" />
+                                    <input type="hidden" name="search" value="@searchTerm" />
+
+                                    <!-- Language -->
+                                    <div class="form-group mb-2">
+                                        <label class="mb-1">Language</label>
+                                        <select name="language" class="form-control">
+                                            <option value="">All languages</option>
+                                            @{
+                                                foreach (var lang in Enum.GetValues(typeof(AseerAlkotb.Domain.Enums.BookLanguage))
+                                                .Cast<AseerAlkotb.Domain.Enums.BookLanguage>())
+                                                {
+                                                    var selected = languageSel == lang ? "selected" : null;
+                                                    <option value="@lang" selected="@selected">@lang</option>
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+
+                                    <!-- Categories -->
+                                    <div class="form-group mb-2">
+                                        <label class="mb-1">Categories</label>
+                                        <select name="categoryIds" class="form-control select2" multiple>
+                                            @foreach (var c in categories)
+                                            {
+                                                bool isSel = selectedCats.Contains((int)c.Id);
+                                                <option value="@c.Id" selected="@(isSel ? "selected" : null)">@c.Name</option>
+                                            }
+                                        </select>
+                                    </div>
+
+                                    <!-- Publishers -->
+                                    <div class="form-group mb-2">
+                                        <label class="mb-1">Publishers</label>
+                                        <select name="publisherIds" class="form-control select2" multiple>
+                                            @foreach (var p in publishers)
+                                            {
+                                                bool isSel = selectedPubs.Contains((int)p.Id);
+                                                <option value="@p.Id" selected="@(isSel ? "selected" : null)">@p.Name</option>
+                                            }
+                                        </select>
+                                    </div>
+
+                                    <!-- Sort -->
+                                    <div class="form-group mb-3">
+                                        <label class="mb-1">Sort by</label>
+                                        <select name="sortBy" class="form-control">
+                                            <option value="">Default</option>
+                                            @{
+                                                foreach (var opt in Enum.GetValues(typeof(AseerAlkotb.Domain.Enums.BookSortOption))
+                                                .Cast<AseerAlkotb.Domain.Enums.BookSortOption>())
+                                                {
+                                                    var selected = sortSel == opt ? "selected" : null;
+                                                    <option value="@opt" selected="@selected">@opt</option>
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between">
+                                        <a class="btn btn-sm btn-link px-0" href="@Url.Action("Index","Books")">Reset</a>
+                                        <button type="submit" class="btn btn-sm btn-primary">Apply Filters</button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -84,17 +194,18 @@
                                 <th>Price</th>
                                 <th>Stock</th>
                                 <th>Status</th>
-                                <th>Actions</th>
+                                <th style="width:160px;">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @if (Model.Data != null)
+                            @if (Model?.Data != null)
                             {
-                                @foreach (var item in Model.Data)
+                                foreach (var item in Model.Data)
                                 {
                                     <tr>
                                         <td>
-                                            <img src="@item.CoverImageUrl" alt="@item.Title" class="img-thumbnail" style="width: 50px; " />
+                                            <img src="@ResolveImg(item.CoverImageUrl)" alt="@item.Title"
+                                                 class="img-thumbnail" style="width:50px;" />
                                         </td>
                                         <td>
                                             <div class="d-flex flex-column">
@@ -105,7 +216,7 @@
                                         <td>@item.ISBN</td>
                                         <td>
                                             <div class="d-flex flex-column">
-                                                <strong>@item.Price.ToString("C")</strong>
+                                                <strong>@item.Price.ToString("C", egp)</strong>
                                                 @if (item.DiscountPercentage > 0)
                                                 {
                                                     <small class="text-success">-@(item.DiscountPercentage)%</small>
@@ -124,13 +235,16 @@
                                         </td>
                                         <td>
                                             <div class="btn-group">
-                                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary" title="Edit">
+                                                <a asp-action="Edit" asp-route-id="@item.Id"
+                                                   class="btn btn-sm btn-outline-primary" title="Edit">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
-                                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info" title="Details">
+                                                <a asp-action="Details" asp-route-id="@item.Id"
+                                                   class="btn btn-sm btn-outline-info" title="Details">
                                                     <i class="fas fa-info-circle"></i>
                                                 </a>
-                                                <a asp-controller="Books" asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger" title="Delete">
+                                                <a asp-controller="Books" asp-action="Delete" asp-route-id="@item.Id"
+                                                   class="btn btn-sm btn-outline-danger" title="Delete">
                                                     <i class="fas fa-trash"></i>
                                                 </a>
                                             </div>
@@ -143,26 +257,52 @@
                 </div>
 
                 <!-- Pagination -->
-                @if (ViewBag.TotalPages > 1)
+                @if (totalPages > 1)
                 {
                     <nav aria-label="Page navigation">
                         <ul class="pagination justify-content-center">
-                            @if (ViewBag.CurrentPage > 1)
+                            @if (currentPage > 1)
                             {
                                 <li class="page-item">
-                                    <a class="page-link" asp-action="Index" asp-route-pageNumber="@(ViewBag.CurrentPage - 1)" asp-route-search="@ViewBag.SearchTerm">Previous</a>
+                                    <a class="page-link"
+                                       asp-action="Index"
+                                       asp-route-pageNumber="@(currentPage - 1)"
+                                       asp-route-pageSize="@pageSize"
+                                       asp-route-search="@searchTerm"
+                                       asp-route-language="@(languageSel)"
+                                       asp-route-categoryIds="@(string.Join(",", selectedCats))"
+                                       asp-route-publisherIds="@(string.Join(",", selectedPubs))"
+                                       asp-route-sortBy="@(sortSel)">Previous</a>
                                 </li>
                             }
-                            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+
+                            @for (int i = 1; i <= totalPages; i++)
                             {
-                                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                                    <a class="page-link" asp-action="Index" asp-route-pageNumber="@i" asp-route-search="@ViewBag.SearchTerm">@i</a>
+                                <li class="page-item @(i == currentPage ? "active" : "")">
+                                    <a class="page-link"
+                                       asp-action="Index"
+                                       asp-route-pageNumber="@i"
+                                       asp-route-pageSize="@pageSize"
+                                       asp-route-search="@searchTerm"
+                                       asp-route-language="@(languageSel)"
+                                       asp-route-categoryIds="@(string.Join(",", selectedCats))"
+                                       asp-route-publisherIds="@(string.Join(",", selectedPubs))"
+                                       asp-route-sortBy="@(sortSel)">@i</a>
                                 </li>
                             }
-                            @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+
+                            @if (currentPage < totalPages)
                             {
                                 <li class="page-item">
-                                    <a class="page-link" asp-action="Index" asp-route-pageNumber="@(ViewBag.CurrentPage + 1)" asp-route-search="@ViewBag.SearchTerm">Next</a>
+                                    <a class="page-link"
+                                       asp-action="Index"
+                                       asp-route-pageNumber="@(currentPage + 1)"
+                                       asp-route-pageSize="@pageSize"
+                                       asp-route-search="@searchTerm"
+                                       asp-route-language="@(languageSel)"
+                                       asp-route-categoryIds="@(string.Join(",", selectedCats))"
+                                       asp-route-publisherIds="@(string.Join(",", selectedPubs))"
+                                       asp-route-sortBy="@(sortSel)">Next</a>
                                 </li>
                             }
                         </ul>
@@ -172,8 +312,31 @@
         </div>
     </div>
 </section>
+
 @section Scripts {
     <script>
-        setTimeout(function () { $('.alert').fadeOut('slow'); }, 5000);
+        $(function () {
+          // مايقفلش الـdropdown لو ضغطت جواه
+          $(document).on('click', '.dropdown-menu', function (e) { e.stopPropagation(); });
+
+          // Fallback لو Bootstrap plugin مش متحمّل
+          $('.filter-toggle').on('click', function () {
+            var usingBs = typeof bootstrap !== 'undefined' || $.fn.dropdown;
+            if (!usingBs) $(this).next('.dropdown-menu').toggleClass('show');
+          });
+
+          // تهيئة Select2 بعد فتح القائمة
+          $(document).on('shown.bs.dropdown', '.dropdown', function () {
+            $('.select2', this).each(function () {
+              $(this).select2({
+                theme: 'bootstrap4',
+                width: '100%',
+                placeholder: 'Select...',
+                allowClear: true,
+                dropdownParent: $(this).closest('.dropdown-menu')
+              });
+            });
+          });
+        });
     </script>
 }

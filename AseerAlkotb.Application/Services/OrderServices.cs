@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿using AseerAlkotb.Application.Contracts;
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Features.Books.DTOs;
 using AseerAlkotb.Application.Features.Orders.Filters;
 using AseerAlkotb.Application.Features.Orders.Requests;
@@ -161,7 +161,7 @@ namespace AseerAlkotb.Application.Services
             AddOrderItems(order, cart.CartItems, books);
 
             // Calculate costs
-            CalculateOrderCosts(order, request);
+            await CalculateOrderCostsAsync(order, request);
 
             // Generate tracking number
             order.TrackingNumber = await GenerateUniqueTrackingNumberAsync();
@@ -178,31 +178,32 @@ namespace AseerAlkotb.Application.Services
                 order.OrderItems.Add(new OrderItem
                 {
                     BookId = book.Id,
+                    Book=book,
+                    Order=order,
+                    OrderId=order.Id,
                     UnitPrice = book.Price, // Always use current price from DB
                     Quantity = cartItem.Quantity
+                   
                 });
             }
         }
 
-        private void CalculateOrderCosts(Order order, AddOrderRequest request)
+        private async Task CalculateOrderCostsAsync(Order order, AddOrderRequest request)
         {
             // Calculate base total
-            order.TotalAmount = order.OrderItems.Sum(oi => oi.TotalPrice);
+            order.TotalAmount = order.OrderItems.Sum(oi => oi.UnitPrice);
 
             // Calculate shipping
-            order.ShippingCost = ShippingServices.CalculateShippingCost(request,order.TotalAmount);
-
-            // Calculate tax (14%)
-            order.TaxAmount = order.TotalAmount * 0.14m;
+            order.ShippingCost = await ShippingServices.CalculateShippingCostAsync(request, order.TotalAmount, unitOfWork);
 
             // Final Amount and Calculate discount
             order.FinalAmount =
-                CalculateDiscountAmount(order) + order.TaxAmount + order.ShippingCost + order.TotalAmount;
+               (order.ShippingCost + order.TotalAmount) - CalculateDiscountAmount(order);
         }
 
         private static decimal CalculateDiscountAmount(Order order)
         {
-            var discountedTotal = order.OrderItems.Sum(oi => oi.TotalPrice);
+            var discountedTotal = order.OrderItems.Sum(oi => oi.Book.DiscountedPrice);
             order.DiscountAmount = order.TotalAmount - discountedTotal;
 
             // Handle edge case where discount equals total (likely means no discount)
@@ -310,7 +311,7 @@ namespace AseerAlkotb.Application.Services
         public async Task<ApiResponsePaginated<List<GetAllOrdersPaginatedResponse>>> GetAllOrdersPaginatedByAdminAsync(GetAllOrdersPaginatedRequest request)
         {
             await DoValidationAsync<GetAllOrdersPaginatedRequestValidator, GetAllOrdersPaginatedRequest>(request);
-            var orders = await unitOfWork.Orders.GetAllAsync((request.PageNumber - 1) * request.PageSize, request.PageSize, default, o => o.OrderItems, o => o.User)
+            var orders = await unitOfWork.Orders.GetAllAsync((request.PageNumber - 1) * request.PageSize, request.PageSize, default, o => o.OrderItems, o => o.User, o => o.Governorate, o => o.City)
                 .Filter(request)
                 .OrderByDescending(o => o.OrderDate)
                 .ToListAsync();
@@ -322,8 +323,10 @@ namespace AseerAlkotb.Application.Services
                 order.User?.UserName ?? string.Empty,
                 order.PaymentMethod,
                 order.PaymentStatus,
-                order.Governorate,
-                order.City,
+                order.GovernorateId,
+                order.Governorate?.Name ?? string.Empty,
+                order.CityId,
+                order.City?.Name ?? string.Empty,
                 order.Status,
                 order.TrackingNumber,
                 order.FinalAmount,
@@ -333,7 +336,9 @@ namespace AseerAlkotb.Application.Services
                     .Select(oi => new BookDTO(
                         oi.Book.Title,
                         oi.UnitPrice,
-                        oi.Quantity
+                        oi.Quantity,
+                        oi.BookId,
+                        oi.Book.CoverImageUrl
                     ))
                     .ToList()
             )).ToList();
@@ -362,7 +367,7 @@ namespace AseerAlkotb.Application.Services
                 return UnAuthorizedList<GetAllUserOrdersPaginatedResponse>();
             }
             // Use current user's ID for security instead of request.UserId
-            var orders =  unitOfWork.Orders.GetAllAsyncByEx(o => o.UserId == currentUser.Id, (request.PageNumber - 1) * request.PageSize, request.PageSize, default, o => o.OrderItems);
+            var orders =  unitOfWork.Orders.GetAllAsyncByEx(o => o.UserId == currentUser.Id, (request.PageNumber - 1) * request.PageSize, request.PageSize, default, o => o.OrderItems, o => o.Governorate, o => o.City);
             var totalCount = await unitOfWork.Orders.CountAsync(o => o.UserId == currentUser.Id);
 
             // Manual mapping instead of Adapt<>
@@ -371,8 +376,10 @@ namespace AseerAlkotb.Application.Services
                 order.User.UserName ?? string.Empty,
                 order.PaymentMethod,
                 order.PaymentStatus,
-                order.Governorate,
-                order.City,
+                order.GovernorateId,
+                order.Governorate.Name ?? string.Empty,
+                order.CityId,
+                order.City.Name ?? string.Empty,
                 order.Status,
                 order.TrackingNumber,
                 order.FinalAmount,
@@ -382,7 +389,9 @@ namespace AseerAlkotb.Application.Services
                     .Select(oi => new BookDTO(
                         oi.Book.Title,
                         oi.UnitPrice,
-                        oi.Quantity
+                        oi.Quantity,
+                        oi.BookId,
+                        oi.Book.CoverImageUrl
                     ))
                     .ToList()
             )).ToList();
@@ -399,6 +408,8 @@ namespace AseerAlkotb.Application.Services
                 q => q.Include(o => o.User)
                       .Include(o => o.OrderItems)
                       .ThenInclude(oi => oi.Book)
+                      .Include(o => o.Governorate)
+                      .Include(o => o.City)
             );
             var order = await query.FirstOrDefaultAsync();
             if (order == null)
@@ -410,13 +421,14 @@ namespace AseerAlkotb.Application.Services
      order.User?.UserName ?? string.Empty, // keep nullable-safe
      order.PaymentMethod,
      order.PaymentStatus,
-     order.Governorate,
-     order.City,
+     order.GovernorateId,
+     order.Governorate?.Name ?? string.Empty,
+     order.CityId,
+     order.City?.Name ?? string.Empty,
      order.Status,
      order.TrackingNumber,
      order.TotalAmount,
      order.ShippingCost,
-     order.TaxAmount,
      order.DiscountAmount,
      order.FinalAmount,
      order.OrderDate,
@@ -426,7 +438,9 @@ namespace AseerAlkotb.Application.Services
          .Select(oi => new BookDTO(
              oi.Book.Title,
             oi.UnitPrice,
-            oi.Quantity
+            oi.Quantity,
+            oi.BookId,
+            oi.Book.CoverImageUrl
          ))
          .ToList()
  );
@@ -457,7 +471,7 @@ namespace AseerAlkotb.Application.Services
                 return UnAuthorized<GetUserOrderByTrackingNumberResponse>();
             }
 
-            var order = await unitOfWork.Orders.FirstOrDefaultAsync(o => o.TrackingNumber == request.TrackingNumber, default, o => o.OrderItems);
+            var order = await unitOfWork.Orders.FirstOrDefaultAsync(o => o.TrackingNumber == request.TrackingNumber, default, o => o.OrderItems, o => o.Governorate, o => o.City);
             if (order == null)
             {
                 return NotFound<GetUserOrderByTrackingNumberResponse>($"{_stringLocalizer["Order"]} {_stringLocalizer["NotFound"]}");
@@ -472,22 +486,34 @@ namespace AseerAlkotb.Application.Services
             var ordMap = new GetUserOrderByTrackingNumberResponse(
                 order.Id,
                 order.User?.UserName ?? string.Empty,
+                order.UserId,
                 order.PaymentMethod,
                 order.PaymentStatus,
-                order.Governorate,
-                order.City,
+                order.GovernorateId,
+                order.Governorate?.Name ?? string.Empty,
+                order.CityId,
+                order.City?.Name ?? string.Empty,
                 order.Status,
                 order.TrackingNumber,
                 order.FinalAmount,
+                order.ShippingCost,
+                order.DiscountAmount,
+                order.TotalAmount,
                 order.OrderDate,
                 order.OrderItems
                     .Where(oi => oi.Book != null)
                     .Select(oi => new BookDTO(
                         oi.Book.Title,
                         oi.UnitPrice,
-                        oi.Quantity
+                        oi.Quantity,
+                        oi.BookId,
+                        oi.Book.CoverImageUrl
                     ))
-                    .ToList()
+                    .ToList(),
+                order.PhoneNumber ?? string.Empty,
+                order.StreetAddress ?? string.Empty,
+                order.FirstName ?? string.Empty,
+                order.LastName ?? string.Empty
             );
 
             return Success(ordMap);
@@ -500,7 +526,7 @@ namespace AseerAlkotb.Application.Services
             var order = await unitOfWork.Orders.FirstOrDefaultAsync(
                 o => o.Id == request.OrderId,
                 default,
-                o => o.User);
+                o => o.User, o => o.OrderItems);
 
             if (order == null)
             {
@@ -513,6 +539,12 @@ namespace AseerAlkotb.Application.Services
                 return BadRequest<UpdateOrderStatusResponse>($"{_stringLocalizer["CannotChangeDeliveredOrder"]}");
             }
 
+            // NEW: Check payment status for status transitions that require payment
+            if (!await CanUpdateToStatusAsync(order, request.NewStatus))
+            {
+                return BadRequest<UpdateOrderStatusResponse>($"{_stringLocalizer["PaymentRequiredForStatusChange"]}");
+            }
+
             // Validate status transition (your existing logic)
             if (!IsValidStatusTransition(order.Status, request.NewStatus))
             {
@@ -520,6 +552,13 @@ namespace AseerAlkotb.Application.Services
             }
 
             var oldStatus = order.Status;
+
+            // NEW: Handle stock restoration if cancelling order
+            if (request.NewStatus == OrderStatus.Cancelled && oldStatus != OrderStatus.Cancelled)
+            {
+                await RestoreStockForCancelledOrderAsync(order);
+            }
+
             order.Status = request.NewStatus;
 
             // Update order first
@@ -563,8 +602,64 @@ namespace AseerAlkotb.Application.Services
                 order.TrackingNumber,
                 DateTime.UtcNow
             );
+
             return Success(response);
         }
+
+        // NEW: Method to check if order can be updated to the requested status based on payment
+        private async Task<bool> CanUpdateToStatusAsync(Order order, OrderStatus newStatus)
+        {
+            // These statuses require payment to be completed first
+            var statusesRequiringPayment = new[]
+            {
+        OrderStatus.Approved,
+        OrderStatus.Shipped,
+        OrderStatus.Delivered
+    };
+
+            if (!statusesRequiringPayment.Contains(newStatus))
+            {
+                return true; // No payment requirement for other statuses
+            }
+
+            // Special handling for Cash on Delivery - allow status changes even if payment is pending
+            if (order.PaymentMethod == PaymentMethod.CashOnDelivery)
+            {
+                return true;
+            }
+
+            // For all other payment methods, check if payment is completed
+            var payment = await unitOfWork.Payments.FirstOrDefaultAsync(p => p.OrderId == order.Id);
+
+            return payment != null && payment.Status == PaymentStatus.Paid;
+        }
+
+        // NEW: Method to restore stock when order is cancelled
+        private async Task RestoreStockForCancelledOrderAsync(Order order)
+        {
+            if (order.OrderItems == null || !order.OrderItems.Any())
+            {
+                return;
+            }
+
+            // Get all book IDs from the order
+            var bookIds = order.OrderItems.Select(oi => oi.BookId).ToList();
+            var books = await unitOfWork.Books.GetByIdsAsync(bookIds);
+
+            // Restore stock for each book
+            foreach (var orderItem in order.OrderItems)
+            {
+                var book = books.FirstOrDefault(b => b.Id == orderItem.BookId);
+                if (book != null)
+                {
+                    book.StockQuantity += orderItem.Quantity;
+                    unitOfWork.Books.Update(book);
+                }
+            }
+
+            await unitOfWork.CommitAsync();
+        }
+
         private static bool IsValidStatusTransition(OrderStatus currentStatus, OrderStatus newStatus)
         {
             // If trying to set the same status, it's valid (no change needed but not an error)
@@ -577,21 +672,15 @@ namespace AseerAlkotb.Application.Services
                 OrderStatus.Pending => newStatus is
                     OrderStatus.Approved or
                     OrderStatus.Cancelled,
-
                 OrderStatus.Approved => newStatus is
                     OrderStatus.Shipped or
                     OrderStatus.Cancelled,
-
                 OrderStatus.Shipped => newStatus is
                     OrderStatus.Delivered or
-                    OrderStatus.Cancelled, 
-
+                    OrderStatus.Cancelled,
                 OrderStatus.Delivered => newStatus is
-                    OrderStatus.Delivered or
-                    OrderStatus.Cancelled, 
-
-                OrderStatus.Cancelled => false, 
-
+                    OrderStatus.Delivered,
+                OrderStatus.Cancelled => false,
                 _ => false // Invalid current status
             };
         }
