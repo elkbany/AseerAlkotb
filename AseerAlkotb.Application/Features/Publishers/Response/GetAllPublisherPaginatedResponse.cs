@@ -6,6 +6,6 @@ using System.Threading.Tasks;
 
 namespace AseerAlkotb.Application.Features.Publishers.Response
 {
-    public record GetAllPublisherPaginatedResponse(int Id, string Name, string Description, string LogoUrl, string ContactEmail);
+    public record GetAllPublisherPaginatedResponse(int Id, string Name, string? Description, string LogoUrl, string ContactEmail);
     
 }

@@ -24,12 +24,22 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
-                                    <label asp-for="Name" class="form-label">Category Name *</label>
+                                    <label asp-for="Name" class="form-label">Category Name (Arabic) *</label>
                                     <input asp-for="Name" class="form-control" placeholder="Enter category name" />
                                     <span asp-validation-for="Name" class="text-danger"></span>
                                 </div>
                             </div>
                             
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="EnglishName" class="form-label">Category Name (English)</label>
+                                    <input name="EnglishName" id="EnglishName" class="form-control" placeholder="Enter English category name" />
+                                    <small class="form-text text-muted">If left empty, Arabic name will be used</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
                                     <label asp-for="IsActive" class="form-label">Status</label>
@@ -44,9 +54,15 @@
                         </div>
                         
                         <div class="form-group mb-3">
-                            <label asp-for="Description" class="form-label">Description</label>
+                            <label asp-for="Description" class="form-label">Description (Arabic)</label>
                             <textarea asp-for="Description" class="form-control" rows="4" placeholder="Enter category description (optional)"></textarea>
                             <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="EnglishDescription" class="form-label">Description (English)</label>
+                            <textarea name="EnglishDescription" id="EnglishDescription" class="form-control" rows="4" placeholder="Enter English category description"></textarea>
+                            <small class="form-text text-muted">If left empty, Arabic description will be used</small>
                         </div>
                         
                         <div class="form-group">

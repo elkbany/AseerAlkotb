@@ -858,4 +858,112 @@
   <data name="Book_51_Description" xml:space="preserve">
     <value>الممر هو كتاب يأخذك في رحلة مشوّقة بين أروقة الخوف والأمل، حيث يصبح الطريق الضيق رمزًا لاختبارات الحياة ومواجهاتها. بين صفحاته ستجد مزيجًا من الغموض والإلهام، وصراع الإنسان مع داخله ومع العالم من حوله. إنه أكثر من مجرد قصة؛ إنه دعوة لاكتشاف القوة الكامنة في أعماقك، حين يتحول الممر المظلم إلى بوابة نحو النور والحرية.</value>
   </data>
+  <data name="Category_87_Name" xml:space="preserve">
+    <value>عصير حماده</value>
+  </data>
+  <data name="Category_87_Description" xml:space="preserve">
+    <value>عصير حماده برودكشن</value>
+  </data>
+  <data name="Book_52_Title" xml:space="preserve">
+    <value>احمد</value>
+  </data>
+  <data name="Book_52_Description" xml:space="preserve">
+    <value>احمد</value>
+  </data>
+  <data name="Book_53_Title" xml:space="preserve">
+    <value>جامد</value>
+  </data>
+  <data name="Book_53_Description" xml:space="preserve">
+    <value>جامد جامد جامد جامد جامد جامد جامد </value>
+  </data>
+  <data name="Publisher_12_Name" xml:space="preserve">
+    <value>عصير حماده</value>
+  </data>
+  <data name="Publisher_12_Description" xml:space="preserve">
+    <value>عصير حماده برودكشن</value>
+  </data>
+  <data name="Book_54_Title" xml:space="preserve">
+    <value>الجامد جدا</value>
+  </data>
+  <data name="Book_54_Description" xml:space="preserve">
+    <value>جميل جمال ملوش مثال</value>
+  </data>
+  <data name="Publisher_13_Name" xml:space="preserve">
+    <value>دار الجامد</value>
+  </data>
+  <data name="Publisher_13_Description" xml:space="preserve">
+    <value>دار الجامد</value>
+  </data>
+  <data name="Publisher_14_Name" xml:space="preserve">
+    <value>بسيونى </value>
+  </data>
+  <data name="Publisher_14_Description" xml:space="preserve">
+    <value>بسيونى بسيونى </value>
+  </data>
+  <data name="Publisher_15_Name" xml:space="preserve">
+    <value>بسيونى </value>
+  </data>
+  <data name="Publisher_15_Description" xml:space="preserve">
+    <value>بسيونى بسيونى </value>
+  </data>
+  <data name="Publisher_16_Name" xml:space="preserve">
+    <value>بسيونى </value>
+  </data>
+  <data name="Publisher_16_Description" xml:space="preserve">
+    <value>بسيونى  بسيونى </value>
+  </data>
+  <data name="Publisher_17_Name" xml:space="preserve">
+    <value>بسيونى </value>
+  </data>
+  <data name="Publisher_17_Description" xml:space="preserve">
+    <value>بسيونى  بسيونى </value>
+  </data>
+  <data name="Publisher_18_Name" xml:space="preserve">
+    <value>بسيونى </value>
+  </data>
+  <data name="Publisher_18_Description" xml:space="preserve">
+    <value>بسيونى  بسيونى </value>
+  </data>
+  <data name="Publisher_19_Name" xml:space="preserve">
+    <value>بسيونى س</value>
+  </data>
+  <data name="Publisher_19_Description" xml:space="preserve">
+    <value>بسيونى  بسيونى سسس</value>
+  </data>
+  <data name="Publisher_20_Name" xml:space="preserve">
+    <value>بسيونى س</value>
+  </data>
+  <data name="Publisher_20_Description" xml:space="preserve">
+    <value>بسيونى  بسيونى سسس</value>
+  </data>
+  <data name="Publisher_21_Name" xml:space="preserve">
+    <value>بسيونى سرر</value>
+  </data>
+  <data name="Publisher_21_Description" xml:space="preserve">
+    <value>بسيونى  بسيونى سسسسسس</value>
+  </data>
+  <data name="Book_55_Title" xml:space="preserve">
+    <value>بيج بوس</value>
+  </data>
+  <data name="Book_55_Description" xml:space="preserve">
+    <value>بيج بوس فور اول</value>
+  </data>
+  <data name="Book_56_Title" xml:space="preserve">
+    <value>فاجر جدا</value>
+  </data>
+  <data name="Book_56_Description" xml:space="preserve">
+    <value>فاجر جدا</value>
+  </data>
+  <data name="Book_57_Title" xml:space="preserve">
+    <value>فييييييييس</value>
+  </data>
+  <data name="Book_57_Description" xml:space="preserve">
+    <value>فييييييييس</value>
+  </data>
+  <data name="Author_7_Name" xml:space="preserve">
+    <value>أحمد خالد مصطفى</value>
+  </data>
+  <data name="Author_7_Bio" xml:space="preserve">
+    <value>الكاتب أحمد خالد مصطفى، من مواليد المدينة المنورة بالمملكة العربية السعودية في 22 يناير 1984م. درس الصيدلة في جامعة القاهرة، ثم اتجه بعدها للكتابة حيث كانت قصة مطعم اللحوم البشرية أول أعماله، تلاها روايات أنتيخريستوس وأرض السافلين، وملائك نصيبين هي أحدث أعماله الصادرة جميعاً عن دار عصير الكتب للنشر والتوزيع، وقد عرفت أعماله بكونها مزيجا من المعلومات التاريخية والدينية والخيال.</value>
+  </data>
 </root>

@@ -211,6 +211,9 @@ namespace AseerAlkotb.Application.Services
             {
                 var bookDto = book.Adapt<GetAllBooksPaginatedResponse>();
                 bookDto.Title = LocalizeEntity("Book", book.Id, "Title", bookDto.Title);
+                bookDto.Description = LocalizeEntity("Book", book.Id, "Description", bookDto.Description);
+                bookDto.AuthorName = LocalizeEntity("Author", book.AuthorId, "Name", bookDto.AuthorName);
+                bookDto.PublisherName = book.PublisherId.HasValue ? LocalizeEntity("Publisher", book.PublisherId.Value, "Name", bookDto.PublisherName) : bookDto.PublisherName;
                 //manual
                 bookDto.CategoryIds = book.Categories?.Select(c => c.Id).ToList() ?? new List<int>();
                 bookDto.CategoryNames = book.Categories?.Select(c => LocalizeEntity("Category", c.Id, "Name", c.Name)).ToList() ?? new List<string>();
@@ -268,9 +271,13 @@ namespace AseerAlkotb.Application.Services
             var bookMap = paginatedBooks.Select(book =>
             {
                 var bookDto = book.Adapt<GetAllBooksPaginatedResponse>();
+                bookDto.Title = LocalizeEntity("Book", book.Id, "Title", bookDto.Title);
+                bookDto.Description = LocalizeEntity("Book", book.Id, "Description", bookDto.Description);
+                bookDto.AuthorName = LocalizeEntity("Author", book.AuthorId, "Name", bookDto.AuthorName);
+                bookDto.PublisherName = book.PublisherId.HasValue ? LocalizeEntity("Publisher", book.PublisherId.Value, "Name", bookDto.PublisherName) : bookDto.PublisherName;
                 //manual
                 bookDto.CategoryIds = book.Categories?.Select(c => c.Id).ToList() ?? new List<int>();
-                bookDto.CategoryNames = book.Categories?.Select(c => c.Name).ToList() ?? new List<string>();
+                bookDto.CategoryNames = book.Categories?.Select(c => LocalizeEntity("Category", c.Id, "Name", c.Name)).ToList() ?? new List<string>();
                 bookDto.Rating = book.Reviews?.Any() == true ? (decimal)book.Reviews.Average(r => r.Rating) : 0;
 
                 return bookDto;

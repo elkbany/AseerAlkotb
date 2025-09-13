@@ -262,6 +262,25 @@ namespace AseerAlkotb.Dashboard.Controllers
                 var result = await _bookServices.UpdateBookAsync(request);
                 if (result.Succeeded)
                 {
+                    try
+                    {
+                        var titleAr = Request.Form["Title"].ToString();
+                        var titleEn = Request.Form["EnglishTitle"].ToString();
+                        if (string.IsNullOrWhiteSpace(titleEn)) titleEn = titleAr;
+                        AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Book_{id}_Title", titleAr, "ar");
+                        AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Book_{id}_Title", titleEn, "en");
+
+                        var descAr = Request.Form["Description"].ToString();
+                        var descEn = Request.Form["EnglishDescription"].ToString();
+                        if (!string.IsNullOrWhiteSpace(descAr) || !string.IsNullOrWhiteSpace(descEn))
+                        {
+                            if (string.IsNullOrWhiteSpace(descEn)) descEn = descAr;
+                            if (string.IsNullOrWhiteSpace(descAr)) descAr = descEn;
+                            AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Book_{id}_Description", descAr ?? string.Empty, "ar");
+                            AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Book_{id}_Description", descEn ?? string.Empty, "en");
+                        }
+                    }
+                    catch { }
                     TempData["Success"] = "Book updated successfully.";
                     return RedirectToAction(nameof(Index));
                 }
