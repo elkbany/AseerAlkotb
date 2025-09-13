@@ -41,6 +41,7 @@ using Microsoft.AspNetCore.Mvc;
 using Polly.Extensions.Http;
 using Polly;
 using System.Net;
+using AseerAlkotb.Application.Features.Account.Validator;
 namespace AseerAlkotb.API
 {
     public class Program
@@ -143,7 +144,7 @@ namespace AseerAlkotb.API
             builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
             builder.Services.AddScoped<IAccountRepository, AccountRepository>();
             #endregion
-
+            builder.Services.AddScoped<RegisterRequestValidator>();
             #region Services
             builder.Services.AddScoped<IAuthorServices, AuthorServices>();
             builder.Services.AddScoped<IBookServices, BookServices>();

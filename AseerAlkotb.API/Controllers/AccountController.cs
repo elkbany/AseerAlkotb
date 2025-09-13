@@ -21,6 +21,7 @@ namespace AseerAlkotb.API.Controllers
            _configuration = configuration;
         }
 
+
         [HttpPost("Register")]
         public async Task<IActionResult> Register(RegisterRequest request)
         {
@@ -29,14 +30,13 @@ namespace AseerAlkotb.API.Controllers
             {
                 return BadRequest(new
                 {
-                    Message = "Registration failed",
+                    Message = result.Message, // Use the actual message from the service
                     Errors = result.Errors
                 });
             }
-
             return Ok(new
             {
-                Message = "Account created successfully. Please check your email to confirm.",
+                Message = result.Message, // Use the success message from the service
                 Data = result.Data
             });
         }
