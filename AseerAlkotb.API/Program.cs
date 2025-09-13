@@ -1,4 +1,4 @@
-﻿﻿using AseerAlkotb.API.DependencyInjection;
+﻿using AseerAlkotb.API.DependencyInjection;
 using AseerAlkotb.API.Extensions;
 using AseerAlkotb.API.Middlewares;
 using AseerAlkotb.Application.Contracts;
@@ -21,13 +21,26 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Localization;
 using Microsoft.IdentityModel.Tokens;
+using System.Reflection;
+using AseerAlkotb.Infrastructure.Data;
 using AseerAlkotb.Application.BackgroundJobs;
 using AseerAlkotb.Infrastructure.Background;
 using AseerAlkotb.Infrastructure.AI;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using AseerAlkotb.Infrastructure.Data;
+using AseerAlkotb.Application.BackgroundJobs;
+using AseerAlkotb.Infrastructure.Background;
+using AseerAlkotb.Infrastructure.AI;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
+using Polly.Extensions.Http;
+using Polly;
+using System.Net;
 namespace AseerAlkotb.API
 {
     public class Program
@@ -39,6 +52,7 @@ namespace AseerAlkotb.API
                 Args = args,
                 WebRootPath = null // Disable wwwroot requirement
             });
+
             #region Context Registeration
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             {
@@ -145,17 +159,21 @@ namespace AseerAlkotb.API
 
             builder.Services.AddScoped<IAccountServices, AccountService>();
             builder.Services.AddScoped<IAdminServices, AdminServices>();
-            
+
             // RAG Services
             builder.Services.AddScoped<IRagService, RagService>();
+            // RAG deps
+            //builder.Services.AddScoped<IQuestionRouterService, GeminiQuestionRouterService>();
+            //builder.Services.AddScoped<IWebsiteCatalogService, WebsiteCatalogService>();
+            builder.Services.AddScoped<IEmbeddingService, GeminiEmbeddingService>();
+            builder.Services.AddScoped<IAnswerSynthesisService, GeminiAnswerSynthesisService>();
 
 
             builder.Services.AddInfrastructure(builder.Configuration);
 
 
-            
-            // RAG Services
-            builder.Services.AddScoped<IRagService, RagService>();
+
+
             builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -165,7 +183,7 @@ namespace AseerAlkotb.API
             builder.Services.AddScoped<ICategoryServices, CategoryServices>();
             builder.Services.AddScoped<IGovernorateServices, GovernorateServices>();
             builder.Services.AddScoped<ICityServices, CityServices>();
-            
+
             // New services for improved Order and Payment flow
             builder.Services.AddScoped<IOrderPaymentSyncService, OrderPaymentSyncService>();
             builder.Services.AddScoped<IPaymentRetryService, PaymentRetryService>();
@@ -254,24 +272,24 @@ namespace AseerAlkotb.API
             });
             #endregion
 
-            // HttpClient لِـ Gemini
+            // HttpClient: Gemini + Website مع Polly
+            static IAsyncPolicy<HttpResponseMessage> ResilientPolicy() =>
+                HttpPolicyExtensions.HandleTransientHttpError()
+                    .OrResult(r => r.StatusCode == HttpStatusCode.TooManyRequests)
+                    .WaitAndRetryAsync(3, attempt => TimeSpan.FromMilliseconds(400 * attempt * attempt));
+
             builder.Services.AddHttpClient("gemini", c =>
             {
-                c.BaseAddress = new Uri("https://generativelanguage.googleapis.com");
-            });
+                c.BaseAddress = new Uri("https://g...content-available-to-author-only...s.com");
+                //c.Timeout = TimeSpan.FromSeconds(30);
+            }).AddPolicyHandler(ResilientPolicy());
 
-            // Embeddings + Synthesis على Gemini
-            builder.Services.AddScoped<IEmbeddingService, GeminiEmbeddingService>();
-            builder.Services.AddScoped<IAnswerSynthesisService, GeminiAnswerSynthesisService>();
-
+            //builder.Services.AddHttpClient("website")
+            //                .AddPolicyHandler(ResilientPolicy());
             // لو هتوقفي الـ ExternalBookService (اختياري):
             // builder.Services.Remove(...)
             // أو ببساطة ما تستخدمهوش في Ask، وخلّيه للـ endpoint المخصص book-summary فقط.
-
-            // الـ Background job (لو مش مسجل):
-            builder.Services.AddSingleton<EmbeddingRefreshBackgroundService>();
-            builder.Services.AddSingleton<IEmbeddingRefreshJob>(sp => sp.GetRequiredService<EmbeddingRefreshBackgroundService>());
-            builder.Services.AddHostedService(sp => sp.GetRequiredService<EmbeddingRefreshBackgroundService>());
+            //builder.Services.AddMemoryCache();
 
 
             #region Swagger
@@ -311,7 +329,7 @@ namespace AseerAlkotb.API
 
             var app = builder.Build();
 
-            
+
 
             #region seed roles
             using (var scope = app.Services.CreateScope())
