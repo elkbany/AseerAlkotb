@@ -43,7 +43,7 @@ namespace AseerAlkotb.Application.Features.Orders.Mapping
                     .Map(dest => dest.UserName, src => src.User.FirstName)
                     .Map(dest => dest.OrderStatus, src => src.Status)
                     .Map(dest => dest.Books, src => src.OrderItems
-                        .Select(oi => new BookDTO(oi.Book.Title, (int)oi.UnitPrice, oi.Quantity,oi.BookId,oi.Book.CoverImageUrl))
+                        .Select(oi => new BookDTO(oi.Book.Title, (int)oi.UnitPrice, oi.Quantity,oi.BookId,oi.Book.CoverImageUrl, oi.Book.DiscountPercentage, oi.Book.DiscountedPrice))
                         .ToList());
 
             // Get Order By Admin (Entity → Response)
@@ -55,7 +55,7 @@ namespace AseerAlkotb.Application.Features.Orders.Mapping
                   .Map(dest => dest.DiscountAmount, src => src.DiscountAmount)
                   .Map(dest => dest.FinalAmount, src => src.FinalAmount)
                   .Map(dest => dest.Books, src => src.OrderItems
-                      .Select(oi => new BookDTO(oi.Book.Title, (int)oi.UnitPrice, oi.Quantity, oi.BookId, oi.Book.CoverImageUrl))
+                      .Select(oi => new BookDTO(oi.Book.Title, (int)oi.UnitPrice, oi.Quantity, oi.BookId, oi.Book.CoverImageUrl,oi.Book.DiscountPercentage,oi.Book.DiscountedPrice))
                       .ToList());
 
 
@@ -64,7 +64,7 @@ namespace AseerAlkotb.Application.Features.Orders.Mapping
                     .Map(dest => dest.UserName, src => src.User.FirstName)
                     .Map(dest => dest.OrderStatus, src => src.Status)
                     .Map(dest => dest.Books, src => src.OrderItems
-                        .Select(oi => new BookDTO(oi.Book.Title, (int)oi.UnitPrice, oi.Quantity, oi.BookId, oi.Book.CoverImageUrl))
+                        .Select(oi => new BookDTO(oi.Book.Title, (int)oi.UnitPrice, oi.Quantity, oi.BookId, oi.Book.CoverImageUrl, oi.Book.DiscountPercentage, oi.Book.DiscountedPrice))
                         .ToList());
 
                 // Get All Orders Paginated
@@ -72,7 +72,7 @@ namespace AseerAlkotb.Application.Features.Orders.Mapping
                     .Map(dest => dest.UserName, src => src.User.FirstName)
                     .Map(dest => dest.OrderStatus, src => src.Status)
                     .Map(dest => dest.Books, src => src.OrderItems
-                        .Select(oi => new BookDTO(oi.Book.Title, (int)oi.UnitPrice, oi.Quantity, oi.BookId, oi.Book.CoverImageUrl))
+                        .Select(oi => new BookDTO(oi.Book.Title, (int)oi.UnitPrice, oi.Quantity, oi.BookId, oi.Book.CoverImageUrl, oi.Book.DiscountPercentage, oi.Book.DiscountedPrice))
                         .ToList());
 
             // Update Order Status Mapping

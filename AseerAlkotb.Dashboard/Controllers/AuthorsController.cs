@@ -31,26 +31,24 @@ namespace AseerAlkotb.Dashboard.Controllers
             if (!result.Succeeded)
             {
                 TempData["Error"] = result.Message ?? "Failed to load authors";
-                // هنا رجع list فاضية، بس ضيف TotalCount = 0 عشان الـ view ميقعش
+
+
+                // Set ViewBag values even for error case to prevent null reference
+                ViewBag.TotalPages = 0;
+                ViewBag.CurrentPage = pageNumber;
                 ViewBag.TotalCount = 0;
-                ViewBag.TotalPages = 1;
-                ViewBag.CurrentPage = 1;
+                ViewBag.SearchTerm = search ?? "";
+
                 return View(new List<GetAllAuthorsPaginatedResponse>());
             }
 
-            // هنا المهم: خد TotalCount كـ long عشان ميحصلش overflow، وبعدين cast لـ int
-            long totalCountLong = result.TotalCount; // لو هو int أو long، تمام
-            int totalCount = (int)totalCountLong;
-            int totalPages = (int)Math.Ceiling((double)totalCountLong / pageSize);
-
-            // حدث الـ ViewBag كله بأنواع واضحة
-            ViewBag.TotalPages = totalPages;
+            // Set all required ViewBag values
+            ViewBag.TotalPages = (int)Math.Ceiling((double)result.TotalCount / pageSize);
             ViewBag.CurrentPage = pageNumber;
-            ViewBag.TotalCount = totalCount; // ده هيخليها int مش byte
-            ViewBag.SearchTerm = search;
+            ViewBag.TotalCount = result.TotalCount; // This was missing!
+            ViewBag.SearchTerm = search ?? "";
 
-            var data = result.Data ?? new List<GetAllAuthorsPaginatedResponse>();
-            return View(data);
+            return View(result.Data);
         }
 
         // GET: Authors/Details/5
