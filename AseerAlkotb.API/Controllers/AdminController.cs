@@ -1,116 +1,141 @@
-﻿using AseerAlkotb.Application.Contracts;
-using AseerAlkotb.Application.Features.Roles.Requests;
-using AseerAlkotb.Application.Services;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.Text;
 
 namespace AseerAlkotb.API.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class AdminController : ControllerBase
     {
-        private readonly IAdminServices adminServices;
-        public AdminController(IAdminServices _adminServices)
+        private readonly IWebHostEnvironment _environment;
+
+        public AdminController(IWebHostEnvironment environment)
         {
-            this.adminServices = _adminServices;
+            _environment = environment;
         }
 
-
-        [HttpPost("createAdminAccount")]
-        public async Task<IActionResult> createAdminAccount([FromForm]CreateAdminAccountRequest request)
+        [HttpPost("upload-resx")]
+        public async Task<IActionResult> UploadResxFile([FromForm] string fileContent, [FromForm] string fileName)
         {
-            var result = await adminServices.createAdminAccount(request);
-            if (!result.Succeeded)
+            try
             {
-                return BadRequest(new
+                if (string.IsNullOrEmpty(fileContent) || string.IsNullOrEmpty(fileName))
                 {
-                    Message = "Registration failed",
-                    Errors = result.Errors
-                });
-            }
+                    return BadRequest("File content and file name are required");
+                }
 
-            return Ok(new
-            {
-                Message = "Account created successfully. Please check your email to confirm.",
-                Data = result.Data
-            });
-        }
-
-        [HttpPut("{Id}")]
-        public async Task<IActionResult> UpdateAdminAccount([FromRoute] int Id, [FromForm] UpdateAdminAccountRequest request)
-        {
-            var result = await adminServices.UpdateAdminAccount(Id, request);
-
-            // Check if the operation was successful
-            if (!result.Succeeded)
-            {
-                return BadRequest(new
+                // Validate file name
+                if (!fileName.EndsWith(".resx"))
                 {
-                    Message = result.Message,
-                    Errors = result.Errors
-                });
-            }
+                    return BadRequest("Only .resx files are allowed");
+                }
 
-            return Ok(new
-            {
-                Message = result.Message,
-                Data = result.Data
-            });
-        }
+                // Get the localization resources path
+                var localizationPath = Path.Combine(_environment.ContentRootPath, "..", "AseerAlkotb.Localization", "Resources");
+                
+                // Ensure directory exists
+                Directory.CreateDirectory(localizationPath);
 
-        [HttpDelete("DeleteAdminAccount")]
-        public async Task<IActionResult> DeleteAdminAccount(DeleteAdminAccountRequest request)
-        {
-            var result = await adminServices.DeleteAdminAccount(request);
-
-            if (!result.Succeeded)
-            {
-                return BadRequest(new
+                // Create backup of existing file
+                var filePath = Path.Combine(localizationPath, fileName);
+                if (System.IO.File.Exists(filePath))
                 {
-                    Message = "can't deleted this user ",
-                    Errors = result.Errors
-                });
+                    var backupPath = Path.Combine(localizationPath, "backup");
+                    Directory.CreateDirectory(backupPath);
+                    var backupFile = Path.Combine(backupPath, $"{fileName}.backup.{DateTime.Now:yyyyMMddHHmmss}");
+                    System.IO.File.Copy(filePath, backupFile);
+                }
+
+                // Write new file
+                await System.IO.File.WriteAllTextAsync(filePath, fileContent, Encoding.UTF8);
+
+                return Ok(new { message = $"File {fileName} uploaded successfully" });
             }
-
-            return Ok(new
+            catch (Exception ex)
             {
-                Message = "Account deleted successfully.",
-                Data = result.Data
-            });
+                return StatusCode(500, new { error = ex.Message });
+            }
         }
 
-        [HttpGet("GetAllClients")]
-        public async Task<IActionResult> GetAllClients( )
+        [HttpGet("backup-resx")]
+        public IActionResult BackupResxFiles()
         {
-            var result = await adminServices.GetAllClients();
+            try
+            {
+                var localizationPath = Path.Combine(_environment.ContentRootPath, "..", "AseerAlkotb.Localization", "Resources");
+                var backupPath = Path.Combine(localizationPath, "backup");
+                
+                Directory.CreateDirectory(backupPath);
 
-            return Ok(result);
-           ;
+                var arabicFile = Path.Combine(localizationPath, "SharedResources.ar.resx");
+                var englishFile = Path.Combine(localizationPath, "SharedResources.en.resx");
+
+                var timestamp = DateTime.Now.ToString("yyyyMMddHHmmss");
+
+                if (System.IO.File.Exists(arabicFile))
+                {
+                    var backupArabic = Path.Combine(backupPath, $"SharedResources.ar.resx.backup.{timestamp}");
+                    System.IO.File.Copy(arabicFile, backupArabic);
+                }
+
+                if (System.IO.File.Exists(englishFile))
+                {
+                    var backupEnglish = Path.Combine(backupPath, $"SharedResources.en.resx.backup.{timestamp}");
+                    System.IO.File.Copy(englishFile, backupEnglish);
+                }
+
+                return Ok(new { message = "Backup created successfully", timestamp });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
         }
 
-        [HttpGet("GetAllAdmins")]
-        public async Task<IActionResult> GetAllAdmins()
+        [HttpGet("restore-resx")]
+        public IActionResult RestoreResxFiles()
         {
-            var result = await adminServices.GetAllAdmins();
+            try
+            {
+                var localizationPath = Path.Combine(_environment.ContentRootPath, "..", "AseerAlkotb.Localization", "Resources");
+                var backupPath = Path.Combine(localizationPath, "backup");
+                
+                if (!Directory.Exists(backupPath))
+                {
+                    return NotFound("No backup directory found");
+                }
 
-            return Ok(result);
-            ;
-        }
+                var backupFiles = Directory.GetFiles(backupPath, "*.backup.*")
+                    .OrderByDescending(f => System.IO.File.GetCreationTime(f))
+                    .ToArray();
 
+                if (backupFiles.Length == 0)
+                {
+                    return NotFound("No backup files found");
+                }
 
-        [HttpPost("AssignRole")]
-        public async Task<IActionResult> AssignRole(AssignRoleRequest request)
-        {
-            var result = await adminServices.AssignRole(request);
-            return Ok(result);
-        }
+                // Restore latest Arabic backup
+                var arabicBackup = backupFiles.FirstOrDefault(f => f.Contains("SharedResources.ar.resx"));
+                if (arabicBackup != null)
+                {
+                    var arabicFile = Path.Combine(localizationPath, "SharedResources.ar.resx");
+                    System.IO.File.Copy(arabicBackup, arabicFile, true);
+                }
 
-        [HttpPost("RemoveRole")]
-        public async Task<IActionResult> RemoveRole(RemoveRoleRequest request)
-        {
-            var result = await adminServices.RemoveRole(request);
-            return Ok(result);
+                // Restore latest English backup
+                var englishBackup = backupFiles.FirstOrDefault(f => f.Contains("SharedResources.en.resx"));
+                if (englishBackup != null)
+                {
+                    var englishFile = Path.Combine(localizationPath, "SharedResources.en.resx");
+                    System.IO.File.Copy(englishBackup, englishFile, true);
+                }
+
+                return Ok(new { message = "Files restored successfully" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
         }
     }
 }

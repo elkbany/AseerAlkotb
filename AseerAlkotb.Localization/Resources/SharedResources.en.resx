@@ -283,191 +283,578 @@
     <value>characters</value>
   </data>
   <!-- Seeded Entities (English variants) -->
-  <data name="Author_1_Name" xml:space="preserve"><value>Naguib Mahfouz</value></data>
-  <data name="Author_1_Bio" xml:space="preserve"><value>Egyptian Nobel laureate novelist.</value></data>
-  <data name="Author_2_Name" xml:space="preserve"><value>Ahmed Khaled Tawfik</value></data>
-  <data name="Author_2_Bio" xml:space="preserve"><value>Egyptian writer, known as the Godfather.</value></data>
-  <data name="Author_3_Name" xml:space="preserve"><value>Yusuf Idris</value></data>
-  <data name="Author_3_Bio" xml:space="preserve"><value>Egyptian writer</value></data>
-  <data name="Author_4_Name" xml:space="preserve"><value>Ahmed Khairy Al-Omari</value></data>
-  <data name="Author_4_Bio" xml:space="preserve"><value>Iraqi writer and dentist, born in Baghdad in 1970.</value></data>
-
-  <data name="Publisher_1_Name" xml:space="preserve"><value>Aseer Alkotob</value></data>
-  <data name="Publisher_1_Description" xml:space="preserve"><value>Egyptian publishing house</value></data>
-  <data name="Publisher_2_Name" xml:space="preserve"><value>Dar Al Shorouk</value></data>
-  <data name="Publisher_2_Description" xml:space="preserve"><value>Arab publishing house</value></data>
-  <data name="Publisher_3_Name" xml:space="preserve"><value>Dar Al Saqi</value></data>
-  <data name="Publisher_3_Description" xml:space="preserve"><value>Lebanese publishing house</value></data>
-
+  <data name="Author_1_Name" xml:space="preserve">
+    <value>Naguib Mahfouz</value>
+  </data>
+  <data name="Author_1_Bio" xml:space="preserve">
+    <value>Egyptian Nobel laureate novelist.</value>
+  </data>
+  <data name="Author_2_Name" xml:space="preserve">
+    <value>Ahmed Khaled Tawfik</value>
+  </data>
+  <data name="Author_2_Bio" xml:space="preserve">
+    <value>Egyptian writer, known as the Godfather.</value>
+  </data>
+  <data name="Author_3_Name" xml:space="preserve">
+    <value>Yusuf Idris</value>
+  </data>
+  <data name="Author_3_Bio" xml:space="preserve">
+    <value>Egyptian writer</value>
+  </data>
+  <data name="Author_4_Name" xml:space="preserve">
+    <value>Ahmed Khairy Al-Omari</value>
+  </data>
+  <data name="Author_4_Bio" xml:space="preserve">
+    <value>Iraqi writer and dentist, born in Baghdad in 1970.</value>
+  </data>
+  <data name="Publisher_1_Name" xml:space="preserve">
+    <value>Aseer Alkotob</value>
+  </data>
+  <data name="Publisher_1_Description" xml:space="preserve">
+    <value>Egyptian publishing house</value>
+  </data>
+  <data name="Publisher_2_Name" xml:space="preserve">
+    <value>Dar Al Shorouk</value>
+  </data>
+  <data name="Publisher_2_Description" xml:space="preserve">
+    <value>Arab publishing house</value>
+  </data>
+  <data name="Publisher_3_Name" xml:space="preserve">
+    <value>Dar Al Saqi</value>
+  </data>
+  <data name="Publisher_3_Description" xml:space="preserve">
+    <value>Lebanese publishing house</value>
+  </data>
   <!-- Categories (subset) -->
-  <data name="Category_1_Name" xml:space="preserve"><value>Novels</value></data>
-  <data name="Category_1_Description" xml:space="preserve"><value>Fiction including Arabic and world literature</value></data>
-  <data name="Category_2_Name" xml:space="preserve"><value>History</value></data>
-  <data name="Category_2_Description" xml:space="preserve"><value>Historical books about civilizations and peoples</value></data>
-  <data name="Category_3_Name" xml:space="preserve"><value>Science</value></data>
-  <data name="Category_3_Description" xml:space="preserve"><value>Scientific books in various fields</value></data>
-  <data name="Category_4_Name" xml:space="preserve"><value>Personal Development</value></data>
-  <data name="Category_4_Description" xml:space="preserve"><value>Books for self-improvement and skills</value></data>
-  <data name="Category_5_Name" xml:space="preserve"><value>Religious Books</value></data>
-  <data name="Category_5_Description" xml:space="preserve"><value>Religious books and Islamic thought</value></data>
-  <data name="Category_6_Name" xml:space="preserve"><value>Literature</value></data>
-  <data name="Category_6_Description" xml:space="preserve"><value>Literature including poetry and prose</value></data>
-  <data name="Category_7_Name" xml:space="preserve"><value>Children's Books</value></data>
-  <data name="Category_7_Description" xml:space="preserve"><value>Books for children and young readers</value></data>
-  <data name="Category_8_Name" xml:space="preserve"><value>Politics</value></data>
-  <data name="Category_8_Description" xml:space="preserve"><value>Politics and international relations</value></data>
-  <data name="Category_9_Name" xml:space="preserve"><value>Economics</value></data>
-  <data name="Category_9_Description" xml:space="preserve"><value>Economics and finance</value></data>
-  <data name="Category_10_Name" xml:space="preserve"><value>Philosophy</value></data>
-  <data name="Category_10_Description" xml:space="preserve"><value>Philosophy and thought</value></data>
-  <data name="Category_11_Name" xml:space="preserve"><value>Cooking</value></data>
-  <data name="Category_11_Description" xml:space="preserve"><value>Cooking and recipes</value></data>
-  <data name="Category_12_Name" xml:space="preserve"><value>Biographies</value></data>
-  <data name="Category_12_Description" xml:space="preserve"><value>Biographies and memoirs</value></data>
-  <data name="Category_13_Name" xml:space="preserve"><value>Arts</value></data>
-  <data name="Category_13_Description" xml:space="preserve"><value>Arts and creativity</value></data>
-  <data name="Category_14_Name" xml:space="preserve"><value>Technology</value></data>
-  <data name="Category_14_Description" xml:space="preserve"><value>Technology and innovation</value></data>
-  <data name="Category_15_Name" xml:space="preserve"><value>Medicine</value></data>
-  <data name="Category_15_Description" xml:space="preserve"><value>Medical and health books</value></data>
-  <data name="Category_16_Name" xml:space="preserve"><value>Sports</value></data>
-  <data name="Category_16_Description" xml:space="preserve"><value>Sports and fitness</value></data>
-  <data name="Category_17_Name" xml:space="preserve"><value>Travel</value></data>
-  <data name="Category_17_Description" xml:space="preserve"><value>Travel and journeys</value></data>
-  <data name="Category_18_Name" xml:space="preserve"><value>Management</value></data>
-  <data name="Category_18_Description" xml:space="preserve"><value>Management and leadership</value></data>
-  <data name="Category_19_Name" xml:space="preserve"><value>Law</value></data>
-  <data name="Category_19_Description" xml:space="preserve"><value>Legal books and legislation</value></data>
-  <data name="Category_20_Name" xml:space="preserve"><value>Education</value></data>
-  <data name="Category_20_Description" xml:space="preserve"><value>Educational and pedagogical books</value></data>
-
+  <data name="Category_1_Name" xml:space="preserve">
+    <value>Novels</value>
+  </data>
+  <data name="Category_1_Description" xml:space="preserve">
+    <value>Fiction including Arabic and world literature</value>
+  </data>
+  <data name="Category_2_Name" xml:space="preserve">
+    <value>History</value>
+  </data>
+  <data name="Category_2_Description" xml:space="preserve">
+    <value>Historical books about civilizations and peoples</value>
+  </data>
+  <data name="Category_3_Name" xml:space="preserve">
+    <value>Science</value>
+  </data>
+  <data name="Category_3_Description" xml:space="preserve">
+    <value>Scientific books in various fields</value>
+  </data>
+  <data name="Category_4_Name" xml:space="preserve">
+    <value>Personal Development</value>
+  </data>
+  <data name="Category_4_Description" xml:space="preserve">
+    <value>Books for self-improvement and skills</value>
+  </data>
+  <data name="Category_5_Name" xml:space="preserve">
+    <value>Religious Books</value>
+  </data>
+  <data name="Category_5_Description" xml:space="preserve">
+    <value>Religious books and Islamic thought</value>
+  </data>
+  <data name="Category_6_Name" xml:space="preserve">
+    <value>Literature</value>
+  </data>
+  <data name="Category_6_Description" xml:space="preserve">
+    <value>Literature including poetry and prose</value>
+  </data>
+  <data name="Category_7_Name" xml:space="preserve">
+    <value>Children's Books</value>
+  </data>
+  <data name="Category_7_Description" xml:space="preserve">
+    <value>Books for children and young readers</value>
+  </data>
+  <data name="Category_8_Name" xml:space="preserve">
+    <value>Politics</value>
+  </data>
+  <data name="Category_8_Description" xml:space="preserve">
+    <value>Politics and international relations</value>
+  </data>
+  <data name="Category_9_Name" xml:space="preserve">
+    <value>Economics</value>
+  </data>
+  <data name="Category_9_Description" xml:space="preserve">
+    <value>Economics and finance</value>
+  </data>
+  <data name="Category_10_Name" xml:space="preserve">
+    <value>Philosophy</value>
+  </data>
+  <data name="Category_10_Description" xml:space="preserve">
+    <value>Philosophy and thought</value>
+  </data>
+  <data name="Category_11_Name" xml:space="preserve">
+    <value>Cooking</value>
+  </data>
+  <data name="Category_11_Description" xml:space="preserve">
+    <value>Cooking and recipes</value>
+  </data>
+  <data name="Category_12_Name" xml:space="preserve">
+    <value>Biographies</value>
+  </data>
+  <data name="Category_12_Description" xml:space="preserve">
+    <value>Biographies and memoirs</value>
+  </data>
+  <data name="Category_13_Name" xml:space="preserve">
+    <value>Arts</value>
+  </data>
+  <data name="Category_13_Description" xml:space="preserve">
+    <value>Arts and creativity</value>
+  </data>
+  <data name="Category_14_Name" xml:space="preserve">
+    <value>Technology</value>
+  </data>
+  <data name="Category_14_Description" xml:space="preserve">
+    <value>Technology and innovation</value>
+  </data>
+  <data name="Category_15_Name" xml:space="preserve">
+    <value>Medicine</value>
+  </data>
+  <data name="Category_15_Description" xml:space="preserve">
+    <value>Medical and health books</value>
+  </data>
+  <data name="Category_16_Name" xml:space="preserve">
+    <value>Sports</value>
+  </data>
+  <data name="Category_16_Description" xml:space="preserve">
+    <value>Sports and fitness</value>
+  </data>
+  <data name="Category_17_Name" xml:space="preserve">
+    <value>Travel</value>
+  </data>
+  <data name="Category_17_Description" xml:space="preserve">
+    <value>Travel and journeys</value>
+  </data>
+  <data name="Category_18_Name" xml:space="preserve">
+    <value>Management</value>
+  </data>
+  <data name="Category_18_Description" xml:space="preserve">
+    <value>Management and leadership</value>
+  </data>
+  <data name="Category_19_Name" xml:space="preserve">
+    <value>Law</value>
+  </data>
+  <data name="Category_19_Description" xml:space="preserve">
+    <value>Legal books and legislation</value>
+  </data>
+  <data name="Category_20_Name" xml:space="preserve">
+    <value>Education</value>
+  </data>
+  <data name="Category_20_Description" xml:space="preserve">
+    <value>Educational and pedagogical books</value>
+  </data>
   <!-- SubCategories -->
-  <data name="Category_21_Name" xml:space="preserve"><value>Arabic Novels</value></data>
-  <data name="Category_21_Description" xml:space="preserve"><value>Novels written in Arabic</value></data>
-  <data name="Category_22_Name" xml:space="preserve"><value>Translated Novels</value></data>
-  <data name="Category_22_Description" xml:space="preserve"><value>Novels translated from other languages</value></data>
-  <data name="Category_23_Name" xml:space="preserve"><value>Crime and Mystery</value></data>
-  <data name="Category_23_Description" xml:space="preserve"><value>Crime and mystery novels</value></data>
-  <data name="Category_24_Name" xml:space="preserve"><value>Science Fiction</value></data>
-  <data name="Category_24_Description" xml:space="preserve"><value>Science fiction novels</value></data>
-  <data name="Category_25_Name" xml:space="preserve"><value>World History</value></data>
-  <data name="Category_25_Description" xml:space="preserve"><value>Books on the history of world civilizations</value></data>
-  <data name="Category_26_Name" xml:space="preserve"><value>Arab History</value></data>
-  <data name="Category_26_Description" xml:space="preserve"><value>Books on Arab and Islamic history</value></data>
-  <data name="Category_27_Name" xml:space="preserve"><value>History of Wars</value></data>
-  <data name="Category_27_Description" xml:space="preserve"><value>Books on wars and conflicts</value></data>
-  <data name="Category_28_Name" xml:space="preserve"><value>Natural Sciences</value></data>
-  <data name="Category_28_Description" xml:space="preserve"><value>Physics and chemistry</value></data>
-  <data name="Category_29_Name" xml:space="preserve"><value>Life Sciences</value></data>
-  <data name="Category_29_Description" xml:space="preserve"><value>Biology and medicine</value></data>
-  <data name="Category_30_Name" xml:space="preserve"><value>Astronomy</value></data>
-  <data name="Category_30_Description" xml:space="preserve"><value>Books about space and the universe</value></data>
-  <data name="Category_31_Name" xml:space="preserve"><value>Self-Improvement</value></data>
-  <data name="Category_31_Description" xml:space="preserve"><value>Books to improve personal skills</value></data>
-  <data name="Category_32_Name" xml:space="preserve"><value>Leadership</value></data>
-  <data name="Category_32_Description" xml:space="preserve"><value>Books on leadership skills</value></data>
-  <data name="Category_33_Name" xml:space="preserve"><value>Time Management</value></data>
-  <data name="Category_33_Description" xml:space="preserve"><value>Books on organizing time</value></data>
-  <data name="Category_34_Name" xml:space="preserve"><value>Islamic Thought</value></data>
-  <data name="Category_34_Description" xml:space="preserve"><value>Books on Islamic thought and jurisprudence</value></data>
-  <data name="Category_35_Name" xml:space="preserve"><value>Quran Tafsir</value></data>
-  <data name="Category_35_Description" xml:space="preserve"><value>Books explaining the Holy Quran</value></data>
-  <data name="Category_36_Name" xml:space="preserve"><value>Arabic Poetry</value></data>
-  <data name="Category_36_Description" xml:space="preserve"><value>Collections of Arabic poetry</value></data>
-  <data name="Category_37_Name" xml:space="preserve"><value>Literary Prose</value></data>
-  <data name="Category_37_Description" xml:space="preserve"><value>Prose and essays</value></data>
-  <data name="Category_38_Name" xml:space="preserve"><value>Children's Stories</value></data>
-  <data name="Category_38_Description" xml:space="preserve"><value>Illustrated children's stories</value></data>
-  <data name="Category_39_Name" xml:space="preserve"><value>Educational for Children</value></data>
-  <data name="Category_39_Description" xml:space="preserve"><value>Educational books for young readers</value></data>
-  <data name="Category_40_Name" xml:space="preserve"><value>International Relations</value></data>
-  <data name="Category_40_Description" xml:space="preserve"><value>Books on world politics</value></data>
-  <data name="Category_41_Name" xml:space="preserve"><value>Local Politics</value></data>
-  <data name="Category_41_Description" xml:space="preserve"><value>Books on Arab politics</value></data>
-  <data name="Category_42_Name" xml:space="preserve"><value>Macroeconomics</value></data>
-  <data name="Category_42_Description" xml:space="preserve"><value>Books on general economics</value></data>
-  <data name="Category_43_Name" xml:space="preserve"><value>Personal Finance</value></data>
-  <data name="Category_43_Description" xml:space="preserve"><value>Personal money management</value></data>
-  <data name="Category_44_Name" xml:space="preserve"><value>Western Philosophy</value></data>
-  <data name="Category_44_Description" xml:space="preserve"><value>Books on Western philosophy</value></data>
-  <data name="Category_45_Name" xml:space="preserve"><value>Eastern Philosophy</value></data>
-  <data name="Category_45_Description" xml:space="preserve"><value>Books on Eastern philosophy</value></data>
-  <data name="Category_46_Name" xml:space="preserve"><value>Arab Cuisine</value></data>
-  <data name="Category_46_Description" xml:space="preserve"><value>Arab food recipes</value></data>
-  <data name="Category_47_Name" xml:space="preserve"><value>World Cuisine</value></data>
-  <data name="Category_47_Description" xml:space="preserve"><value>Recipes from world cuisines</value></data>
-  <data name="Category_48_Name" xml:space="preserve"><value>Political Biographies</value></data>
-  <data name="Category_48_Description" xml:space="preserve"><value>Biographies of political figures</value></data>
-  <data name="Category_49_Name" xml:space="preserve"><value>Artists' Biographies</value></data>
-  <data name="Category_49_Description" xml:space="preserve"><value>Biographies of artists and creators</value></data>
-  <data name="Category_50_Name" xml:space="preserve"><value>Fine Arts</value></data>
-  <data name="Category_50_Description" xml:space="preserve"><value>Painting and sculpture</value></data>
-  <data name="Category_51_Name" xml:space="preserve"><value>Music</value></data>
-  <data name="Category_51_Description" xml:space="preserve"><value>Music and instruments</value></data>
-  <data name="Category_52_Name" xml:space="preserve"><value>Programming</value></data>
-  <data name="Category_52_Description" xml:space="preserve"><value>Software development</value></data>
-  <data name="Category_53_Name" xml:space="preserve"><value>Artificial Intelligence</value></data>
-  <data name="Category_53_Description" xml:space="preserve"><value>Books on artificial intelligence</value></data>
-  <data name="Category_54_Name" xml:space="preserve"><value>General Medicine</value></data>
-  <data name="Category_54_Description" xml:space="preserve"><value>General medicine and health</value></data>
-  <data name="Category_55_Name" xml:space="preserve"><value>Nutrition</value></data>
-  <data name="Category_55_Description" xml:space="preserve"><value>Nutrition and health</value></data>
-  <data name="Category_56_Name" xml:space="preserve"><value>Fitness</value></data>
-  <data name="Category_56_Description" xml:space="preserve"><value>Exercise and workouts</value></data>
-  <data name="Category_57_Name" xml:space="preserve"><value>Team Sports</value></data>
-  <data name="Category_57_Description" xml:space="preserve"><value>Football and other team sports</value></data>
-  <data name="Category_58_Name" xml:space="preserve"><value>Adventure Travel</value></data>
-  <data name="Category_58_Description" xml:space="preserve"><value>Travel and adventures</value></data>
-  <data name="Category_59_Name" xml:space="preserve"><value>Travel Guides</value></data>
-  <data name="Category_59_Description" xml:space="preserve"><value>Travel and tourism guides</value></data>
-  <data name="Category_60_Name" xml:space="preserve"><value>Business Management</value></data>
-  <data name="Category_60_Description" xml:space="preserve"><value>Books on business management</value></data>
-
+  <data name="Category_21_Name" xml:space="preserve">
+    <value>Arabic Novels</value>
+  </data>
+  <data name="Category_21_Description" xml:space="preserve">
+    <value>Novels written in Arabic</value>
+  </data>
+  <data name="Category_22_Name" xml:space="preserve">
+    <value>Translated Novels</value>
+  </data>
+  <data name="Category_22_Description" xml:space="preserve">
+    <value>Novels translated from other languages</value>
+  </data>
+  <data name="Category_23_Name" xml:space="preserve">
+    <value>Crime and Mystery</value>
+  </data>
+  <data name="Category_23_Description" xml:space="preserve">
+    <value>Crime and mystery novels</value>
+  </data>
+  <data name="Category_24_Name" xml:space="preserve">
+    <value>Science Fiction</value>
+  </data>
+  <data name="Category_24_Description" xml:space="preserve">
+    <value>Science fiction novels</value>
+  </data>
+  <data name="Category_25_Name" xml:space="preserve">
+    <value>World History</value>
+  </data>
+  <data name="Category_25_Description" xml:space="preserve">
+    <value>Books on the history of world civilizations</value>
+  </data>
+  <data name="Category_26_Name" xml:space="preserve">
+    <value>Arab History</value>
+  </data>
+  <data name="Category_26_Description" xml:space="preserve">
+    <value>Books on Arab and Islamic history</value>
+  </data>
+  <data name="Category_27_Name" xml:space="preserve">
+    <value>History of Wars</value>
+  </data>
+  <data name="Category_27_Description" xml:space="preserve">
+    <value>Books on wars and conflicts</value>
+  </data>
+  <data name="Category_28_Name" xml:space="preserve">
+    <value>Natural Sciences</value>
+  </data>
+  <data name="Category_28_Description" xml:space="preserve">
+    <value>Physics and chemistry</value>
+  </data>
+  <data name="Category_29_Name" xml:space="preserve">
+    <value>Life Sciences</value>
+  </data>
+  <data name="Category_29_Description" xml:space="preserve">
+    <value>Biology and medicine</value>
+  </data>
+  <data name="Category_30_Name" xml:space="preserve">
+    <value>Astronomy</value>
+  </data>
+  <data name="Category_30_Description" xml:space="preserve">
+    <value>Books about space and the universe</value>
+  </data>
+  <data name="Category_31_Name" xml:space="preserve">
+    <value>Self-Improvement</value>
+  </data>
+  <data name="Category_31_Description" xml:space="preserve">
+    <value>Books to improve personal skills</value>
+  </data>
+  <data name="Category_32_Name" xml:space="preserve">
+    <value>Leadership</value>
+  </data>
+  <data name="Category_32_Description" xml:space="preserve">
+    <value>Books on leadership skills</value>
+  </data>
+  <data name="Category_33_Name" xml:space="preserve">
+    <value>Time Management</value>
+  </data>
+  <data name="Category_33_Description" xml:space="preserve">
+    <value>Books on organizing time</value>
+  </data>
+  <data name="Category_34_Name" xml:space="preserve">
+    <value>Islamic Thought</value>
+  </data>
+  <data name="Category_34_Description" xml:space="preserve">
+    <value>Books on Islamic thought and jurisprudence</value>
+  </data>
+  <data name="Category_35_Name" xml:space="preserve">
+    <value>Quran Tafsir</value>
+  </data>
+  <data name="Category_35_Description" xml:space="preserve">
+    <value>Books explaining the Holy Quran</value>
+  </data>
+  <data name="Category_36_Name" xml:space="preserve">
+    <value>Arabic Poetry</value>
+  </data>
+  <data name="Category_36_Description" xml:space="preserve">
+    <value>Collections of Arabic poetry</value>
+  </data>
+  <data name="Category_37_Name" xml:space="preserve">
+    <value>Literary Prose</value>
+  </data>
+  <data name="Category_37_Description" xml:space="preserve">
+    <value>Prose and essays</value>
+  </data>
+  <data name="Category_38_Name" xml:space="preserve">
+    <value>Children's Stories</value>
+  </data>
+  <data name="Category_38_Description" xml:space="preserve">
+    <value>Illustrated children's stories</value>
+  </data>
+  <data name="Category_39_Name" xml:space="preserve">
+    <value>Educational for Children</value>
+  </data>
+  <data name="Category_39_Description" xml:space="preserve">
+    <value>Educational books for young readers</value>
+  </data>
+  <data name="Category_40_Name" xml:space="preserve">
+    <value>International Relations</value>
+  </data>
+  <data name="Category_40_Description" xml:space="preserve">
+    <value>Books on world politics</value>
+  </data>
+  <data name="Category_41_Name" xml:space="preserve">
+    <value>Local Politics</value>
+  </data>
+  <data name="Category_41_Description" xml:space="preserve">
+    <value>Books on Arab politics</value>
+  </data>
+  <data name="Category_42_Name" xml:space="preserve">
+    <value>Macroeconomics</value>
+  </data>
+  <data name="Category_42_Description" xml:space="preserve">
+    <value>Books on general economics</value>
+  </data>
+  <data name="Category_43_Name" xml:space="preserve">
+    <value>Personal Finance</value>
+  </data>
+  <data name="Category_43_Description" xml:space="preserve">
+    <value>Personal money management</value>
+  </data>
+  <data name="Category_44_Name" xml:space="preserve">
+    <value>Western Philosophy</value>
+  </data>
+  <data name="Category_44_Description" xml:space="preserve">
+    <value>Books on Western philosophy</value>
+  </data>
+  <data name="Category_45_Name" xml:space="preserve">
+    <value>Eastern Philosophy</value>
+  </data>
+  <data name="Category_45_Description" xml:space="preserve">
+    <value>Books on Eastern philosophy</value>
+  </data>
+  <data name="Category_46_Name" xml:space="preserve">
+    <value>Arab Cuisine</value>
+  </data>
+  <data name="Category_46_Description" xml:space="preserve">
+    <value>Arab food recipes</value>
+  </data>
+  <data name="Category_47_Name" xml:space="preserve">
+    <value>World Cuisine</value>
+  </data>
+  <data name="Category_47_Description" xml:space="preserve">
+    <value>Recipes from world cuisines</value>
+  </data>
+  <data name="Category_48_Name" xml:space="preserve">
+    <value>Political Biographies</value>
+  </data>
+  <data name="Category_48_Description" xml:space="preserve">
+    <value>Biographies of political figures</value>
+  </data>
+  <data name="Category_49_Name" xml:space="preserve">
+    <value>Artists' Biographies</value>
+  </data>
+  <data name="Category_49_Description" xml:space="preserve">
+    <value>Biographies of artists and creators</value>
+  </data>
+  <data name="Category_50_Name" xml:space="preserve">
+    <value>Fine Arts</value>
+  </data>
+  <data name="Category_50_Description" xml:space="preserve">
+    <value>Painting and sculpture</value>
+  </data>
+  <data name="Category_51_Name" xml:space="preserve">
+    <value>Music</value>
+  </data>
+  <data name="Category_51_Description" xml:space="preserve">
+    <value>Music and instruments</value>
+  </data>
+  <data name="Category_52_Name" xml:space="preserve">
+    <value>Programming</value>
+  </data>
+  <data name="Category_52_Description" xml:space="preserve">
+    <value>Software development</value>
+  </data>
+  <data name="Category_53_Name" xml:space="preserve">
+    <value>Artificial Intelligence</value>
+  </data>
+  <data name="Category_53_Description" xml:space="preserve">
+    <value>Books on artificial intelligence</value>
+  </data>
+  <data name="Category_54_Name" xml:space="preserve">
+    <value>General Medicine</value>
+  </data>
+  <data name="Category_54_Description" xml:space="preserve">
+    <value>General medicine and health</value>
+  </data>
+  <data name="Category_55_Name" xml:space="preserve">
+    <value>Nutrition</value>
+  </data>
+  <data name="Category_55_Description" xml:space="preserve">
+    <value>Nutrition and health</value>
+  </data>
+  <data name="Category_56_Name" xml:space="preserve">
+    <value>Fitness</value>
+  </data>
+  <data name="Category_56_Description" xml:space="preserve">
+    <value>Exercise and workouts</value>
+  </data>
+  <data name="Category_57_Name" xml:space="preserve">
+    <value>Team Sports</value>
+  </data>
+  <data name="Category_57_Description" xml:space="preserve">
+    <value>Football and other team sports</value>
+  </data>
+  <data name="Category_58_Name" xml:space="preserve">
+    <value>Adventure Travel</value>
+  </data>
+  <data name="Category_58_Description" xml:space="preserve">
+    <value>Travel and adventures</value>
+  </data>
+  <data name="Category_59_Name" xml:space="preserve">
+    <value>Travel Guides</value>
+  </data>
+  <data name="Category_59_Description" xml:space="preserve">
+    <value>Travel and tourism guides</value>
+  </data>
+  <data name="Category_60_Name" xml:space="preserve">
+    <value>Business Management</value>
+  </data>
+  <data name="Category_60_Description" xml:space="preserve">
+    <value>Books on business management</value>
+  </data>
   <!-- Books 1..20 -->
-  <data name="Book_1_Title" xml:space="preserve"><value>Midaq Alley</value></data>
-  <data name="Book_1_Description" xml:space="preserve"><value>A famous novel by Naguib Mahfouz</value></data>
-  <data name="Book_2_Title" xml:space="preserve"><value>New Book</value></data>
-  <data name="Book_2_Description" xml:space="preserve"><value>Description of the new book</value></data>
-  <data name="Book_3_Title" xml:space="preserve"><value>Another Book</value></data>
-  <data name="Book_3_Description" xml:space="preserve"><value>Description of the other book</value></data>
-  <data name="Book_4_Title" xml:space="preserve"><value>Al-Karnak</value></data>
-  <data name="Book_4_Description" xml:space="preserve"><value>A political novel by Naguib Mahfouz</value></data>
-  <data name="Book_5_Title" xml:space="preserve"><value>Children of the Alley</value></data>
-  <data name="Book_5_Description" xml:space="preserve"><value>A controversial novel by Naguib Mahfouz</value></data>
-  <data name="Book_6_Title" xml:space="preserve"><value>The Harafish</value></data>
-  <data name="Book_6_Description" xml:space="preserve"><value>An epic novel by Naguib Mahfouz</value></data>
-  <data name="Book_7_Title" xml:space="preserve"><value>Palace Walk</value></data>
-  <data name="Book_7_Description" xml:space="preserve"><value>The first part of Mahfouz's Cairo Trilogy</value></data>
-  <data name="Book_8_Title" xml:space="preserve"><value>Palace of Desire</value></data>
-  <data name="Book_8_Description" xml:space="preserve"><value>The second part of Mahfouz's Cairo Trilogy</value></data>
-  <data name="Book_9_Title" xml:space="preserve"><value>Sugar Street</value></data>
-  <data name="Book_9_Description" xml:space="preserve"><value>The third part of Mahfouz's Cairo Trilogy</value></data>
-  <data name="Book_10_Title" xml:space="preserve"><value>Khan Al-Khalili</value></data>
-  <data name="Book_10_Description" xml:space="preserve"><value>A social novel by Naguib Mahfouz</value></data>
-  <data name="Book_11_Title" xml:space="preserve"><value>New Book</value></data>
-  <data name="Book_11_Description" xml:space="preserve"><value>Description of the new book</value></data>
-  <data name="Book_12_Title" xml:space="preserve"><value>Another Book</value></data>
-  <data name="Book_12_Description" xml:space="preserve"><value>Description of the other book</value></data>
-  <data name="Book_13_Title" xml:space="preserve"><value>The Collar and the Bracelet</value></data>
-  <data name="Book_13_Description" xml:space="preserve"><value>A renowned novel by Yahya Taher Abdullah</value></data>
-  <data name="Book_14_Title" xml:space="preserve"><value>Men in the Sun</value></data>
-  <data name="Book_14_Description" xml:space="preserve"><value>Ghassan Kanafani's celebrated novel</value></data>
-  <data name="Book_15_Title" xml:space="preserve"><value>Season of Migration to the North</value></data>
-  <data name="Book_15_Description" xml:space="preserve"><value>Tayeb Salih's most famous novel</value></data>
-  <data name="Book_16_Title" xml:space="preserve"><value>For Bread Alone</value></data>
-  <data name="Book_16_Description" xml:space="preserve"><value>Mohammed Choukri's autobiographical novel</value></data>
-  <data name="Book_17_Title" xml:space="preserve"><value>Azazel</value></data>
-  <data name="Book_17_Description" xml:space="preserve"><value>Youssef Ziedan's historical novel</value></data>
-  <data name="Book_18_Title" xml:space="preserve"><value>Returning to Haifa</value></data>
-  <data name="Book_18_Description" xml:space="preserve"><value>A short novel by Ghassan Kanafani</value></data>
-  <data name="Book_19_Title" xml:space="preserve"><value>Love in the Time of Cholera</value></data>
-  <data name="Book_19_Description" xml:space="preserve"><value>Gabriel García Márquez's novel translated into Arabic</value></data>
-  <data name="Book_20_Title" xml:space="preserve"><value>Cities of Salt</value></data>
-  <data name="Book_20_Description" xml:space="preserve"><value>Abdul Rahman Munif's famous novel</value></data>
-
+  <data name="Book_1_Title" xml:space="preserve">
+    <value>Midaq Alley</value>
+  </data>
+  <data name="Book_1_Description" xml:space="preserve">
+    <value>A famous novel by Naguib Mahfouz</value>
+  </data>
+  <data name="Book_2_Title" xml:space="preserve">
+    <value>New Book</value>
+  </data>
+  <data name="Book_2_Description" xml:space="preserve">
+    <value>Description of the new book</value>
+  </data>
+  <data name="Book_3_Title" xml:space="preserve">
+    <value>Another Book</value>
+  </data>
+  <data name="Book_3_Description" xml:space="preserve">
+    <value>Description of the other book</value>
+  </data>
+  <data name="Book_4_Title" xml:space="preserve">
+    <value>Al-Karnak</value>
+  </data>
+  <data name="Book_4_Description" xml:space="preserve">
+    <value>A political novel by Naguib Mahfouz</value>
+  </data>
+  <data name="Book_5_Title" xml:space="preserve">
+    <value>Children of the Alley</value>
+  </data>
+  <data name="Book_5_Description" xml:space="preserve">
+    <value>A controversial novel by Naguib Mahfouz</value>
+  </data>
+  <data name="Book_6_Title" xml:space="preserve">
+    <value>The Harafish</value>
+  </data>
+  <data name="Book_6_Description" xml:space="preserve">
+    <value>An epic novel by Naguib Mahfouz</value>
+  </data>
+  <data name="Book_7_Title" xml:space="preserve">
+    <value>Palace Walk</value>
+  </data>
+  <data name="Book_7_Description" xml:space="preserve">
+    <value>The first part of Mahfouz's Cairo Trilogy</value>
+  </data>
+  <data name="Book_8_Title" xml:space="preserve">
+    <value>Palace of Desire</value>
+  </data>
+  <data name="Book_8_Description" xml:space="preserve">
+    <value>The second part of Mahfouz's Cairo Trilogy</value>
+  </data>
+  <data name="Book_9_Title" xml:space="preserve">
+    <value>Sugar Street</value>
+  </data>
+  <data name="Book_9_Description" xml:space="preserve">
+    <value>The third part of Mahfouz's Cairo Trilogy</value>
+  </data>
+  <data name="Book_10_Title" xml:space="preserve">
+    <value>Khan Al-Khalili</value>
+  </data>
+  <data name="Book_10_Description" xml:space="preserve">
+    <value>A social novel by Naguib Mahfouz</value>
+  </data>
+  <data name="Book_11_Title" xml:space="preserve">
+    <value>New Book</value>
+  </data>
+  <data name="Book_11_Description" xml:space="preserve">
+    <value>Description of the new book</value>
+  </data>
+  <data name="Book_12_Title" xml:space="preserve">
+    <value>Another Book</value>
+  </data>
+  <data name="Book_12_Description" xml:space="preserve">
+    <value>Description of the other book</value>
+  </data>
+  <data name="Book_13_Title" xml:space="preserve">
+    <value>The Collar and the Bracelet</value>
+  </data>
+  <data name="Book_13_Description" xml:space="preserve">
+    <value>A renowned novel by Yahya Taher Abdullah</value>
+  </data>
+  <data name="Book_14_Title" xml:space="preserve">
+    <value>Men in the Sun</value>
+  </data>
+  <data name="Book_14_Description" xml:space="preserve">
+    <value>Ghassan Kanafani's celebrated novel</value>
+  </data>
+  <data name="Book_15_Title" xml:space="preserve">
+    <value>Season of Migration to the North</value>
+  </data>
+  <data name="Book_15_Description" xml:space="preserve">
+    <value>Tayeb Salih's most famous novel</value>
+  </data>
+  <data name="Book_16_Title" xml:space="preserve">
+    <value>For Bread Alone</value>
+  </data>
+  <data name="Book_16_Description" xml:space="preserve">
+    <value>Mohammed Choukri's autobiographical novel</value>
+  </data>
+  <data name="Book_17_Title" xml:space="preserve">
+    <value>Azazel</value>
+  </data>
+  <data name="Book_17_Description" xml:space="preserve">
+    <value>Youssef Ziedan's historical novel</value>
+  </data>
+  <data name="Book_18_Title" xml:space="preserve">
+    <value>Returning to Haifa</value>
+  </data>
+  <data name="Book_18_Description" xml:space="preserve">
+    <value>A short novel by Ghassan Kanafani</value>
+  </data>
+  <data name="Book_19_Title" xml:space="preserve">
+    <value>Love in the Time of Cholera</value>
+  </data>
+  <data name="Book_19_Description" xml:space="preserve">
+    <value>Gabriel García Márquez's novel translated into Arabic</value>
+  </data>
+  <data name="Book_20_Title" xml:space="preserve">
+    <value>Cities of Salt</value>
+  </data>
+  <data name="Book_20_Description" xml:space="preserve">
+    <value>Abdul Rahman Munif's famous novel</value>
+  </data>
   <!-- Books (subset) -->
-  <data name="Book_1_Title" xml:space="preserve"><value>Midaq Alley</value></data>
-  <data name="Book_1_Description" xml:space="preserve"><value>A famous novel by Naguib Mahfouz</value></data>
-  <data name="Book_4_Title" xml:space="preserve"><value>Al-Karnak</value></data>
-  <data name="Book_4_Description" xml:space="preserve"><value>A political novel by Naguib Mahfouz</value></data>
+  <data name="Book_1_Title" xml:space="preserve">
+    <value>Midaq Alley</value>
+  </data>
+  <data name="Book_1_Description" xml:space="preserve">
+    <value>A famous novel by Naguib Mahfouz</value>
+  </data>
+  <data name="Book_4_Title" xml:space="preserve">
+    <value>Al-Karnak</value>
+  </data>
+  <data name="Book_4_Description" xml:space="preserve">
+    <value>A political novel by Naguib Mahfouz</value>
+  </data>
+  <data name="Category_61_Name" xml:space="preserve">
+    <value>Recorded novels</value>
+  </data>
+  <data name="Category_61_Description" xml:space="preserve">
+    <value>يُعد تصنيف الروايات من الأدوات النقدية والفنية التي تهدف إلى تنظيم هذا الشكل الأدبي الطويل والمعقد وفق موضوعاته وأساليبه وبنيته الفنية، وتُعرّف الرواية بأنها سرد نثري طويل يتناول تجربة إنسانية مركبة من خلال شخصيات متعددة وأحداث متشابكة، ويعتمد تصنيف الروايات على معايير متعددة مثل النوع الأدبي، حيث نجد الروايات الواقعية التي ترصد الحياة اليومية، والروايات الرومانسية التي تركز على العلاقات العاطفية، والروايات البوليسية التي تدور حول الجريمة والتحقيق، والروايات التاريخية التي تستند إلى وقائع الماضي، والخيالية التي تبني عوالم غير مألوفة، كما يُمكن تصنيف الروايات حسب أسلوب السرد</value>
+  </data>
+  <data name="Author_5_Name" xml:space="preserve">
+    <value>Ahmed Abouelwafa</value>
+  </data>
+  <data name="Author_5_Bio" xml:space="preserve">
+    <value>Ahmed Abouelwafa Mohamed(1962 – 2018) was an Egyptian author and physician, widely known as "The Godfather" of modern Arabic literature in horror, fantasy, and science fiction. He was the first contemporary Arab writer to explore the horror genre, becoming a cultural icon across the Arab world. His most famous book series include Ma Waraa Al Tabiaa (Metaphysics), Fantasia, and Safari. Tawfik’s work inspired generations of young readers and left a lasting legacy in modern Arabic literature.</value>
+  </data>
+  <data name="Book_50_Title" xml:space="preserve">
+    <value>القادمون</value>
+  </data>
+  <data name="Book_50_Description" xml:space="preserve">
+    <value>The long time has ended, and the long-awaited time has come. People are caught up in amusement and games, and temptations like pieces of a dark night. The earth has been decorated and prepared, and devils have ascended every pulpit. You do not know where to place your soul, or how to hold on to your religion. The fog of truth has covered the blackness of falsehood, and only the eye of your heart can see. Then the time for our departure has come, and people have prepared for the final temptation; the temptation of the end.</value>
+  </data>
+  <data name="Category_86_Name" xml:space="preserve">
+    <value>Scary and inspiring</value>
+  </data>
+  <data name="Category_86_Description" xml:space="preserve">
+    <value>In the Terrifying &amp; Inspiring section of Aseer Alkotb, the dread of darkness intertwines with sparks of hope, creating a mesmerizing world of contrasting emotions. Within its pages, you will encounter fear that takes your breath away, and inspiration that awakens hidden strength within you. It is a realm that leads you to the edge of fear only to reveal the depths of courage, leaving you suspended between the thrill of mystery and the pulse of life.</value>
+  </data>
+  <data name="Author_23_Name" xml:space="preserve">
+    <value>Ahmed Khaled Mouwad </value>
+  </data>
+  <data name="Author_23_Bio" xml:space="preserve">
+    <value>Ahmed Khaled Mouwad is a young writer passionate about exploring the realms of literature and thought, blending profound imagination with genuine human reflection in his works. His writings, ranging from inspiring reflections to thrilling tales, leave a lasting impact on readers. With a constant search for meaning, he believes that words hold the power to touch hearts and unlock new perspectives.</value>
+  </data>
+  <data name="Book_51_Title" xml:space="preserve">
+    <value>root</value>
+  </data>
+  <data name="Book_51_Description" xml:space="preserve">
+    <value>The Passage is a book that takes you on a thrilling journey through corridors of fear and hope, where the narrow path becomes a symbol of life’s trials and challenges. Within its pages, you will encounter a blend of mystery and inspiration, reflecting the struggle between one’s inner self and the outer world. It is more than just a story; it is an invitation to discover the hidden strength within, as the dark passage transforms into a gateway to light and freedom.</value>
+  </data>
 </root>

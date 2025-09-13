@@ -193,193 +193,544 @@
     <value>أحرف</value>
   </data>
   <!-- مفاتيح محلية للبيانات المزروعة (يمكن توسيعها لاحقاً) -->
-  <data name="Author_1_Name" xml:space="preserve"><value>نجيب محفوظ</value></data>
-  <data name="Author_1_Bio" xml:space="preserve"><value>كاتب مصري حائز على نوبل</value></data>
-  <data name="Author_2_Name" xml:space="preserve"><value>أحمد خالد توفيق</value></data>
-  <data name="Author_2_Bio" xml:space="preserve"><value>العرّاب وأديب الرعب العربي</value></data>
-  <data name="Author_3_Name" xml:space="preserve"><value>يوسف إدريس</value></data>
-  <data name="Author_3_Bio" xml:space="preserve"><value>كاتب مصري</value></data>
-  <data name="Author_4_Name" xml:space="preserve"><value>أحمد خيري العمري</value></data>
-  <data name="Author_4_Bio" xml:space="preserve"><value>كاتب وطبيب أسنان عراقي</value></data>
-
-  <data name="Publisher_1_Name" xml:space="preserve"><value>عصير الكتب</value></data>
-  <data name="Publisher_1_Description" xml:space="preserve"><value>دار نشر مصرية</value></data>
-  <data name="Publisher_2_Name" xml:space="preserve"><value>دار الشروق</value></data>
-  <data name="Publisher_2_Description" xml:space="preserve"><value>دار نشر عربية</value></data>
-  <data name="Publisher_3_Name" xml:space="preserve"><value>دار الساقي</value></data>
-  <data name="Publisher_3_Description" xml:space="preserve"><value>دار نشر لبنانية</value></data>
-
+  <data name="Author_1_Name" xml:space="preserve">
+    <value>نجيب محفوظ</value>
+  </data>
+  <data name="Author_1_Bio" xml:space="preserve">
+    <value>كاتب مصري حائز على نوبل</value>
+  </data>
+  <data name="Author_2_Name" xml:space="preserve">
+    <value>أحمد خالد توفيق</value>
+  </data>
+  <data name="Author_2_Bio" xml:space="preserve">
+    <value>العرّاب وأديب الرعب العربي</value>
+  </data>
+  <data name="Author_3_Name" xml:space="preserve">
+    <value>يوسف إدريس</value>
+  </data>
+  <data name="Author_3_Bio" xml:space="preserve">
+    <value>كاتب مصري</value>
+  </data>
+  <data name="Author_4_Name" xml:space="preserve">
+    <value>أحمد خيري العمري</value>
+  </data>
+  <data name="Author_4_Bio" xml:space="preserve">
+    <value>كاتب وطبيب أسنان عراقي</value>
+  </data>
+  <data name="Publisher_1_Name" xml:space="preserve">
+    <value>عصير الكتب</value>
+  </data>
+  <data name="Publisher_1_Description" xml:space="preserve">
+    <value>دار نشر مصرية</value>
+  </data>
+  <data name="Publisher_2_Name" xml:space="preserve">
+    <value>دار الشروق</value>
+  </data>
+  <data name="Publisher_2_Description" xml:space="preserve">
+    <value>دار نشر عربية</value>
+  </data>
+  <data name="Publisher_3_Name" xml:space="preserve">
+    <value>دار الساقي</value>
+  </data>
+  <data name="Publisher_3_Description" xml:space="preserve">
+    <value>دار نشر لبنانية</value>
+  </data>
   <!-- التصنيفات الرئيسية -->
-  <data name="Category_1_Name" xml:space="preserve"><value>روايات</value></data>
-  <data name="Category_1_Description" xml:space="preserve"><value>كتب روائية تشمل الأدب العربي والعالمي</value></data>
-  <data name="Category_2_Name" xml:space="preserve"><value>تاريخ</value></data>
-  <data name="Category_2_Description" xml:space="preserve"><value>كتب تاريخية عن الحضارات والشعوب</value></data>
-  <data name="Category_3_Name" xml:space="preserve"><value>علوم</value></data>
-  <data name="Category_3_Description" xml:space="preserve"><value>كتب علمية في مجالات متنوعة</value></data>
-  <data name="Category_4_Name" xml:space="preserve"><value>تنمية بشرية</value></data>
-  <data name="Category_4_Description" xml:space="preserve"><value>كتب لتطوير الذات والمهارات</value></data>
-  <data name="Category_5_Name" xml:space="preserve"><value>كتب دينية</value></data>
-  <data name="Category_5_Description" xml:space="preserve"><value>كتب دينية وفكر إسلامي</value></data>
-  <data name="Category_6_Name" xml:space="preserve"><value>أدب</value></data>
-  <data name="Category_6_Description" xml:space="preserve"><value>كتب أدبية تشمل الشعر والنثر</value></data>
-  <data name="Category_7_Name" xml:space="preserve"><value>كتب أطفال</value></data>
-  <data name="Category_7_Description" xml:space="preserve"><value>كتب مخصصة للأطفال والناشئة</value></data>
-  <data name="Category_8_Name" xml:space="preserve"><value>سياسة</value></data>
-  <data name="Category_8_Description" xml:space="preserve"><value>كتب عن السياسة والعلاقات الدولية</value></data>
-  <data name="Category_9_Name" xml:space="preserve"><value>اقتصاد</value></data>
-  <data name="Category_9_Description" xml:space="preserve"><value>كتب اقتصادية ومالية</value></data>
-  <data name="Category_10_Name" xml:space="preserve"><value>فلسفة</value></data>
-  <data name="Category_10_Description" xml:space="preserve"><value>كتب فلسفية وفكرية</value></data>
-  <data name="Category_11_Name" xml:space="preserve"><value>طبخ</value></data>
-  <data name="Category_11_Description" xml:space="preserve"><value>كتب عن الطبخ والوصفات</value></data>
-  <data name="Category_12_Name" xml:space="preserve"><value>سير ذاتية</value></data>
-  <data name="Category_12_Description" xml:space="preserve"><value>سير ذاتية ومذكرات</value></data>
-  <data name="Category_13_Name" xml:space="preserve"><value>فنون</value></data>
-  <data name="Category_13_Description" xml:space="preserve"><value>كتب عن الفنون والإبداع</value></data>
-  <data name="Category_14_Name" xml:space="preserve"><value>تكنولوجيا</value></data>
-  <data name="Category_14_Description" xml:space="preserve"><value>كتب عن التكنولوجيا والابتكار</value></data>
-  <data name="Category_15_Name" xml:space="preserve"><value>طب</value></data>
-  <data name="Category_15_Description" xml:space="preserve"><value>كتب طبية وصحية</value></data>
-  <data name="Category_16_Name" xml:space="preserve"><value>رياضة</value></data>
-  <data name="Category_16_Description" xml:space="preserve"><value>كتب عن الرياضة واللياقة البدنية</value></data>
-  <data name="Category_17_Name" xml:space="preserve"><value>سفر</value></data>
-  <data name="Category_17_Description" xml:space="preserve"><value>كتب عن السفر والرحلات</value></data>
-  <data name="Category_18_Name" xml:space="preserve"><value>إدارة</value></data>
-  <data name="Category_18_Description" xml:space="preserve"><value>كتب عن الإدارة والقيادة</value></data>
-  <data name="Category_19_Name" xml:space="preserve"><value>قانون</value></data>
-  <data name="Category_19_Description" xml:space="preserve"><value>كتب قانونية وتشريعات</value></data>
-  <data name="Category_20_Name" xml:space="preserve"><value>تعليم</value></data>
-  <data name="Category_20_Description" xml:space="preserve"><value>كتب تعليمية وتربوية</value></data>
-
+  <data name="Category_1_Name" xml:space="preserve">
+    <value>روايات</value>
+  </data>
+  <data name="Category_1_Description" xml:space="preserve">
+    <value>كتب روائية تشمل الأدب العربي والعالمي</value>
+  </data>
+  <data name="Category_2_Name" xml:space="preserve">
+    <value>تاريخ</value>
+  </data>
+  <data name="Category_2_Description" xml:space="preserve">
+    <value>كتب تاريخية عن الحضارات والشعوب</value>
+  </data>
+  <data name="Category_3_Name" xml:space="preserve">
+    <value>علوم</value>
+  </data>
+  <data name="Category_3_Description" xml:space="preserve">
+    <value>كتب علمية في مجالات متنوعة</value>
+  </data>
+  <data name="Category_4_Name" xml:space="preserve">
+    <value>تنمية بشرية</value>
+  </data>
+  <data name="Category_4_Description" xml:space="preserve">
+    <value>كتب لتطوير الذات والمهارات</value>
+  </data>
+  <data name="Category_5_Name" xml:space="preserve">
+    <value>كتب دينية</value>
+  </data>
+  <data name="Category_5_Description" xml:space="preserve">
+    <value>كتب دينية وفكر إسلامي</value>
+  </data>
+  <data name="Category_6_Name" xml:space="preserve">
+    <value>أدب</value>
+  </data>
+  <data name="Category_6_Description" xml:space="preserve">
+    <value>كتب أدبية تشمل الشعر والنثر</value>
+  </data>
+  <data name="Category_7_Name" xml:space="preserve">
+    <value>كتب أطفال</value>
+  </data>
+  <data name="Category_7_Description" xml:space="preserve">
+    <value>كتب مخصصة للأطفال والناشئة</value>
+  </data>
+  <data name="Category_8_Name" xml:space="preserve">
+    <value>سياسة</value>
+  </data>
+  <data name="Category_8_Description" xml:space="preserve">
+    <value>كتب عن السياسة والعلاقات الدولية</value>
+  </data>
+  <data name="Category_9_Name" xml:space="preserve">
+    <value>اقتصاد</value>
+  </data>
+  <data name="Category_9_Description" xml:space="preserve">
+    <value>كتب اقتصادية ومالية</value>
+  </data>
+  <data name="Category_10_Name" xml:space="preserve">
+    <value>فلسفة</value>
+  </data>
+  <data name="Category_10_Description" xml:space="preserve">
+    <value>كتب فلسفية وفكرية</value>
+  </data>
+  <data name="Category_11_Name" xml:space="preserve">
+    <value>طبخ</value>
+  </data>
+  <data name="Category_11_Description" xml:space="preserve">
+    <value>كتب عن الطبخ والوصفات</value>
+  </data>
+  <data name="Category_12_Name" xml:space="preserve">
+    <value>سير ذاتية</value>
+  </data>
+  <data name="Category_12_Description" xml:space="preserve">
+    <value>سير ذاتية ومذكرات</value>
+  </data>
+  <data name="Category_13_Name" xml:space="preserve">
+    <value>فنون</value>
+  </data>
+  <data name="Category_13_Description" xml:space="preserve">
+    <value>كتب عن الفنون والإبداع</value>
+  </data>
+  <data name="Category_14_Name" xml:space="preserve">
+    <value>تكنولوجيا</value>
+  </data>
+  <data name="Category_14_Description" xml:space="preserve">
+    <value>كتب عن التكنولوجيا والابتكار</value>
+  </data>
+  <data name="Category_15_Name" xml:space="preserve">
+    <value>طب</value>
+  </data>
+  <data name="Category_15_Description" xml:space="preserve">
+    <value>كتب طبية وصحية</value>
+  </data>
+  <data name="Category_16_Name" xml:space="preserve">
+    <value>رياضة</value>
+  </data>
+  <data name="Category_16_Description" xml:space="preserve">
+    <value>كتب عن الرياضة واللياقة البدنية</value>
+  </data>
+  <data name="Category_17_Name" xml:space="preserve">
+    <value>سفر</value>
+  </data>
+  <data name="Category_17_Description" xml:space="preserve">
+    <value>كتب عن السفر والرحلات</value>
+  </data>
+  <data name="Category_18_Name" xml:space="preserve">
+    <value>إدارة</value>
+  </data>
+  <data name="Category_18_Description" xml:space="preserve">
+    <value>كتب عن الإدارة والقيادة</value>
+  </data>
+  <data name="Category_19_Name" xml:space="preserve">
+    <value>قانون</value>
+  </data>
+  <data name="Category_19_Description" xml:space="preserve">
+    <value>كتب قانونية وتشريعات</value>
+  </data>
+  <data name="Category_20_Name" xml:space="preserve">
+    <value>تعليم</value>
+  </data>
+  <data name="Category_20_Description" xml:space="preserve">
+    <value>كتب تعليمية وتربوية</value>
+  </data>
   <!-- التصنيفات الفرعية -->
-  <data name="Category_21_Name" xml:space="preserve"><value>روايات عربية</value></data>
-  <data name="Category_21_Description" xml:space="preserve"><value>روايات مكتوبة باللغة العربية</value></data>
-  <data name="Category_22_Name" xml:space="preserve"><value>روايات مترجمة</value></data>
-  <data name="Category_22_Description" xml:space="preserve"><value>روايات مترجمة من لغات أخرى</value></data>
-  <data name="Category_23_Name" xml:space="preserve"><value>روايات بوليسية</value></data>
-  <data name="Category_23_Description" xml:space="preserve"><value>روايات الجريمة والغموض</value></data>
-  <data name="Category_24_Name" xml:space="preserve"><value>روايات خيال علمي</value></data>
-  <data name="Category_24_Description" xml:space="preserve"><value>روايات في عالم الخيال العلمي</value></data>
-  <data name="Category_25_Name" xml:space="preserve"><value>تاريخ العالم</value></data>
-  <data name="Category_25_Description" xml:space="preserve"><value>كتب عن تاريخ الحضارات العالمية</value></data>
-  <data name="Category_26_Name" xml:space="preserve"><value>تاريخ العرب</value></data>
-  <data name="Category_26_Description" xml:space="preserve"><value>كتب عن تاريخ العرب والإسلام</value></data>
-  <data name="Category_27_Name" xml:space="preserve"><value>تاريخ الحروب</value></data>
-  <data name="Category_27_Description" xml:space="preserve"><value>كتب عن الحروب والصراعات</value></data>
-  <data name="Category_28_Name" xml:space="preserve"><value>علوم طبيعية</value></data>
-  <data name="Category_28_Description" xml:space="preserve"><value>كتب في الفيزياء والكيمياء</value></data>
-  <data name="Category_29_Name" xml:space="preserve"><value>علوم حيوية</value></data>
-  <data name="Category_29_Description" xml:space="preserve"><value>كتب في البيولوجيا والطب</value></data>
-  <data name="Category_30_Name" xml:space="preserve"><value>علوم الفلك</value></data>
-  <data name="Category_30_Description" xml:space="preserve"><value>كتب عن الفضاء والكون</value></data>
-  <data name="Category_31_Name" xml:space="preserve"><value>تطوير الذات</value></data>
-  <data name="Category_31_Description" xml:space="preserve"><value>كتب لتحسين المهارات الشخصية</value></data>
-  <data name="Category_32_Name" xml:space="preserve"><value>القيادة</value></data>
-  <data name="Category_32_Description" xml:space="preserve"><value>كتب عن مهارات القيادة</value></data>
-  <data name="Category_33_Name" xml:space="preserve"><value>إدارة الوقت</value></data>
-  <data name="Category_33_Description" xml:space="preserve"><value>كتب عن تنظيم الوقت</value></data>
-  <data name="Category_34_Name" xml:space="preserve"><value>فكر إسلامي</value></data>
-  <data name="Category_34_Description" xml:space="preserve"><value>كتب عن الفكر والفقه الإسلامي</value></data>
-  <data name="Category_35_Name" xml:space="preserve"><value>تفسير القرآن</value></data>
-  <data name="Category_35_Description" xml:space="preserve"><value>كتب تفسير القرآن الكريم</value></data>
-  <data name="Category_36_Name" xml:space="preserve"><value>شعر عربي</value></data>
-  <data name="Category_36_Description" xml:space="preserve"><value>دواوين الشعر العربي</value></data>
-  <data name="Category_37_Name" xml:space="preserve"><value>نثر أدبي</value></data>
-  <data name="Category_37_Description" xml:space="preserve"><value>كتب النثر الأدبي والمقالات</value></data>
-  <data name="Category_38_Name" xml:space="preserve"><value>قصص أطفال</value></data>
-  <data name="Category_38_Description" xml:space="preserve"><value>قصص مصورة للأطفال</value></data>
-  <data name="Category_39_Name" xml:space="preserve"><value>كتب تعليمية للأطفال</value></data>
-  <data name="Category_39_Description" xml:space="preserve"><value>كتب تعليمية للناشئة</value></data>
-  <data name="Category_40_Name" xml:space="preserve"><value>علاقات دولية</value></data>
-  <data name="Category_40_Description" xml:space="preserve"><value>كتب عن السياسة العالمية</value></data>
-  <data name="Category_41_Name" xml:space="preserve"><value>سياسة محلية</value></data>
-  <data name="Category_41_Description" xml:space="preserve"><value>كتب عن السياسة العربية</value></data>
-  <data name="Category_42_Name" xml:space="preserve"><value>اقتصاد كلي</value></data>
-  <data name="Category_42_Description" xml:space="preserve"><value>كتب عن الاقتصاد العام</value></data>
-  <data name="Category_43_Name" xml:space="preserve"><value>مالية شخصية</value></data>
-  <data name="Category_43_Description" xml:space="preserve"><value>كتب عن إدارة الأموال الشخصية</value></data>
-  <data name="Category_44_Name" xml:space="preserve"><value>فلسفة غربية</value></data>
-  <data name="Category_44_Description" xml:space="preserve"><value>كتب عن الفلسفة الغربية</value></data>
-  <data name="Category_45_Name" xml:space="preserve"><value>فلسفة شرقية</value></data>
-  <data name="Category_45_Description" xml:space="preserve"><value>كتب عن الفلسفة الشرقية</value></data>
-  <data name="Category_46_Name" xml:space="preserve"><value>مطبخ عربي</value></data>
-  <data name="Category_46_Description" xml:space="preserve"><value>وصفات الطعام العربي</value></data>
-  <data name="Category_47_Name" xml:space="preserve"><value>مطبخ عالمي</value></data>
-  <data name="Category_47_Description" xml:space="preserve"><value>وصفات من مطابخ العالم</value></data>
-  <data name="Category_48_Name" xml:space="preserve"><value>سير سياسيين</value></data>
-  <data name="Category_48_Description" xml:space="preserve"><value>سير ذاتية لشخصيات سياسية</value></data>
-  <data name="Category_49_Name" xml:space="preserve"><value>سير فنانين</value></data>
-  <data name="Category_49_Description" xml:space="preserve"><value>سير ذاتية لفنانين ومبدعين</value></data>
-  <data name="Category_50_Name" xml:space="preserve"><value>فنون تشكيلية</value></data>
-  <data name="Category_50_Description" xml:space="preserve"><value>كتب عن الرسم والنحت</value></data>
-  <data name="Category_51_Name" xml:space="preserve"><value>موسيقى</value></data>
-  <data name="Category_51_Description" xml:space="preserve"><value>كتب عن الموسيقى والآلات</value></data>
-  <data name="Category_52_Name" xml:space="preserve"><value>برمجة</value></data>
-  <data name="Category_52_Description" xml:space="preserve"><value>كتب عن البرمجة وتطوير البرمجيات</value></data>
-  <data name="Category_53_Name" xml:space="preserve"><value>ذكاء اصطناعي</value></data>
-  <data name="Category_53_Description" xml:space="preserve"><value>كتب عن الذكاء الاصطناعي</value></data>
-  <data name="Category_54_Name" xml:space="preserve"><value>طب عام</value></data>
-  <data name="Category_54_Description" xml:space="preserve"><value>كتب عن الطب العام والصحة</value></data>
-  <data name="Category_55_Name" xml:space="preserve"><value>تغذية</value></data>
-  <data name="Category_55_Description" xml:space="preserve"><value>كتب عن التغذية والصحة</value></data>
-  <data name="Category_56_Name" xml:space="preserve"><value>لياقة بدنية</value></data>
-  <data name="Category_56_Description" xml:space="preserve"><value>كتب عن التمارين الرياضية</value></data>
-  <data name="Category_57_Name" xml:space="preserve"><value>رياضات جماعية</value></data>
-  <data name="Category_57_Description" xml:space="preserve"><value>كتب عن كرة القدم وغيرها</value></data>
-  <data name="Category_58_Name" xml:space="preserve"><value>رحلات مغامرة</value></data>
-  <data name="Category_58_Description" xml:space="preserve"><value>كتب عن السفر والمغامرات</value></data>
-  <data name="Category_59_Name" xml:space="preserve"><value>أدلة سياحية</value></data>
-  <data name="Category_59_Description" xml:space="preserve"><value>أدلة للسفر والسياحة</value></data>
-  <data name="Category_60_Name" xml:space="preserve"><value>إدارة الأعمال</value></data>
-  <data name="Category_60_Description" xml:space="preserve"><value>كتب عن إدارة الشركات</value></data>
-
+  <data name="Category_21_Name" xml:space="preserve">
+    <value>روايات عربية</value>
+  </data>
+  <data name="Category_21_Description" xml:space="preserve">
+    <value>روايات مكتوبة باللغة العربية</value>
+  </data>
+  <data name="Category_22_Name" xml:space="preserve">
+    <value>روايات مترجمة</value>
+  </data>
+  <data name="Category_22_Description" xml:space="preserve">
+    <value>روايات مترجمة من لغات أخرى</value>
+  </data>
+  <data name="Category_23_Name" xml:space="preserve">
+    <value>روايات بوليسية</value>
+  </data>
+  <data name="Category_23_Description" xml:space="preserve">
+    <value>روايات الجريمة والغموض</value>
+  </data>
+  <data name="Category_24_Name" xml:space="preserve">
+    <value>روايات خيال علمي</value>
+  </data>
+  <data name="Category_24_Description" xml:space="preserve">
+    <value>روايات في عالم الخيال العلمي</value>
+  </data>
+  <data name="Category_25_Name" xml:space="preserve">
+    <value>تاريخ العالم</value>
+  </data>
+  <data name="Category_25_Description" xml:space="preserve">
+    <value>كتب عن تاريخ الحضارات العالمية</value>
+  </data>
+  <data name="Category_26_Name" xml:space="preserve">
+    <value>تاريخ العرب</value>
+  </data>
+  <data name="Category_26_Description" xml:space="preserve">
+    <value>كتب عن تاريخ العرب والإسلام</value>
+  </data>
+  <data name="Category_27_Name" xml:space="preserve">
+    <value>تاريخ الحروب</value>
+  </data>
+  <data name="Category_27_Description" xml:space="preserve">
+    <value>كتب عن الحروب والصراعات</value>
+  </data>
+  <data name="Category_28_Name" xml:space="preserve">
+    <value>علوم طبيعية</value>
+  </data>
+  <data name="Category_28_Description" xml:space="preserve">
+    <value>كتب في الفيزياء والكيمياء</value>
+  </data>
+  <data name="Category_29_Name" xml:space="preserve">
+    <value>علوم حيوية</value>
+  </data>
+  <data name="Category_29_Description" xml:space="preserve">
+    <value>كتب في البيولوجيا والطب</value>
+  </data>
+  <data name="Category_30_Name" xml:space="preserve">
+    <value>علوم الفلك</value>
+  </data>
+  <data name="Category_30_Description" xml:space="preserve">
+    <value>كتب عن الفضاء والكون</value>
+  </data>
+  <data name="Category_31_Name" xml:space="preserve">
+    <value>تطوير الذات</value>
+  </data>
+  <data name="Category_31_Description" xml:space="preserve">
+    <value>كتب لتحسين المهارات الشخصية</value>
+  </data>
+  <data name="Category_32_Name" xml:space="preserve">
+    <value>القيادة</value>
+  </data>
+  <data name="Category_32_Description" xml:space="preserve">
+    <value>كتب عن مهارات القيادة</value>
+  </data>
+  <data name="Category_33_Name" xml:space="preserve">
+    <value>إدارة الوقت</value>
+  </data>
+  <data name="Category_33_Description" xml:space="preserve">
+    <value>كتب عن تنظيم الوقت</value>
+  </data>
+  <data name="Category_34_Name" xml:space="preserve">
+    <value>فكر إسلامي</value>
+  </data>
+  <data name="Category_34_Description" xml:space="preserve">
+    <value>كتب عن الفكر والفقه الإسلامي</value>
+  </data>
+  <data name="Category_35_Name" xml:space="preserve">
+    <value>تفسير القرآن</value>
+  </data>
+  <data name="Category_35_Description" xml:space="preserve">
+    <value>كتب تفسير القرآن الكريم</value>
+  </data>
+  <data name="Category_36_Name" xml:space="preserve">
+    <value>شعر عربي</value>
+  </data>
+  <data name="Category_36_Description" xml:space="preserve">
+    <value>دواوين الشعر العربي</value>
+  </data>
+  <data name="Category_37_Name" xml:space="preserve">
+    <value>نثر أدبي</value>
+  </data>
+  <data name="Category_37_Description" xml:space="preserve">
+    <value>كتب النثر الأدبي والمقالات</value>
+  </data>
+  <data name="Category_38_Name" xml:space="preserve">
+    <value>قصص أطفال</value>
+  </data>
+  <data name="Category_38_Description" xml:space="preserve">
+    <value>قصص مصورة للأطفال</value>
+  </data>
+  <data name="Category_39_Name" xml:space="preserve">
+    <value>كتب تعليمية للأطفال</value>
+  </data>
+  <data name="Category_39_Description" xml:space="preserve">
+    <value>كتب تعليمية للناشئة</value>
+  </data>
+  <data name="Category_40_Name" xml:space="preserve">
+    <value>علاقات دولية</value>
+  </data>
+  <data name="Category_40_Description" xml:space="preserve">
+    <value>كتب عن السياسة العالمية</value>
+  </data>
+  <data name="Category_41_Name" xml:space="preserve">
+    <value>سياسة محلية</value>
+  </data>
+  <data name="Category_41_Description" xml:space="preserve">
+    <value>كتب عن السياسة العربية</value>
+  </data>
+  <data name="Category_42_Name" xml:space="preserve">
+    <value>اقتصاد كلي</value>
+  </data>
+  <data name="Category_42_Description" xml:space="preserve">
+    <value>كتب عن الاقتصاد العام</value>
+  </data>
+  <data name="Category_43_Name" xml:space="preserve">
+    <value>مالية شخصية</value>
+  </data>
+  <data name="Category_43_Description" xml:space="preserve">
+    <value>كتب عن إدارة الأموال الشخصية</value>
+  </data>
+  <data name="Category_44_Name" xml:space="preserve">
+    <value>فلسفة غربية</value>
+  </data>
+  <data name="Category_44_Description" xml:space="preserve">
+    <value>كتب عن الفلسفة الغربية</value>
+  </data>
+  <data name="Category_45_Name" xml:space="preserve">
+    <value>فلسفة شرقية</value>
+  </data>
+  <data name="Category_45_Description" xml:space="preserve">
+    <value>كتب عن الفلسفة الشرقية</value>
+  </data>
+  <data name="Category_46_Name" xml:space="preserve">
+    <value>مطبخ عربي</value>
+  </data>
+  <data name="Category_46_Description" xml:space="preserve">
+    <value>وصفات الطعام العربي</value>
+  </data>
+  <data name="Category_47_Name" xml:space="preserve">
+    <value>مطبخ عالمي</value>
+  </data>
+  <data name="Category_47_Description" xml:space="preserve">
+    <value>وصفات من مطابخ العالم</value>
+  </data>
+  <data name="Category_48_Name" xml:space="preserve">
+    <value>سير سياسيين</value>
+  </data>
+  <data name="Category_48_Description" xml:space="preserve">
+    <value>سير ذاتية لشخصيات سياسية</value>
+  </data>
+  <data name="Category_49_Name" xml:space="preserve">
+    <value>سير فنانين</value>
+  </data>
+  <data name="Category_49_Description" xml:space="preserve">
+    <value>سير ذاتية لفنانين ومبدعين</value>
+  </data>
+  <data name="Category_50_Name" xml:space="preserve">
+    <value>فنون تشكيلية</value>
+  </data>
+  <data name="Category_50_Description" xml:space="preserve">
+    <value>كتب عن الرسم والنحت</value>
+  </data>
+  <data name="Category_51_Name" xml:space="preserve">
+    <value>موسيقى</value>
+  </data>
+  <data name="Category_51_Description" xml:space="preserve">
+    <value>كتب عن الموسيقى والآلات</value>
+  </data>
+  <data name="Category_52_Name" xml:space="preserve">
+    <value>برمجة</value>
+  </data>
+  <data name="Category_52_Description" xml:space="preserve">
+    <value>كتب عن البرمجة وتطوير البرمجيات</value>
+  </data>
+  <data name="Category_53_Name" xml:space="preserve">
+    <value>ذكاء اصطناعي</value>
+  </data>
+  <data name="Category_53_Description" xml:space="preserve">
+    <value>كتب عن الذكاء الاصطناعي</value>
+  </data>
+  <data name="Category_54_Name" xml:space="preserve">
+    <value>طب عام</value>
+  </data>
+  <data name="Category_54_Description" xml:space="preserve">
+    <value>كتب عن الطب العام والصحة</value>
+  </data>
+  <data name="Category_55_Name" xml:space="preserve">
+    <value>تغذية</value>
+  </data>
+  <data name="Category_55_Description" xml:space="preserve">
+    <value>كتب عن التغذية والصحة</value>
+  </data>
+  <data name="Category_56_Name" xml:space="preserve">
+    <value>لياقة بدنية</value>
+  </data>
+  <data name="Category_56_Description" xml:space="preserve">
+    <value>كتب عن التمارين الرياضية</value>
+  </data>
+  <data name="Category_57_Name" xml:space="preserve">
+    <value>رياضات جماعية</value>
+  </data>
+  <data name="Category_57_Description" xml:space="preserve">
+    <value>كتب عن كرة القدم وغيرها</value>
+  </data>
+  <data name="Category_58_Name" xml:space="preserve">
+    <value>رحلات مغامرة</value>
+  </data>
+  <data name="Category_58_Description" xml:space="preserve">
+    <value>كتب عن السفر والمغامرات</value>
+  </data>
+  <data name="Category_59_Name" xml:space="preserve">
+    <value>أدلة سياحية</value>
+  </data>
+  <data name="Category_59_Description" xml:space="preserve">
+    <value>أدلة للسفر والسياحة</value>
+  </data>
+  <data name="Category_60_Name" xml:space="preserve">
+    <value>إدارة الأعمال</value>
+  </data>
+  <data name="Category_60_Description" xml:space="preserve">
+    <value>كتب عن إدارة الشركات</value>
+  </data>
   <!-- الكتب 1..20 -->
-  <data name="Book_1_Title" xml:space="preserve"><value>زقاق المدق</value></data>
-  <data name="Book_1_Description" xml:space="preserve"><value>رواية شهيرة لنجيب محفوظ</value></data>
-  <data name="Book_2_Title" xml:space="preserve"><value>كتاب جديد</value></data>
-  <data name="Book_2_Description" xml:space="preserve"><value>وصف الكتاب الجديد</value></data>
-  <data name="Book_3_Title" xml:space="preserve"><value>كتاب آخر</value></data>
-  <data name="Book_3_Description" xml:space="preserve"><value>وصف الكتاب الآخر</value></data>
-  <data name="Book_4_Title" xml:space="preserve"><value>الكرنك</value></data>
-  <data name="Book_4_Description" xml:space="preserve"><value>رواية سياسية لنجيب محفوظ</value></data>
-  <data name="Book_5_Title" xml:space="preserve"><value>أولاد حارتنا</value></data>
-  <data name="Book_5_Description" xml:space="preserve"><value>رواية مثيرة للجدل لنجيب محفوظ</value></data>
-  <data name="Book_6_Title" xml:space="preserve"><value>الحرافيش</value></data>
-  <data name="Book_6_Description" xml:space="preserve"><value>ملحمة أدبية لنجيب محفوظ</value></data>
-  <data name="Book_7_Title" xml:space="preserve"><value>بين القصرين</value></data>
-  <data name="Book_7_Description" xml:space="preserve"><value>الجزء الأول من ثلاثية نجيب محفوظ</value></data>
-  <data name="Book_8_Title" xml:space="preserve"><value>قصر الشوق</value></data>
-  <data name="Book_8_Description" xml:space="preserve"><value>الجزء الثاني من ثلاثية نجيب محفوظ</value></data>
-  <data name="Book_9_Title" xml:space="preserve"><value>السكرية</value></data>
-  <data name="Book_9_Description" xml:space="preserve"><value>الجزء الثالث من ثلاثية نجيب محفوظ</value></data>
-  <data name="Book_10_Title" xml:space="preserve"><value>خان الخليلي</value></data>
-  <data name="Book_10_Description" xml:space="preserve"><value>رواية اجتماعية لنجيب محفوظ</value></data>
-  <data name="Book_11_Title" xml:space="preserve"><value>كتاب جديد</value></data>
-  <data name="Book_11_Description" xml:space="preserve"><value>وصف الكتاب الجديد</value></data>
-  <data name="Book_12_Title" xml:space="preserve"><value>كتاب آخر</value></data>
-  <data name="Book_12_Description" xml:space="preserve"><value>وصف الكتاب الآخر</value></data>
-  <data name="Book_13_Title" xml:space="preserve"><value>الطوق والأسورة</value></data>
-  <data name="Book_13_Description" xml:space="preserve"><value>رواية شهيرة ليحيى الطاهر عبدالله</value></data>
-  <data name="Book_14_Title" xml:space="preserve"><value>رجال في الشمس</value></data>
-  <data name="Book_14_Description" xml:space="preserve"><value>رواية غسان كنفاني الشهيرة</value></data>
-  <data name="Book_15_Title" xml:space="preserve"><value>موسم الهجرة إلى الشمال</value></data>
-  <data name="Book_15_Description" xml:space="preserve"><value>رواية الطيب صالح الأشهر</value></data>
-  <data name="Book_16_Title" xml:space="preserve"><value>الخبز الحافي</value></data>
-  <data name="Book_16_Description" xml:space="preserve"><value>رواية محمد شكري الذاتية</value></data>
-  <data name="Book_17_Title" xml:space="preserve"><value>عزازيل</value></data>
-  <data name="Book_17_Description" xml:space="preserve"><value>رواية يوسف زيدان التاريخية</value></data>
-  <data name="Book_18_Title" xml:space="preserve"><value>عائد إلى حيفا</value></data>
-  <data name="Book_18_Description" xml:space="preserve"><value>رواية قصيرة لغسان كنفاني</value></data>
-  <data name="Book_19_Title" xml:space="preserve"><value>الحب في زمن الكوليرا</value></data>
-  <data name="Book_19_Description" xml:space="preserve"><value>رواية غابرييل غارسيا ماركيز المترجمة للعربية</value></data>
-  <data name="Book_20_Title" xml:space="preserve"><value>مدن الملح</value></data>
-  <data name="Book_20_Description" xml:space="preserve"><value>رواية عبد الرحمن منيف الشهيرة</value></data>
-
+  <data name="Book_1_Title" xml:space="preserve">
+    <value>زقاق المدق</value>
+  </data>
+  <data name="Book_1_Description" xml:space="preserve">
+    <value>رواية شهيرة لنجيب محفوظ</value>
+  </data>
+  <data name="Book_2_Title" xml:space="preserve">
+    <value>كتاب جديد</value>
+  </data>
+  <data name="Book_2_Description" xml:space="preserve">
+    <value>وصف الكتاب الجديد</value>
+  </data>
+  <data name="Book_3_Title" xml:space="preserve">
+    <value>كتاب آخر</value>
+  </data>
+  <data name="Book_3_Description" xml:space="preserve">
+    <value>وصف الكتاب الآخر</value>
+  </data>
+  <data name="Book_4_Title" xml:space="preserve">
+    <value>الكرنك</value>
+  </data>
+  <data name="Book_4_Description" xml:space="preserve">
+    <value>رواية سياسية لنجيب محفوظ</value>
+  </data>
+  <data name="Book_5_Title" xml:space="preserve">
+    <value>أولاد حارتنا</value>
+  </data>
+  <data name="Book_5_Description" xml:space="preserve">
+    <value>رواية مثيرة للجدل لنجيب محفوظ</value>
+  </data>
+  <data name="Book_6_Title" xml:space="preserve">
+    <value>الحرافيش</value>
+  </data>
+  <data name="Book_6_Description" xml:space="preserve">
+    <value>ملحمة أدبية لنجيب محفوظ</value>
+  </data>
+  <data name="Book_7_Title" xml:space="preserve">
+    <value>بين القصرين</value>
+  </data>
+  <data name="Book_7_Description" xml:space="preserve">
+    <value>الجزء الأول من ثلاثية نجيب محفوظ</value>
+  </data>
+  <data name="Book_8_Title" xml:space="preserve">
+    <value>قصر الشوق</value>
+  </data>
+  <data name="Book_8_Description" xml:space="preserve">
+    <value>الجزء الثاني من ثلاثية نجيب محفوظ</value>
+  </data>
+  <data name="Book_9_Title" xml:space="preserve">
+    <value>السكرية</value>
+  </data>
+  <data name="Book_9_Description" xml:space="preserve">
+    <value>الجزء الثالث من ثلاثية نجيب محفوظ</value>
+  </data>
+  <data name="Book_10_Title" xml:space="preserve">
+    <value>خان الخليلي</value>
+  </data>
+  <data name="Book_10_Description" xml:space="preserve">
+    <value>رواية اجتماعية لنجيب محفوظ</value>
+  </data>
+  <data name="Book_11_Title" xml:space="preserve">
+    <value>كتاب جديد</value>
+  </data>
+  <data name="Book_11_Description" xml:space="preserve">
+    <value>وصف الكتاب الجديد</value>
+  </data>
+  <data name="Book_12_Title" xml:space="preserve">
+    <value>كتاب آخر</value>
+  </data>
+  <data name="Book_12_Description" xml:space="preserve">
+    <value>وصف الكتاب الآخر</value>
+  </data>
+  <data name="Book_13_Title" xml:space="preserve">
+    <value>الطوق والأسورة</value>
+  </data>
+  <data name="Book_13_Description" xml:space="preserve">
+    <value>رواية شهيرة ليحيى الطاهر عبدالله</value>
+  </data>
+  <data name="Book_14_Title" xml:space="preserve">
+    <value>رجال في الشمس</value>
+  </data>
+  <data name="Book_14_Description" xml:space="preserve">
+    <value>رواية غسان كنفاني الشهيرة</value>
+  </data>
+  <data name="Book_15_Title" xml:space="preserve">
+    <value>موسم الهجرة إلى الشمال</value>
+  </data>
+  <data name="Book_15_Description" xml:space="preserve">
+    <value>رواية الطيب صالح الأشهر</value>
+  </data>
+  <data name="Book_16_Title" xml:space="preserve">
+    <value>الخبز الحافي</value>
+  </data>
+  <data name="Book_16_Description" xml:space="preserve">
+    <value>رواية محمد شكري الذاتية</value>
+  </data>
+  <data name="Book_17_Title" xml:space="preserve">
+    <value>عزازيل</value>
+  </data>
+  <data name="Book_17_Description" xml:space="preserve">
+    <value>رواية يوسف زيدان التاريخية</value>
+  </data>
+  <data name="Book_18_Title" xml:space="preserve">
+    <value>عائد إلى حيفا</value>
+  </data>
+  <data name="Book_18_Description" xml:space="preserve">
+    <value>رواية قصيرة لغسان كنفاني</value>
+  </data>
+  <data name="Book_19_Title" xml:space="preserve">
+    <value>الحب في زمن الكوليرا</value>
+  </data>
+  <data name="Book_19_Description" xml:space="preserve">
+    <value>رواية غابرييل غارسيا ماركيز المترجمة للعربية</value>
+  </data>
+  <data name="Book_20_Title" xml:space="preserve">
+    <value>مدن الملح</value>
+  </data>
+  <data name="Book_20_Description" xml:space="preserve">
+    <value>رواية عبد الرحمن منيف الشهيرة</value>
+  </data>
   <!-- الكتب (عينة) -->
-  <data name="Book_1_Title" xml:space="preserve"><value>زقاق المدق</value></data>
-  <data name="Book_1_Description" xml:space="preserve"><value>رواية شهيرة لنجيب محفوظ</value></data>
-  <data name="Book_4_Title" xml:space="preserve"><value>الكرنك</value></data>
-  <data name="Book_4_Description" xml:space="preserve"><value>رواية سياسية لنجيب محفوظ</value></data>
+  <data name="Book_1_Title" xml:space="preserve">
+    <value>زقاق المدق</value>
+  </data>
+  <data name="Book_1_Description" xml:space="preserve">
+    <value>رواية شهيرة لنجيب محفوظ</value>
+  </data>
+  <data name="Book_4_Title" xml:space="preserve">
+    <value>الكرنك</value>
+  </data>
+  <data name="Book_4_Description" xml:space="preserve">
+    <value>رواية سياسية لنجيب محفوظ</value>
+  </data>
   <data name="ContainsInvalidCharacters" xml:space="preserve">
     <value>يحتوي على رموز غير صالحة</value>
   </data>
@@ -469,5 +820,42 @@
   </data>
   <data name="Characters" xml:space="preserve">
     <value>أحرف</value>
+  </data>
+  <data name="Category_61_Name" xml:space="preserve">
+    <value>روايات مسجله</value>
+  </data>
+  <data name="Category_61_Description" xml:space="preserve">
+    <value>يُعد تصنيف الروايات من الأدوات النقدية والفنية التي تهدف إلى تنظيم هذا الشكل الأدبي الطويل والمعقد وفق موضوعاته وأساليبه وبنيته الفنية، وتُعرّف الرواية بأنها سرد نثري طويل يتناول تجربة إنسانية مركبة من خلال شخصيات متعددة وأحداث متشابكة، ويعتمد تصنيف الروايات على معايير متعددة مثل النوع الأدبي، حيث نجد الروايات الواقعية التي ترصد الحياة اليومية، والروايات الرومانسية التي تركز على العلاقات العاطفية، والروايات البوليسية التي تدور حول الجريمة والتحقيق، والروايات التاريخية التي تستند إلى وقائع الماضي، والخيالية التي تبني عوالم غير مألوفة، كما يُمكن تصنيف الروايات حسب أسلوب السرد</value>
+  </data>
+  <data name="Author_5_Name" xml:space="preserve">
+    <value>احمد ابوالوفا</value>
+  </data>
+  <data name="Author_5_Bio" xml:space="preserve">
+    <value>أحمد أبوالوفا محمد (1962 – 2018) كاتب وأديب مصري، يُعرف بلقب "العرّاب". يُعد أول كاتب عربي في مجال أدب الرعب، وواحدًا من أبرز من كتبوا في الفانتازيا والخيال العلمي. صدر له العديد من السلاسل الشهيرة مثل ما وراء الطبيعة، فانتازيا، وسافاري، إلى جانب مقالاته الأدبية والساخرة. ترك أثرًا كبيرًا في أجيال كاملة من القراء الشباب، ويُعتبر أيقونة للأدب العربي الحديث.</value>
+  </data>
+  <data name="Book_50_Title" xml:space="preserve">
+    <value>القادمون</value>
+  </data>
+  <data name="Book_50_Description" xml:space="preserve">
+    <value>ها قد انتهى الزمن الطويل، وحان الوقت المنتظر. البشر بين لهو ولعب، وفتن كقطع الليل المظلم. الأرض تزيَّنت وتهيَّأت، وصعدت الشياطين على كل المنابر. فلا تدري أين تضع روحك، وكيف تقبض على دينك. ضباب الحق غطَّى سواد الباطل، وعين قلبك وحدها التي ترى. ثم حان وقت خروجنا.. وتهيَّأ البشر للفتنة الأخيرة؛ فتنة النهاية.
+</value>
+  </data>
+  <data name="Category_86_Name" xml:space="preserve">
+    <value>مرعب وملهم</value>
+  </data>
+  <data name="Category_86_Description" xml:space="preserve">
+    <value>في قسم المرعب والملهم من متجر عصير الكتب، تمتزج رهبة الظلام بوميض الأمل لتصنع عالماً مدهشاً من المشاعر المتناقضة. بين سطور قصصه ستجد رعباً يشد أنفاسك، وإلهاماً يوقظ في داخلك قوة لم تكن تعلم بوجودها. إنه عالم يأخذك إلى حافة الخوف ليكشف لك عن أعماق الشجاعة، ويتركك بين رعشة الغموض ونبض الحياة.</value>
+  </data>
+  <data name="Author_23_Name" xml:space="preserve">
+    <value>أحمد خالد معوض</value>
+  </data>
+  <data name="Author_23_Bio" xml:space="preserve">
+    <value>أحمد خالد معوض كاتب شاب يعشق الغوص في عوالم الأدب والفكر، حيث يجمع في كتاباته بين الخيال العميق والتأمل الإنساني الصادق. صدرت له نصوص أدبية وخواطر تحمل مزيجًا من الرعب والإلهام، تاركةً بصمة مختلفة في وجدان القارئ. يكتب بروح باحثة عن المعنى، ويؤمن أن الكلمة قادرة على أن تهز القلوب وتفتح أبواب الإدراك.</value>
+  </data>
+  <data name="Book_51_Title" xml:space="preserve">
+    <value>الممر</value>
+  </data>
+  <data name="Book_51_Description" xml:space="preserve">
+    <value>الممر هو كتاب يأخذك في رحلة مشوّقة بين أروقة الخوف والأمل، حيث يصبح الطريق الضيق رمزًا لاختبارات الحياة ومواجهاتها. بين صفحاته ستجد مزيجًا من الغموض والإلهام، وصراع الإنسان مع داخله ومع العالم من حوله. إنه أكثر من مجرد قصة؛ إنه دعوة لاكتشاف القوة الكامنة في أعماقك، حين يتحول الممر المظلم إلى بوابة نحو النور والحرية.</value>
   </data>
 </root>
