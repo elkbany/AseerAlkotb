@@ -8,7 +8,7 @@ using FluentValidation;
 
 namespace AseerAlkotb.Application.Features.Publishers.Validators
 {
-    class GetPublisherFollowerCountRequestValidation :AbstractValidator<GetPublisherFollowerCountRequest>
+   public class GetPublisherFollowerCountRequestValidation :AbstractValidator<GetPublisherFollowerCountRequest>
     {
         public GetPublisherFollowerCountRequestValidation()
         {
