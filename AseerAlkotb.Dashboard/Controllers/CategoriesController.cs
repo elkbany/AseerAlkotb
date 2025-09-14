@@ -85,6 +85,32 @@ namespace AseerAlkotb.Dashboard.Controllers
                 
                 if (result.Succeeded)
                 {
+                    try
+                    {
+                        var id = result.Data.Id;
+                        var keyName = $"Category_{id}_Name";
+                        var arName = Request.Form["Name"].ToString();
+                        var enName = Request.Form["EnglishName"].ToString();
+
+                        // Fallbacks: if English not provided, reuse Arabic for both
+                        if (string.IsNullOrWhiteSpace(enName)) enName = arName;
+
+                        AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource(keyName, arName, "ar");
+                        AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource(keyName, enName, "en");
+
+                        // Description keys if provided
+                        var descAr = Request.Form["Description"].ToString();
+                        var descEn = Request.Form["EnglishDescription"].ToString();
+                        if (!string.IsNullOrWhiteSpace(descAr) || !string.IsNullOrWhiteSpace(descEn))
+                        {
+                            var keyDesc = $"Category_{id}_Description";
+                            if (string.IsNullOrWhiteSpace(descEn)) descEn = descAr;
+                            if (string.IsNullOrWhiteSpace(descAr)) descAr = descEn;
+                            AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource(keyDesc, descAr ?? string.Empty, "ar");
+                            AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource(keyDesc, descEn ?? string.Empty, "en");
+                        }
+                    }
+                    catch { }
                     TempData["Success"] = "تم إضافة التصنيف بنجاح";
                     return RedirectToAction(nameof(Index));
                 }

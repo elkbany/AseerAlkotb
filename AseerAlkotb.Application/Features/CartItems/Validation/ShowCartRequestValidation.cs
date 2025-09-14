@@ -9,7 +9,7 @@ using FluentValidation;
 
 namespace AseerAlkotb.Application.Features.CartItems.Validation
 {
-    class ShowCartRequestValidation: AbstractValidator<ShowCartRequest>
+   public class ShowCartRequestValidation: AbstractValidator<ShowCartRequest>
     {
         public ShowCartRequestValidation()
         {

@@ -181,8 +181,33 @@ namespace AseerAlkotb.Dashboard.Controllers
                     request = request with { CategoryIds = new List<int>() };
                 }
 
-                await _bookServices.AddBookAsync(request);
-                return RedirectToAction(nameof(Index));
+                var result = await _bookServices.AddBookAsync(request);
+                if (result.Succeeded)
+                {
+                    try
+                    {
+                        var id = result.Data.Id;
+                        var titleAr = Request.Form["Title"].ToString();
+                        var titleEn = Request.Form["EnglishTitle"].ToString();
+                        if (string.IsNullOrWhiteSpace(titleEn)) titleEn = titleAr;
+                        AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Book_{id}_Title", titleAr, "ar");
+                        AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Book_{id}_Title", titleEn, "en");
+
+                        var descAr = Request.Form["Description"].ToString();
+                        var descEn = Request.Form["EnglishDescription"].ToString();
+                        if (!string.IsNullOrWhiteSpace(descAr) || !string.IsNullOrWhiteSpace(descEn))
+                        {
+                            if (string.IsNullOrWhiteSpace(descEn)) descEn = descAr;
+                            if (string.IsNullOrWhiteSpace(descAr)) descAr = descEn;
+                            AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Book_{id}_Description", descAr ?? string.Empty, "ar");
+                            AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Book_{id}_Description", descEn ?? string.Empty, "en");
+                        }
+                    }
+                    catch { }
+                    return RedirectToAction(nameof(Index));
+                }
+
+                TempData["Error"] = result.Message ?? "Failed to create book";
             }
 
             return View(request);

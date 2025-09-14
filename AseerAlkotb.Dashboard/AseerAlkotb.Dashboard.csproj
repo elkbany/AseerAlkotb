@@ -4,8 +4,12 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
+	<PropertyGroup>
+		<AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
+	</PropertyGroup>
 
-  <ItemGroup>
+
+	<ItemGroup>
     <Folder Include="wwwroot\images\" />
   </ItemGroup>
 

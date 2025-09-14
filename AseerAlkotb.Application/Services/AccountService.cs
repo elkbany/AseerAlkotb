@@ -27,6 +27,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using static AseerAlkotb.Application.ResponseHandler.ApiResponseHandler;
+using FluentValidation;
 
 namespace AseerAlkotb.Application.Services
 {
@@ -46,46 +47,38 @@ namespace AseerAlkotb.Application.Services
             _emailService = emailService;
         }
 
-        
+
         public async Task<ApiResponse<RegisterResponse>> Register(RegisterRequest request)
         {
             try
             {
-                // 1- Validate input
+                // 1- Validate input (using Solution 1 - DI approach)
                 await DoValidationAsync<RegisterRequestValidator, RegisterRequest>(request);
 
-                // 2- Check for duplicate email
-                if (await _userManager.FindByEmailAsync(request.Email) is not null)
-                    return BadRequest<RegisterResponse>("Email is already taken");
+                // Note: Remove duplicate email/username checks since validator handles them
 
-                // 3- Check for duplicate username
-                if (await _userManager.FindByNameAsync(request.UserName) is not null)
-                    return BadRequest<RegisterResponse>("Username is already taken");
-
-                // 4- Map request to User entity
+                // 2- Map request to User entity
                 var newAccount = request.Adapt<User>();
-                newAccount.IsActive = true;//??????
+                newAccount.IsActive = true;
 
-                // 5- Create user
+                // 3- Create user
                 var result = await _userManager.CreateAsync(newAccount, request.Password);
                 if (!result.Succeeded)
                     return BadRequest<RegisterResponse>(
                         string.Join(", ", result.Errors.Select(e => e.Description))
                     );
 
-                //add role to the new user
+                // 4- Add role to the new user
                 var addRole = await _userManager.AddToRoleAsync(newAccount, "Client");
                 if (!addRole.Succeeded)
                 {
                     return BadRequest<RegisterResponse>("Failed to assign role to user");
-                    //return BadRequest<RegisterResponse>(addRole.Errors.Select(e => e.Description).ToList());
                 }
 
-                //add cart for the new user
+                // 5- Add cart for the new user
                 var cart = new Cart()
                 {
                     UserId = newAccount.Id
-                   
                 };
                 await _unitOfWork.Carts.InsertAsync(cart);
                 await _unitOfWork.CommitAsync();
@@ -101,24 +94,21 @@ namespace AseerAlkotb.Application.Services
                 }
                 catch (Exception ex)
                 {
-                    // Log the exception
                     Console.WriteLine($"Token encoding failed: {ex.Message}");
                     return BadRequest<RegisterResponse>("Failed to generate confirmation link");
                 }
 
                 // 8- Create confirmation URL
-                //var frontendBase = _configuration["App:FrontendBaseUrl"] ?? "http://localhost:4200";
                 var BackendBase = _configuration["App:BackendBaseUrl"] ?? "http://localhost:5234";
                 var confirmUrl = $"{BackendBase}/api/Account/confirm-email?userId={newAccount.Id}&token={tokenEncoded}";
 
                 // 9- Send email
                 var subject = "Confirm your email";
                 var body = $@"
-                    <p>Hello {newAccount.UserName},</p>
-                    <p>Please confirm your email by clicking the link below:</p>
-                    <p><a href=""{confirmUrl}"">Confirm Email</a></p>
-                ";
-
+            <p>Hello {newAccount.UserName},</p>
+            <p>Please confirm your email by clicking the link below:</p>
+            <p><a href=""{confirmUrl}"">Confirm Email</a></p>
+        ";
                 try
                 {
                     await _emailService.SendEmailAsync(newAccount.Email!, subject, body);
@@ -126,21 +116,31 @@ namespace AseerAlkotb.Application.Services
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Failed to send confirmation email: {ex.Message}");
-                    // retry mechanism 
                     return BadRequest<RegisterResponse>("Failed to send confirmation email. Please try again later.");
                 }
 
                 var response = newAccount.Adapt<RegisterResponse>();
                 return Success(response, "Registered successfully. Please check your email to confirm.");
             }
+            catch (ValidationException validationEx)
+            {
+                // Handle validation exceptions specifically
+                var errors = validationEx.Errors?.Select(e => e.ErrorMessage).ToList()
+                             ?? new List<string> { validationEx.Message };
+                Console.WriteLine($"Validation failed: {string.Join(", ", errors)}");
+                return BadRequest<RegisterResponse>(string.Join(", ", errors));
+            }
             catch (Exception ex)
             {
-                // Log the exception
-                Console.WriteLine($"Unexpected error in Register: {ex.Message}");
+                // Log the exception details for debugging
+                Console.WriteLine($"Unexpected error in Register:");
+                Console.WriteLine($"Exception Type: {ex.GetType().Name}");
+                Console.WriteLine($"Message: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+
                 return BadRequest<RegisterResponse>("An unexpected error occurred. Try again.");
             }
         }
-
 
         public async Task<ApiResponse<string>> ConfirmEmail(string userId, string token)
         {
