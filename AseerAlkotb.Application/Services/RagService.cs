@@ -437,7 +437,8 @@ namespace AseerAlkotb.Application.Services
             }
 
             bool available = match.StockQuantity > 0;
-            var price = (match.DiscountedPrice > 0m && match.DiscountedPrice < match.Price) ? match.DiscountedPrice : match.Price;
+            
+            var price = (match.Price - (match.Price * match.DiscountPercentage / 100m));
 
             var ansAr = available
                 ? $"\"{match.Title}\" متاح للشراء الآن{(includePrice ? $" — السعر: {price:F2}" : "")}."
