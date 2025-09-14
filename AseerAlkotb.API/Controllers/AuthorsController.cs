@@ -31,9 +31,10 @@ namespace AseerAlkotb.API.Controllers
 
         }
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById([FromRoute]GetAuthorByIdRequest request)
+        public async Task<IActionResult> GetById([FromRoute]int id)
         {
-            var result = await authorServices.GetAuthorByIdAsync(request);
+            var req = new GetAuthorByIdRequest(id);
+            var result = await authorServices.GetAuthorByIdAsync(req);
             return ApiResult(result);
         }
         //[Authorize]/////////for test

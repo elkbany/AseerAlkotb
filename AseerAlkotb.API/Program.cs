@@ -175,6 +175,7 @@ namespace AseerAlkotb.API
             builder.Services.AddScoped<GetFollowersAuthorRequestValidation>();
             builder.Services.AddScoped<UnFollowAuthorRequestValidation>();
             builder.Services.AddScoped<UpdateAuthorRequestValidator>();
+            builder.Services.AddScoped<GetAuthorByIdRequestValidator>();
 
             // Books Validators
             builder.Services.AddScoped<AddBookRequestValidator>();
