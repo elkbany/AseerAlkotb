@@ -181,6 +181,25 @@ namespace AseerAlkotb.Dashboard.Controllers
                 
                 if (result.Succeeded)
                 {
+                    try
+                    {
+                        var nameAr = Request.Form["Name"].ToString();
+                        var nameEn = Request.Form["EnglishName"].ToString();
+                        if (string.IsNullOrWhiteSpace(nameEn)) nameEn = nameAr;
+                        AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Category_{id}_Name", nameAr, "ar");
+                        AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Category_{id}_Name", nameEn, "en");
+
+                        var descAr = Request.Form["Description"].ToString();
+                        var descEn = Request.Form["EnglishDescription"].ToString();
+                        if (!string.IsNullOrWhiteSpace(descAr) || !string.IsNullOrWhiteSpace(descEn))
+                        {
+                            if (string.IsNullOrWhiteSpace(descEn)) descEn = descAr;
+                            if (string.IsNullOrWhiteSpace(descAr)) descAr = descEn;
+                            AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Category_{id}_Description", descAr ?? string.Empty, "ar");
+                            AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Category_{id}_Description", descEn ?? string.Empty, "en");
+                        }
+                    }
+                    catch { }
                     TempData["Success"] = "تم تحديث التصنيف بنجاح";
                     return RedirectToAction(nameof(Index));
                 }
