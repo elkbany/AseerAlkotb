@@ -109,8 +109,12 @@ namespace AseerAlkotb.Dashboard
             // RAG deps (Embedding + Router)
             builder.Services.AddScoped<IEmbeddingService, GeminiEmbeddingService>();
             builder.Services.AddScoped<IQuestionRouterService, GeminiQuestionRouterService>();
+            builder.Services.AddScoped<ITranslationService, GeminiTranslationService>();
+            builder.Services.AddSingleton<EmbeddingRefreshBackgroundService>();
+            builder.Services.AddSingleton<IEmbeddingRefreshJob>(sp => sp.GetRequiredService<EmbeddingRefreshBackgroundService>());
+            builder.Services.AddHostedService(sp => sp.GetRequiredService<EmbeddingRefreshBackgroundService>());
 
-         
+
             // HttpClient (Gemini) مع Polly
             static IAsyncPolicy<HttpResponseMessage> ResilientPolicy() =>
                 HttpPolicyExtensions.HandleTransientHttpError()

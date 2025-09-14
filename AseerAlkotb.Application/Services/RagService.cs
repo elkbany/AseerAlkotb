@@ -20,6 +20,7 @@ namespace AseerAlkotb.Application.Services
         private readonly IEmbeddingService _emb;
         private readonly IAnswerSynthesisService _synth;
         private readonly IQuestionRouterService _router;
+        private readonly ITranslationService _translator;
         private readonly IConfiguration _cfg;
 
         public RagService(
@@ -27,73 +28,75 @@ namespace AseerAlkotb.Application.Services
             IEmbeddingService emb,
             IAnswerSynthesisService synth,
             IQuestionRouterService router,
+            ITranslationService translator,
             IServiceProvider sp,
             Microsoft.Extensions.Hosting.IHostEnvironment env
         ) : base(sp, env)
         {
-            _uow = uow; _emb = emb; _synth = synth; _router = router;
+            _uow = uow; _emb = emb; _synth = synth; _router = router; _translator = translator;
             _cfg = sp.GetRequiredService<IConfiguration>();
         }
 
         public async Task<ApiResponse<RagAskResponse>> AskAsync(RagAskRequest request)
         {
             await DoValidationAsync<Application.Features.Rag.Validators.RagAskRequestValidator, RagAskRequest>(request);
-            var lang = LangUtils.Detect(request.Question);
-            if (IsGreeting(request.Question))
+            
+            var originalQuestion = request.Question;
+            var isEnglishQuery = await _translator.IsEnglishTextAsync(originalQuestion);
+            
+            // Translate English questions to Arabic for database search
+            var processedQuestion = isEnglishQuery 
+                ? await _translator.TranslateToArabicAsync(originalQuestion)
+                : originalQuestion;
+                
+            var lang = LangUtils.Detect(originalQuestion); // Keep original language for response
+            
+            if (IsGreeting(originalQuestion))
             {
                 return Success(new RagAskResponse
                 {
                     Answer = Intro(lang)
                 });
             }
-            // 1) استخرج Hints محليًا (عنوان/مؤلف)
-            var (titleHint, authorHint) = QueryExtractor.Extract(request.Question);
 
-            // 2) ابنِ نسخة موجّهة للـ Router فيها الـ Hints بشكل صريح
-            var routerInput = BuildRouterInput(request.Question, titleHint, authorHint);
-
-            // 3) اسأل Gemini دائمًا أولًا عن النية والكيانات
-            var route = await _router.RouteAsync(routerInput);
-            var _ = route.confidence < 0.55; // للعلم فقط
-
-            // 4) دمج الكيانات: Gemini أولاً ثم fallback محلي للـ title فقط
-            string? title = route.entities.title ?? titleHint ?? ExtractTitleLoose(request.Question);
-            string? author = route.entities.author ?? authorHint;
+            // 1) Use Gemini for intent detection and entity extraction on processed question
+            var route = await _router.RouteAsync(processedQuestion);
+            
+            // 2) Trust Gemini completely - no local fallbacks or guessing
+            string? title = route.entities.title;
+            string? author = route.entities.author;
             string? category = SanitizeCategory(request.Category) ?? route.entities.category;
-
-            // 5) النية: اعتماد كامل على Gemini (بدون أي تخمين محلي)
-            static string? NormalizeRouterIntent(string? x)
-            {
-                if (string.IsNullOrWhiteSpace(x)) return null;
-                var allowed = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-                {
-                    "summary","availability","price","author_bio",
-                    "more_by_author","category_recs","similar_to_title","general_recs"
-                };
-                return allowed.Contains(x) ? x : null;
-            }
+            string? publisher = route.entities.publisher;
+            
+            // 3) Use only the intent from Gemini - no local intent detection
             string intent = NormalizeRouterIntent(route.intent) ?? "general_recs";
 
             switch (intent)
             {
                 case "summary":
                     {
-                        var t = title ?? request.Question;
-                        var book = await FindBookByTitleAsync(t);
+                        if (string.IsNullOrWhiteSpace(title))
+                        {
+                            var response = new RagAskResponse { Answer = "برجاء تحديد اسم الكتاب المطلوب تلخيصه." };
+                            return Success(await TranslateResponseIfNeededAsync(response, isEnglishQuery));
+                        }
+                        
+                        var book = await FindBookByTitleAsync(title);
                         if (book != null)
                         {
                             bool preferDesc = string.Equals(_cfg["Rag:SummarizeFromDescription"], "true", StringComparison.OrdinalIgnoreCase);
                             if (preferDesc && !string.IsNullOrWhiteSpace(book.Description) && book.Description!.Length >= 160)
                             {
-                                return Success(new RagAskResponse
+                                var response = new RagAskResponse
                                 {
                                     Answer = book.Description!,
                                     Sources = ToSources(new List<BookBriefDto> {
                                         new BookBriefDto(book.Id, book.Title, book.Author?.Name, book.Price, book.DiscountedPrice, book.CoverImageUrl, book.Description)
-                                    }, request.Question),
+                                    }, originalQuestion),
                                     PrimaryBookId = book.Id,
                                     PrimaryBookTitle = book.Title
-                                });
+                                };
+                                return Success(await TranslateResponseIfNeededAsync(response, isEnglishQuery));
                             }
 
                             var src = new ChatSource { BookId = book.Id, Title = book.Title, CoverImageUrl = book.CoverImageUrl, Snippet = book.Description };
@@ -104,44 +107,61 @@ namespace AseerAlkotb.Application.Services
                             var summary = await _synth.SynthesizeAsync(prompt, new List<ChatSource> { src });
                             var answer = string.IsNullOrWhiteSpace(summary) ? (book.Description ?? "لا تتوفر لدينا نبذة كافية لهذا الكتاب حاليًا.") : summary;
 
-                            return Success(new RagAskResponse
+                            var finalResponse = new RagAskResponse
                             {
                                 Answer = answer,
                                 Sources = new List<ChatSource> { src },
                                 PrimaryBookId = book.Id,
                                 PrimaryBookTitle = book.Title
-                            });
+                            };
+                            return Success(await TranslateResponseIfNeededAsync(finalResponse, isEnglishQuery));
                         }
 
-                        var gen = await _synth.SynthesizeAsync(request.Question, new List<ChatSource>());
-                        return Success(new RagAskResponse { Answer = string.IsNullOrWhiteSpace(gen) ? $"ملقتش كتاب بعنوان «{t}»." : gen });
+                        var notFoundResponse = new RagAskResponse { Answer = $"لم أجد كتاب بعنوان «{title}». تأكد من كتابة الاسم بشكل صحيح." };
+                        return Success(await TranslateResponseIfNeededAsync(notFoundResponse, isEnglishQuery));
                     }
 
                 case "availability":
                     {
-                        var t = title ?? request.Question;
-                        var r = await GetAvailabilityAnswerAsync(t, includePrice: false);
-                        return Success(r);
+                        if (string.IsNullOrWhiteSpace(title))
+                        {
+                            var response = new RagAskResponse { Answer = "برجاء تحديد اسم الكتاب للاستعلام عن توافره." };
+                            return Success(await TranslateResponseIfNeededAsync(response, isEnglishQuery));
+                        }
+                        
+                        var r = await GetAvailabilityAnswerAsync(title, includePrice: false);
+                        return Success(await TranslateResponseIfNeededAsync(r, isEnglishQuery));
                     }
 
                 case "price":
                     {
-                        var t = title ?? request.Question;
-                        var r = await GetAvailabilityAnswerAsync(t, includePrice: true);
-                        return Success(r);
+                        if (string.IsNullOrWhiteSpace(title))
+                        {
+                            var response = new RagAskResponse { Answer = "برجاء تحديد اسم الكتاب للاستعلام عن سعره." };
+                            return Success(await TranslateResponseIfNeededAsync(response, isEnglishQuery));
+                        }
+                        
+                        var r = await GetAvailabilityAnswerAsync(title, includePrice: true);
+                        return Success(await TranslateResponseIfNeededAsync(r, isEnglishQuery));
                     }
 
                 case "author_bio":
                     {
-                        var a = author ?? (title != null ? await ResolveAuthorByTitleAsync(title) : null);
-                        if (string.IsNullOrWhiteSpace(a))
-                            return Success(new RagAskResponse { Answer = "اكتب اسم المؤلف أو اسم كتاب له علشان أجيب لك نبذة عنه." });
+                        string? authorName = author ?? (title != null ? await ResolveAuthorByTitleAsync(title) : null);
+                        if (string.IsNullOrWhiteSpace(authorName))
+                        {
+                            var response = new RagAskResponse { Answer = "برجاء تحديد اسم المؤلف أو اسم كتاب له للحصول على نبذة عنه." };
+                            return Success(await TranslateResponseIfNeededAsync(response, isEnglishQuery));
+                        }
 
-                        var authorRow = await _uow.Authors.GetQueryable(x => ((x.Name ?? "").ToLower()).Contains(a.ToLower()))
+                        var authorRow = await _uow.Authors.GetQueryable(x => ((x.Name ?? "").ToLower()).Contains(authorName.ToLower()))
                                                           .Include(x => x.Books)
                                                           .FirstOrDefaultAsync();
                         if (authorRow == null)
-                            return Success(new RagAskResponse { Answer = $"مش لاقي مؤلف بالاسم: {a}" });
+                        {
+                            var response = new RagAskResponse { Answer = $"لم أجد مؤلف بالاسم: {authorName}" };
+                            return Success(await TranslateResponseIfNeededAsync(response, isEnglishQuery));
+                        }
 
                         string? bio = authorRow.Bio;
                         if (string.IsNullOrWhiteSpace(bio) || bio.Trim().Length < 80)
@@ -150,61 +170,103 @@ namespace AseerAlkotb.Application.Services
                                   ?? $"لا تتوفر لدينا نبذة كافية عن {authorRow.Name} حاليًا.";
                         }
 
-                        return Success(new RagAskResponse { Answer = bio });
+                        var finalResponse = new RagAskResponse { Answer = bio };
+                        return Success(await TranslateResponseIfNeededAsync(finalResponse, isEnglishQuery));
                     }
 
                 case "more_by_author":
                     {
-                        var a = author ?? (title != null ? await ResolveAuthorByTitleAsync(title) : null);
-                        if (string.IsNullOrWhiteSpace(a))
-                            return Success(new RagAskResponse { Answer = "محتاج اسم المؤلف أو اسم كتاب له علشان أرشّح مؤلفات أخرى." });
+                        string? authorName = author ?? (title != null ? await ResolveAuthorByTitleAsync(title) : null);
+                        if (string.IsNullOrWhiteSpace(authorName))
+                        {
+                            var authorResponse = new RagAskResponse { Answer = "برجاء تحديد اسم المؤلف أو اسم كتاب له للعثور على مؤلفات أخرى." };
+                            return Success(await TranslateResponseIfNeededAsync(authorResponse, isEnglishQuery));
+                        }
 
-                        var list = await GetAuthorBooksAsync(a);
+                        var list = await GetAuthorBooksAsync(authorName);
                         var names = list.Data!.Select(b => b.Title).ToList();
                         var ans = names.Any()
                             ? $"كتب أخرى لنفس المؤلف: {string.Join("، ", names)}."
                             : "لم أجد كتبًا لنفس المؤلف.";
-                        return Success(new RagAskResponse { Answer = ans, Sources = ToSources(list.Data!) });
+                        var authorBooksResponse = new RagAskResponse { Answer = ans, Sources = ToSources(list.Data!) };
+                        return Success(await TranslateResponseIfNeededAsync(authorBooksResponse, isEnglishQuery));
                     }
 
                 case "category_recs":
                     {
-                        var cat = category ?? ExtractCategory(request.Question);
-                        if (string.IsNullOrWhiteSpace(cat))
-                            return Success(new RagAskResponse { Answer = "اذكر اسم التصنيف (مثال: روايات/تطوير ذات)." });
+                        if (string.IsNullOrWhiteSpace(category))
+                        {
+                            var categoryResponse = new RagAskResponse { Answer = "برجاء تحديد التصنيف المطلوب (مثال: روايات، تطوير ذات، تاريخ)." };
+                            return Success(await TranslateResponseIfNeededAsync(categoryResponse, isEnglishQuery));
+                        }
 
                         var take = request.Limit > 0 ? request.Limit : 8;
-                        var list = await GetCategoryBooksAsync(cat, take);
+                        var list = await GetCategoryBooksAsync(category, take);
                         var dedup = list.Data!.GroupBy(b => b.Title.Trim()).Select(g => g.First()).Take(take).ToList();
 
                         var ans = dedup.Any()
-                            ? $"ترشيحات ضمن «{cat}»: {string.Join("، ", dedup.Select(b => b.Title))}."
-                            : $"لا توجد نتائج ضمن التصنيف «{cat}».";
-                        return Success(new RagAskResponse { Answer = ans, Sources = ToSources(dedup, request.Question) });
+                            ? $"ترشيحات ضمن «{category}»: {string.Join("، ", dedup.Select(b => b.Title))}."
+                            : $"لا توجد نتائج ضمن التصنيف «{category}».";
+                        var categoryRecsResponse = new RagAskResponse { Answer = ans, Sources = ToSources(dedup, originalQuestion) };
+                        return Success(await TranslateResponseIfNeededAsync(categoryRecsResponse, isEnglishQuery));
                     }
 
                 case "similar_to_title":
                     {
                         if (string.IsNullOrWhiteSpace(title))
-                            return Success(new RagAskResponse { Answer = "اذكر اسم الكتاب اللي عايز ترشيحات شبهه." });
+                        {
+                            var similarResponse = new RagAskResponse { Answer = "برجاء تحديد اسم الكتاب للبحث عن كتب مشابهة له." };
+                            return Success(await TranslateResponseIfNeededAsync(similarResponse, isEnglishQuery));
+                        }
 
                         var take = request.Limit > 0 ? request.Limit : 8;
                         var recs = await SimilarByTitleAsync(title, take);
                         var ans = recs.Any()
                             ? $"كتب تشبه «{title}»: {string.Join("، ", recs.Select(b => b.Title))}."
-                            : $"ملقتش ترشيحات قريبة من «{title}».";
-                        return Success(new RagAskResponse { Answer = ans, Sources = ToSources(recs, request.Question) });
+                            : $"لم أجد ترشيحات قريبة من «{title}».";
+                        var similarTitleResponse = new RagAskResponse { Answer = ans, Sources = ToSources(recs, originalQuestion) };
+                        return Success(await TranslateResponseIfNeededAsync(similarTitleResponse, isEnglishQuery));
+                    }
+
+                case "publisher_info":
+                    {
+                        return Success(await HandlePublisherInfoAsync(title, publisher, request.Question));
+                    }
+
+                case "publisher_books":
+                    {
+                        return Success(await HandlePublisherBooksAsync(publisher, request.Limit, request.Question));
                     }
 
                 default:
                     {
-                        var top = await GetRecommendationsAsync(request.Question);
+                        var top = await GetRecommendationsAsync(processedQuestion);
                         var reply = top.Data!.Any()
-                            ? $"بناءً على سؤالك، أنصحك بالاطلاع على: {string.Join("، ", top.Data!.Select(x => x.Title))}."
+                            ? $"لم أجد نتائج مطابقة تمامًا لسؤالك، لكن بناءً على ما بحثت عنه أرشح لك: {string.Join("، ", top.Data!.Select(x => x.Title))}."
                             : "لم أجد كتباً متعلقة مباشرة بسؤالك. جرّب كلمات مفتاحية مختلفة أو تصنيفاً آخر.";
-                        return Success(new RagAskResponse { Answer = reply, Sources = ToSources(top.Data ?? new List<BookBriefDto>(), request.Question) });
+                        
+                        var defaultResponse = new RagAskResponse { Answer = reply, Sources = ToSources(top.Data ?? new List<BookBriefDto>(), originalQuestion) };
+                        return Success(await TranslateResponseIfNeededAsync(defaultResponse, isEnglishQuery));
                     }
             }
+        }
+
+        private async Task<RagAskResponse> TranslateResponseIfNeededAsync(RagAskResponse response, bool isEnglishQuery)
+        {
+            if (!isEnglishQuery) return response; // Keep Arabic response for Arabic queries
+            
+            // Translate Arabic response to English
+            var translatedAnswer = await _translator.TranslateToEnglishAsync(response.Answer);
+            
+            return new RagAskResponse
+            {
+                Answer = translatedAnswer,
+                Sources = response.Sources,
+                IsAvailable = response.IsAvailable,
+                PrimaryBookId = response.PrimaryBookId,
+                PrimaryBookTitle = response.PrimaryBookTitle,
+                CanAddToCart = response.CanAddToCart
+            };
         }
 
         // ====== Public Queries ======
@@ -283,18 +345,17 @@ namespace AseerAlkotb.Application.Services
         }
 
         // ====== Helpers ======
-        private static string BuildRouterInput(string question, string? titleHint, string? authorHint)
+        private static string? NormalizeRouterIntent(string? x)
         {
-            // بنضيف HINTS واضحة للسؤال علشان Gemini يلقط العنوان/المؤلف بسهولة
-            var sb = new System.Text.StringBuilder();
-            sb.AppendLine(question?.Trim() ?? string.Empty);
-            if (!string.IsNullOrWhiteSpace(titleHint)) sb.AppendLine($"[TITLE_HINT]: {titleHint}");
-            if (!string.IsNullOrWhiteSpace(authorHint)) sb.AppendLine($"[AUTHOR_HINT]: {authorHint}");
-            return sb.ToString();
+            if (string.IsNullOrWhiteSpace(x)) return null;
+            var allowed = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "summary","availability","price","author_bio",
+                "more_by_author","category_recs","similar_to_title",
+                "publisher_info","publisher_books","general_recs"
+            };
+            return allowed.Contains(x) ? x : null;
         }
-
-        // لم نعد نستخدم أي Fallback محلي للنية — Gemini هو المصدر الوحيد
-        private static string DetectIntentFallback(string q) => "general_recs";
 
         private static string? SanitizeCategory(string? cat)
         {
@@ -303,34 +364,6 @@ namespace AseerAlkotb.Application.Services
             var bad = new[] { "string", "undefined", "null", "-" };
             return bad.Contains(v, StringComparer.OrdinalIgnoreCase) ? null : v;
         }
-
-        private static string Normalize(string? x)
-        {
-            if (string.IsNullOrWhiteSpace(x)) return string.Empty;
-            var s = x.Trim().ToLowerInvariant();
-            s = s.Replace("ـ", "")
-                 .Replace('أ', 'ا').Replace('إ', 'ا').Replace('آ', 'ا')
-                 .Replace('ى', 'ي').Replace('ؤ', 'و').Replace('ئ', 'ي');
-            return s;
-        }
-
-        private static string? ExtractTitleLoose(string text)
-        {
-            if (string.IsNullOrWhiteSpace(text)) return null;
-            var s = text.Trim();
-
-            var q = Regex.Match(s, "[\"«»“”'`]{1}(?<t>[^\"«»“”'`]{2,})[\"«»“”'`]{1}");
-            if (q.Success) return q.Groups["t"].Value.Trim();
-
-            var m = Regex.Match(s, @"(?:نبذة|نبذه|ملخص)\s+عن\s+(?<t>[^\.،:;!\?؟]{2,})", RegexOptions.IgnoreCase);
-            if (m.Success) return m.Groups["t"].Value.Trim();
-
-            m = Regex.Match(s, @"(?:ال)?(?:كتاب|كتب|رواية|الرواية)\s+(?<t>[^\.،:;!\?؟]{2,})", RegexOptions.IgnoreCase);
-            if (m.Success) return m.Groups["t"].Value.Trim();
-
-            return null;
-        }
-
         private async Task<Domain.Entites.Models.Book?> FindBookByTitleAsync(string rawTitle)
         {
             if (string.IsNullOrWhiteSpace(rawTitle)) return null;
@@ -340,7 +373,7 @@ namespace AseerAlkotb.Application.Services
             var lowerAlt = lower.StartsWith("ال") ? lower[2..] : lower;
 
             IQueryable<Domain.Entites.Models.Book> baseQuery =
-                _uow.Books.GetQueryable(b => b.IsActive && b.Title != null, q => q.Include(b => b.Author));
+                _uow.Books.GetQueryable(b => b.IsActive && b.Title != null, q => q.Include(b => b.Author).Include(b => b.Publisher));
 
             // تطابق دقيق بعد ToLower
             var exactDb = await baseQuery
@@ -453,47 +486,6 @@ namespace AseerAlkotb.Application.Services
         }
 
         // ====== Helpers: ExtractCategory ======
-        private static string? ExtractCategory(string text)
-        {
-            if (string.IsNullOrWhiteSpace(text)) return null;
-
-            var q = text.Trim();
-            var qLower = q.ToLowerInvariant();
-            var markers = new[] { "نوع", "تصنيف", "genre", "category" };
-
-            foreach (var m in markers)
-            {
-                var idx = qLower.IndexOf(m);
-                if (idx >= 0)
-                {
-                    var start = idx + m.Length;
-                    var tail = q.Substring(start).Trim(' ', ':', '：', '-', '—', '،', '"', '«', '»', '“', '”', '\'', '`');
-                    var stops = new[] { "،", ",", ";", "؛", ".", ":", "—", "-", "!", "؟", "?" };
-                    foreach (var s in stops)
-                    {
-                        var cut = tail.IndexOf(s, StringComparison.Ordinal);
-                        if (cut >= 0) { tail = tail[..cut]; break; }
-                    }
-                    tail = tail.Trim();
-                    if (tail.StartsWith("ال")) tail = tail[2..];
-                    return string.IsNullOrWhiteSpace(tail) ? null : tail;
-                }
-            }
-
-            var likePatterns = new[]
-            {
-                @"بحب\s+ال?(?:نوع|تصنيف)\s+(?<cat>[^\.,;:!\?؟،\-]{2,})",
-                @"i\s+like\s+the\s+(?:genre|category)\s+(?<cat>[^\.,;:!\?،\-]{2,})"
-            };
-            foreach (var pat in likePatterns)
-            {
-                var m = System.Text.RegularExpressions.Regex.Match(q, pat, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-                if (m.Success) return m.Groups["cat"].Value.Trim();
-            }
-
-            return null;
-        }
-
         private static bool IsGreeting(string q)
         {
             if (string.IsNullOrWhiteSpace(q)) return false;
@@ -506,7 +498,120 @@ namespace AseerAlkotb.Application.Services
         }
 
         private static string Intro(Lang lang) => lang == Lang.English
-            ? "Hi! I’m Aseer Alkotb assistant 🤖. I can help you with book summaries, availability, prices, author bios, and recommendations."
-            : "أهلاً! أنا مساعد عصير الكتب 🤖. أقدر أساعدك في ملخصات الكتب، التوافر، الأسعار، نبذات المؤلفين، والترشيحات.";
+            ? "Hi! I'm Aseer Alkotb assistant 🤖. I can help you with book summaries, availability, prices, author bios, publisher info, and recommendations."
+            : "أهلاً! أنا مساعد عصير الكتب 🤖. أقدر أساعدك في ملخصات الكتب، التوافر، الأسعار، نبذات المؤلفين، معلومات دور النشر، والترشيحات.";
+
+        // ====== Publisher Methods ======
+        private async Task<RagAskResponse> HandlePublisherInfoAsync(string? title, string? publisher, string question)
+        {
+            var isEnglishQuery = await _translator.IsEnglishTextAsync(question);
+            
+            Publisher? publisherEntity = null;
+            
+            // If we have a title, find its publisher
+            if (!string.IsNullOrWhiteSpace(title))
+            {
+                var book = await FindBookByTitleAsync(title);
+                if (book?.Publisher != null)
+                {
+                    var answer = $"\"{book.Title}\" منشور من دار {book.Publisher.Name}.";
+                    if (!string.IsNullOrWhiteSpace(book.Publisher.Description))
+                        answer += $" نبذة عن دار النشر: {book.Publisher.Description}";
+                    
+                    var response = new RagAskResponse 
+                    { 
+                        Answer = answer,
+                        Sources = ToSources(new List<BookBriefDto> {
+                            new(book.Id, book.Title, book.Author?.Name, book.Price, book.DiscountedPrice, book.CoverImageUrl, book.Description)
+                        }, question)
+                    };
+                    return await TranslateResponseIfNeededAsync(response, isEnglishQuery);
+                }
+                var notFoundResponse = new RagAskResponse { Answer = $"لم أجد معلومات عن ناشر كتاب \"{title}\"." };
+                return await TranslateResponseIfNeededAsync(notFoundResponse, isEnglishQuery);
+            }
+            
+            // Direct publisher query
+            if (!string.IsNullOrWhiteSpace(publisher))
+            {
+                publisherEntity = await FindPublisherByNameAsync(publisher);
+                if (publisherEntity != null)
+                {
+                    var answer = $"معلومات عن {publisherEntity.Name}:";
+                    if (!string.IsNullOrWhiteSpace(publisherEntity.Description))
+                        answer += $" {publisherEntity.Description}";
+                    else
+                        answer += " لا تتوفر نبذة مفصلة حالياً.";
+                    
+                    var response = new RagAskResponse { Answer = answer };
+                    return await TranslateResponseIfNeededAsync(response, isEnglishQuery);
+                }
+                var notFoundResponse = new RagAskResponse { Answer = $"لم أجد دار نشر بالاسم \"{publisher}\"." };
+                return await TranslateResponseIfNeededAsync(notFoundResponse, isEnglishQuery);
+            }
+            
+            var defaultResponse = new RagAskResponse { Answer = "برجاء تحديد اسم دار النشر أو اسم كتاب للاستعلام عن ناشره." };
+            return await TranslateResponseIfNeededAsync(defaultResponse, isEnglishQuery);
+        }
+        
+        private async Task<RagAskResponse> HandlePublisherBooksAsync(string? publisher, int limit, string question)
+        {
+            var isEnglishQuery = await _translator.IsEnglishTextAsync(question);
+            
+            if (string.IsNullOrWhiteSpace(publisher))
+            {
+                var response = new RagAskResponse { Answer = "برجاء تحديد اسم دار النشر للعثور على كتبها." };
+                return await TranslateResponseIfNeededAsync(response, isEnglishQuery);
+            }
+                
+            var take = limit > 0 ? limit : 10;
+            var books = await GetPublisherBooksAsync(publisher, take);
+            
+            if (!books.Data!.Any())
+            {
+                var response = new RagAskResponse { Answer = $"لم أجد كتباً لدار النشر \"{publisher}\"." };
+                return await TranslateResponseIfNeededAsync(response, isEnglishQuery);
+            }
+                
+            var titles = books.Data!.Select(b => b.Title).ToList();
+            var answer = $"كتب من {publisher}: {string.Join("، ", titles)}.";
+            
+            var finalResponse = new RagAskResponse 
+            {
+                Answer = answer,
+                Sources = ToSources(books.Data!, question)
+            };
+            return await TranslateResponseIfNeededAsync(finalResponse, isEnglishQuery);
+        }
+        
+        private async Task<Publisher?> FindPublisherByNameAsync(string publisherName)
+        {
+            if (string.IsNullOrWhiteSpace(publisherName)) return null;
+            
+            var lower = publisherName.Trim().ToLower();
+            var lowerAlt = lower.StartsWith("ال") ? lower[2..] : lower;
+            
+            return await _uow.Publishers.GetQueryable(
+                p => EF.Functions.Like(p.Name.ToLower(), $"%{lower}%") ||
+                     EF.Functions.Like(p.Name.ToLower(), $"%{lowerAlt}%"))
+                .FirstOrDefaultAsync();
+        }
+        
+        private async Task<ApiResponse<List<BookBriefDto>>> GetPublisherBooksAsync(string publisherName, int take = 10)
+        {
+            var publisher = await FindPublisherByNameAsync(publisherName);
+            if (publisher == null)
+                return Success(new List<BookBriefDto>());
+                
+            var books = await _uow.Books.GetQueryable(
+                    b => b.IsActive && b.PublisherId == publisher.Id,
+                    q => q.Include(b => b.Author).Include(b => b.Publisher))
+                .OrderByDescending(b => b.SalesCount)
+                .ThenByDescending(b => b.ViewCount)
+                .Take(take)
+                .ToListAsync();
+                
+            return Success(books.Adapt<List<BookBriefDto>>());
+        }
     }
 }

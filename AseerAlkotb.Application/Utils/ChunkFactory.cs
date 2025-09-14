@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -29,8 +29,16 @@ namespace AseerAlkotb.Application.Utils
             if (!string.IsNullOrWhiteSpace(cats))
                 chunks.Add(("category", cats));
 
+            // Always include author bio if available (previously was conditional)
             if (!string.IsNullOrWhiteSpace(b.Author?.Bio))
                 chunks.Add(("author_bio", b.Author!.Bio!));
+
+            // Add publisher info if available
+            if (!string.IsNullOrWhiteSpace(b.Publisher?.Name))
+                chunks.Add(("publisher", b.Publisher!.Name));
+
+            if (!string.IsNullOrWhiteSpace(b.Publisher?.Description))
+                chunks.Add(("publisher_bio", b.Publisher!.Description));
 
             return chunks;
         }

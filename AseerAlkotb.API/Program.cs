@@ -1,4 +1,4 @@
-﻿﻿using AseerAlkotb.API.DependencyInjection;
+﻿﻿﻿﻿using AseerAlkotb.API.DependencyInjection;
 using AseerAlkotb.API.Extensions;
 using AseerAlkotb.API.Middlewares;
 using AseerAlkotb.Application.Contracts;
@@ -160,6 +160,7 @@ namespace AseerAlkotb.API
             builder.Services.AddScoped<IRagService, RagService>();
             // RAG deps
             builder.Services.AddScoped<IQuestionRouterService, GeminiQuestionRouterService>();
+            builder.Services.AddScoped<ITranslationService, GeminiTranslationService>();
             builder.Services.AddScoped<IWebsiteCatalogService, WebsiteCatalogService>();
             builder.Services.AddScoped<IEmbeddingService, GeminiEmbeddingService>();
             builder.Services.AddScoped<IAnswerSynthesisService, GeminiAnswerSynthesisService>();

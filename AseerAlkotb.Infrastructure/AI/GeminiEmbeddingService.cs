@@ -1,4 +1,4 @@
-﻿using System.Net.Http.Json;
+﻿﻿﻿﻿using System.Net.Http.Json;
 using System.Text.Json;
 using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Utils;
@@ -85,13 +85,17 @@ namespace AseerAlkotb.Infrastructure.AI
         private static string BuildEmbeddingQuery(string? query)
         {
             query ??= string.Empty;
-            var (title, author) = QueryExtractor.Extract(query);
+            var (title, author, publisher) = QueryExtractor.ExtractAdvanced(query);
 
-            if (!string.IsNullOrWhiteSpace(author) && string.IsNullOrWhiteSpace(title))
-                return author!.Trim();
-
+            // Prioritize the most specific entity available
             if (!string.IsNullOrWhiteSpace(title))
                 return title!.Trim();
+                
+            if (!string.IsNullOrWhiteSpace(author))
+                return author!.Trim();
+                
+            if (!string.IsNullOrWhiteSpace(publisher))
+                return publisher!.Trim();
 
             return query.Trim();
         }
@@ -133,14 +137,12 @@ namespace AseerAlkotb.Infrastructure.AI
             var book = await _db.Books
                                 .Include(b => b.Author)
                                 .Include(b => b.Categories)
+                                .Include(b => b.Publisher)  // Include publisher data
                                 .FirstOrDefaultAsync(b => b.Id == bookId);
 
             if (book is null) return;
 
             var chunks = ChunkFactory.BuildBookChunks(book);
-
-            // إعداد يسمح بتجاهل author_bio داخل كل كتاب (لتقليل التكرار)
-            bool includeAuthorBioInBook = string.Equals(_cfg["Embeddings:IncludeAuthorBioInBookChunks"], "true", StringComparison.OrdinalIgnoreCase);
 
             var existing = await _db.BookEmbeddings.Where(e => e.BookId == bookId).ToListAsync();
             _db.BookEmbeddings.RemoveRange(existing);
@@ -148,7 +150,6 @@ namespace AseerAlkotb.Infrastructure.AI
             foreach (var c in chunks)
             {
                 if (string.IsNullOrWhiteSpace(c.Content)) continue;
-                if (!includeAuthorBioInBook && c.Type == "author_bio") continue;
 
                 var vec = await EmbedWithCacheAsync(c.Content);
                 _db.BookEmbeddings.Add(new BookEmbedding

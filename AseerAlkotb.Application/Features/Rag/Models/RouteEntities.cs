@@ -11,5 +11,6 @@ namespace AseerAlkotb.Application.Features.Rag.Models
         public string? title { get; set; }
         public string? author { get; set; }
         public string? category { get; set; }
+        public string? publisher { get; set; }
     }
 }
