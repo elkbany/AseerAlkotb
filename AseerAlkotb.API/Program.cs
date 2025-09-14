@@ -273,6 +273,8 @@ namespace AseerAlkotb.API
 
             builder.Services.AddScoped<IAccountServices, AccountService>();
             builder.Services.AddScoped<IAdminServices, AdminServices>();
+            builder.Services.AddHostedService<ExpiredCartCleanupService>();
+            builder.Services.AddScoped<IExpiredCartCleanupService, ExpiredCartCleanupService>();
 
             // RAG Services
             builder.Services.AddScoped<IRagService, RagService>();

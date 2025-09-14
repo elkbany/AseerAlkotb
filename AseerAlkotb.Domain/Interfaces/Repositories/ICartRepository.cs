@@ -22,6 +22,6 @@ namespace AseerAlkotb.Domain.Interfaces.Repositories
 
 
         Task ClearCartAsync(int userId);
-
+        Task<List<Cart>> GetCartsOlderThanAsync(DateTime expirationTime);
     }
 }

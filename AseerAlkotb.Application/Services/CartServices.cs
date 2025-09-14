@@ -123,8 +123,12 @@ namespace AseerAlkotb.Application.Services
             {
                 existingItem.Quantity += 1;
                 item.StockQuantity -= 1;
+
                 await unitOfWork.Carts.UpdateCartItemAsync(existingItem);
+                cart.UpdatedAt = DateTime.UtcNow;
+                unitOfWork.Carts.Update(cart);
                 await unitOfWork.CommitAsync();
+
                 response = existingItem.Adapt<AddItemToCartResponse>();
             }
             else
@@ -138,6 +142,8 @@ namespace AseerAlkotb.Application.Services
                 };
                 item.StockQuantity -= 1;
                 await unitOfWork.Carts.AddCartItemAsync(newItem);
+                cart.UpdatedAt = DateTime.UtcNow;
+                unitOfWork.Carts.Update(cart);
                 await unitOfWork.CommitAsync();
                 response = newItem.Adapt<AddItemToCartResponse>();
             }
@@ -173,6 +179,8 @@ namespace AseerAlkotb.Application.Services
             var item = cart.CartItems.FirstOrDefault(ci => ci.BookId == request.bookId);
             await unitOfWork.Carts.RemoveCartItemAsync(item);
             item.Book.StockQuantity += item.Quantity; ///restore Quantity in stock
+            cart.UpdatedAt = DateTime.UtcNow;
+            unitOfWork.Carts.Update(cart);
             await unitOfWork.CommitAsync();
             var response = item.Adapt<DeleteItemResponse>();
             return Success(response);
@@ -223,7 +231,9 @@ namespace AseerAlkotb.Application.Services
                 }
                 item.Quantity = request.NewQuantity;
 
+                cart.UpdatedAt = DateTime.UtcNow;
                 await unitOfWork.Carts.UpdateCartItemAsync(item);
+                unitOfWork.Carts.Update(cart);
                 await unitOfWork.CommitAsync();
                 var respone = item.Adapt<UpdateItemQuantityResponse>();
                 return Success(respone);
@@ -259,6 +269,8 @@ namespace AseerAlkotb.Application.Services
                 await unitOfWork.Carts.RemoveCartItemAsync(item);
                 item.Book.StockQuantity += item.Quantity;
             }
+            cart.UpdatedAt = DateTime.UtcNow;
+            unitOfWork.Carts.Update(cart);
             await unitOfWork.CommitAsync();
             var response = cart.Adapt<ClearCartResponse>();
             return Success(response);
