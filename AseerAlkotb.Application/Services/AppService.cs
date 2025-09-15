@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Localization;
+using System.Globalization;
 
 namespace AseerAlkotb.Application.Services
 {
@@ -158,12 +159,27 @@ namespace AseerAlkotb.Application.Services
         #region Localization Helpers
         protected string LocalizeOr(string key, string fallback)
         {
-            var localized = _stringLocalizer[key];
-            if (localized.ResourceNotFound || string.IsNullOrWhiteSpace(localized.Value))
+            // 1) Try reading the runtime-updated resx on disk (no restart needed)
+            try
             {
-                return fallback;
+                var culture = CultureInfo.CurrentUICulture?.TwoLetterISOLanguageName ?? "en";
+                var direct = ResxResourceHelper.GetSharedResourceOrNull(key, culture);
+                if (!string.IsNullOrWhiteSpace(direct))
+                {
+                    return direct!;
+                }
             }
-            return localized.Value;
+            catch { /* ignore and fallback */ }
+
+            // 2) Fallback to the registered IStringLocalizer (may be cached)
+            var localized = _stringLocalizer[key];
+            if (!localized.ResourceNotFound && !string.IsNullOrWhiteSpace(localized.Value))
+            {
+                return localized.Value;
+            }
+
+            // 3) Final fallback to provided default value
+            return fallback;
         }
 
         protected string LocalizeEntity(string entityType, int id, string field, string fallback)

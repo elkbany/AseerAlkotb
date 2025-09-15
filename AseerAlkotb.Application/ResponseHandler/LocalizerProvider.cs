@@ -1,6 +1,7 @@
 using AseerAlkotb.Localization.Resources;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
@@ -14,19 +15,55 @@ namespace AseerAlkotb.Application.ResponseHandler
     {
         private static IStringLocalizer<SharedResources> _localizer;
         private static IHttpContextAccessor _httpContextAccessor;
+        private static IServiceProvider _serviceProvider;
+        private static IStringLocalizerFactory _localizerFactory;
 
         public static IStringLocalizer<SharedResources> Localizer
         {
             get
             {
+                if (_localizer == null && _localizerFactory != null)
+                {
+                    _localizer = (IStringLocalizer<SharedResources>)_localizerFactory.Create(typeof(SharedResources));
+                }
                 return _localizer;
             }
         }
 
-        public static void Init(IStringLocalizer<SharedResources> localizer, IHttpContextAccessor httpContextAccessor = null)
+        public static void Init(IStringLocalizer<SharedResources> localizer, IHttpContextAccessor httpContextAccessor = null, IServiceProvider serviceProvider = null)
         {
             _localizer = localizer;
             _httpContextAccessor = httpContextAccessor;
+            _serviceProvider = serviceProvider;
+            
+            if (serviceProvider != null)
+            {
+                _localizerFactory = serviceProvider.GetRequiredService<IStringLocalizerFactory>();
+            }
+        }
+
+        public static void RefreshLocalizer()
+        {
+            try
+            {
+                if (_localizerFactory != null)
+                {
+                    // إنشاء localizer جديد من الـ factory
+                    _localizer = (IStringLocalizer<SharedResources>)_localizerFactory.Create(typeof(SharedResources));
+                    Console.WriteLine("Localizer refreshed successfully");
+                }
+                else if (_serviceProvider != null)
+                {
+                    // fallback: استخدام الـ service provider
+                    using var scope = _serviceProvider.CreateScope();
+                    _localizer = scope.ServiceProvider.GetRequiredService<IStringLocalizer<SharedResources>>();
+                    Console.WriteLine("Localizer refreshed successfully via service provider");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to refresh localizer: {ex.Message}");
+            }
         }
 
         // Helper method to get localized message

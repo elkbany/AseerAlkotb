@@ -1,6 +1,7 @@
 ﻿using AseerAlkotb.API.DependencyInjection;
 using AseerAlkotb.API.Extensions;
 using AseerAlkotb.API.Middlewares;
+using AseerAlkotb.API.Services;
 using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Contracts.External;
 using AseerAlkotb.Application.ResponseHandler;
@@ -64,6 +65,7 @@ namespace AseerAlkotb.API
             #region Localization
             builder.Services.AddLocalizationServices();
             builder.Services.AddHttpContextAccessor();
+            builder.Services.AddHostedService<LocalizationRefreshService>();
             #endregion
 
             #region Identity Registration
@@ -366,7 +368,7 @@ namespace AseerAlkotb.API
             {
                 var localizer = scope.ServiceProvider.GetRequiredService<IStringLocalizer<SharedResources>>();
                 var httpContextAccessor = scope.ServiceProvider.GetRequiredService<IHttpContextAccessor>();
-                LocalizerProvider.Init(localizer, httpContextAccessor);
+                LocalizerProvider.Init(localizer, httpContextAccessor, app.Services);
             }
 
             app.UseHttpsRedirection();

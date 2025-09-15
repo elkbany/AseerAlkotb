@@ -965,4 +965,64 @@
   <data name="Author_7_Bio" xml:space="preserve">
     <value>Writer Ahmed Khaled Mustafa was born in Medina, Saudi Arabia, on January 22, 1984. He studied pharmacy at Cairo University, before turning to writing. His first novel, "The Cannibal Restaurant," was his first, followed by the novels "Antichrist," "The Underworld," and "Angels of Nasibin," his most recent, all published by Assir Al-Kotob Publishing and Distribution House. His works are known for their blend of historical and religious information and fantasy.</value>
   </data>
+  <data name="Category_63_Name" xml:space="preserve">
+    <value>Historya</value>
+  </data>
+  <data name="Category_64_Name" xml:space="preserve">
+    <value>Egypt History</value>
+  </data>
+  <data name="Category_64_Description" xml:space="preserve">
+    <value>Egypt History</value>
+  </data>
+  <data name="Book_59_Title" xml:space="preserve">
+    <value>Mayada</value>
+  </data>
+  <data name="Book_59_Description" xml:space="preserve">
+    <value>Mayada Mayada</value>
+  </data>
+  <data name="Category_65_Name" xml:space="preserve">
+    <value>Arabic and Islamic History</value>
+  </data>
+  <data name="Category_65_Description" xml:space="preserve">
+    <value>Arabic and Islamic History</value>
+  </data>
+  <data name="Category_67_Name" xml:space="preserve">
+    <value>na</value>
+  </data>
+  <data name="Category_67_Description" xml:space="preserve">
+    <value>na</value>
+  </data>
+  <data name="Category_69_Name" xml:space="preserve">
+    <value>Crime and suspense</value>
+  </data>
+  <data name="Category_69_Description" xml:space="preserve">
+    <value>Crime and suspense</value>
+  </data>
+  <data name="Category_73_Name" xml:space="preserve">
+    <value>Classiky</value>
+  </data>
+  <data name="Category_73_Description" xml:space="preserve">
+    <value>Classiky</value>
+  </data>
+  <data name="Category_71_Name" xml:space="preserve">
+    <value>Historc Novels</value>
+  </data>
+  <data name="Category_71_Description" xml:space="preserve">
+    <value>Historc Novels</value>
+  </data>
+  <data name="Category_63_Description" xml:space="preserve">
+    <value>Historya</value>
+  </data>
+  <data name="Book_24_Title" xml:space="preserve">
+    <value>The Hellions</value>
+  </data>
+  <data name="Book_24_Description" xml:space="preserve">
+    <value>They were slowly approaching... creeping into the lands of the earth from every direction, their eyes slanted, filled with mischief. They emerged from the darkness of the earth, where they had been trapped for centuries. They had human faces, human bodies, and demonic hearts, like hungry beasts thrown into a desert.</value>
+  </data>
+  <data name="Publisher_5_Name" xml:space="preserve">
+    <value>Aseer Alkotb</value>
+  </data>
+  <data name="Publisher_5_Description" xml:space="preserve">
+    <value>Aseer Alkotb for Translation, Publishing, and Distribution is an Egyptian publishing house founded in 2014. It is one of the most prominent Arab publishing houses that has succeeded in carving out a distinct position for itself in the world of books and reading. Founded with the aim of providing diverse content that combines authenticity and modernity, it focuses on publishing translated Arabic and international novels, in addition to books on thought, philosophy, history, human development, and children's and young adult books. The publishing house is distinguished by the quality of its selection and its commitment to presenting works that suit various tastes and interests. It has also contributed to enriching the Arab cultural scene with solid translations and innovative publications, becoming a beloved destination for every reader seeking creativity and knowledge. The publishing house has won numerous awards, including the Best Pavilion Award at the 51st Cairo International Book Fair 2020 and the Excellence in Publishing Award in the Translation category at the Riyadh International Book Fair 2024.</value>
+  </data>
 </root>
