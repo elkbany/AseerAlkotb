@@ -966,4 +966,64 @@
   <data name="Author_7_Bio" xml:space="preserve">
     <value>الكاتب أحمد خالد مصطفى، من مواليد المدينة المنورة بالمملكة العربية السعودية في 22 يناير 1984م. درس الصيدلة في جامعة القاهرة، ثم اتجه بعدها للكتابة حيث كانت قصة مطعم اللحوم البشرية أول أعماله، تلاها روايات أنتيخريستوس وأرض السافلين، وملائك نصيبين هي أحدث أعماله الصادرة جميعاً عن دار عصير الكتب للنشر والتوزيع، وقد عرفت أعماله بكونها مزيجا من المعلومات التاريخية والدينية والخيال.</value>
   </data>
+  <data name="Category_63_Name" xml:space="preserve">
+    <value>تاريخ</value>
+  </data>
+  <data name="Category_64_Name" xml:space="preserve">
+    <value>تاريخ مصر</value>
+  </data>
+  <data name="Category_64_Description" xml:space="preserve">
+    <value>تاريخ مصر</value>
+  </data>
+  <data name="Book_59_Title" xml:space="preserve">
+    <value>مياده</value>
+  </data>
+  <data name="Book_59_Description" xml:space="preserve">
+    <value>مياده مياده</value>
+  </data>
+  <data name="Category_65_Name" xml:space="preserve">
+    <value>التاريخ العربى والاسلامي</value>
+  </data>
+  <data name="Category_65_Description" xml:space="preserve">
+    <value>التاريخ العربى والاسلامي</value>
+  </data>
+  <data name="Category_67_Name" xml:space="preserve">
+    <value>روايات</value>
+  </data>
+  <data name="Category_67_Description" xml:space="preserve">
+    <value>روايات</value>
+  </data>
+  <data name="Category_69_Name" xml:space="preserve">
+    <value>جريمة وتشويق</value>
+  </data>
+  <data name="Category_69_Description" xml:space="preserve">
+    <value>جريمة وتشويق</value>
+  </data>
+  <data name="Category_73_Name" xml:space="preserve">
+    <value>روايات كلاسيكية</value>
+  </data>
+  <data name="Category_73_Description" xml:space="preserve">
+    <value>روايات كلاسيكية</value>
+  </data>
+  <data name="Category_71_Name" xml:space="preserve">
+    <value>روايات تاريخية</value>
+  </data>
+  <data name="Category_71_Description" xml:space="preserve">
+    <value>روايات تاريخية</value>
+  </data>
+  <data name="Category_63_Description" xml:space="preserve">
+    <value>تاريخ</value>
+  </data>
+  <data name="Book_24_Title" xml:space="preserve">
+    <value>الهلكوت</value>
+  </data>
+  <data name="Book_24_Description" xml:space="preserve">
+    <value>كانوا يقتربون ببطء.. ينسلون على بلاد الأرض من كل حدب، أعينهم مائلة، مملوءة بالأذى. خارجون من تحت ظلمة في الأرض احتبسوا وراءها لقرون. لهم وجوه بشر وأجساد بشر وقلوب شياطين، كأنهم ضوارٍ جائعة أُلقِيت في صحراء.</value>
+  </data>
+  <data name="Publisher_5_Name" xml:space="preserve">
+    <value>عصير الكتب</value>
+  </data>
+  <data name="Publisher_5_Description" xml:space="preserve">
+    <value>دار عصير الكتب للترجمة والنشر والتوزيع، هي دار نشر مصرية تأسست عام 2014، وتعد واحدة من أبرز دور النشر العربية التي استطاعت أن تحجز لنفسها مكانة مميزة في عالم الكتب والقراءة. تأسست بهدف تقديم محتوى متنوع يجمع بين الأصالة والمعاصرة، حيث تهتم بنشر الروايات العربية والعالمية المترجمة، إلى جانب كتب الفكر والفلسفة، والتاريخ، والتنمية البشرية، وكتب الأطفال واليافعين. تميّزت الدار بجودة اختياراتها وحرصها على تقديم أعمال تناسب مختلف الأذواق والاهتمامات، كما أسهمت في إثراء الساحة الثقافية العربية بترجمات رصينة وإصدارات مبتكرة، لتصبح وجهة محببة لكل قارئ يبحث عن الإبداع والمعرفة. وقد حصدت الدار على الكثير من الجوائز منها جائزة أفضل جناح في الدورة الـ51 لـمعرض القاهرة الدولي للكتاب 2020، وجائزة التميُّز في النشر عن فئة الترجمة خلال فعاليات معرض الرياض الدولي للكتاب 2024.</value>
+  </data>
 </root>

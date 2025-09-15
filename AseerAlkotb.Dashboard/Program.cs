@@ -281,7 +281,7 @@ namespace AseerAlkotb.Dashboard
             {
                 var localizer = scope.ServiceProvider.GetRequiredService<IStringLocalizer<SharedResources>>();
                 var httpContextAccessor = scope.ServiceProvider.GetRequiredService<IHttpContextAccessor>();
-                LocalizerProvider.Init(localizer, httpContextAccessor);
+                LocalizerProvider.Init(localizer, httpContextAccessor, app.Services);
             }
             app.UseHttpsRedirection();
             app.UseStaticFiles(); // Serves static files from wwwroot

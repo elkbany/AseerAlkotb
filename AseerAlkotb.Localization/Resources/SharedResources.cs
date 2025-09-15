@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -142,6 +143,63 @@ namespace AseerAlkotb.Localization.Resources
             }
 
             doc.Save(resxPath);
+            
+            // محاولة استدعاء الـ refresh endpoint مباشرة
+            RefreshLocalizationResources();
+            
+            Console.WriteLine($"Resource updated: {key} = {value} ({culture})");
+        }
+
+        private static void RefreshLocalizationResources()
+        {
+            try
+            {
+                // محاولة استدعاء الـ refresh endpoint
+                using var httpClient = new HttpClient();
+                httpClient.Timeout = TimeSpan.FromSeconds(3);
+                
+                var apiBaseUrl = GetApiBaseUrl();
+                if (!string.IsNullOrEmpty(apiBaseUrl))
+                {
+                    var response = httpClient.PostAsync($"{apiBaseUrl}/api/localization/force-refresh", null).Result;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        Console.WriteLine("Localization resources refreshed successfully via API");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"API returned status: {response.StatusCode}");
+                    }
+                }
+            }
+            catch (HttpRequestException ex) when (ex.Message.Contains("refused"))
+            {
+                Console.WriteLine("API is not running - localization will be refreshed on next API startup");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to refresh localization resources: {ex.Message}");
+            }
+        }
+
+        private static string? GetApiBaseUrl()
+        {
+            try
+            {
+                // محاولة الحصول على الـ API base URL من الـ environment variable
+                var apiBaseUrl = Environment.GetEnvironmentVariable("ApiBaseUrl");
+                if (!string.IsNullOrEmpty(apiBaseUrl))
+                {
+                    return apiBaseUrl;
+                }
+
+                // Default API URL
+                return "https://localhost:7207";
+            }
+            catch
+            {
+                return "https://localhost:7207";
+            }
         }
 
         private static string? FindLocalizationProjectRoot()
