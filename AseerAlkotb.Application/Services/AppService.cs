@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Localization;
+using System;
 using System.Globalization;
 
 namespace AseerAlkotb.Application.Services
@@ -34,12 +35,12 @@ namespace AseerAlkotb.Application.Services
         }
 
         #region Validate Async
-        protected async Task DoValidationAsync<TValidator, TRequest>(TRequest request, params object[] constructorParameters)
-        where TValidator : AbstractValidator<TRequest>
+        protected async Task DoValidationAsync<TValidator, TRequest>(TRequest request)
+            where TValidator : AbstractValidator<TRequest>
         {
-            var instance = (TValidator)Activator.CreateInstance(typeof(TValidator), constructorParameters)!;
-
-            var validateResult = await instance.ValidateAsync(request);
+            // Use DI container instead of Activator.CreateInstance
+            var validator = serviceProvider.GetRequiredService<TValidator>();
+            var validateResult = await validator.ValidateAsync(request);
             if (!validateResult.IsValid)
             {
                 throw new ValidationException(validateResult.Errors);

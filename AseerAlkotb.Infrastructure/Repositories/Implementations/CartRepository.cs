@@ -11,11 +11,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AseerAlkotb.Infrastructure.Repositories.Implementations
 {
-    public class CartRepository: GenericRepository<Cart, int>, ICartRepository
+    public class CartRepository : GenericRepository<Cart, int>, ICartRepository
     {
         public CartRepository(ApplicationDbContext context) : base(context)
         {
-                        
+
         }
 
         public async Task<Cart> GetUserCartAsync(int userId)
@@ -24,7 +24,7 @@ namespace AseerAlkotb.Infrastructure.Repositories.Implementations
                  .Include(cart => cart.CartItems)
                      .ThenInclude(cartitem => cartitem.Book)
                  .FirstOrDefaultAsync(Book => Book.UserId == userId);
-          
+
         }
         public async Task ClearCartAsync(int userId)
         {
@@ -50,6 +50,15 @@ namespace AseerAlkotb.Infrastructure.Repositories.Implementations
 
         }
 
+        public async Task<List<Cart>> GetCartsOlderThanAsync(DateTime expirationTime)
+        {
+            return await _dbContext.Cart
+                .Include(c => c.CartItems)
+                .ThenInclude(ci => ci.Book)
+                .Where(c => c.UpdatedAt < expirationTime && c.CartItems.Any())
+                .ToListAsync();
+        }
 
     }
+
 }

@@ -8,7 +8,7 @@ using FluentValidation;
 
 namespace AseerAlkotb.Application.Features.Roles.Validators
 {
-    class RemoveRoleRequestValidator :AbstractValidator<RemoveRoleRequest>
+   public class RemoveRoleRequestValidator :AbstractValidator<RemoveRoleRequest>
     {
         public RemoveRoleRequestValidator() {
             RuleFor(x => x.UserId)
