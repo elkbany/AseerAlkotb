@@ -1,4 +1,4 @@
-﻿
+﻿﻿﻿
 
 using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Features.Authors.Requests;
@@ -92,13 +92,13 @@ namespace AseerAlkotb.Application.Services
                 return NotFound<GetAuthorByIdResponse>($"{_stringLocalizer["Author"]} {_stringLocalizer["NotFound"]}");
             }
             var authMap = author.Adapt<GetAuthorByIdResponse>();
-            authMap.Name = LocalizeEntity("Author", author.Id, "Name", authMap.Name);
-            authMap.Bio = LocalizeEntity("Author", author.Id, "Bio", authMap.Bio);
+            authMap.Name = GetLocalizedText(author.Name, author.Name_en);
+            authMap.Bio = GetLocalizedText(author.Bio, author.Bio_en);
             authMap.Rating=author.Reviews?.Any() == true ? (decimal)author.Reviews.Average(r => r.Rating) : 0;
             authMap.Books = author.Books.Select(book =>
             {
                 var bookDto = book.Adapt<BookCardDto>();
-                bookDto.Title = LocalizeEntity("Book", book.Id, "Title", bookDto.Title);
+                bookDto.Title = GetLocalizedText(book.Title, book.Title_en);
                 bookDto.Rating = book.Reviews?.Any() == true ? (decimal)book.Reviews.Average(r => r.Rating): 0;
                 return bookDto;
             }).ToList();
@@ -114,12 +114,12 @@ namespace AseerAlkotb.Application.Services
             var authsMap = authors.Select(author =>
             {
                 var authorDto = author.Adapt<GetAllAuthorsPaginatedResponse>();
-                authorDto.Name = LocalizeEntity("Author", author.Id, "Name", authorDto.Name);
+                authorDto.Name = GetLocalizedText(author.Name, author.Name_en);
                 authorDto.Rating = author.Reviews?.Any() == true ? (decimal)author.Reviews.Average(r => r.Rating): 0;
                 authorDto.Books = author.Books.Select(book =>
                 {
                     var bookDto = book.Adapt<BookCardDto>();
-                    bookDto.Title = LocalizeEntity("Book", book.Id, "Title", bookDto.Title);
+                    bookDto.Title = GetLocalizedText(book.Title, book.Title_en);
                     bookDto.Rating = book.Reviews?.Any() == true ? (decimal)book.Reviews.Average(r => r.Rating): 0;
                     return bookDto;
                 }).ToList();

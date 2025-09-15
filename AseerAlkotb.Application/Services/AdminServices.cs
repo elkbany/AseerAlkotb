@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿﻿﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -295,7 +295,15 @@ namespace AseerAlkotb.Application.Services
           
             var clients = await userManager.GetUsersInRoleAsync(Roles.Client.ToString());
 
-            var response = clients.Adapt<List<GetAllClientResponse>>();
+            var response = clients.Select(client => {
+                var dto = client.Adapt<GetAllClientResponse>();
+                return dto with
+                {
+                    FirstName = GetLocalizedText(client.FirstName, client.FirstName_en),
+                    LastName = GetLocalizedText(client.LastName, client.LastName_en),
+                    Nationality = GetLocalizedText(client.Nationality ?? "", client.Nationality_en)
+                };
+            }).ToList();
 
             return Success(response);
         }
@@ -303,9 +311,17 @@ namespace AseerAlkotb.Application.Services
         public async Task<ApiResponse<List<GetAllAdminResponse>>> GetAllAdmins()
         {
 
-            var clients = await userManager.GetUsersInRoleAsync(Roles.Admin.ToString());
+            var admins = await userManager.GetUsersInRoleAsync(Roles.Admin.ToString());
 
-            var response = clients.Adapt<List<GetAllAdminResponse>>();
+            var response = admins.Select(admin => {
+                var dto = admin.Adapt<GetAllAdminResponse>();
+                return dto with
+                {
+                    FirstName = GetLocalizedText(admin.FirstName, admin.FirstName_en),
+                    LastName = GetLocalizedText(admin.LastName, admin.LastName_en),
+                    Nationality = GetLocalizedText(admin.Nationality ?? "", admin.Nationality_en)
+                };
+            }).ToList();
 
             return Success(response);
         }
@@ -322,7 +338,15 @@ namespace AseerAlkotb.Application.Services
                 allUsers.AddRange(admins);
                 allUsers.AddRange(clients);
 
-                var response = allUsers.Adapt<List<GetAllAdminResponse>>();
+                var response = allUsers.Select(user => {
+                    var dto = user.Adapt<GetAllAdminResponse>();
+                    return dto with
+                    {
+                        FirstName = GetLocalizedText(user.FirstName, user.FirstName_en),
+                        LastName = GetLocalizedText(user.LastName, user.LastName_en),
+                        Nationality = GetLocalizedText(user.Nationality ?? "", user.Nationality_en)
+                    };
+                }).ToList();
                 return Success(response);
             }
             catch (Exception ex)
@@ -351,7 +375,13 @@ namespace AseerAlkotb.Application.Services
                 }
 
                 var response = user.Adapt<GetAllAdminResponse>();
-                return Success(response);
+                var localizedResponse = response with
+                {
+                    FirstName = GetLocalizedText(user.FirstName, user.FirstName_en),
+                    LastName = GetLocalizedText(user.LastName, user.LastName_en),
+                    Nationality = GetLocalizedText(user.Nationality ?? "", user.Nationality_en)
+                };
+                return Success(localizedResponse);
             }
             catch (Exception ex)
             {
@@ -419,7 +449,20 @@ namespace AseerAlkotb.Application.Services
 
                 var response = new UserDetailsResponse
                 {
-                    User = user.Adapt<GetAllAdminResponse>(),
+                    User = new GetAllAdminResponse(
+                        user.Id,
+                        GetLocalizedText(user.FirstName, user.FirstName_en),
+                        GetLocalizedText(user.LastName, user.LastName_en),
+                        user.UserName,
+                        user.Email,
+                        user.Gender,
+                        user.IsActive,
+                        user.PhoneNumber ?? "",
+                        GetLocalizedText(user.Nationality ?? "", user.Nationality_en),
+                        user.ProfilePictureUrl,
+                        user.CreatedAt,
+                        user.UpdatedAt
+                    ),
                     Orders = orders.Adapt<List<OrderDetailsResponse>>(),
                     Reviews = reviews.Adapt<List<ReviewDetailsResponse>>(),
                     Quotes = quotes.Adapt<List<QuoteDetailsResponse>>(),
