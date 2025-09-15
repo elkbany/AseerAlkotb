@@ -13,11 +13,15 @@ namespace AseerAlkotb.Domain.Entites.Models
     public class User : IdentityUser<int>
     {
         public string FirstName { get; set; }
+        public string? FirstName_en { get; set; }
         public string LastName { get; set; }
+        public string? LastName_en { get; set; }
         public DateTime? DateOfBirth { get; set; }
         public string? ProfilePictureUrl { get; set; }
         public string? Bio { get; set; }
+        public string? Bio_en { get; set; }
         public string? Nationality { get; set; }
+        public string? Nationality_en { get; set; }
         public Gender Gender { get; set; }
         public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; } 

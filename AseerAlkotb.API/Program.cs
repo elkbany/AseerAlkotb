@@ -70,7 +70,7 @@ namespace AseerAlkotb.API
             #region Context Registeration
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             {
-                var connectionString = builder.Configuration.GetConnectionString("Shared");
+                var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
                 options.UseSqlServer(connectionString).UseLazyLoadingProxies();
             });
             #endregion
@@ -345,7 +345,7 @@ namespace AseerAlkotb.API
                 // Callback endpoint rate limiting - 10 requests per minute per IP
                 options.AddFixedWindowLimiter("CallbackPolicy", opt =>
                 {
-                    opt.PermitLimit = 10;
+                    opt.PermitLimit = 20;
                     opt.Window = TimeSpan.FromMinutes(1);
                     opt.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
                     opt.QueueLimit = 0; // No queuing, reject immediately when limit exceeded

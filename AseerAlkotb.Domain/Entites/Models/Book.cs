@@ -6,7 +6,9 @@ namespace AseerAlkotb.Domain.Entites.Models
     public class Book : Entity<int>
     {
         public string Title { get; set; }
+        public string? Title_en { get; set; }
         public string? Description { get; set; }
+        public string? Description_en { get; set; }
         public string ISBN { get; set; }
         public decimal Price { get; set; }
         public decimal DiscountPercentage { get; set; }

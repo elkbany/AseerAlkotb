@@ -81,7 +81,7 @@ namespace AseerAlkotb.Application.Services
                 phone_number = Order.PhoneNumber ?? "+201128292897",
                 street = Order.StreetAddress ?? "N/A",
                 building = "N/A",
-                city = Order.City,
+                city = "N/A",
                 country = "Egypt",
                 floor = "N/A",
                 state = Order.Governorate.ToString() ?? "N/A"
