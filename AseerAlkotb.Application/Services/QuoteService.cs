@@ -170,16 +170,34 @@ namespace AseerAlkotb.Application.Services
 
         public async Task<ApiResponse<GetQuoteByIdResponse>> GetQuoteByIdAsync(GetQuoteByIdRequest request)
         {
-            var quote = await unitOfWork.Quotes.FirstOrDefaultAsync(q => q.Id == request.Id, default, r => r.Book, r => r.Author, r => r.User);
+            var quote = await unitOfWork.Quotes
+                .FirstOrDefaultAsync(
+                    q => q.Id == request.Id,
+                    default,
+                    r => r.Book,
+                    r => r.Author,
+                    r => r.User
+                );
+
             if (quote == null)
             {
                 return NotFound<GetQuoteByIdResponse>($"{_stringLocalizer["Quote"]} {_stringLocalizer["NotFound"]}");
             }
-            var response = quote.Adapt<GetQuoteByIdResponse>();
+
+            var response = new GetQuoteByIdResponse
+            (
+                quote.Id,
+                quote.BookId,
+                quote.AuthorId,
+                quote.UserId,
+                quote.User.FirstName + ' ' + quote.User.LastName,
+                quote.Comment ?? string.Empty
+            );
             return Success(response);
         }
 
         public async Task<ApiResponse<List<GetAllQuotesPaginatedResponse>>> GetAllQuotesAsync(GetAllQuotesPaginatedRequest request)
+                
         {
             var quotes = await unitOfWork.Quotes.GetAllAsync(
                     r => (request.BookId.HasValue && r.BookId == request.BookId.Value) ||
@@ -193,8 +211,19 @@ namespace AseerAlkotb.Application.Services
 
             var totalCount = quotes.Count;
 
-            var response = quotes.Adapt<List<GetAllQuotesPaginatedResponse>>();
+            var response = quotes.Select(q => new GetAllQuotesPaginatedResponse
+            (
+                q.Id,
+                q.BookId,
+                q.AuthorId,
+                q.UserId,
+                q.User.FirstName + ' ' + q.User.LastName,
+                q.Comment ?? string.Empty
+            )).ToList();
+
             return Success(response, totalCount, request.PageNumber, request.PageSize);
         }
+
+      
     }
 }

@@ -16,6 +16,9 @@ namespace AseerAlkotb.Application.Features.Account.Responses
         public string ImageUrl { get; set; }
         public TimeSpan RegistrationPeriod { get; set; }
         public List<ReviewDto> Reviews { get; set; } = [];
+        public List<QuoteDto> Quotes { get; set; } = [];
+
+
         public List<UserFollowDto> Following { get; set; } = [];
     }
 
@@ -24,10 +27,20 @@ namespace AseerAlkotb.Application.Features.Account.Responses
        public int Id { get; set; }
         public ReviewFor ReviewFor { get; set; }
     }
+
+    public record QuoteDto
+    {
+        public int Id { get; set; }
+        public QuoteFor QuoteFor { get; set; }
+    }
+
+
     public record UserFollowDto
     {
         public int Id { get; set; }
         public FollowType FollowType { get; set; }
     }
+
+
 
 }
