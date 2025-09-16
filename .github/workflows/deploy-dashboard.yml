@@ -1,0 +1,43 @@
+name: Build and Deploy Dashboard
+
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore AseerAlkotb.Dashboard/AseerAlkotb.Dashboard.csproj
+
+      - name: Build
+        run: dotnet build AseerAlkotb.Dashboard/AseerAlkotb.Dashboard.csproj --configuration Release --no-restore
+
+      - name: Publish
+        run: dotnet publish AseerAlkotb.Dashboard/AseerAlkotb.Dashboard.csproj -c Release -o published
+
+      - name: Deploy to branch
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git fetch
+          git checkout dashboard-deploy || git checkout -b dashboard-deploy
+          git rm -rf .
+          cp -r published/* .
+          git add .
+          git commit -m "Deploy Dashboard" || echo "No changes to commit"
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} dashboard-deploy --force

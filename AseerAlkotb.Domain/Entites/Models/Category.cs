@@ -5,7 +5,9 @@ namespace AseerAlkotb.Domain.Entites.Models
     public class Category: Entity<int>
     {
         public string Name { get; set; } = string.Empty;
+        public string? Name_en { get; set; } = string.Empty;
         public string? Description { get; set; } // nullable when it's subctegory
+        public string? Description_en { get; set; } // nullable when it's subctegory
         public bool IsActive { get; set; } = true;
 
         #region Navigation Properties

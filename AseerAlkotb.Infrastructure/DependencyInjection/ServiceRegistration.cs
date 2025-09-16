@@ -1,4 +1,5 @@
 ﻿using AseerAlkotb.Application.Contracts.External;
+using AseerAlkotb.Application.Services;
 using AseerAlkotb.Infrastructure.ExternalServices;
 using CloudinaryDotNet;
 using Microsoft.Extensions.Configuration;
@@ -35,6 +36,12 @@ namespace AseerAlkotb.Infrastructure.DependencyInjection
             }
 
             #endregion
+
+            //#region Localization Services
+            //services.AddScoped<IDataExtractionService, DataExtractionService>();
+            //services.AddScoped<ITranslationService, TranslationService>();
+            //services.AddScoped<ILocalizationUpdateService, LocalizationUpdateService>();
+            //#endregion
 
             return services;
         }

@@ -338,7 +338,9 @@ namespace AseerAlkotb.Application.Services
                         oi.UnitPrice,
                         oi.Quantity,
                         oi.BookId,
-                        oi.Book.CoverImageUrl
+                        oi.Book.CoverImageUrl,
+                        oi.Book.DiscountPercentage,
+                        oi.Book.DiscountedPrice
                     ))
                     .ToList()
             )).ToList();
@@ -391,7 +393,9 @@ namespace AseerAlkotb.Application.Services
                         oi.UnitPrice,
                         oi.Quantity,
                         oi.BookId,
-                        oi.Book.CoverImageUrl
+                        oi.Book.CoverImageUrl,
+                        oi.Book.DiscountPercentage,
+                        oi.Book.DiscountedPrice
                     ))
                     .ToList()
             )).ToList();
@@ -440,7 +444,9 @@ namespace AseerAlkotb.Application.Services
             oi.UnitPrice,
             oi.Quantity,
             oi.BookId,
-            oi.Book.CoverImageUrl
+            oi.Book.CoverImageUrl,
+            oi.Book.DiscountPercentage,
+            oi.Book.DiscountedPrice
          ))
          .ToList()
  );
@@ -507,9 +513,16 @@ namespace AseerAlkotb.Application.Services
                         oi.UnitPrice,
                         oi.Quantity,
                         oi.BookId,
-                        oi.Book.CoverImageUrl
+                        oi.Book.CoverImageUrl,
+                        oi.Book.DiscountPercentage,
+                        oi.Book.DiscountedPrice
                     ))
-                    .ToList()
+                    .ToList(),
+                order.PhoneNumber ?? string.Empty,
+                order.StreetAddress ?? string.Empty,
+                order.FirstName ?? string.Empty,
+                order.LastName ?? string.Empty,
+                order.User.Email 
             );
 
             return Success(ordMap);

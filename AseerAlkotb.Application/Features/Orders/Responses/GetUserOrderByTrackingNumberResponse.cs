@@ -26,6 +26,12 @@ namespace AseerAlkotb.Application.Features.Orders.Responses
        decimal DiscountedAmount,
        decimal TotalAmount,
        DateTime OrderDate,
-       List<BookDTO> Books
+       List<BookDTO> Books,
+       string PhoneNumber,//added
+       string StreetAddress,//added
+       string FirstName,//added
+       string LastName,//added
+       string email//added
+
     );
 }

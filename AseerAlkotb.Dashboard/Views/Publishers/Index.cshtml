@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Publishers Management";
 }
+
 @functions {
     string ResolveImg(string? url)
     {
@@ -15,10 +16,12 @@
         return Url.Content("~/" + url);
     }
 }
+
 @functions {
     string Trunc(string? s, int n = 120)
         => string.IsNullOrEmpty(s) ? "" : (s.Length <= n ? s : s.Substring(0, n) + "…");
 }
+
 <div class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
@@ -41,7 +44,7 @@
             <div class="col-lg-3 col-6">
                 <div class="small-box bg-purple">
                     <div class="inner">
-                        <h3>@(Model?.Count ?? 0)</h3>
+                        <h3>@(ViewBag.TotalCount ?? 0)</h3>
                         <p>Total Publishers</p>
                     </div>
                     <div class="icon">
@@ -61,6 +64,21 @@
                 </div>
             </div>
             <div class="card-body">
+                @if (TempData["Error"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible">
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                        @TempData["Error"]
+                    </div>
+                }
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible">
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                        @TempData["Success"]
+                    </div>
+                }
+
                 <div class="row mb-3">
                     <div class="col-md-8">
                         <form asp-action="Index" method="get" class="form-inline">
@@ -72,6 +90,10 @@
                                     </button>
                                 </div>
                             </div>
+                            @if (!string.IsNullOrEmpty(ViewBag.SearchTerm?.ToString()))
+                            {
+                                <a href="@Url.Action("Index")" class="btn btn-outline-secondary ml-2">Clear</a>
+                            }
                         </form>
                     </div>
                 </div>
@@ -88,17 +110,17 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @if (Model != null)
+                            @if (Model != null && Model.Any())
                             {
                                 @foreach (var item in Model)
                                 {
                                     <tr>
                                         <td>
-                                              <img src="@ResolveImg(item.LogoUrl)" alt="@item.Name Logo" class="img-thumbnail" style="width:50px;" />
+                                            <img src="@ResolveImg(item.LogoUrl)" alt="@item.Name Logo" class="img-thumbnail" style="width:50px;" />
                                         </td>
                                         <td>@item.Name</td>
                                         <td>@(string.IsNullOrWhiteSpace(item.ContactEmail) ? "-" : item.ContactEmail)</td>
-                                        <td title="@item.Description">@Trunc(item.Description)</td>
+                                        <td title="@item.Description">@Trunc(item.Description ?? "")</td>
                                         <td>
                                             <div class="btn-group">
                                                 <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary" title="Edit">
@@ -115,6 +137,12 @@
                                     </tr>
                                 }
                             }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="5" class="text-center">No publishers found.</td>
+                                </tr>
+                            }
                         </tbody>
                     </table>
                 </div>
@@ -122,15 +150,34 @@
                 @if (ViewBag.TotalPages > 1)
                 {
                     <div class="d-flex justify-content-between align-items-center mt-4">
+                        @{
+                            // Explicitly cast and compute to int to avoid dynamic binding issues
+                            int currentPage = (int)ViewBag.CurrentPage;
+                            int pageSize = (int)ViewBag.PageSize;
+                            int totalCount = (int)ViewBag.TotalCount;
+                            int endIndex = Math.Min(currentPage * pageSize, totalCount);
+                        }
                         <div class="text-muted">
-                            Showing @((ViewBag.CurrentPage - 1) * 10 + 1) to @(Math.Min(ViewBag.CurrentPage * 10, ViewBag.TotalCount)) of @ViewBag.TotalCount entries
+                            Showing @((currentPage - 1) * pageSize + 1) to @endIndex of @totalCount entries
                         </div>
                         <nav>
                             <ul class="pagination mb-0">
-                                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                                @if (currentPage > 1)
                                 {
-                                    <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                    <li class="page-item">
+                                        <a class="page-link" href="@Url.Action("Index", new { pageNumber = currentPage - 1, search = ViewBag.SearchTerm })">Previous</a>
+                                    </li>
+                                }
+                                @for (int i = Math.Max(1, currentPage - 2); i <= Math.Min((int)ViewBag.TotalPages, currentPage + 2); i++)
+                                {
+                                    <li class="page-item @(i == currentPage ? "active" : "")">
                                         <a class="page-link" href="@Url.Action("Index", new { pageNumber = i, search = ViewBag.SearchTerm })">@i</a>
+                                    </li>
+                                }
+                                @if (currentPage < ViewBag.TotalPages)
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" href="@Url.Action("Index", new { pageNumber = currentPage + 1, search = ViewBag.SearchTerm })">Next</a>
                                     </li>
                                 }
                             </ul>
@@ -146,7 +193,7 @@
     <script>
         $(function () {
             // Enable tooltips
-            $('[data-toggle="tooltip"]').tooltip();
+            $('[title]').tooltip();
 
             // Enable DataTable for better table functionality
             $('.table').DataTable({
@@ -154,8 +201,16 @@
                 "ordering": true,
                 "info": false,
                 "searching": false,
-                "responsive": true
+                "responsive": true,
+                "language": {
+                    "emptyTable": "No data available in table"
+                }
             });
+
+            // Auto-dismiss alerts after 5 seconds
+            setTimeout(function() {
+                $('.alert').fadeOut('slow');
+            }, 5000);
         });
     </script>
 }

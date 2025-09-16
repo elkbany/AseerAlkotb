@@ -36,16 +36,25 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="form-group">
-                                        <label asp-for="Title"></label>
-                                        <input asp-for="Title" class="form-control" placeholder="Enter book title" />
+                                        <label class="form-label">Book Title (Arabic)</label>
+                                        <input asp-for="Title" id="Title" class="form-control" placeholder="أدخل عنوان الكتاب بالعربي" />
                                         <span asp-validation-for="Title" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Book Title (English)</label>
+                                        <input name="EnglishTitle" id="EnglishTitle" class="form-control" placeholder="Enter book title in English" />
                                     </div>
 
                                     <div class="form-group">
-                                        <label asp-for="Description"></label>
-                                        <textarea asp-for="Description" class="form-control" rows="4"
-                                                  placeholder="Enter book description"></textarea>
+                                        <label class="form-label">Description (Arabic)</label>
+                                        <textarea asp-for="Description" id="Description" class="form-control" rows="4"
+                                                  placeholder="أدخل وصف الكتاب بالعربي"></textarea>
                                         <span asp-validation-for="Description" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Description (English)</label>
+                                        <textarea name="EnglishDescription" id="EnglishDescription" class="form-control" rows="4"
+                                                  placeholder="Enter book description in English"></textarea>
                                     </div>
 
                                     <div class="row">

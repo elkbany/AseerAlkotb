@@ -1,6 +1,7 @@
-﻿﻿﻿﻿using AseerAlkotb.API.DependencyInjection;
+﻿using AseerAlkotb.API.DependencyInjection;
 using AseerAlkotb.API.Extensions;
 using AseerAlkotb.API.Middlewares;
+using AseerAlkotb.API.Services;
 using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Contracts.External;
 using AseerAlkotb.Application.ResponseHandler;
@@ -41,13 +42,30 @@ using Microsoft.AspNetCore.Mvc;
 using Polly.Extensions.Http;
 using Polly;
 using System.Net;
+using AseerAlkotb.Application.Features.Account.Validator;
+using AseerAlkotb.Application.Features.Authors.Validators;
+using AseerAlkotb.Application.Features.Books.Validators;
+using AseerAlkotb.Application.Features.CartItems.Validation;
+using AseerAlkotb.Application.Features.Categories.Validators;
+using AseerAlkotb.Application.Features.Orders.Validators;
+using AseerAlkotb.Application.Features.Payments.Validators;
+using AseerAlkotb.Application.Features.Publishers.Validators;
+using AseerAlkotb.Application.Features.Quotes.Validators;
+using AseerAlkotb.Application.Features.Rag.Validators;
+using AseerAlkotb.Application.Features.Reviews.Validators;
+using AseerAlkotb.Application.Features.Roles.Validators;
+using AseerAlkotb.Application.Features.Wishlist.Validators;
 namespace AseerAlkotb.API
 {
     public class Program
     {
         public static async Task Main(string[] args)
         {
-            var builder = WebApplication.CreateBuilder(args);
+            var builder = WebApplication.CreateBuilder(new WebApplicationOptions
+            {
+                Args = args,
+                WebRootPath = null // Disable wwwroot requirement
+            });
 
             #region Context Registeration
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -60,6 +78,7 @@ namespace AseerAlkotb.API
             #region Localization
             builder.Services.AddLocalizationServices();
             builder.Services.AddHttpContextAccessor();
+            builder.Services.AddHostedService<LocalizationRefreshService>();
             #endregion
 
             #region Identity Registration
@@ -139,7 +158,109 @@ namespace AseerAlkotb.API
             builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
             builder.Services.AddScoped<IAccountRepository, AccountRepository>();
             #endregion
+            #region Validators 
+            // Account Validators
+            builder.Services.AddScoped<GetProfileRequestValidator>();
+            builder.Services.AddScoped<LoginRequestValidator>();
+            builder.Services.AddScoped<RegisterRequestValidator>();
+            builder.Services.AddScoped<ResetPasswordRequestValidator>();
+            builder.Services.AddScoped<UpdateProfileRequestValidator>();
 
+            // Authors Validators
+            builder.Services.AddScoped<AddAuthorRequestValidator>();
+            builder.Services.AddScoped<DeleteAuthorRequestValidator>();
+            builder.Services.AddScoped<FollowAuthorRequestValidation>();
+            builder.Services.AddScoped<GetAllAuthorsPaginatedRequestValidator>();
+            builder.Services.AddScoped<GetAutherFollowerCountRequestValidation>();
+            builder.Services.AddScoped<GetFollowedAuthorRequestValidatin>();
+            builder.Services.AddScoped<GetFollowersAuthorRequestValidation>();
+            builder.Services.AddScoped<GetFollowersAuthorRequestValidation>();
+            builder.Services.AddScoped<UnFollowAuthorRequestValidation>();
+            builder.Services.AddScoped<UpdateAuthorRequestValidator>();
+            builder.Services.AddScoped<GetAuthorByIdRequestValidator>();
+
+            // Books Validators
+            builder.Services.AddScoped<AddBookRequestValidator>();
+            builder.Services.AddScoped<DeleteBookRequestValidator>();
+            builder.Services.AddScoped<FilterBooksRequestValidator>();
+            builder.Services.AddScoped<GetAllBooksPaginatedValidator>();
+            builder.Services.AddScoped<GetBookByIdRequestValidator>();
+            builder.Services.AddScoped<UpdateBookRequestValidator>();
+
+            // Cart Items Validators
+            builder.Services.AddScoped<AddCartItemValidation>();
+            builder.Services.AddScoped<ClearCartRequestValidation>();
+            builder.Services.AddScoped<DeleteItemValidation>();
+            builder.Services.AddScoped<ShowCartRequestValidation>();
+            builder.Services.AddScoped<UpdateItemQuantityValidation>();
+
+            // Category Validators
+            builder.Services.AddScoped<AddCategoryRequestValidator>();
+            builder.Services.AddScoped<AddSubCategoryRequestValidator>();
+            builder.Services.AddScoped<DeleteCategoryRequestValidator>();
+            builder.Services.AddScoped<DeleteSubCategoryRequestValidator>();
+            builder.Services.AddScoped<GetAllCategoriesPaginatedRequestValidator>();
+            builder.Services.AddScoped<GetAllSubCategoriesPaginatedRequestValidator>();
+            builder.Services.AddScoped<GetCategoryByIdRequestValidator>();
+            builder.Services.AddScoped<UpdateCategoryRequestValidator>();
+
+            // Order Validators
+            builder.Services.AddScoped<AddOrderRequestValidator>();
+            builder.Services.AddScoped<CancelOrderRequestValidator>();
+            builder.Services.AddScoped<GetOrderByAdminByTrackingNumberRequestValidator>();
+            builder.Services.AddScoped<GetAllUserOrdersPaginatedRequestValidator>();
+            builder.Services.AddScoped<GetOrderByAdminByTrackingNumberRequestValidator>();
+            builder.Services.AddScoped<GetUserOrderByTrackingNumberRequestValidator>();
+            builder.Services.AddScoped<OrderItemDTOValidator>();
+            builder.Services.AddScoped<UpdateOrderStatusRequestValidator>();
+            // Payment Validators
+            builder.Services.AddScoped<InitializePaymentRequestValidator>();
+            builder.Services.AddScoped<UpdatePaymentStatusRequestValidator>();
+
+            // Publisher Validators
+            builder.Services.AddScoped<AddPublisherRequestValidator>();
+            builder.Services.AddScoped<DeletePublisherRequestValidator>();
+            builder.Services.AddScoped<FollowPublisherRequestValidation>();
+            builder.Services.AddScoped<GetAllPublishersPaginatedRequestValidator>();
+            builder.Services.AddScoped<GetFollowedPublisherRequestValidation>();
+            builder.Services.AddScoped<GetFollowersPublisherRequestValidation>();
+            builder.Services.AddScoped<GetPublisherByIdRequestValidator>();
+            builder.Services.AddScoped<GetPublisherFollowerCountRequestValidation>();
+            builder.Services.AddScoped<UnFollowPublisherRequestValidation>();
+            builder.Services.AddScoped<UpdatePublisherRequestValidator>();
+
+            // Quote Validators
+            builder.Services.AddScoped<AddQuoteRequestValidator>();
+            builder.Services.AddScoped<DeleteQuoteRequestValidator>();
+            builder.Services.AddScoped<GetAllQuotePaginatedRequestValidator>();
+            builder.Services.AddScoped<GetByIdQuoteRequestValidator>();
+            builder.Services.AddScoped<UpdateQuoteRequestValidator>();
+
+            // Rag Validators
+            builder.Services.AddScoped<RagAskRequestValidator>();
+
+            // Review Validators
+            builder.Services.AddScoped<AddReviewRequestValidator>();
+            builder.Services.AddScoped<DeleteReviewRequestValidator>();
+            builder.Services.AddScoped<GetAllReviewsPaginatedRequestValidator>();
+            builder.Services.AddScoped<GetReviewByIdRequestValidator>();
+            builder.Services.AddScoped<UpdateReviewRequestValidator>();
+
+            // Role Validators
+            builder.Services.AddScoped<AssignRoleRequestValidator>();
+            builder.Services.AddScoped<CreateAdminAccountRequestValidator>();
+            builder.Services.AddScoped<DeleteAdminAccountRequestValidator>();
+            builder.Services.AddScoped<RemoveRoleRequestValidator>();
+            builder.Services.AddScoped<UpdateAdminAccountRequestValidator>();
+
+            // Wishlist Validators
+            builder.Services.AddScoped<AddWishlistItemValidation>();
+            builder.Services.AddScoped<ClearWishlistValidation>();
+            builder.Services.AddScoped<DeleteWishlistItemValidation>();
+            builder.Services.AddScoped<GetUserWishlistValidation>();
+            builder.Services.AddScoped<GetWishlistItemCountValidation>();
+            builder.Services.AddScoped<IsBookInWishlistValidation>();
+            #endregion
             #region Services
             builder.Services.AddScoped<IAuthorServices, AuthorServices>();
             builder.Services.AddScoped<IBookServices, BookServices>();
@@ -155,9 +276,12 @@ namespace AseerAlkotb.API
 
             builder.Services.AddScoped<IAccountServices, AccountService>();
             builder.Services.AddScoped<IAdminServices, AdminServices>();
-            
+            builder.Services.AddHostedService<ExpiredCartCleanupService>();
+            builder.Services.AddScoped<IExpiredCartCleanupService, ExpiredCartCleanupService>();
+
             // RAG Services
             builder.Services.AddScoped<IRagService, RagService>();
+
             // RAG deps
             builder.Services.AddScoped<IQuestionRouterService, GeminiQuestionRouterService>();
             builder.Services.AddScoped<ITranslationService, GeminiTranslationService>();
@@ -166,11 +290,21 @@ namespace AseerAlkotb.API
             builder.Services.AddScoped<IAnswerSynthesisService, GeminiAnswerSynthesisService>();
 
 
+            // RAG deps
+            builder.Services.AddScoped<IQuestionRouterService, GeminiQuestionRouterService>();
+            builder.Services.AddScoped<IWebsiteCatalogService, WebsiteCatalogService>();
+            builder.Services.AddScoped<ITranslationService, GeminiTranslationService>();
+            builder.Services.AddScoped<IEmbeddingService, GeminiEmbeddingService>();
+            builder.Services.AddScoped<IAnswerSynthesisService, GeminiAnswerSynthesisService>();
+
+
             builder.Services.AddInfrastructure(builder.Configuration);
 
 
-            
-           
+
+
+            builder.Services.AddScoped<IRagService, RagService>();
+            builder.Services.AddScoped<IRagService, RagService>();
             builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -180,7 +314,7 @@ namespace AseerAlkotb.API
             builder.Services.AddScoped<ICategoryServices, CategoryServices>();
             builder.Services.AddScoped<IGovernorateServices, GovernorateServices>();
             builder.Services.AddScoped<ICityServices, CityServices>();
-            
+
             // New services for improved Order and Payment flow
             builder.Services.AddScoped<IOrderPaymentSyncService, OrderPaymentSyncService>();
             builder.Services.AddScoped<IPaymentRetryService, PaymentRetryService>();
@@ -223,7 +357,7 @@ namespace AseerAlkotb.API
                 // Callback endpoint rate limiting - 10 requests per minute per IP
                 options.AddFixedWindowLimiter("CallbackPolicy", opt =>
                 {
-                    opt.PermitLimit = 10;
+                    opt.PermitLimit = 20;
                     opt.Window = TimeSpan.FromMinutes(1);
                     opt.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
                     opt.QueueLimit = 0; // No queuing, reject immediately when limit exceeded
@@ -275,14 +409,15 @@ namespace AseerAlkotb.API
                     .OrResult(r => r.StatusCode == HttpStatusCode.TooManyRequests)
                     .WaitAndRetryAsync(3, attempt => TimeSpan.FromMilliseconds(400 * attempt * attempt));
 
-            builder.Services.AddHttpClient("gemini", c =>
-            {
-                c.BaseAddress = new Uri("https://generativelanguage.googleapis.com");
+                c.BaseAddress = new Uri("https://g...content-available-to-author-only...s.com");
                 //c.Timeout = TimeSpan.FromSeconds(30);
             }).AddPolicyHandler(ResilientPolicy());
 
             //builder.Services.AddHttpClient("website")
             //                .AddPolicyHandler(ResilientPolicy());
+
+            builder.Services.AddScoped<IAnswerSynthesisService, GeminiAnswerSynthesisService>();
+
             // لو هتوقفي الـ ExternalBookService (اختياري):
             // builder.Services.Remove(...)
             // أو ببساطة ما تستخدمهوش في Ask، وخلّيه للـ endpoint المخصص book-summary فقط.
@@ -326,15 +461,7 @@ namespace AseerAlkotb.API
 
             var app = builder.Build();
 
-            #region Access Images
-            app.UseStaticFiles();
-            app.UseStaticFiles(new StaticFileOptions
-            {
-                FileProvider = new PhysicalFileProvider(
-                    Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads")),
-                RequestPath = "/uploads"
-            });
-            #endregion
+
 
             #region seed roles
             using (var scope = app.Services.CreateScope())
@@ -371,7 +498,7 @@ namespace AseerAlkotb.API
             {
                 var localizer = scope.ServiceProvider.GetRequiredService<IStringLocalizer<SharedResources>>();
                 var httpContextAccessor = scope.ServiceProvider.GetRequiredService<IHttpContextAccessor>();
-                LocalizerProvider.Init(localizer, httpContextAccessor);
+                LocalizerProvider.Init(localizer, httpContextAccessor, app.Services);
             }
 
             app.UseHttpsRedirection();

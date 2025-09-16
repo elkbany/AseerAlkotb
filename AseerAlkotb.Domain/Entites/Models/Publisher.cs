@@ -5,7 +5,9 @@ namespace AseerAlkotb.Domain.Entites.Models
     public class Publisher : Entity<int>
     {
         public string Name { get; set; }
+        public string? Name_en { get; set; }
         public string Description { get; set; }
+        public string? Description_en { get; set; }
         public string? LogoUrl { get; set; }
         public string ContactEmail { get; set; }
         #region Navigation Properties

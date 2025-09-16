@@ -10,6 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Localization;
+using System;
+using System.Globalization;
 
 namespace AseerAlkotb.Application.Services
 {
@@ -33,12 +35,12 @@ namespace AseerAlkotb.Application.Services
         }
 
         #region Validate Async
-        protected async Task DoValidationAsync<TValidator, TRequest>(TRequest request, params object[] constructorParameters)
-        where TValidator : AbstractValidator<TRequest>
+        protected async Task DoValidationAsync<TValidator, TRequest>(TRequest request)
+            where TValidator : AbstractValidator<TRequest>
         {
-            var instance = (TValidator)Activator.CreateInstance(typeof(TValidator), constructorParameters)!;
-
-            var validateResult = await instance.ValidateAsync(request);
+            // Use DI container instead of Activator.CreateInstance
+            var validator = serviceProvider.GetRequiredService<TValidator>();
+            var validateResult = await validator.ValidateAsync(request);
             if (!validateResult.IsValid)
             {
                 throw new ValidationException(validateResult.Errors);
@@ -58,49 +60,15 @@ namespace AseerAlkotb.Application.Services
                 if (!allowedContentTypes.Contains(imageFile.ContentType.ToLowerInvariant()))
                     throw new ArgumentException("Invalid image file type");
 
-                // ✅ Generate unique filename
-                var fileName = GenerateUniqueFileName(imageFile.FileName);
+                // ✅ Cloudinary Upload only
+                if (_cloudinaryService == null)
+                    throw new InvalidOperationException("Cloudinary service is not available");
 
-                // ✅ Local Save
-                var currentDirectory = Directory.GetCurrentDirectory();
-                var wwwrootPath = Path.Combine(currentDirectory, "wwwroot");
-                var uploadsFolder = Path.Combine(wwwrootPath, "uploads", folder);
+                string cloudUrl = await _cloudinaryService.UploadImageAsync(imageFile, folder);
 
-                Directory.CreateDirectory(uploadsFolder);
-
-                var filePath = Path.Combine(uploadsFolder, fileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await imageFile.CopyToAsync(stream);
-                }
-
-                var localUrl = $"/uploads/{folder}/{fileName}";
-
-                // ✅ Cloudinary Upload (if available)
-                string cloudUrl = string.Empty;
-                if (_cloudinaryService != null)
-                {
-                    try
-                    {
-                        cloudUrl = await _cloudinaryService.UploadImageAsync(imageFile, folder);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Warning: Cloudinary upload failed: {ex.Message}. Using local URL only.");
-                        cloudUrl = localUrl; // Fallback to local URL
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Warning: Cloudinary service is not available. Using local URL only.");
-                    cloudUrl = localUrl; // Fallback to local URL
-                }
-
-                // ✅ Return both (or local only if cloudinary fails)
+                // ✅ Return Cloudinary URL only
                 return new UploadResultDto
                 {
-                    LocalUrl = localUrl,
                     CloudUrl = cloudUrl
                 };
             }
@@ -115,25 +83,7 @@ namespace AseerAlkotb.Application.Services
         {
             var deletedLocal = false;
 
-            // ✅ Delete Local
-            if (!string.IsNullOrEmpty(localImageUrl))
-            {
-                try
-                {
-                    var currentDirectory = Directory.GetCurrentDirectory();
-                    var wwwrootPath = Path.Combine(currentDirectory, "wwwroot");
 
-                    var relativePath = localImageUrl.TrimStart('/');
-                    var filePath = Path.Combine(wwwrootPath, relativePath);
-
-                    if (File.Exists(filePath))
-                    {
-                        File.Delete(filePath);
-                        deletedLocal = true;
-                    }
-                }
-                catch { deletedLocal = false; }
-            }
 
             // ✅ Delete Cloud
             var deletedCloud = true;
@@ -199,23 +149,38 @@ namespace AseerAlkotb.Application.Services
 
 
 
-        private string GenerateUniqueFileName(string originalFileName)
-        {
-            var extension = Path.GetExtension(originalFileName);
-            var uniqueName = $"{Guid.NewGuid()}{extension}";
-            return uniqueName;
-        }
+        //private string GenerateUniqueFileName(string originalFileName)
+        //{
+        //    var extension = Path.GetExtension(originalFileName);
+        //    var uniqueName = $"{Guid.NewGuid()}{extension}";
+        //    return uniqueName;
+        //}
         #endregion
 
         #region Localization Helpers
         protected string LocalizeOr(string key, string fallback)
         {
-            var localized = _stringLocalizer[key];
-            if (localized.ResourceNotFound || string.IsNullOrWhiteSpace(localized.Value))
+            // 1) Try reading the runtime-updated resx on disk (no restart needed)
+            try
             {
-                return fallback;
+                var culture = CultureInfo.CurrentUICulture?.TwoLetterISOLanguageName ?? "en";
+                var direct = ResxResourceHelper.GetSharedResourceOrNull(key, culture);
+                if (!string.IsNullOrWhiteSpace(direct))
+                {
+                    return direct!;
+                }
             }
-            return localized.Value;
+            catch { /* ignore and fallback */ }
+
+            // 2) Fallback to the registered IStringLocalizer (may be cached)
+            var localized = _stringLocalizer[key];
+            if (!localized.ResourceNotFound && !string.IsNullOrWhiteSpace(localized.Value))
+            {
+                return localized.Value;
+            }
+
+            // 3) Final fallback to provided default value
+            return fallback;
         }
 
         protected string LocalizeEntity(string entityType, int id, string field, string fallback)

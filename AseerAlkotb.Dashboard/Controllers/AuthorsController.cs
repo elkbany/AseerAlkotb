@@ -21,18 +21,33 @@ namespace AseerAlkotb.Dashboard.Controllers
         // GET: Authors
         public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 10, string search = "")
         {
+            // حد أدنى وأقصى عشان pageNumber و pageSize ميبقوش حمير
+            pageNumber = Math.Max(1, pageNumber);
+            pageSize = Math.Max(1, Math.Min(100, pageSize)); // مثلاً مش أكتر من 100 عشان الداتا بيس ميتعبش
+
             var request = new GetAllAuthorsPaginatedRequest(pageNumber, pageSize, search);
             var result = await _authorServices.GetAllAuthorsPaginatedAsync(request);
 
             if (!result.Succeeded)
             {
                 TempData["Error"] = result.Message ?? "Failed to load authors";
+
+
+                // Set ViewBag values even for error case to prevent null reference
+                ViewBag.TotalPages = 0;
+                ViewBag.CurrentPage = pageNumber;
+                ViewBag.TotalCount = 0;
+                ViewBag.SearchTerm = search ?? "";
+
                 return View(new List<GetAllAuthorsPaginatedResponse>());
             }
 
+            // Set all required ViewBag values
             ViewBag.TotalPages = (int)Math.Ceiling((double)result.TotalCount / pageSize);
             ViewBag.CurrentPage = pageNumber;
-            ViewBag.SearchTerm = search;
+            ViewBag.TotalCount = result.TotalCount; // This was missing!
+            ViewBag.SearchTerm = search ?? "";
+
             return View(result.Data);
         }
 
@@ -62,8 +77,32 @@ namespace AseerAlkotb.Dashboard.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _authorServices.AddAuthorAsync(request);
-                return RedirectToAction(nameof(Index));
+                var result = await _authorServices.AddAuthorAsync(request);
+                if (result.Succeeded)
+                {
+                    try
+                    {
+                        var id = result.Data.Id;
+                        var nameAr = Request.Form["Name"].ToString();
+                        var nameEn = Request.Form["EnglishName"].ToString();
+                        if (string.IsNullOrWhiteSpace(nameEn)) nameEn = nameAr;
+                        AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Author_{id}_Name", nameAr, "ar");
+                        AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Author_{id}_Name", nameEn, "en");
+
+                        var bioAr = Request.Form["Bio"].ToString();
+                        var bioEn = Request.Form["EnglishBio"].ToString();
+                        if (!string.IsNullOrWhiteSpace(bioAr) || !string.IsNullOrWhiteSpace(bioEn))
+                        {
+                            if (string.IsNullOrWhiteSpace(bioEn)) bioEn = bioAr;
+                            if (string.IsNullOrWhiteSpace(bioAr)) bioAr = bioEn;
+                            AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Author_{id}_Bio", bioAr ?? string.Empty, "ar");
+                            AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Author_{id}_Bio", bioEn ?? string.Empty, "en");
+                        }
+                    }
+                    catch { }
+                    return RedirectToAction(nameof(Index));
+                }
+                TempData["Error"] = result.Message ?? "Failed to create author";
             }
             return View(request);
         }
@@ -102,6 +141,25 @@ namespace AseerAlkotb.Dashboard.Controllers
             if (ModelState.IsValid)
             {
                 await _authorServices.UpdateAuthorAsync(request);
+                try
+                {
+                    var nameAr = Request.Form["Name"].ToString();
+                    var nameEn = Request.Form["EnglishName"].ToString();
+                    if (string.IsNullOrWhiteSpace(nameEn)) nameEn = nameAr;
+                    AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Author_{id}_Name", nameAr, "ar");
+                    AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Author_{id}_Name", nameEn, "en");
+
+                    var bioAr = Request.Form["Bio"].ToString();
+                    var bioEn = Request.Form["EnglishBio"].ToString();
+                    if (!string.IsNullOrWhiteSpace(bioAr) || !string.IsNullOrWhiteSpace(bioEn))
+                    {
+                        if (string.IsNullOrWhiteSpace(bioEn)) bioEn = bioAr;
+                        if (string.IsNullOrWhiteSpace(bioAr)) bioAr = bioEn;
+                        AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Author_{id}_Bio", bioAr ?? string.Empty, "ar");
+                        AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Author_{id}_Bio", bioEn ?? string.Empty, "en");
+                    }
+                }
+                catch { }
                 return RedirectToAction(nameof(Index));
             }
             return View(request);
