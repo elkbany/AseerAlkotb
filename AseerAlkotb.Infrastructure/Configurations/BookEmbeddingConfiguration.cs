@@ -12,7 +12,7 @@ namespace AseerAlkotb.Infrastructure.Configurations
         {
             builder.HasKey(be => be.Id);
 
-            builder.Property(be => be.Content).IsRequired().HasMaxLength(4000);
+            builder.Property(be => be.Content).IsRequired().HasColumnType("nvarchar(max)");
             builder.Property(be => be.ContentType).IsRequired().HasMaxLength(50);
 
             var conv = new ValueConverter<float[], string>(
@@ -25,8 +25,7 @@ namespace AseerAlkotb.Infrastructure.Configurations
                    .HasColumnType("nvarchar(max)")
                    .IsRequired();
 
-            builder.Property(be => be.ChunkIndex);
-            builder.Property(be => be.TokenCount);
+
             builder.Property(be => be.LastUpdated).IsRequired();
 
             builder.HasOne(be => be.Book)
@@ -34,7 +33,7 @@ namespace AseerAlkotb.Infrastructure.Configurations
                    .HasForeignKey(be => be.BookId)
                    .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasIndex(be => new { be.BookId, be.ContentType, be.ChunkIndex });
+            builder.HasIndex(be => new { be.BookId, be.ContentType });
             builder.HasIndex(be => be.LastUpdated);
         }
     }
