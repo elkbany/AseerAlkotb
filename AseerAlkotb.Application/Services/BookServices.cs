@@ -1,4 +1,4 @@
-﻿using AseerAlkotb.Application.Contracts;
+﻿﻿﻿﻿using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Features.Books.Mapping;
 using AseerAlkotb.Application.Features.Books.Requests;
 using AseerAlkotb.Application.Features.Books.Responses;
@@ -187,13 +187,13 @@ namespace AseerAlkotb.Application.Services
                 return NotFound<GetBookByIdResponse>($"{_stringLocalizer["Book"]} {_stringLocalizer["NotFound"]}");
             }
             var bookMap = book.Adapt<GetBookByIdResponse>();
-            bookMap.Title = LocalizeEntity("Book", book.Id, "Title", bookMap.Title);
-            bookMap.Description = LocalizeEntity("Book", book.Id, "Description", bookMap.Description);
+            bookMap.Title = GetLocalizedText(book.Title, book.Title_en);
+            bookMap.Description = GetLocalizedText(book.Description, book.Description_en);
 
             bookMap.Rating = book.Reviews?.Any() == true ? (decimal)book.Reviews.Average(r => r.Rating) : 0;
             //manual
             bookMap.CategoryIds = book.Categories?.Select(c => c.Id).ToList() ?? new List<int>();
-            bookMap.CategoryNames = book.Categories?.Select(c => LocalizeEntity("Category", c.Id, "Name", c.Name)).ToList() ?? new List<string>();
+            bookMap.CategoryNames = book.Categories?.Select(c => GetLocalizedText(c.Name, c.Name_en)).ToList() ?? new List<string>();
 
 
             return Success(bookMap);
@@ -205,18 +205,18 @@ namespace AseerAlkotb.Application.Services
         await DoValidationAsync<GetAllBooksPaginatedValidator, GetAllBooksPaginatedRequest>(request);
             var books = await _uniteOfWork.Books
                     .GetAllAsync(s => s.Title.Contains(request.Search),
-                (request.PageNumber - 1) * request.PageSize, request.PageSize, default, b => b.Reviews, b => b.Categories);
+                (request.PageNumber - 1) * request.PageSize, request.PageSize, default, b => b.Reviews, b => b.Categories, b => b.Author, b => b.Publisher);
             var totalCount = await _uniteOfWork.Books.CountAsync(s => s.Title.Contains(request.Search));
             var bookMap = books.Select(book =>
             {
                 var bookDto = book.Adapt<GetAllBooksPaginatedResponse>();
-                bookDto.Title = LocalizeEntity("Book", book.Id, "Title", bookDto.Title);
-                bookDto.Description = LocalizeEntity("Book", book.Id, "Description", bookDto.Description);
-                bookDto.AuthorName = LocalizeEntity("Author", book.AuthorId, "Name", bookDto.AuthorName);
-                bookDto.PublisherName = book.PublisherId.HasValue ? LocalizeEntity("Publisher", book.PublisherId.Value, "Name", bookDto.PublisherName) : bookDto.PublisherName;
+                bookDto.Title = GetLocalizedText(book.Title, book.Title_en);
+                bookDto.Description = GetLocalizedText(book.Description, book.Description_en);
+                bookDto.AuthorName = GetLocalizedText(book.Author.Name, book.Author.Name_en);
+                bookDto.PublisherName = book.PublisherId.HasValue ? GetLocalizedText(book.Publisher.Name, book.Publisher.Name_en) : bookDto.PublisherName;
                 //manual
                 bookDto.CategoryIds = book.Categories?.Select(c => c.Id).ToList() ?? new List<int>();
-                bookDto.CategoryNames = book.Categories?.Select(c => LocalizeEntity("Category", c.Id, "Name", c.Name)).ToList() ?? new List<string>();
+                bookDto.CategoryNames = book.Categories?.Select(c => GetLocalizedText(c.Name, c.Name_en)).ToList() ?? new List<string>();
                 bookDto.Rating = book.Reviews?.Any() == true ? (decimal)book.Reviews.Average(r => r.Rating) : 0;
 
                 return bookDto;
@@ -271,13 +271,13 @@ namespace AseerAlkotb.Application.Services
             var bookMap = paginatedBooks.Select(book =>
             {
                 var bookDto = book.Adapt<GetAllBooksPaginatedResponse>();
-                bookDto.Title = LocalizeEntity("Book", book.Id, "Title", bookDto.Title);
-                bookDto.Description = LocalizeEntity("Book", book.Id, "Description", bookDto.Description);
-                bookDto.AuthorName = LocalizeEntity("Author", book.AuthorId, "Name", bookDto.AuthorName);
-                bookDto.PublisherName = book.PublisherId.HasValue ? LocalizeEntity("Publisher", book.PublisherId.Value, "Name", bookDto.PublisherName) : bookDto.PublisherName;
+                bookDto.Title = GetLocalizedText(book.Title, book.Title_en);
+                bookDto.Description = GetLocalizedText(book.Description, book.Description_en);
+                bookDto.AuthorName = GetLocalizedText(book.Author.Name, book.Author.Name_en);
+                bookDto.PublisherName = book.PublisherId.HasValue ? GetLocalizedText(book.Publisher.Name, book.Publisher.Name_en) : bookDto.PublisherName;
                 //manual
                 bookDto.CategoryIds = book.Categories?.Select(c => c.Id).ToList() ?? new List<int>();
-                bookDto.CategoryNames = book.Categories?.Select(c => LocalizeEntity("Category", c.Id, "Name", c.Name)).ToList() ?? new List<string>();
+                bookDto.CategoryNames = book.Categories?.Select(c => GetLocalizedText(c.Name, c.Name_en)).ToList() ?? new List<string>();
                 bookDto.Rating = book.Reviews?.Any() == true ? (decimal)book.Reviews.Average(r => r.Rating) : 0;
 
                 return bookDto;

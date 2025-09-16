@@ -42,16 +42,31 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label asp-for="FirstName" class="control-label">First Name *</label>
-                                        <input asp-for="FirstName" class="form-control" placeholder="Enter first name" />
+                                        <label asp-for="FirstName" class="control-label">First Name (Arabic) *</label>
+                                        <input asp-for="FirstName" class="form-control" placeholder="Enter first name in Arabic" />
                                         <span asp-validation-for="FirstName" class="text-danger"></span>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label asp-for="LastName" class="control-label">Last Name *</label>
-                                        <input asp-for="LastName" class="form-control" placeholder="Enter last name" />
+                                        <label class="control-label">First Name (English)</label>
+                                        <input name="EnglishFirstName" class="form-control" placeholder="Enter first name in English (optional)" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="LastName" class="control-label">Last Name (Arabic) *</label>
+                                        <input asp-for="LastName" class="form-control" placeholder="Enter last name in Arabic" />
                                         <span asp-validation-for="LastName" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Last Name (English)</label>
+                                        <input name="EnglishLastName" class="form-control" placeholder="Enter last name in English (optional)" />
                                     </div>
                                 </div>
                             </div>
@@ -123,19 +138,23 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label asp-for="Nationality" class="control-label">Nationality</label>
-                                        <input asp-for="Nationality" class="form-control" placeholder="Enter nationality (optional)" />
+                                        <label asp-for="Nationality" class="control-label">Nationality (Arabic)</label>
+                                        <input asp-for="Nationality" class="form-control" placeholder="Enter nationality in Arabic (optional)" />
                                         <span asp-validation-for="Nationality" class="text-danger"></span>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <!-- Hidden input for UserRole set to Admin -->
-                                    <input asp-for="UserRole" type="hidden" value="Admin" />
+                                    <div class="form-group">
+                                        <label class="control-label">Nationality (English)</label>
+                                        <input name="EnglishNationality" class="form-control" placeholder="Enter nationality in English (optional)" />
+                                    </div>
                                 </div>
                             </div>
 
                             <div class="row">
                                 <div class="col-md-12">
+                                    <!-- Hidden input for UserRole set to Admin -->
+                                    <input asp-for="UserRole" type="hidden" value="Admin" />
                                     <div class="form-group">
                                         <label asp-for="ProfilePictureUrl" class="control-label">Profile Picture</label>
                                         <div class="custom-file">

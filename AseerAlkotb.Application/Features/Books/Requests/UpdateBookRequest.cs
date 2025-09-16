@@ -11,7 +11,9 @@ namespace AseerAlkotb.Application.Features.Books.Requests
     public record UpdateBookRequest(
         int Id,
         string Title,
+        string? Title_en,
         string Description,
+        string? Description_en,
         string ISBN,
         decimal Price,
         decimal DiscountPercentage,
