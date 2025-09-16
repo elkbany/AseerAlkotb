@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+﻿﻿﻿using System.Text.RegularExpressions;
 
 namespace AseerAlkotb.Application.Utils
 {
@@ -20,6 +20,29 @@ namespace AseerAlkotb.Application.Utils
 
         // "المؤلف: <اسم>" أو "الكاتب: <اسم>"
         private static readonly Regex LabelAuthor = new(@"\b(?:المؤلف|الكاتب)\s*[:：]\s*(?<a>[اأإآء-يA-Za-z][\p{L}A-Za-z\s\.\-']{1,60})", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+        // دار النشر patterns: "دار <اسم>" أو "منشورات <اسم>" أو "من دار النشر <اسم>"
+        private static readonly Regex PublisherPatterns = new(@"\b(?:دار|منشورات|من\s+دار\s+النشر)\s+(?<p>[اأإآء-يA-Za-z][\p{L}A-Za-z\s\.\-']{1,60})", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        
+        // "الناشر: <اسم>" أو "publisher: <name>"
+        private static readonly Regex LabelPublisher = new(@"\b(?:الناشر|publisher)\s*[:：]\s*(?<p>[اأإآء-يA-Za-z][\p{L}A-Za-z\s\.\-']{1,60})", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+        public static (string? Title, string? Author, string? Publisher) ExtractAdvanced(string question)
+        {
+            if (string.IsNullOrWhiteSpace(question)) return (null, null, null);
+            var q = question.Trim();
+
+            // 1) عنوان داخل اقتباس
+            var m = QuotedTitle.Match(q);
+            if (m.Success) return (Clean(m.Groups["t"].Value), FindAuthor(q), FindPublisher(q));
+
+            // 2) "كتاب <عنوان>"
+            m = AfterKitab.Match(q);
+            if (m.Success) return (Clean(m.Groups["t"].Value), FindAuthor(q), FindPublisher(q));
+
+            // 3) لو مفيش عنوان، رجّع بس المؤلف والناشر لو موجودين
+            return (null, FindAuthor(q), FindPublisher(q));
+        }
 
         public static (string? Title, string? Author) Extract(string question)
         {
@@ -52,6 +75,17 @@ namespace AseerAlkotb.Application.Utils
             return null;
         }
 
+        private static string? FindPublisher(string q)
+        {
+            var m = PublisherPatterns.Match(q);
+            if (m.Success) return Clean(m.Groups["p"].Value);
+
+            m = LabelPublisher.Match(q);
+            if (m.Success) return Clean(m.Groups["p"].Value);
+
+            return null;
+        }
+
         private static string Clean(string x)
         {
             var s = x.Trim();
@@ -67,7 +101,9 @@ namespace AseerAlkotb.Application.Utils
         "الكاتب", "المؤلف",
         "للكاتب", "لكاتب", "للمؤلف", "لمؤلف",
         "الكاتب:", "المؤلف:",
-        "بقلم", "بقلم:", "تأليف", "تأليف:"
+        "بقلم", "بقلم:", "تأليف", "تأليف:",
+        "دار", "منشورات", "الناشر", "الناشر:",
+        "من دار النشر", "دار النشر"
     };
 
             foreach (var prefix in removePrefixes)

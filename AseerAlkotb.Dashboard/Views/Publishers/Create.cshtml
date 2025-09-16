@@ -70,16 +70,17 @@
                                     <h3 class="card-title">Logo</h3>
                                 </div>
                                 <div class="card-body">
-                                    <div class="text-center mb-3">
-                                        <img id="logoPreview" src="/images/default-logo.png"
-                                             class="img-circle" style="max-height:200px;" />
-                                    </div>
                                     <div class="form-group">
+                                        <div class="text-center mb-3">
+                                            <img id="logoPreview" src="/images/default-logo.png"
+                                                 class="img-circle" style="width: 150px; height: 150px; object-fit: cover;" />
+                                        </div>
                                         <div class="custom-file">
                                             <!-- IMPORTANT: name/id must match property LogoUrl -->
                                             <input asp-for="LogoUrl" type="file" class="custom-file-input" id="LogoUrl" accept="image/*" />
                                             <label class="custom-file-label" for="LogoUrl">Choose logo image</label>
                                         </div>
+                                        <small class="form-text text-muted">Supported formats: JPG, PNG. Max size: 2MB</small>
                                         <span asp-validation-for="LogoUrl" class="text-danger"></span>
                                     </div>
                                 </div>
