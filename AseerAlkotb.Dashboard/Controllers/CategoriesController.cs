@@ -81,36 +81,21 @@ namespace AseerAlkotb.Dashboard.Controllers
         {
             if (ModelState.IsValid)
             {
-                var result = await _categoryServices.AddCategoryAsync(request);
+                // Extract English fields from form
+                var nameEn = Request.Form["EnglishName"].ToString();
+                var descriptionEn = Request.Form["EnglishDescription"].ToString();
+                
+                // Create new request with English fields
+                var updatedRequest = request with 
+                { 
+                    Name_en = !string.IsNullOrWhiteSpace(nameEn) ? nameEn : null,
+                    Description_en = !string.IsNullOrWhiteSpace(descriptionEn) ? descriptionEn : null
+                };
+                
+                var result = await _categoryServices.AddCategoryAsync(updatedRequest);
                 
                 if (result.Succeeded)
                 {
-                    try
-                    {
-                        var id = result.Data.Id;
-                        var keyName = $"Category_{id}_Name";
-                        var arName = Request.Form["Name"].ToString();
-                        var enName = Request.Form["EnglishName"].ToString();
-
-                        // Fallbacks: if English not provided, reuse Arabic for both
-                        if (string.IsNullOrWhiteSpace(enName)) enName = arName;
-
-                        AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource(keyName, arName, "ar");
-                        AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource(keyName, enName, "en");
-
-                        // Description keys if provided
-                        var descAr = Request.Form["Description"].ToString();
-                        var descEn = Request.Form["EnglishDescription"].ToString();
-                        if (!string.IsNullOrWhiteSpace(descAr) || !string.IsNullOrWhiteSpace(descEn))
-                        {
-                            var keyDesc = $"Category_{id}_Description";
-                            if (string.IsNullOrWhiteSpace(descEn)) descEn = descAr;
-                            if (string.IsNullOrWhiteSpace(descAr)) descAr = descEn;
-                            AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource(keyDesc, descAr ?? string.Empty, "ar");
-                            AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource(keyDesc, descEn ?? string.Empty, "en");
-                        }
-                    }
-                    catch { }
                     TempData["Success"] = "تم إضافة التصنيف بنجاح";
                     return RedirectToAction(nameof(Index));
                 }
@@ -143,7 +128,9 @@ namespace AseerAlkotb.Dashboard.Controllers
                 var updateRequest = new UpdateCategoryRequest(
                     result.Data.Id,
                     result.Data.Name,
+                    null, // Name_en - will be filled from form
                     result.Data.Description,
+                    null, // Description_en - will be filled from form
                     result.Data.IsActive
                 );
 
@@ -177,29 +164,21 @@ namespace AseerAlkotb.Dashboard.Controllers
 
             if (ModelState.IsValid)
             {
-                var result = await _categoryServices.UpdateCategoryAsync(request);
+                // Extract English fields from form
+                var nameEn = Request.Form["EnglishName"].ToString();
+                var descriptionEn = Request.Form["EnglishDescription"].ToString();
+                
+                // Create new request with English fields
+                var updatedRequest = request with 
+                { 
+                    Name_en = !string.IsNullOrWhiteSpace(nameEn) ? nameEn : null,
+                    Description_en = !string.IsNullOrWhiteSpace(descriptionEn) ? descriptionEn : null
+                };
+                
+                var result = await _categoryServices.UpdateCategoryAsync(updatedRequest);
                 
                 if (result.Succeeded)
                 {
-                    try
-                    {
-                        var nameAr = Request.Form["Name"].ToString();
-                        var nameEn = Request.Form["EnglishName"].ToString();
-                        if (string.IsNullOrWhiteSpace(nameEn)) nameEn = nameAr;
-                        AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Category_{id}_Name", nameAr, "ar");
-                        AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Category_{id}_Name", nameEn, "en");
-
-                        var descAr = Request.Form["Description"].ToString();
-                        var descEn = Request.Form["EnglishDescription"].ToString();
-                        if (!string.IsNullOrWhiteSpace(descAr) || !string.IsNullOrWhiteSpace(descEn))
-                        {
-                            if (string.IsNullOrWhiteSpace(descEn)) descEn = descAr;
-                            if (string.IsNullOrWhiteSpace(descAr)) descAr = descEn;
-                            AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Category_{id}_Description", descAr ?? string.Empty, "ar");
-                            AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Category_{id}_Description", descEn ?? string.Empty, "en");
-                        }
-                    }
-                    catch { }
                     TempData["Success"] = "تم تحديث التصنيف بنجاح";
                     return RedirectToAction(nameof(Index));
                 }

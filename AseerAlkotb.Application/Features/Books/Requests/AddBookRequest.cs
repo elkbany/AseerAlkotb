@@ -10,7 +10,9 @@ namespace AseerAlkotb.Application.Features.Books.Mapping
 {
     public record AddBookRequest(
         string Title,
+        string? Title_en,
         string Description,
+        string? Description_en,
         string ISBN,
         decimal Price,
         decimal DiscountPercentage,

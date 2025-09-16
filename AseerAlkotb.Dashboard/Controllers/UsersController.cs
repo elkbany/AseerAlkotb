@@ -1,4 +1,4 @@
-﻿using AseerAlkotb.Application.Contracts;
+﻿﻿﻿using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Features.Roles.Requests;
 using AseerAlkotb.Application.Features.Roles.Responses;
 using Microsoft.AspNetCore.Mvc;
@@ -104,23 +104,36 @@ namespace AseerAlkotb.Dashboard.Controllers
         {
             try
             {
+                // Extract English fields from form
+                var firstNameEn = Request.Form["EnglishFirstName"].ToString();
+                var lastNameEn = Request.Form["EnglishLastName"].ToString();
+                var nationalityEn = Request.Form["EnglishNationality"].ToString();
+                
+                // Create new request with English fields
+                var updatedRequest = request with 
+                { 
+                    FirstName_en = !string.IsNullOrWhiteSpace(firstNameEn) ? firstNameEn : null,
+                    LastName_en = !string.IsNullOrWhiteSpace(lastNameEn) ? lastNameEn : null,
+                    Nationality_en = !string.IsNullOrWhiteSpace(nationalityEn) ? nationalityEn : null
+                };
+
                 // Handle file upload
                 if (Request.Form.Files != null && Request.Form.Files.Count > 0)
                 {
                     var file = Request.Form.Files["ProfilePictureUrl"];
                     if (file != null && file.Length > 0)
                     {
-                        request = request with { ProfilePictureUrl = file };
+                        updatedRequest = updatedRequest with { ProfilePictureUrl = file };
                     }
                 }
 
                 if (ModelState.IsValid)
                 {
-                    var result = await _adminServices.createAdminAccount(request);
+                    var result = await _adminServices.createAdminAccount(updatedRequest);
                     
                     if (result.Succeeded)
                     {
-                        TempData["Success"] = $"User created successfully as {request.UserRole}";
+                        TempData["Success"] = $"User created successfully as {updatedRequest.UserRole}";
                         return RedirectToAction(nameof(Index));
                     }
                     else
@@ -224,6 +237,16 @@ namespace AseerAlkotb.Dashboard.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    // Extract English fields from form
+                    var firstNameEn = Request.Form["EnglishFirstName"].ToString();
+                    var lastNameEn = Request.Form["EnglishLastName"].ToString();
+                    var nationalityEn = Request.Form["EnglishNationality"].ToString();
+                    
+                    // Update request with English fields
+                    request.FirstName_en = !string.IsNullOrWhiteSpace(firstNameEn) ? firstNameEn : null;
+                    request.LastName_en = !string.IsNullOrWhiteSpace(lastNameEn) ? lastNameEn : null;
+                    request.Nationality_en = !string.IsNullOrWhiteSpace(nationalityEn) ? nationalityEn : null;
+
                     // Map uploaded file (if any) to the request's IFormFile property
                     if (Request.Form.Files != null && Request.Form.Files.Count > 0)
                     {

@@ -1,10 +1,11 @@
-﻿using AseerAlkotb.Application.Contracts.External;
+﻿﻿﻿using AseerAlkotb.Application.Contracts.External;
 using AseerAlkotb.Application.Features.UploadImages.Dto;
 using AseerAlkotb.Application.ResponseHandler;
 using AseerAlkotb.Domain.Entites.Models;
 using AseerAlkotb.Localization.Resources;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Localization;
 //using Microsoft.AspNetCore.Hosting;  // For IWebHostEnvironment
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -187,6 +188,59 @@ namespace AseerAlkotb.Application.Services
         {
             var key = $"{entityType}_{id}_{field}";
             return LocalizeOr(key, fallback);
+        }
+
+        /// <summary>
+        /// Gets localized text based on current culture using entity English fields
+        /// Returns Arabic field for 'ar' culture, English field for other cultures
+        /// Falls back to Arabic if English is not available
+        /// </summary>
+        protected string GetLocalizedText(string arabicText, string? englishText)
+        {
+            // Try to get culture from multiple sources for better reliability
+            var culture = GetCurrentCulture();
+            
+            if (culture == "ar")
+            {
+                return arabicText ?? string.Empty;
+            }
+            
+            // For English or other cultures, return English if available, otherwise Arabic
+            return !string.IsNullOrWhiteSpace(englishText) ? englishText : arabicText ?? string.Empty;
+        }
+
+        /// <summary>
+        /// Gets the current culture from multiple sources with fallback logic
+        /// </summary>
+        private string GetCurrentCulture()
+        {
+            try
+            {
+                // 1. Try to get from HttpContext first (most reliable for web requests)
+                var httpContextAccessor = serviceProvider.GetService<IHttpContextAccessor>();
+                if (httpContextAccessor?.HttpContext != null)
+                {
+                    var requestCulture = httpContextAccessor.HttpContext.Features.Get<IRequestCultureFeature>();
+                    if (requestCulture != null)
+                    {
+                        return requestCulture.RequestCulture.Culture.TwoLetterISOLanguageName;
+                    }
+                }
+
+                // 2. Fallback to Thread culture
+                var culture = CultureInfo.CurrentUICulture?.TwoLetterISOLanguageName;
+                if (!string.IsNullOrEmpty(culture))
+                {
+                    return culture;
+                }
+            }
+            catch
+            {
+                // Ignore errors and use fallback
+            }
+
+            // 3. Final fallback
+            return "en";
         }
         #endregion
     }
