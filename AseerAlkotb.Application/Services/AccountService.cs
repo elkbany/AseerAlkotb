@@ -3,29 +3,19 @@ using AseerAlkotb.Application.Contracts.External;
 using AseerAlkotb.Application.Features.Account.Requests;
 using AseerAlkotb.Application.Features.Account.Responses;
 using AseerAlkotb.Application.Features.Account.Validator;
-using AseerAlkotb.Application.Features.CartItem.Requests;
-using AseerAlkotb.Application.Features.CartItem.Responses;
-using AseerAlkotb.Application.Features.CartItems.Validation;
 using AseerAlkotb.Application.ResponseHandler;
 using AseerAlkotb.Domain.Entites.Models;
 using AseerAlkotb.Domain.Interfaces.Base;
 using Mapster;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 using static AseerAlkotb.Application.ResponseHandler.ApiResponseHandler;
 using FluentValidation;
 
@@ -33,14 +23,16 @@ namespace AseerAlkotb.Application.Services
 {
     public class AccountService : AppService, IAccountServices
     {
+        private readonly IHttpContextAccessor httpContextAccessor;
         private readonly UserManager<User> _userManager;
         private readonly IConfiguration _configuration;
         private readonly IEmailService _emailService;
         private readonly IUnitOfWork _unitOfWork;
 
 
-        public AccountService(UserManager<User> userManager, IUnitOfWork unitOfWork, IServiceProvider serviceProvider, IHostEnvironment environment, IConfiguration configuration, IEmailService emailService) : base(serviceProvider, environment)
+        public AccountService(IHttpContextAccessor httpContextAccessor,UserManager<User> userManager, IUnitOfWork unitOfWork, IServiceProvider serviceProvider, IHostEnvironment environment, IConfiguration configuration, IEmailService emailService) : base(serviceProvider, environment)
         {
+            this.httpContextAccessor = httpContextAccessor;
             _userManager = userManager;
             _configuration = configuration;
             _unitOfWork = unitOfWork;
@@ -346,13 +338,27 @@ namespace AseerAlkotb.Application.Services
 
         }
 
-        public async Task<ApiResponse<UpdateProfileResponse>> UpdateProfile( int userId,UpdateProfileRequest request)
+        public async Task<ApiResponse<UpdateProfileResponse>> UpdateProfile( UpdateProfileRequest request)
         {
-            await DoValidationAsync<UpdateProfileRequestValidator, UpdateProfileRequest>(request);
-            var existingUser = await _userManager.FindByIdAsync(userId.ToString());
+
+            // Get current user from HttpContext
+            var httpContext = httpContextAccessor.HttpContext;
+            if (httpContext?.User?.Identity?.IsAuthenticated != true)
+            {
+                return UnAuthorized<UpdateProfileResponse>();
+            }
+
+            var existingUser = await _userManager.GetUserAsync(httpContext.User);
             if (existingUser == null)
             {
-                return NotFound<UpdateProfileResponse>("User not found");
+                return UnAuthorized<UpdateProfileResponse>();
+            }
+
+            // Check if user has "Client" role
+            var isInClientRole = await _userManager.IsInRoleAsync(existingUser, "Client");
+            if (!isInClientRole)
+            {
+                return UnAuthorized<UpdateProfileResponse>();
             }
             existingUser = request.Adapt(existingUser);
             var result = await _userManager.UpdateAsync(existingUser);
@@ -364,15 +370,29 @@ namespace AseerAlkotb.Application.Services
             return Success(response);
         }
       
-        public async Task<ApiResponse<GetProfileResponse>>GetProfile(GetProfileRequest request)
+        public async Task<ApiResponse<GetProfileResponse>>GetProfile()
         {
-            await DoValidationAsync<GetProfileRequestValidator,GetProfileRequest>(request);
 
-            var existingUser = await _unitOfWork.Account.GetUserWithRelatedData(request.UserId);
+            // Get current user from HttpContext
+            var httpContext = httpContextAccessor.HttpContext;
+            if (httpContext?.User?.Identity?.IsAuthenticated != true)
+            {
+                return UnAuthorized<GetProfileResponse>();
+            }
+
+            var existingUser = await _userManager.GetUserAsync(httpContext.User);
             if (existingUser == null)
             {
-                return NotFound<GetProfileResponse>("User not found");
+                return UnAuthorized<GetProfileResponse>();
             }
+
+            // Check if user has "Client" role
+            var isInClientRole = await _userManager.IsInRoleAsync(existingUser, "Client");
+            if (!isInClientRole)
+            {
+                return UnAuthorized<GetProfileResponse>();
+            }
+
             var response = new GetProfileResponse()
             {
                 Id = existingUser.Id,
