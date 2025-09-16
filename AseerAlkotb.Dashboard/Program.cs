@@ -232,16 +232,19 @@ namespace AseerAlkotb.Dashboard
             builder.Services.AddSingleton<IEmbeddingRefreshJob>(sp => sp.GetRequiredService<EmbeddingRefreshBackgroundService>());
             builder.Services.AddHostedService(sp => sp.GetRequiredService<EmbeddingRefreshBackgroundService>());
             // HttpClient (Gemini) مع Polly
+            // Polly (اختياري)
             static IAsyncPolicy<HttpResponseMessage> ResilientPolicy() =>
                 HttpPolicyExtensions.HandleTransientHttpError()
-                .OrResult(r => r.StatusCode == HttpStatusCode.TooManyRequests)
-                .WaitAndRetryAsync(3, attempt => TimeSpan.FromMilliseconds(400 * attempt * attempt));
+                    .OrResult(r => r.StatusCode == HttpStatusCode.TooManyRequests)
+                    .WaitAndRetryAsync(3, a => TimeSpan.FromMilliseconds(400 * a * a));
 
+            // HttpClient باسمي "gemini"
             builder.Services.AddHttpClient("gemini", c =>
             {
-                c.BaseAddress = new Uri("https://g...content-available-to-author-only...s.com");
-                c.Timeout = TimeSpan.FromSeconds(30);
-            }).AddPolicyHandler(ResilientPolicy());
+                c.BaseAddress = new Uri("https://generativelanguage.googleapis.com");
+                // c.Timeout = TimeSpan.FromSeconds(30);
+            })
+            .AddPolicyHandler(ResilientPolicy());
 
 
             // Configure Mapster for object mapping

@@ -6,11 +6,9 @@ namespace AseerAlkotb.Domain.Entites.Models
     {
         public int BookId { get; set; }
         public virtual Book Book { get; set; }
-        
-        public string Content { get; set; } // النص الذي تم تحويله إلى embedding
-        public string ContentType { get; set; } // "title", "description", "author", "category"
-        public float[] Embedding { get; set; } // Vector representation
-        
+        public string Content { get; set; } = "";
+        public string ContentType { get; set; } = "";
+        public float[] Embedding { get; set; } = Array.Empty<float>();
         public DateTime LastUpdated { get; set; } = DateTime.UtcNow;
     }
 }
