@@ -140,15 +140,16 @@ namespace AseerAlkotb.API.Controllers
                 Message = "Confirmation email resent successfully"
             });
         }
-        //[Authorize]
+        [Authorize(Roles ="Client")]
         [HttpGet("GetProfile")]
         public async Task<IActionResult> GetProfile()
         {
             var result = await _accountServices.GetProfile();
             return Ok(result);
         }
+        [Authorize(Roles = "Client")]   
         [HttpPut("UpdateProfile")]
-        public async Task<IActionResult> UpdateProfile(UpdateProfileRequest request)
+        public async Task<IActionResult> UpdateProfile([FromForm]UpdateProfileRequest request)
         {
             var result = await _accountServices.UpdateProfile(request);
             return Ok(result);
