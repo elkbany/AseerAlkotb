@@ -1,4 +1,5 @@
-﻿@model AseerAlkotb.Application.Features.Publishers.Response.UpdatePublisherResponse
+﻿
+@model AseerAlkotb.Application.Features.Publishers.Response.UpdatePublisherResponse
 
 @{
     ViewData["Title"] = "Edit Publisher";
@@ -28,6 +29,24 @@
                 <form asp-action="Edit" enctype="multipart/form-data" id="editPublisherForm">
                     <input type="hidden" asp-for="Id" />
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                            <h5><i class="icon fas fa-ban"></i> Error!</h5>
+                            @TempData["Error"]
+                        </div>
+                    }
+                    
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                            <h5><i class="icon fas fa-check"></i> Success!</h5>
+                            @TempData["Success"]
+                        </div>
+                    }
 
                     <div class="row">
                         <!-- LEFT: Publisher Info -->
@@ -133,6 +152,152 @@
                     $("#logoPreview").attr("src", oldImageUrl || "/images/default-user.png");
                     $(this).next(".custom-file-label").text("Choose logo...");
                 }
+            });
+
+            // Publisher Validation Functions
+            function validateId(id) {
+                var errors = [];
+                if (!id || id <= 0) {
+                    errors.push('Publisher ID must be greater than 0.');
+                }
+                return errors;
+            }
+
+            function validateName(name) {
+                var errors = [];
+                
+                if (!name || name.trim() === '') {
+                    errors.push('Publisher name is required.');
+                } else {
+                    if (name.length < 2 || name.length > 200) {
+                        errors.push('Publisher name must be between 2 and 200 characters.');
+                    }
+                    
+                    var namePattern = /^[a-zA-Z\u0600-\u06FF\s]+$/;
+                    if (!namePattern.test(name)) {
+                        errors.push('Publisher name must contain only letters and spaces.');
+                    }
+                }
+                
+                return errors;
+            }
+
+            function validateDescription(description) {
+                var errors = [];
+                
+                if (description && description.length > 1000) {
+                    errors.push('Description must not exceed 1000 characters.');
+                }
+                
+                return errors;
+            }
+
+            function validateContactEmail(email) {
+                var errors = [];
+                
+                if (!email || email.trim() === '') {
+                    errors.push('Contact email is required.');
+                } else {
+                    var emailPattern = /^[^\s]+[^\s]+\.[^\s]+$/;
+                    if (!emailPattern.test(email)) {
+                        errors.push('Please enter a valid email address.');
+                    }
+                }
+                
+                return errors;
+            }
+
+            function validateLogo(fileInput) {
+                var errors = [];
+                var file = fileInput.files[0];
+                
+                if (file) {
+                    // Check file size (5MB max)
+                    if (file.size > 5 * 1024 * 1024) {
+                        errors.push('Logo size must not exceed 5MB.');
+                    }
+                    
+                    // Check file extension
+                    var allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+                    var fileName = file.name.toLowerCase();
+                    var hasValidExtension = allowedExtensions.some(ext => fileName.endsWith(ext));
+                    
+                    if (!hasValidExtension) {
+                        errors.push('Only JPG, JPEG, PNG, GIF, and WebP images are allowed.');
+                    }
+                    
+                    // Check content type
+                    var allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+                    if (!allowedTypes.includes(file.type.toLowerCase())) {
+                        errors.push('Invalid image format.');
+                    }
+                }
+                
+                return errors;
+            }
+
+            function showValidationErrors(errors) {
+                // Clear previous errors
+                $('.validation-error').remove();
+                
+                if (errors.length > 0) {
+                    var errorHtml = '<div class="alert alert-danger validation-error"><h5><i class="icon fas fa-exclamation-triangle"></i> Please check the following:</h5><ul>';
+                    errors.forEach(function(error) {
+                        errorHtml += '<li>' + error + '</li>';
+                    });
+                    errorHtml += '</ul></div>';
+                    
+                    $('.card-body').first().prepend(errorHtml);
+                    
+                    // Scroll to top to show errors
+                    $('html, body').animate({
+                        scrollTop: $('.validation-error').offset().top - 100
+                    }, 500);
+                    
+                    return false;
+                }
+                return true;
+            }
+
+            // Form validation on submit
+            $('#editPublisherForm').on('submit', function(e) {
+                var allErrors = [];
+                
+                // Validate all fields
+                allErrors = allErrors.concat(validateId(parseInt($('#Id').val())));
+                allErrors = allErrors.concat(validateName($('#Name').val()));
+                allErrors = allErrors.concat(validateDescription($('#Description').val()));
+                allErrors = allErrors.concat(validateContactEmail($('#ContactEmail').val()));
+                allErrors = allErrors.concat(validateLogo(document.getElementById('imageInput')));
+                
+                if (!showValidationErrors(allErrors)) {
+                    e.preventDefault();
+                }
+            });
+
+            // Real-time validation feedback
+            $('#Name').on('blur', function() {
+                var errors = validateName($(this).val());
+                var errorSpan = $(this).siblings('.text-danger');
+                errorSpan.text(errors.length > 0 ? errors[0] : '');
+            });
+
+            $('#Description').on('blur', function() {
+                var errors = validateDescription($(this).val());
+                var errorSpan = $(this).siblings('.text-danger');
+                errorSpan.text(errors.length > 0 ? errors[0] : '');
+            });
+
+            $('#ContactEmail').on('blur', function() {
+                var errors = validateContactEmail($(this).val());
+                var errorSpan = $(this).siblings('.text-danger');
+                errorSpan.text(errors.length > 0 ? errors[0] : '');
+            });
+
+            $('#imageInput').on('change', function() {
+                var errors = validateLogo(this);
+                var errorSpan = $('.text-danger').last();
+                errorSpan.text(errors.length > 0 ? errors[0] : '');
             });
         });
     </script>
