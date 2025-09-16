@@ -268,5 +268,59 @@ namespace AseerAlkotb.Application.Services
             var response = Publishers.Adapt<List<GetFollowersPublisherResponse>>();
             return Success(response);
         }
+
+        public async Task<ApiResponse<IsFollowingResponse>> IsFollowing(IsFollowingRequest request)
+        {
+            await DoValidationAsync<IsFollowingRequestValidator, IsFollowingRequest>(request);
+            var result = await unitOfWork.Publishers.IsFollowingPublisher(request.UserId, request.PublisherId);
+            if (result)
+            {
+                var isFollowingResponse = new IsFollowingResponse
+                (
+                     isFollow: true
+                );
+                return Success(isFollowingResponse);
+            }
+            else
+            {
+                var isFollowingResponse = new IsFollowingResponse
+               (
+                    isFollow: false
+               );
+                return Success(isFollowingResponse);
+
+            }
+
+        }
+
+
+        public async Task<ApiResponse<List<GetAuthorRelatedToPublisherResponse>>> GetAuthorRelatedToPublisher(GetAuthorRelatedToPublisherRequest request)
+        {
+            await DoValidationAsync<GetAuthorRelatedToPublisherRequestValidator, GetAuthorRelatedToPublisherRequest>(request);
+            var Authors = unitOfWork.Publishers.GetAuthorsRelatededToPublisher(request.publisherId).ToList();
+
+            // Apply pagination
+            var pagedAuthors = Authors
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToList();
+
+            var totalCount = pagedAuthors.Count;
+            if (pagedAuthors == null)
+            {
+                return BadRequest<List<GetAuthorRelatedToPublisherResponse>>("No Authors Yet");
+            }
+            else
+            {
+                var responseData = pagedAuthors.Select(a => new GetAuthorRelatedToPublisherResponse(
+                 Id: a.Id,
+                 Name: a.Name,
+                 Bio: a.Bio,
+                 ImageUrl: a.ImageUrl
+                  )).ToList();
+                return Success(responseData, totalCount, request.PageNumber, request.PageSize);
+            }
+
+        }
     }
 }
