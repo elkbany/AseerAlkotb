@@ -6,6 +6,6 @@ using System.Threading.Tasks;
 
 namespace AseerAlkotb.Application.Features.Authors.Requests
 {
-    public record UnFollowAuthorRequest(int userId,int authorId);
+    public record UnFollowAuthorRequest( int authorId);
     
 }

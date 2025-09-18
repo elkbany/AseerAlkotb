@@ -12,12 +12,12 @@ namespace AseerAlkotb.Application.Features.Publishers.Validators
     {
         public FollowPublisherRequestValidation() {
             
-            RuleFor(x => x.UserId)
-               .NotEmpty()
-               .GreaterThan(0)
-               .WithMessage("User ID must be greater than 0");
+            //RuleFor(x => x.UserId)
+            //   .NotEmpty()
+            //   .GreaterThan(0)
+            //   .WithMessage("User ID must be greater than 0");
 
-            RuleFor(x => x.PublisherId)
+            RuleFor(x => x.publisherId)
               .NotEmpty()
               .GreaterThan(0)
              .WithMessage("Publisher ID must be greater than 0");

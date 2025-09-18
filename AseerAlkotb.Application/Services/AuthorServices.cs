@@ -5,14 +5,19 @@ using AseerAlkotb.Application.Features.Authors.Requests;
 using AseerAlkotb.Application.Features.Authors.Responses;
 using AseerAlkotb.Application.Features.Authors.Validators;
 using AseerAlkotb.Application.Features.Books.DTOs;
+using AseerAlkotb.Application.Features.Publishers.Requests;
+using AseerAlkotb.Application.Features.Publishers.Response;
+using AseerAlkotb.Application.Features.Publishers.Validators;
 using AseerAlkotb.Application.Features.Reviews.Responses;
 using AseerAlkotb.Application.ResponseHandler;
 using AseerAlkotb.Domain.Entites.Models;
 using AseerAlkotb.Domain.Interfaces.Base;
 using AseerAlkotb.Localization.Resources;
 using Mapster;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Localization;
+using Microsoft.AspNetCore.Identity;
 using static AseerAlkotb.Application.ResponseHandler.ApiResponseHandler;
 
 namespace AseerAlkotb.Application.Services
@@ -20,10 +25,15 @@ namespace AseerAlkotb.Application.Services
     public class AuthorServices : AppService,IAuthorServices
     {
         private readonly IUnitOfWork unitOfWork;
+        private readonly UserManager<User> _userManager;
 
-        public AuthorServices(IUnitOfWork unitOfWork , IServiceProvider serviceProvider,IHostEnvironment environment ) : base(serviceProvider,environment) 
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public AuthorServices(IUnitOfWork unitOfWork , IServiceProvider serviceProvider,IHostEnvironment environment, IHttpContextAccessor httpContextAccessor, UserManager<User> userManager) : base(serviceProvider,environment) 
         {
             this.unitOfWork = unitOfWork;
+            _httpContextAccessor = httpContextAccessor;
+            _userManager = userManager;
+
         }
         public async Task<ApiResponse<AddAuthorResponse>> AddAuthorAsync(AddAuthorRequest request)
         {
@@ -134,12 +144,33 @@ namespace AseerAlkotb.Application.Services
         public async Task<ApiResponse<FollowAutherResponse>>FollowAuther(FollowAutherRequest request)
         {
             await DoValidationAsync<FollowAuthorRequestValidation, FollowAutherRequest>(request);
-            if (await unitOfWork.Authors.IsFollowingAuther(request.UserId, request.UserId)) { 
+
+            // Get current user from HttpContext
+            var httpContext = _httpContextAccessor.HttpContext;
+            if (httpContext?.User?.Identity?.IsAuthenticated != true)
+            {
+                return UnAuthorized<FollowAutherResponse>();
+            }
+
+            var currentUser = await _userManager.GetUserAsync(httpContext.User);
+            if (currentUser == null)
+            {
+                return UnAuthorized<FollowAutherResponse>();
+            }
+
+            // Check if user has "Client" role
+            var isInClientRole = await _userManager.IsInRoleAsync(currentUser, "Client");
+            if (!isInClientRole)
+            {
+                return UnAuthorized<FollowAutherResponse>();
+            }
+
+            if (await unitOfWork.Authors.IsFollowingAuther(currentUser.Id, request.authorId)) { 
                 return BadRequest<FollowAutherResponse>("You are already following this author");
             }
             else
             {
-                var userFollow=await unitOfWork.Authors.FollowAuther(request.UserId, request.AuthorId);
+                var userFollow=await unitOfWork.Authors.FollowAuther(currentUser.Id, request.authorId);
                 await unitOfWork.CommitAsync();
                 var response=userFollow.Adapt<FollowAutherResponse>();
                 return Success(response);
@@ -149,9 +180,28 @@ namespace AseerAlkotb.Application.Services
         public async Task<ApiResponse<UnFollowAuthorResponse>>UnFollowAuthor(UnFollowAuthorRequest request)
         {
             await DoValidationAsync<UnFollowAuthorRequestValidation, UnFollowAuthorRequest>(request);
-            if (await unitOfWork.Authors.IsFollowingAuther(request.userId,request.authorId))
+            // Get current user from HttpContext
+            var httpContext = _httpContextAccessor.HttpContext;
+            if (httpContext?.User?.Identity?.IsAuthenticated != true)
             {
-                var userFollow = await unitOfWork.Authors.UnFollowAuther(request.userId, request.authorId);
+                return UnAuthorized<UnFollowAuthorResponse>();
+            }
+
+            var currentUser = await _userManager.GetUserAsync(httpContext.User);
+            if (currentUser == null)
+            {
+                return UnAuthorized<UnFollowAuthorResponse>();
+            }
+
+            // Check if user has "Client" role
+            var isInClientRole = await _userManager.IsInRoleAsync(currentUser, "Client");
+            if (!isInClientRole)
+            {
+                return UnAuthorized<UnFollowAuthorResponse>();
+            }
+            if (await unitOfWork.Authors.IsFollowingAuther(currentUser.Id,request.authorId))
+            {
+                var userFollow = await unitOfWork.Authors.UnFollowAuther(currentUser.Id, request.authorId);
                 await unitOfWork.CommitAsync();
                 var response = userFollow.Adapt<UnFollowAuthorResponse>();
                 return Success(response);
@@ -189,6 +239,49 @@ namespace AseerAlkotb.Application.Services
             var Authors = unitOfWork.Authors.GetFollowerAuther(request.AuthorId).ToList();
             var response = Authors.Adapt<List<GetFollowersAuthorResponse>>();
             return Success(response);
+
+        }
+
+        public async Task<ApiResponse<IsFollowingResponse>> IsFollowing(IsFollowingAuthorRequest request)
+        {
+            //await DoValidationAsync<IsFollowingAuthorRequestValidator, IsFollowingAuthorRequest>(request);
+            // Get current user from HttpContext
+            var httpContext = _httpContextAccessor.HttpContext;
+            if (httpContext?.User?.Identity?.IsAuthenticated != true)
+            {
+                return UnAuthorized<IsFollowingResponse>();
+            }
+
+            var currentUser = await _userManager.GetUserAsync(httpContext.User);
+            if (currentUser == null)
+            {
+                return UnAuthorized<IsFollowingResponse>();
+            }
+
+            // Check if user has "Client" role
+            var isInClientRole = await _userManager.IsInRoleAsync(currentUser, "Client");
+            if (!isInClientRole)
+            {
+                return UnAuthorized<IsFollowingResponse>();
+            }
+            var result = await unitOfWork.Authors.IsFollowingAuther(currentUser.Id, request.authorId);
+            if (result)
+            {
+                var isFollowingResponse = new IsFollowingResponse
+                (
+                     isFollow: true
+                );
+                return Success(isFollowingResponse);
+            }
+            else
+            {
+                var isFollowingResponse = new IsFollowingResponse
+               (
+                    isFollow: false
+               );
+                return Success(isFollowingResponse);
+
+            }
 
         }
 

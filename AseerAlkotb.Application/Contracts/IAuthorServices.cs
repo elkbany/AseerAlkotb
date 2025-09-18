@@ -1,6 +1,8 @@
 ﻿using AseerAlkotb.Application.Features.Authors.Requests;
 using AseerAlkotb.Application.Features.Authors.Responses;
 using AseerAlkotb.Application.Features.Authors.Validators;
+using AseerAlkotb.Application.Features.Publishers.Requests;
+using AseerAlkotb.Application.Features.Publishers.Response;
 using AseerAlkotb.Application.ResponseHandler;
 using System;
 using System.Collections.Generic;
@@ -30,6 +32,7 @@ namespace AseerAlkotb.Application.Contracts
 
 
         Task<ApiResponse<List<GetFollowersAuthorResponse>>> GetFollowerAuther(GetFollowersAuthorRequest request);
-        
+        Task<ApiResponse<IsFollowingResponse>> IsFollowing(IsFollowingAuthorRequest request);
+
     }
 }
