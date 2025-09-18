@@ -1,4 +1,5 @@
-﻿@model AseerAlkotb.Application.Features.Publishers.Requests.AddPublisherRequest
+﻿﻿
+@model AseerAlkotb.Application.Features.Publishers.Requests.AddPublisherRequest
 
 @{
     ViewData["Title"] = "Add New Publisher";
@@ -25,8 +26,26 @@
     <div class="container-fluid">
         <div class="card">
             <div class="card-body">
-                <form asp-action="Create" enctype="multipart/form-data">
+                <form asp-action="Create" enctype="multipart/form-data" id="createPublisherForm">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                            <h5><i class="icon fas fa-ban"></i> Error!</h5>
+                            @TempData["Error"]
+                        </div>
+                    }
+                    
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                            <h5><i class="icon fas fa-check"></i> Success!</h5>
+                            @TempData["Success"]
+                        </div>
+                    }
 
                     <div class="row">
                         <!-- LEFT -->
@@ -70,16 +89,17 @@
                                     <h3 class="card-title">Logo</h3>
                                 </div>
                                 <div class="card-body">
-                                    <div class="text-center mb-3">
-                                        <img id="logoPreview" src="/images/default-logo.png"
-                                             class="img-circle" style="max-height:200px;" />
-                                    </div>
                                     <div class="form-group">
+                                        <div class="text-center mb-3">
+                                            <img id="logoPreview" src="/images/default-logo.png"
+                                                 class="img-circle" style="width: 150px; height: 150px; object-fit: cover;" />
+                                        </div>
                                         <div class="custom-file">
                                             <!-- IMPORTANT: name/id must match property LogoUrl -->
                                             <input asp-for="LogoUrl" type="file" class="custom-file-input" id="LogoUrl" accept="image/*" />
                                             <label class="custom-file-label" for="LogoUrl">Choose logo image</label>
                                         </div>
+                                        <small class="form-text text-muted">Supported formats: JPG, PNG. Max size: 2MB</small>
                                         <span asp-validation-for="LogoUrl" class="text-danger"></span>
                                     </div>
                                 </div>
@@ -104,20 +124,159 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script>
-        $('#LogoUrl').on('change', function () {
-            const file = this.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    $('#logoPreview').attr('src', e.target.result);
-                };
-                reader.readAsDataURL(file);
-                const fileName = $(this).val().split('\\').pop();
-                $(this).next('.custom-file-label').text(fileName);
-            } else {
-                $('#logoPreview').attr('src', '/images/default-logo.png');
-                $(this).next('.custom-file-label').text('Choose logo image');
+        $(function() {
+            $('#LogoUrl').on('change', function () {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        $('#logoPreview').attr('src', e.target.result);
+                    };
+                    reader.readAsDataURL(file);
+                    const fileName = $(this).val().split('\\').pop();
+                    $(this).next('.custom-file-label').text(fileName);
+                } else {
+                    $('#logoPreview').attr('src', '/images/default-logo.png');
+                    $(this).next('.custom-file-label').text('Choose logo image');
+                }
+            });
+
+            // Publisher Validation Functions
+            function validateName(name) {
+                var errors = [];
+                
+                if (!name || name.trim() === '') {
+                    errors.push('Publisher name is required.');
+                } else {
+                    if (name.length < 2 || name.length > 100) {
+                        errors.push('Publisher name must be between 2 and 100 characters.');
+                    }
+                    
+                    var namePattern = /^[a-zA-Z\u0600-\u06FF\s]+$/;
+                    if (!namePattern.test(name)) {
+                        errors.push('Publisher name must contain only letters and spaces.');
+                    }
+                }
+                
+                return errors;
             }
+
+            function validateDescription(description) {
+                var errors = [];
+                
+                if (description && description.length > 1000) {
+                    errors.push('Description must not exceed 1000 characters.');
+                }
+                
+                return errors;
+            }
+
+            function validateContactEmail(email) {
+                var errors = [];
+                
+                if (!email || email.trim() === '') {
+                    errors.push('Contact email is required.');
+                } else {
+                    var emailPattern = /^[^\s]+[^\s]+\.[^\s]+$/;
+                    if (!emailPattern.test(email)) {
+                        errors.push('Please enter a valid email address.');
+                    }
+                }
+                
+                return errors;
+            }
+
+            function validateLogo(fileInput) {
+                var errors = [];
+                var file = fileInput.files[0];
+                
+                if (file) {
+                    // Check file size (5MB max)
+                    if (file.size > 5 * 1024 * 1024) {
+                        errors.push('Logo size must not exceed 5MB.');
+                    }
+                    
+                    // Check file extension
+                    var allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+                    var fileName = file.name.toLowerCase();
+                    var hasValidExtension = allowedExtensions.some(ext => fileName.endsWith(ext));
+                    
+                    if (!hasValidExtension) {
+                        errors.push('Only JPG, JPEG, PNG, GIF, and WebP images are allowed.');
+                    }
+                    
+                    // Check content type
+                    var allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+                    if (!allowedTypes.includes(file.type.toLowerCase())) {
+                        errors.push('Invalid image format.');
+                    }
+                }
+                
+                return errors;
+            }
+
+            function showValidationErrors(errors) {
+                // Clear previous errors
+                $('.validation-error').remove();
+                
+                if (errors.length > 0) {
+                    var errorHtml = '<div class="alert alert-danger validation-error"><h5><i class="icon fas fa-exclamation-triangle"></i> Please check the following:</h5><ul>';
+                    errors.forEach(function(error) {
+                        errorHtml += '<li>' + error + '</li>';
+                    });
+                    errorHtml += '</ul></div>';
+                    
+                    $('.card-body').first().prepend(errorHtml);
+                    
+                    // Scroll to top to show errors
+                    $('html, body').animate({
+                        scrollTop: $('.validation-error').offset().top - 100
+                    }, 500);
+                    
+                    return false;
+                }
+                return true;
+            }
+
+            // Form validation on submit
+            $('#createPublisherForm').on('submit', function(e) {
+                var allErrors = [];
+                
+                // Validate all fields
+                allErrors = allErrors.concat(validateName($('#Name').val()));
+                allErrors = allErrors.concat(validateDescription($('#Description').val()));
+                allErrors = allErrors.concat(validateContactEmail($('#ContactEmail').val()));
+                allErrors = allErrors.concat(validateLogo(document.getElementById('LogoUrl')));
+                
+                if (!showValidationErrors(allErrors)) {
+                    e.preventDefault();
+                }
+            });
+
+            // Real-time validation feedback
+            $('#Name').on('blur', function() {
+                var errors = validateName($(this).val());
+                var errorSpan = $(this).siblings('.text-danger');
+                errorSpan.text(errors.length > 0 ? errors[0] : '');
+            });
+
+            $('#Description').on('blur', function() {
+                var errors = validateDescription($(this).val());
+                var errorSpan = $(this).siblings('.text-danger');
+                errorSpan.text(errors.length > 0 ? errors[0] : '');
+            });
+
+            $('#ContactEmail').on('blur', function() {
+                var errors = validateContactEmail($(this).val());
+                var errorSpan = $(this).siblings('.text-danger');
+                errorSpan.text(errors.length > 0 ? errors[0] : '');
+            });
+
+            $('#LogoUrl').on('change', function() {
+                var errors = validateLogo(this);
+                var errorSpan = $(this).parent().siblings('.text-danger');
+                errorSpan.text(errors.length > 0 ? errors[0] : '');
+            });
         });
     </script>
 }

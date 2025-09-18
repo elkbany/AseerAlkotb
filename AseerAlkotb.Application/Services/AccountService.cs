@@ -18,6 +18,7 @@ using System.Security.Claims;
 using System.Text;
 using static AseerAlkotb.Application.ResponseHandler.ApiResponseHandler;
 using FluentValidation;
+using AseerAlkotb.Domain.Enums;
 
 namespace AseerAlkotb.Application.Services
 {
@@ -338,7 +339,7 @@ namespace AseerAlkotb.Application.Services
 
         }
 
-        public async Task<ApiResponse<UpdateProfileResponse>> UpdateProfile( UpdateProfileRequest request)
+        public async Task<ApiResponse<UpdateProfileResponse>> UpdateProfile(UpdateProfileRequest request)
         {
 
             // Get current user from HttpContext
@@ -398,14 +399,23 @@ namespace AseerAlkotb.Application.Services
                 Id = existingUser.Id,
                 FirstName = existingUser.FirstName,
                 LastName = existingUser.LastName,
-                ImageUrl=existingUser.ProfilePictureUrl,
-                RegistrationPeriod= DateTime.UtcNow-existingUser.CreatedAt,
-                Reviews=existingUser.Reviews?.Select(r => new ReviewDto
+                ImageUrl = existingUser.ProfilePictureUrl ?? "",
+                Bio = existingUser.Bio ?? "",
+                Email = existingUser.Email ?? "",
+                DateOfBirth = existingUser.DateOfBirth ?? default,
+                Gender = existingUser.Gender,
+                Nationality = existingUser.Nationality ?? "",
+                RegistrationPeriod = DateTime.UtcNow - existingUser.CreatedAt,
+                Reviews = existingUser.Reviews?.Select(r => new ReviewDto
                 {
                     Id = r.Id,
                     ReviewFor = r.ReviewFor
-                }).ToList()??new List<ReviewDto>(),
-
+                }).ToList() ?? new List<ReviewDto>(),
+                Quotes = existingUser.Quotes?.Select(q => new QuoteDto
+                {
+                    Id = q.Id,
+                    QuoteFor = q.QuoteFor
+                }).ToList() ?? new List<QuoteDto>(),
                 Following = existingUser.Following?.Select(f => new UserFollowDto
                 {
                     Id = f.Id,

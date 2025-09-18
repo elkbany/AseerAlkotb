@@ -87,8 +87,8 @@ namespace AseerAlkotb.Application.Services
                     var dto = p.Adapt<GetAllPublisherPaginatedResponse>();
                     return dto with
                     {
-                        Name = LocalizeEntity("Publisher", dto.Id, "Name", dto.Name),
-                        Description = LocalizeEntity("Publisher", dto.Id, "Description", dto.Description)
+                        Name = GetLocalizedText(p.Name, p.Name_en),
+                        Description = GetLocalizedText(p.Description, p.Description_en)
                     };
                 })
                 .ToList();
@@ -107,8 +107,8 @@ namespace AseerAlkotb.Application.Services
             var response = publisher.Adapt<GetPublisherByIdResponse>();
             var localized = response with
             {
-                Name = LocalizeEntity("Publisher", publisher.Id, "Name", response.Name),
-                Description = LocalizeEntity("Publisher", publisher.Id, "Description", response.Description)
+                Name = GetLocalizedText(publisher.Name, publisher.Name_en),
+                Description = GetLocalizedText(publisher.Description, publisher.Description_en)
             };
             return Success(localized);
         }

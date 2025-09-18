@@ -171,8 +171,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
 
                     b.Property<string>("Content")
                         .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ContentType")
                         .IsRequired()
@@ -194,11 +193,9 @@ namespace AseerAlkotb.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BookId");
-
-                    b.HasIndex("ContentType");
-
                     b.HasIndex("LastUpdated");
+
+                    b.HasIndex("BookId", "ContentType");
 
                     b.ToTable("BookEmbeddings");
                 });

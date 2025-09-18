@@ -160,7 +160,7 @@ namespace AseerAlkotb.Dashboard.Controllers
             ViewBag.Publisher = publisher.Data;
             ViewBag.Categories = selectedCategories;
             ViewBag.Reviews = reviews; // Pass reviews to the view
-      
+
             return View(result.Data);
         }
 
@@ -174,40 +174,52 @@ namespace AseerAlkotb.Dashboard.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(AddBookRequest request)
         {
-            if (ModelState.IsValid)
+            try
             {
-                if (request.CategoryIds == null)
+                if (ModelState.IsValid)
                 {
-                    request = request with { CategoryIds = new List<int>() };
-                }
-
-                var result = await _bookServices.AddBookAsync(request);
-                if (result.Succeeded)
-                {
-                    try
+                    if (request.CategoryIds == null)
                     {
-                        var id = result.Data.Id;
-                        var titleAr = Request.Form["Title"].ToString();
-                        var titleEn = Request.Form["EnglishTitle"].ToString();
-                        if (string.IsNullOrWhiteSpace(titleEn)) titleEn = titleAr;
-                        AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Book_{id}_Title", titleAr, "ar");
-                        AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Book_{id}_Title", titleEn, "en");
+                        request = request with { CategoryIds = new List<int>() };
+                    }
 
-                        var descAr = Request.Form["Description"].ToString();
-                        var descEn = Request.Form["EnglishDescription"].ToString();
-                        if (!string.IsNullOrWhiteSpace(descAr) || !string.IsNullOrWhiteSpace(descEn))
+                    // Extract English fields from form
+                    var titleEn = Request.Form["EnglishTitle"].ToString();
+                    var descriptionEn = Request.Form["EnglishDescription"].ToString();
+
+                    // Create new request with English fields
+                    var updatedRequest = request with
+                    {
+                        Title_en = !string.IsNullOrWhiteSpace(titleEn) ? titleEn : null,
+                        Description_en = !string.IsNullOrWhiteSpace(descriptionEn) ? descriptionEn : null
+                    };
+
+                    var result = await _bookServices.AddBookAsync(updatedRequest);
+                    if (result.Succeeded)
+                    {
+                        TempData["Success"] = "Book created successfully!";
+                        return RedirectToAction(nameof(Index));
+                    }
+                    
+                    // Handle validation errors from FluentValidation
+                    if (result.Errors != null && result.Errors.Any())
+                    {
+                        foreach (var error in result.Errors)
                         {
-                            if (string.IsNullOrWhiteSpace(descEn)) descEn = descAr;
-                            if (string.IsNullOrWhiteSpace(descAr)) descAr = descEn;
-                            AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Book_{id}_Description", descAr ?? string.Empty, "ar");
-                            AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Book_{id}_Description", descEn ?? string.Empty, "en");
+                            foreach (var error2 in error.Value)
+                                ModelState.AddModelError(string.Empty, error2);
                         }
                     }
-                    catch { }
-                    return RedirectToAction(nameof(Index));
+                    else
+                    {
+                        TempData["Error"] = result.Message ?? "Failed to create book. Please check your input and try again.";
+                    }
                 }
-
-                TempData["Error"] = result.Message ?? "Failed to create book";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "An error occurred while creating the book. Please try again.";
+                // Log the exception if you have logging configured
             }
 
             return View(request);
@@ -244,7 +256,7 @@ namespace AseerAlkotb.Dashboard.Controllers
             var publisher = await _publisherServices.GetPublisherByIdAsync(new GetPublisherByIdRequest(response.Data.PublisherId));
 
             ViewBag.AuthorName = author?.Data?.Name;
-            ViewBag.PublisherName = publisher?.Data?.Name; 
+            ViewBag.PublisherName = publisher?.Data?.Name;
 
             ViewBag.CategoryIds = response.Data.CategoryIds;
             ViewBag.CategoryNames = response.Data.CategoryNames;
@@ -255,32 +267,24 @@ namespace AseerAlkotb.Dashboard.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id,UpdateBookRequest request)
+        public async Task<IActionResult> Edit(int id, UpdateBookRequest request)
         {
             if (ModelState.IsValid)
             {
-                var result = await _bookServices.UpdateBookAsync(request);
+                // Extract English fields from form
+                var titleEn = Request.Form["EnglishTitle"].ToString();
+                var descriptionEn = Request.Form["EnglishDescription"].ToString();
+
+                // Create new request with English fields
+                var updatedRequest = request with
+                {
+                    Title_en = !string.IsNullOrWhiteSpace(titleEn) ? titleEn : null,
+                    Description_en = !string.IsNullOrWhiteSpace(descriptionEn) ? descriptionEn : null
+                };
+
+                var result = await _bookServices.UpdateBookAsync(updatedRequest);
                 if (result.Succeeded)
                 {
-                    try
-                    {
-                        var titleAr = Request.Form["Title"].ToString();
-                        var titleEn = Request.Form["EnglishTitle"].ToString();
-                        if (string.IsNullOrWhiteSpace(titleEn)) titleEn = titleAr;
-                        AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Book_{id}_Title", titleAr, "ar");
-                        AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Book_{id}_Title", titleEn, "en");
-
-                        var descAr = Request.Form["Description"].ToString();
-                        var descEn = Request.Form["EnglishDescription"].ToString();
-                        if (!string.IsNullOrWhiteSpace(descAr) || !string.IsNullOrWhiteSpace(descEn))
-                        {
-                            if (string.IsNullOrWhiteSpace(descEn)) descEn = descAr;
-                            if (string.IsNullOrWhiteSpace(descAr)) descAr = descEn;
-                            AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Book_{id}_Description", descAr ?? string.Empty, "ar");
-                            AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Book_{id}_Description", descEn ?? string.Empty, "en");
-                        }
-                    }
-                    catch { }
                     TempData["Success"] = "Book updated successfully.";
                     return RedirectToAction(nameof(Index));
                 }
@@ -341,7 +345,7 @@ namespace AseerAlkotb.Dashboard.Controllers
 
             return Json(publishers.Data.Select(p => new { id = p.Id, text = p.Name }));
         }
-       
+
 
     }
 }

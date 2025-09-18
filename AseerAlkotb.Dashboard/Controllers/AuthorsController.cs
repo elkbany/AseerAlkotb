@@ -5,6 +5,7 @@ using AseerAlkotb.Application.Features.Authors.Responses;
 using AseerAlkotb.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace AseerAlkotb.Dashboard.Controllers
 {
@@ -75,35 +76,49 @@ namespace AseerAlkotb.Dashboard.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(AddAuthorRequest request)
         {
-            if (ModelState.IsValid)
+            try
             {
-                var result = await _authorServices.AddAuthorAsync(request);
-                if (result.Succeeded)
+                if (ModelState.IsValid)
                 {
-                    try
+                    // Extract English fields from form
+                    var nameEn = Request.Form["EnglishName"].ToString();
+                    var bioEn = Request.Form["EnglishBio"].ToString();
+                    
+                    // Create new request with English fields
+                    var updatedRequest = request with 
+                    { 
+                        Name_en = !string.IsNullOrWhiteSpace(nameEn) ? nameEn : null,
+                        Bio_en = !string.IsNullOrWhiteSpace(bioEn) ? bioEn : null
+                    };
+                    
+                    var result = await _authorServices.AddAuthorAsync(updatedRequest);
+                    if (result.Succeeded)
                     {
-                        var id = result.Data.Id;
-                        var nameAr = Request.Form["Name"].ToString();
-                        var nameEn = Request.Form["EnglishName"].ToString();
-                        if (string.IsNullOrWhiteSpace(nameEn)) nameEn = nameAr;
-                        AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Author_{id}_Name", nameAr, "ar");
-                        AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Author_{id}_Name", nameEn, "en");
-
-                        var bioAr = Request.Form["Bio"].ToString();
-                        var bioEn = Request.Form["EnglishBio"].ToString();
-                        if (!string.IsNullOrWhiteSpace(bioAr) || !string.IsNullOrWhiteSpace(bioEn))
+                        TempData["Success"] = "Author created successfully!";
+                        return RedirectToAction(nameof(Index));
+                    }
+                    
+                    // Handle validation errors from FluentValidation
+                    if (result.Errors != null && result.Errors.Any())
+                    {
+                        foreach (var error in result.Errors)
                         {
-                            if (string.IsNullOrWhiteSpace(bioEn)) bioEn = bioAr;
-                            if (string.IsNullOrWhiteSpace(bioAr)) bioAr = bioEn;
-                            AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Author_{id}_Bio", bioAr ?? string.Empty, "ar");
-                            AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Author_{id}_Bio", bioEn ?? string.Empty, "en");
+                            foreach (var error2 in error.Value)
+                                ModelState.AddModelError(string.Empty,error2);
                         }
                     }
-                    catch { }
-                    return RedirectToAction(nameof(Index));
+                    else
+                    {
+                        TempData["Error"] = result.Message ?? "Failed to create author. Please check your input and try again.";
+                    }
                 }
-                TempData["Error"] = result.Message ?? "Failed to create author";
             }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "An error occurred while creating the author. Please try again.";
+                // Log the exception if you have logging configured
+            }
+            
             return View(request);
         }
 
@@ -135,33 +150,52 @@ namespace AseerAlkotb.Dashboard.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, UpdateAuthorRequest request)
         {
-            // إضافة الـ Id إلى الـ Request
-            request = request with { Id = id };
-            
-            if (ModelState.IsValid)
+            try
             {
-                await _authorServices.UpdateAuthorAsync(request);
-                try
+                // إضافة الـ Id إلى الـ Request
+                request = request with { Id = id };
+                
+                if (ModelState.IsValid)
                 {
-                    var nameAr = Request.Form["Name"].ToString();
+                    // Extract English fields from form
                     var nameEn = Request.Form["EnglishName"].ToString();
-                    if (string.IsNullOrWhiteSpace(nameEn)) nameEn = nameAr;
-                    AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Author_{id}_Name", nameAr, "ar");
-                    AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Author_{id}_Name", nameEn, "en");
-
-                    var bioAr = Request.Form["Bio"].ToString();
                     var bioEn = Request.Form["EnglishBio"].ToString();
-                    if (!string.IsNullOrWhiteSpace(bioAr) || !string.IsNullOrWhiteSpace(bioEn))
+                    
+                    // Create new request with English fields
+                    var updatedRequest = request with 
+                    { 
+                        Name_en = !string.IsNullOrWhiteSpace(nameEn) ? nameEn : null,
+                        Bio_en = !string.IsNullOrWhiteSpace(bioEn) ? bioEn : null
+                    };
+                    
+                    var result = await _authorServices.UpdateAuthorAsync(updatedRequest);
+                    if (result.Succeeded)
                     {
-                        if (string.IsNullOrWhiteSpace(bioEn)) bioEn = bioAr;
-                        if (string.IsNullOrWhiteSpace(bioAr)) bioAr = bioEn;
-                        AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Author_{id}_Bio", bioAr ?? string.Empty, "ar");
-                        AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Author_{id}_Bio", bioEn ?? string.Empty, "en");
+                        TempData["Success"] = "Author updated successfully!";
+                        return RedirectToAction(nameof(Index));
+                    }
+                    
+                    // Handle validation errors from FluentValidation
+                    if (result.Errors != null && result.Errors.Any())
+                    {
+                        foreach (var error in result.Errors)
+                        {
+                            foreach (var error2 in error.Value)
+                                ModelState.AddModelError(string.Empty, error2);
+                        }
+                    }
+                    else
+                    {
+                        TempData["Error"] = result.Message ?? "Failed to update author. Please check your input and try again.";
                     }
                 }
-                catch { }
-                return RedirectToAction(nameof(Index));
             }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "An error occurred while updating the author. Please try again.";
+                // Log the exception if you have logging configured
+            }
+            
             return View(request);
         }
 

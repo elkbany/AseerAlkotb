@@ -79,43 +79,48 @@ namespace AseerAlkotb.Dashboard.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(AddCategoryRequest request)
         {
-            if (ModelState.IsValid)
+            try
             {
-                var result = await _categoryServices.AddCategoryAsync(request);
-                
-                if (result.Succeeded)
+                if (ModelState.IsValid)
                 {
-                    try
+                    // Extract English fields from form
+                    var nameEn = Request.Form["EnglishName"].ToString();
+                    var descriptionEn = Request.Form["EnglishDescription"].ToString();
+                    
+                    // Create new request with English fields
+                    var updatedRequest = request with 
+                    { 
+                        Name_en = !string.IsNullOrWhiteSpace(nameEn) ? nameEn : null,
+                        Description_en = !string.IsNullOrWhiteSpace(descriptionEn) ? descriptionEn : null
+                    };
+                    
+                    var result = await _categoryServices.AddCategoryAsync(updatedRequest);
+                    
+                    if (result.Succeeded)
                     {
-                        var id = result.Data.Id;
-                        var keyName = $"Category_{id}_Name";
-                        var arName = Request.Form["Name"].ToString();
-                        var enName = Request.Form["EnglishName"].ToString();
-
-                        // Fallbacks: if English not provided, reuse Arabic for both
-                        if (string.IsNullOrWhiteSpace(enName)) enName = arName;
-
-                        AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource(keyName, arName, "ar");
-                        AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource(keyName, enName, "en");
-
-                        // Description keys if provided
-                        var descAr = Request.Form["Description"].ToString();
-                        var descEn = Request.Form["EnglishDescription"].ToString();
-                        if (!string.IsNullOrWhiteSpace(descAr) || !string.IsNullOrWhiteSpace(descEn))
+                        TempData["Success"] = "Category created successfully!";
+                        return RedirectToAction(nameof(Index));
+                    }
+                    
+                    // Handle validation errors from FluentValidation
+                    if (result.Errors != null && result.Errors.Any())
+                    {
+                        foreach (var error in result.Errors)
                         {
-                            var keyDesc = $"Category_{id}_Description";
-                            if (string.IsNullOrWhiteSpace(descEn)) descEn = descAr;
-                            if (string.IsNullOrWhiteSpace(descAr)) descAr = descEn;
-                            AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource(keyDesc, descAr ?? string.Empty, "ar");
-                            AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource(keyDesc, descEn ?? string.Empty, "en");
+                            foreach (var error2 in error.Value)
+                                ModelState.AddModelError(string.Empty, error2);
                         }
                     }
-                    catch { }
-                    TempData["Success"] = "تم إضافة التصنيف بنجاح";
-                    return RedirectToAction(nameof(Index));
+                    else
+                    {
+                        TempData["Error"] = result.Message ?? "Failed to create category. Please check your input and try again.";
+                    }
                 }
-                
-                TempData["Error"] = result.Message ?? "حدث خطأ أثناء إضافة التصنيف";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "An error occurred while creating the category. Please try again.";
+                // Log the exception if you have logging configured
             }
 
             // Reload parent categories for dropdown
@@ -143,7 +148,9 @@ namespace AseerAlkotb.Dashboard.Controllers
                 var updateRequest = new UpdateCategoryRequest(
                     result.Data.Id,
                     result.Data.Name,
+                    null, // Name_en - will be filled from form
                     result.Data.Description,
+                    null, // Description_en - will be filled from form
                     result.Data.IsActive
                 );
 
@@ -175,36 +182,48 @@ namespace AseerAlkotb.Dashboard.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            try
             {
-                var result = await _categoryServices.UpdateCategoryAsync(request);
-                
-                if (result.Succeeded)
+                if (ModelState.IsValid)
                 {
-                    try
+                    // Extract English fields from form
+                    var nameEn = Request.Form["EnglishName"].ToString();
+                    var descriptionEn = Request.Form["EnglishDescription"].ToString();
+                    
+                    // Create new request with English fields
+                    var updatedRequest = request with 
+                    { 
+                        Name_en = !string.IsNullOrWhiteSpace(nameEn) ? nameEn : null,
+                        Description_en = !string.IsNullOrWhiteSpace(descriptionEn) ? descriptionEn : null
+                    };
+                    
+                    var result = await _categoryServices.UpdateCategoryAsync(updatedRequest);
+                    
+                    if (result.Succeeded)
                     {
-                        var nameAr = Request.Form["Name"].ToString();
-                        var nameEn = Request.Form["EnglishName"].ToString();
-                        if (string.IsNullOrWhiteSpace(nameEn)) nameEn = nameAr;
-                        AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Category_{id}_Name", nameAr, "ar");
-                        AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Category_{id}_Name", nameEn, "en");
-
-                        var descAr = Request.Form["Description"].ToString();
-                        var descEn = Request.Form["EnglishDescription"].ToString();
-                        if (!string.IsNullOrWhiteSpace(descAr) || !string.IsNullOrWhiteSpace(descEn))
+                        TempData["Success"] = "Category updated successfully!";
+                        return RedirectToAction(nameof(Index));
+                    }
+                    
+                    // Handle validation errors from FluentValidation
+                    if (result.Errors != null && result.Errors.Any())
+                    {
+                        foreach (var error in result.Errors)
                         {
-                            if (string.IsNullOrWhiteSpace(descEn)) descEn = descAr;
-                            if (string.IsNullOrWhiteSpace(descAr)) descAr = descEn;
-                            AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Category_{id}_Description", descAr ?? string.Empty, "ar");
-                            AseerAlkotb.Localization.Resources.ResxResourceHelper.UpsertSharedResource($"Category_{id}_Description", descEn ?? string.Empty, "en");
+                            foreach (var error2 in error.Value)
+                                ModelState.AddModelError(string.Empty, error2);
                         }
                     }
-                    catch { }
-                    TempData["Success"] = "تم تحديث التصنيف بنجاح";
-                    return RedirectToAction(nameof(Index));
+                    else
+                    {
+                        TempData["Error"] = result.Message ?? "Failed to update category. Please check your input and try again.";
+                    }
                 }
-                
-                TempData["Error"] = result.Message ?? "حدث خطأ أثناء تحديث التصنيف";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "An error occurred while updating the category. Please try again.";
+                // Log the exception if you have logging configured
             }
 
             // Reload parent categories for dropdown

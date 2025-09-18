@@ -26,6 +26,24 @@
             <div class="card-body">
                 <form asp-action="Create" enctype="multipart/form-data" id="createBookForm">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                            <h5><i class="icon fas fa-ban"></i> Error!</h5>
+                            @TempData["Error"]
+                        </div>
+                    }
+                    
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                            <h5><i class="icon fas fa-check"></i> Success!</h5>
+                            @TempData["Success"]
+                        </div>
+                    }
 
                     <div class="row">
                         <!-- LEFT: Book Info -->
@@ -397,6 +415,225 @@
             bindEnter('#authorSearch', '#authorSearchBtn');
             bindEnter('#publisherSearch', '#publisherSearchBtn');
             bindEnter('#categorySearch', '#categorySearchBtn');
+            
+            // Book Validation Functions
+            function validateTitle(title) {
+                var errors = [];
+                if (!title || title.trim() === '') {
+                    errors.push('Book title is required.');
+                } else if (title.length > 200) {
+                    errors.push('Title must be less than 200 characters.');
+                }
+                return errors;
+            }
+
+            function validateDescription(description) {
+                var errors = [];
+                if (!description || description.trim() === '') {
+                    errors.push('Book description is required.');
+                }
+                return errors;
+            }
+
+            function validateISBN(isbn) {
+                var errors = [];
+                if (!isbn || isbn.trim() === '') {
+                    errors.push('ISBN is required.');
+                } else {
+                    var isbnPattern = /^\d{10}(\d{3})?$/;
+                    if (!isbnPattern.test(isbn.replace(/[^\d]/g, ''))) {
+                        errors.push('ISBN must be 10 or 13 digits only.');
+                    }
+                }
+                return errors;
+            }
+
+            function validatePrice(price) {
+                var errors = [];
+                if (!price || price <= 0) {
+                    errors.push('Price must be greater than 0.');
+                }
+                return errors;
+            }
+
+            function validateDiscountPercentage(discount) {
+                var errors = [];
+                if (discount < 0 || discount > 100) {
+                    errors.push('Discount percentage must be between 0 and 100.');
+                }
+                return errors;
+            }
+
+            function validatePublishedDate(date) {
+                var errors = [];
+                if (date && new Date(date) > new Date()) {
+                    errors.push('Published date cannot be in the future.');
+                }
+                return errors;
+            }
+
+            function validatePageCount(pageCount) {
+                var errors = [];
+                if (!pageCount || pageCount <= 0) {
+                    errors.push('Page count must be greater than 0.');
+                }
+                return errors;
+            }
+
+            function validateLanguage(language) {
+                var errors = [];
+                if (!language || language === '') {
+                    errors.push('Please select a language.');
+                }
+                return errors;
+            }
+
+            function validateFormat(format) {
+                var errors = [];
+                if (!format || format.trim() === '') {
+                    errors.push('Book format is required.');
+                }
+                return errors;
+            }
+
+            function validateStockQuantity(stock) {
+                var errors = [];
+                if (stock < 0) {
+                    errors.push('Stock quantity cannot be negative.');
+                }
+                return errors;
+            }
+
+            function validateAuthorId(authorId) {
+                var errors = [];
+                if (!authorId || authorId <= 0) {
+                    errors.push('Please select an author.');
+                }
+                return errors;
+            }
+
+            function validatePublisherId(publisherId) {
+                var errors = [];
+                if (!publisherId || publisherId <= 0) {
+                    errors.push('Please select a publisher.');
+                }
+                return errors;
+            }
+
+            function validateCategoryIds() {
+                var errors = [];
+                var categories = $('#categorySelect option').length;
+                if (categories === 0) {
+                    errors.push('Please select at least one category.');
+                }
+                return errors;
+            }
+
+            function validateCoverImage(fileInput) {
+                var errors = [];
+                var file = fileInput.files[0];
+                
+                if (file) {
+                    // Check file size (5MB max)
+                    if (file.size > 5 * 1024 * 1024) {
+                        errors.push('Cover image size must not exceed 5MB.');
+                    }
+                    
+                    // Check file extension
+                    var allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+                    var fileName = file.name.toLowerCase();
+                    var hasValidExtension = allowedExtensions.some(ext => fileName.endsWith(ext));
+                    
+                    if (!hasValidExtension) {
+                        errors.push('Only JPG, JPEG, PNG, GIF, and WebP images are allowed.');
+                    }
+                    
+                    // Check content type
+                    var allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+                    if (!allowedTypes.includes(file.type.toLowerCase())) {
+                        errors.push('Invalid image format.');
+                    }
+                }
+                
+                return errors;
+            }
+
+            function showValidationErrors(errors) {
+                // Clear previous errors
+                $('.validation-error').remove();
+                
+                if (errors.length > 0) {
+                    var errorHtml = '<div class="alert alert-danger validation-error"><h5><i class="icon fas fa-exclamation-triangle"></i> Please check the following:</h5><ul>';
+                    errors.forEach(function(error) {
+                        errorHtml += '<li>' + error + '</li>';
+                    });
+                    errorHtml += '</ul></div>';
+                    
+                    $('.card-body').first().prepend(errorHtml);
+                    
+                    // Scroll to top to show errors
+                    $('html, body').animate({
+                        scrollTop: $('.validation-error').offset().top - 100
+                    }, 500);
+                    
+                    return false;
+                }
+                return true;
+            }
+
+            // Form validation on submit
+            $('#createBookForm').on('submit', function(e) {
+                var allErrors = [];
+                
+                // Validate all fields
+                allErrors = allErrors.concat(validateTitle($('#Title').val()));
+                allErrors = allErrors.concat(validateDescription($('#Description').val()));
+                allErrors = allErrors.concat(validateISBN($('#ISBN').val()));
+                allErrors = allErrors.concat(validatePrice(parseFloat($('#Price').val())));
+                allErrors = allErrors.concat(validateDiscountPercentage(parseFloat($('#DiscountPercentage').val() || 0)));
+                allErrors = allErrors.concat(validatePublishedDate($('#PublishedDate').val()));
+                allErrors = allErrors.concat(validatePageCount(parseInt($('#PageCount').val())));
+                allErrors = allErrors.concat(validateLanguage($('#Language').val()));
+                allErrors = allErrors.concat(validateFormat($('#Format').val()));
+                allErrors = allErrors.concat(validateStockQuantity(parseInt($('#StockQuantity').val() || 0)));
+                allErrors = allErrors.concat(validateAuthorId(parseInt($('#AuthorId').val())));
+                allErrors = allErrors.concat(validatePublisherId(parseInt($('#PublisherId').val())));
+                allErrors = allErrors.concat(validateCategoryIds());
+                
+                var coverImageInput = document.getElementById('CoverImageUrl');
+                if (coverImageInput) {
+                    allErrors = allErrors.concat(validateCoverImage(coverImageInput));
+                }
+                
+                if (!showValidationErrors(allErrors)) {
+                    e.preventDefault();
+                }
+            });
+
+            // Real-time validation feedback
+            $('#Title').on('blur', function() {
+                var errors = validateTitle($(this).val());
+                var errorSpan = $(this).siblings('.text-danger');
+                errorSpan.text(errors.length > 0 ? errors[0] : '');
+            });
+
+            $('#Description').on('blur', function() {
+                var errors = validateDescription($(this).val());
+                var errorSpan = $(this).siblings('.text-danger');
+                errorSpan.text(errors.length > 0 ? errors[0] : '');
+            });
+
+            $('#ISBN').on('blur', function() {
+                var errors = validateISBN($(this).val());
+                var errorSpan = $(this).siblings('.text-danger');
+                errorSpan.text(errors.length > 0 ? errors[0] : '');
+            });
+
+            $('#Price').on('blur', function() {
+                var errors = validatePrice(parseFloat($(this).val()));
+                var errorSpan = $(this).siblings('.text-danger');
+                errorSpan.text(errors.length > 0 ? errors[0] : '');
+            });
         });
     </script>
 }

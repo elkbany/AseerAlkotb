@@ -1,7 +1,11 @@
 @model AseerAlkotb.Application.Features.Books.Responses.GetBookByIdResponse
+@using System.Globalization
 
 @{
     ViewData["Title"] = "Delete Book";
+
+    var egp = CultureInfo.GetCultureInfo("en-EG");
+
 }
 
 <div class="content-header">
@@ -66,7 +70,7 @@
 
                             <dt class="col-sm-3">Price</dt>
                             <dd class="col-sm-9">
-                                @Model.Price.ToString("C")
+                                @Model.Price.ToString("C", egp)
                                 @if (Model.DiscountPercentage > 0)
                                 {
                                     <span class="text-success ml-2">-@(Model.DiscountPercentage)%</span>
