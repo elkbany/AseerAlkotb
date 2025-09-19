@@ -160,7 +160,7 @@ namespace AseerAlkotb.Dashboard.Controllers
             ViewBag.Publisher = publisher.Data;
             ViewBag.Categories = selectedCategories;
             ViewBag.Reviews = reviews; // Pass reviews to the view
-
+      
             return View(result.Data);
         }
 
@@ -184,10 +184,10 @@ namespace AseerAlkotb.Dashboard.Controllers
                 // Extract English fields from form
                 var titleEn = Request.Form["EnglishTitle"].ToString();
                 var descriptionEn = Request.Form["EnglishDescription"].ToString();
-
+                
                 // Create new request with English fields
-                var updatedRequest = request with
-                {
+                var updatedRequest = request with 
+                { 
                     Title_en = !string.IsNullOrWhiteSpace(titleEn) ? titleEn : null,
                     Description_en = !string.IsNullOrWhiteSpace(descriptionEn) ? descriptionEn : null
                 };
@@ -235,7 +235,7 @@ namespace AseerAlkotb.Dashboard.Controllers
             var publisher = await _publisherServices.GetPublisherByIdAsync(new GetPublisherByIdRequest(response.Data.PublisherId));
 
             ViewBag.AuthorName = author?.Data?.Name;
-            ViewBag.PublisherName = publisher?.Data?.Name;
+            ViewBag.PublisherName = publisher?.Data?.Name; 
 
             ViewBag.CategoryIds = response.Data.CategoryIds;
             ViewBag.CategoryNames = response.Data.CategoryNames;
@@ -246,21 +246,21 @@ namespace AseerAlkotb.Dashboard.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, UpdateBookRequest request)
+        public async Task<IActionResult> Edit(int id,UpdateBookRequest request)
         {
             if (ModelState.IsValid)
             {
                 // Extract English fields from form
                 var titleEn = Request.Form["EnglishTitle"].ToString();
                 var descriptionEn = Request.Form["EnglishDescription"].ToString();
-
+                
                 // Create new request with English fields
-                var updatedRequest = request with
-                {
+                var updatedRequest = request with 
+                { 
                     Title_en = !string.IsNullOrWhiteSpace(titleEn) ? titleEn : null,
                     Description_en = !string.IsNullOrWhiteSpace(descriptionEn) ? descriptionEn : null
                 };
-
+                
                 var result = await _bookServices.UpdateBookAsync(updatedRequest);
                 if (result.Succeeded)
                 {
@@ -324,7 +324,7 @@ namespace AseerAlkotb.Dashboard.Controllers
 
             return Json(publishers.Data.Select(p => new { id = p.Id, text = p.Name }));
         }
-
+       
 
     }
 }
