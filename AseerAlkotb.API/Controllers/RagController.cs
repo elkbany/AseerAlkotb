@@ -21,6 +21,7 @@ namespace AseerAlkotb.API.Controllers
 
         /// <summary>
         /// نقطة واحدة لكل الاستخدامات: تلخيص / ترشيحات / توافر / مؤلف / تصنيف.
+        /// يدعم الآن الذاكرة المؤقتة للجلسة - أرسل session-id في الهيدر للاستمرارية.
         /// </summary>
         /// <remarks>
         /// أمثلة:
@@ -28,6 +29,9 @@ namespace AseerAlkotb.API.Controllers
         /// - {"question":"هل كتاب «الخيميائي» متاح؟"}
         /// - {"question":"كتب أخرى لنفس المؤلف: نجيب محفوظ"}
         /// - {"question":"عايز ملخص كتاب العادات الذرية"}
+        /// 
+        /// للاستمرارية في المحادثة، أرسل session-id في الهيدر:
+        /// Headers: { "X-Session-Id": "your-session-id" }
         /// </remarks>
         [HttpPost("ask")]
         [ProducesResponseType(typeof(ApiResponse<RagAskResponse>), (int)HttpStatusCode.OK)]
@@ -38,7 +42,21 @@ namespace AseerAlkotb.API.Controllers
         {
             try
             {
-                var res = await _rag.AskAsync(request);
+                // Check for session ID in headers for conversation continuity
+                string? sessionId = Request.Headers["X-Session-Id"].FirstOrDefault();
+                
+                // Generate session ID if not provided
+                if (string.IsNullOrWhiteSpace(sessionId))
+                {
+                    sessionId = Guid.NewGuid().ToString();
+                }
+                
+                // Always use session-aware method
+                var res = await _rag.AskWithSessionAsync(request, sessionId);
+                
+                // Add session ID to response headers for client to use in subsequent requests
+                Response.Headers["X-Session-Id"] = sessionId;
+                
                 return ApiResult(res);
             }
             catch (ArgumentException ex)

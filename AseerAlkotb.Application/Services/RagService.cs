@@ -2,6 +2,7 @@ using System.Text.RegularExpressions;
 using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Features.Rag.Requests;
 using AseerAlkotb.Application.Features.Rag.Responses;
+using AseerAlkotb.Application.Features.Rag.Models;
 using AseerAlkotb.Application.ResponseHandler;
 using AseerAlkotb.Application.Utils;
 using AseerAlkotb.Domain.Entites.Models;
@@ -10,6 +11,7 @@ using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using static AseerAlkotb.Application.ResponseHandler.ApiResponseHandler;
 
 namespace AseerAlkotb.Application.Services
@@ -21,7 +23,9 @@ namespace AseerAlkotb.Application.Services
         private readonly IAnswerSynthesisService _synth;
         private readonly IQuestionRouterService _router;
         private readonly ITranslationService _translator;
+        private readonly ISessionMemoryService _sessionMemory;
         private readonly IConfiguration _cfg;
+        private readonly ILogger<RagService> _logger;
 
         public RagService(
             IUnitOfWork uow,
@@ -29,20 +33,35 @@ namespace AseerAlkotb.Application.Services
             IAnswerSynthesisService synth,
             IQuestionRouterService router,
             ITranslationService translator,
+            ISessionMemoryService sessionMemory,
             IServiceProvider sp,
             Microsoft.Extensions.Hosting.IHostEnvironment env
         ) : base(sp, env)
         {
             _uow = uow; _emb = emb; _synth = synth; _router = router; _translator = translator;
+            _sessionMemory = sessionMemory;
             _cfg = sp.GetRequiredService<IConfiguration>();
+            _logger = sp.GetRequiredService<ILogger<RagService>>();
         }
 
         public async Task<ApiResponse<RagAskResponse>> AskAsync(RagAskRequest request)
+        {
+            return await AskWithSessionAsync(request, sessionId: null);
+        }
+
+        public async Task<ApiResponse<RagAskResponse>> AskWithSessionAsync(RagAskRequest request, string? sessionId)
         {
             await DoValidationAsync<Application.Features.Rag.Validators.RagAskRequestValidator, RagAskRequest>(request);
             
             var originalQuestion = request.Question;
             var isEnglishQuery = await _translator.IsEnglishTextAsync(originalQuestion);
+            
+            // Generate session ID if not provided
+            sessionId ??= Guid.NewGuid().ToString();
+            
+            // Check for previous similar questions in session
+            var similarQuestions = await _sessionMemory.FindSimilarQuestionsAsync(sessionId, originalQuestion);
+            var conversationContext = await _sessionMemory.GetConversationContextAsync(sessionId, originalQuestion);
             
             // Translate English questions to Arabic for database search
             var processedQuestion = isEnglishQuery 
@@ -53,23 +72,82 @@ namespace AseerAlkotb.Application.Services
             
             if (IsGreeting(originalQuestion))
             {
-                return Success(new RagAskResponse
+                var greetingResponse = new RagAskResponse
                 {
                     Answer = Intro(lang)
-                });
+                };
+                
+                // Save greeting to session
+                await SaveMessageToSessionAsync(sessionId, originalQuestion, greetingResponse.Answer, "greeting", null, null, null, null, isEnglishQuery);
+                
+                return Success(greetingResponse);
+            }
+
+            // Handle repeated questions
+            if (similarQuestions.Any())
+            {
+                var mostSimilar = similarQuestions.First();
+                var timeDiff = DateTime.UtcNow - mostSimilar.Timestamp;
+                
+                // If asked same question within last 10 minutes, provide context-aware response
+                if (timeDiff.TotalMinutes < 10)
+                {
+                    var contextualAnswer = lang == Lang.English
+                        ? $"I remember you asked about this recently. {mostSimilar.Answer}"
+                        : $"أتذكر إنك سألت عن هذا مؤخراً. {mostSimilar.Answer}";
+                    
+                    var contextualResponse = new RagAskResponse
+                    {
+                        Answer = contextualAnswer
+                    };
+                    
+                    // Don't save repeated question, just update last accessed
+                    return Success(await TranslateResponseIfNeededAsync(contextualResponse, isEnglishQuery));
+                }
             }
 
             // 1) Use Gemini for intent detection and entity extraction on processed question
             var route = await _router.RouteAsync(processedQuestion);
             
-            // 2) Trust Gemini completely - no local fallbacks or guessing
+            // 2) Get intent first
+            string intent = NormalizeRouterIntent(route.intent) ?? "general_recs";
+            
+            // 2.1) Special case: If no specific intent but we have cached author and question about books
+            if (intent == "general_recs" && !string.IsNullOrWhiteSpace(await _sessionMemory.GetCachedAuthorAsync(sessionId)))
+            {
+                var lowerQuestion = processedQuestion.ToLower();
+                if (lowerQuestion.Contains("كتب") || lowerQuestion.Contains("مؤلفات") || 
+                    lowerQuestion.Contains("أعمال") || lowerQuestion.Contains("روايات") ||
+                    lowerQuestion.Contains("أشهر") || lowerQuestion.Contains("books") ||
+                    lowerQuestion.Contains("works") || lowerQuestion.Contains("novels"))
+                {
+                    intent = "more_by_author";
+                    _logger.LogInformation("Detected 'more_by_author' intent from cached context for session {SessionId}", sessionId);
+                }
+            }
+            
+            // 3) Trust Gemini completely - no local fallbacks or guessing
             string? title = route.entities.title;
             string? author = route.entities.author;
             string? category = SanitizeCategory(request.Category) ?? route.entities.category;
             string? publisher = route.entities.publisher;
             
-            // 3) Use only the intent from Gemini - no local intent detection
-            string intent = NormalizeRouterIntent(route.intent) ?? "general_recs";
+            // 4) If entities are missing, try to get them from session cache
+            if (string.IsNullOrWhiteSpace(title))
+                title = await _sessionMemory.GetCachedTitleAsync(sessionId);
+            
+            if (string.IsNullOrWhiteSpace(author))
+                author = await _sessionMemory.GetCachedAuthorAsync(sessionId);
+                
+            if (string.IsNullOrWhiteSpace(category))
+                category = await _sessionMemory.GetCachedCategoryAsync(sessionId);
+                
+            if (string.IsNullOrWhiteSpace(publisher))
+                publisher = await _sessionMemory.GetCachedPublisherAsync(sessionId);
+            
+            // Log for debugging
+            _logger.LogInformation("Session {SessionId}: Intent={Intent}, Author={Author}, Title={Title}, CachedAuthor={CachedAuthor}", 
+                sessionId, intent, route.entities.author, route.entities.title, author);
 
             switch (intent)
             {
@@ -78,6 +156,7 @@ namespace AseerAlkotb.Application.Services
                         if (string.IsNullOrWhiteSpace(title))
                         {
                             var response = new RagAskResponse { Answer = "برجاء تحديد اسم الكتاب المطلوب تلخيصه." };
+                            await SaveMessageToSessionAsync(sessionId, originalQuestion, response.Answer, intent, title, author, category, publisher, isEnglishQuery);
                             return Success(await TranslateResponseIfNeededAsync(response, isEnglishQuery));
                         }
                         
@@ -96,13 +175,22 @@ namespace AseerAlkotb.Application.Services
                                     PrimaryBookId = book.Id,
                                     PrimaryBookTitle = book.Title
                                 };
+                                await SaveMessageToSessionAsync(sessionId, originalQuestion, response.Answer, intent, title, author, category, publisher, isEnglishQuery);
                                 return Success(await TranslateResponseIfNeededAsync(response, isEnglishQuery));
                             }
 
                             var src = new ChatSource { BookId = book.Id, Title = book.Title, CoverImageUrl = book.CoverImageUrl, Snippet = book.Description };
+                            
+                            // Add conversation context to synthesis if available
                             string prompt = !string.IsNullOrWhiteSpace(book.Description) && book.Description!.Trim().Length >= 120
                                 ? $"لخّص كتاب \"{book.Title}\" للمؤلف {book.Author?.Name} في 3–5 نقاط بالاعتماد على الوصف أدناه."
                                 : $"أعطني ملخصًا موجزًا وواضحًا لكتاب \"{book.Title}\" للمؤلف {book.Author?.Name}.";
+                            
+                            // Include context if user has asked about this author or similar books before
+                            if (!string.IsNullOrEmpty(conversationContext))
+                            {
+                                prompt += $"\n\n{conversationContext}";
+                            }
 
                             var summary = await _synth.SynthesizeAsync(prompt, new List<ChatSource> { src });
                             var answer = string.IsNullOrWhiteSpace(summary) ? (book.Description ?? "لا تتوفر لدينا نبذة كافية لهذا الكتاب حاليًا.") : summary;
@@ -114,10 +202,13 @@ namespace AseerAlkotb.Application.Services
                                 PrimaryBookId = book.Id,
                                 PrimaryBookTitle = book.Title
                             };
+                            
+                            await SaveMessageToSessionAsync(sessionId, originalQuestion, finalResponse.Answer, intent, title, author, category, publisher, isEnglishQuery);
                             return Success(await TranslateResponseIfNeededAsync(finalResponse, isEnglishQuery));
                         }
 
                         var notFoundResponse = new RagAskResponse { Answer = $"لم أجد كتاب بعنوان «{title}». تأكد من كتابة الاسم بشكل صحيح." };
+                        await SaveMessageToSessionAsync(sessionId, originalQuestion, notFoundResponse.Answer, intent, title, author, category, publisher, isEnglishQuery);
                         return Success(await TranslateResponseIfNeededAsync(notFoundResponse, isEnglishQuery));
                     }
 
@@ -151,6 +242,7 @@ namespace AseerAlkotb.Application.Services
                         if (string.IsNullOrWhiteSpace(authorName))
                         {
                             var response = new RagAskResponse { Answer = "برجاء تحديد اسم المؤلف أو اسم كتاب له للحصول على نبذة عنه." };
+                            await SaveMessageToSessionAsync(sessionId, originalQuestion, response.Answer, intent, title, author, category, publisher, isEnglishQuery);
                             return Success(await TranslateResponseIfNeededAsync(response, isEnglishQuery));
                         }
 
@@ -160,6 +252,7 @@ namespace AseerAlkotb.Application.Services
                         if (authorRow == null)
                         {
                             var response = new RagAskResponse { Answer = $"لم أجد مؤلف بالاسم: {authorName}" };
+                            await SaveMessageToSessionAsync(sessionId, originalQuestion, response.Answer, intent, title, authorName, category, publisher, isEnglishQuery);
                             return Success(await TranslateResponseIfNeededAsync(response, isEnglishQuery));
                         }
 
@@ -171,6 +264,7 @@ namespace AseerAlkotb.Application.Services
                         }
 
                         var finalResponse = new RagAskResponse { Answer = bio };
+                        await SaveMessageToSessionAsync(sessionId, originalQuestion, finalResponse.Answer, intent, title, authorRow.Name, category, publisher, isEnglishQuery);
                         return Success(await TranslateResponseIfNeededAsync(finalResponse, isEnglishQuery));
                     }
 
@@ -180,6 +274,7 @@ namespace AseerAlkotb.Application.Services
                         if (string.IsNullOrWhiteSpace(authorName))
                         {
                             var authorResponse = new RagAskResponse { Answer = "برجاء تحديد اسم المؤلف أو اسم كتاب له للعثور على مؤلفات أخرى." };
+                            await SaveMessageToSessionAsync(sessionId, originalQuestion, authorResponse.Answer, intent, title, author, category, publisher, isEnglishQuery);
                             return Success(await TranslateResponseIfNeededAsync(authorResponse, isEnglishQuery));
                         }
 
@@ -189,6 +284,7 @@ namespace AseerAlkotb.Application.Services
                             ? $"كتب أخرى لنفس المؤلف: {string.Join("، ", names)}."
                             : "لم أجد كتبًا لنفس المؤلف.";
                         var authorBooksResponse = new RagAskResponse { Answer = ans, Sources = ToSources(list.Data!) };
+                        await SaveMessageToSessionAsync(sessionId, originalQuestion, authorBooksResponse.Answer, intent, title, authorName, category, publisher, isEnglishQuery);
                         return Success(await TranslateResponseIfNeededAsync(authorBooksResponse, isEnglishQuery));
                     }
 
@@ -246,6 +342,7 @@ namespace AseerAlkotb.Application.Services
                             : "لم أجد كتباً متعلقة مباشرة بسؤالك. جرّب كلمات مفتاحية مختلفة أو تصنيفاً آخر.";
                         
                         var defaultResponse = new RagAskResponse { Answer = reply, Sources = ToSources(top.Data ?? new List<BookBriefDto>(), originalQuestion) };
+                        await SaveMessageToSessionAsync(sessionId, originalQuestion, defaultResponse.Answer, "general_recs", title, author, category, publisher, isEnglishQuery);
                         return Success(await TranslateResponseIfNeededAsync(defaultResponse, isEnglishQuery));
                     }
             }
@@ -469,6 +566,118 @@ namespace AseerAlkotb.Application.Services
                             .GroupBy(b => b.Id).Select(g => g.First())
                             .Take(take).ToList();
             return books.Adapt<List<BookBriefDto>>();
+        }
+        
+        // ====== Session Memory Helper ======
+        private async Task SaveMessageToSessionAsync(
+            string sessionId, 
+            string question, 
+            string answer, 
+            string? intent, 
+            string? title, 
+            string? author, 
+            string? category, 
+            string? publisher, 
+            bool isEnglishQuery)
+        {
+            var sessionMessage = new SessionMessage
+            {
+                Question = question,
+                Answer = answer,
+                Intent = intent,
+                ExtractedTitle = title,
+                ExtractedAuthor = author,
+                ExtractedCategory = category,
+                ExtractedPublisher = publisher,
+                IsEnglishQuery = isEnglishQuery,
+                Timestamp = DateTime.UtcNow
+            };
+            
+            // Try to resolve entity IDs for caching
+            int? resolvedBookId = null;
+            int? resolvedAuthorId = null;
+            int? resolvedPublisherId = null;
+            int? resolvedCategoryId = null;
+            
+            try
+            {
+                // Resolve book ID if title is available
+                if (!string.IsNullOrWhiteSpace(title))
+                {
+                    var book = await FindBookByTitleAsync(title);
+                    if (book != null)
+                    {
+                        resolvedBookId = book.Id;
+                        // Also capture author and publisher from the book
+                        if (book.Author != null && string.IsNullOrWhiteSpace(author))
+                        {
+                            author = book.Author.Name;
+                            resolvedAuthorId = book.Author.Id;
+                        }
+                        if (book.Publisher != null && string.IsNullOrWhiteSpace(publisher))
+                        {
+                            publisher = book.Publisher.Name;
+                            resolvedPublisherId = book.Publisher.Id;
+                        }
+                    }
+                }
+                
+                // Resolve author ID if author name is available
+                if (!string.IsNullOrWhiteSpace(author) && !resolvedAuthorId.HasValue)
+                {
+                    var authorEntity = await _uow.Authors.GetQueryable(a => 
+                        EF.Functions.Like(a.Name.ToLower(), $"%{author.ToLower()}%"))
+                        .FirstOrDefaultAsync();
+                    if (authorEntity != null)
+                        resolvedAuthorId = authorEntity.Id;
+                }
+                
+                // Resolve publisher ID if publisher name is available
+                if (!string.IsNullOrWhiteSpace(publisher) && !resolvedPublisherId.HasValue)
+                {
+                    var publisherEntity = await FindPublisherByNameAsync(publisher);
+                    if (publisherEntity != null)
+                        resolvedPublisherId = publisherEntity.Id;
+                }
+                
+                // Resolve category ID if category name is available
+                if (!string.IsNullOrWhiteSpace(category))
+                {
+                    var categoryEntity = await _uow.Categories.GetQueryable(c => 
+                        EF.Functions.Like(c.Name.ToLower(), $"%{category.ToLower()}%"))
+                        .FirstOrDefaultAsync();
+                    if (categoryEntity != null)
+                        resolvedCategoryId = categoryEntity.Id;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Don't fail the main operation if entity resolution fails
+                _logger.LogWarning(ex, "Failed to resolve entity IDs for session {SessionId}", sessionId);
+            }
+            
+            await _sessionMemory.AddMessageWithEntitiesAsync(
+                sessionId, 
+                sessionMessage,
+                resolvedBookId, 
+                resolvedAuthorId, 
+                resolvedPublisherId, 
+                resolvedCategoryId,
+                NormalizeEntityName(title),
+                NormalizeEntityName(author),
+                NormalizeEntityName(publisher),
+                NormalizeEntityName(category)
+            );
+        }
+        
+        private static string? NormalizeEntityName(string? name)
+        {
+            if (string.IsNullOrWhiteSpace(name)) return null;
+            
+            return name.Trim().ToLowerInvariant()
+                .Replace("ـ", "")
+                .Replace('أ', 'ا').Replace('إ', 'ا').Replace('آ', 'ا')
+                .Replace('ى', 'ي').Replace('ؤ', 'و').Replace('ئ', 'ي');
         }
 
         private static List<ChatSource> ToSources(List<BookBriefDto> books, string? question = null) =>
