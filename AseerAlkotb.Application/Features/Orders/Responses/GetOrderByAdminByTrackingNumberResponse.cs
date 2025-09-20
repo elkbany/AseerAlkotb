@@ -26,6 +26,7 @@ namespace AseerAlkotb.Application.Features.Orders.Responses
        decimal FinalAmount,
        DateTime OrderDate,
        DateTime UpdatedAt,
+       int Quantity,
        List<BookDTO> Books
     );
 }

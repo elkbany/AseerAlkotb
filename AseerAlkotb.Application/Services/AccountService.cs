@@ -409,12 +409,16 @@ namespace AseerAlkotb.Application.Services
                 Reviews = existingUser.Reviews?.Select(r => new ReviewDto
                 {
                     Id = r.Id,
-                    ReviewFor = r.ReviewFor
+                    Comment = r.Comment,
+                    Rating = r.Rating,
+                    BookId = r.BookId,
+                    Title = r.Book?.Title ?? "",
+                    CoverImageUrl = r.Book?.CoverImageUrl ?? ""
                 }).ToList() ?? new List<ReviewDto>(),
                 Quotes = existingUser.Quotes?.Select(q => new QuoteDto
                 {
                     Id = q.Id,
-                    QuoteFor = q.QuoteFor
+                    QouteComment = q.Comment
                 }).ToList() ?? new List<QuoteDto>(),
                 Following = existingUser.Following?.Select(f => new UserFollowDto
                 {

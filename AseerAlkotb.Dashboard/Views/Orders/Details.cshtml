@@ -159,7 +159,10 @@
                                                 </div>
                                             </td>
                                             <td class="text-center">
-                                                <span class="badge bg-secondary">1</span>
+                                                <span class="badge bg-secondary">@book.Quantity</span>
+                                            </td>
+                                            <td class="text-end font-weight-bold">
+                                                @((book.Price * book.Quantity).ToString("C", new System.Globalization.CultureInfo("ar-EG")))
                                             </td>
                                             <td class="text-end">
                                                 @book.Price.ToString("C", new System.Globalization.CultureInfo("ar-EG"))

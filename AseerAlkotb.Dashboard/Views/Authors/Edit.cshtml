@@ -1,4 +1,4 @@
-@model AseerAlkotb.Application.Features.Authors.Responses.UpdateAuthorResponse;
+﻿@model AseerAlkotb.Application.Features.Authors.Responses.UpdateAuthorResponse;
 @{
     ViewData["Title"] = "Edit Author";
 }
@@ -87,8 +87,10 @@
 
                                     <div class="form-group">
                                         <label asp-for="CountryCode"></label>
-                                        <select asp-for="CountryCode" class="form-control"
-                                                asp-items="Html.GetEnumSelectList<AseerAlkotb.Domain.Enums.CountryCode>()"></select>
+                                        @Html.DropDownListFor(m => m.CountryCode,
+                                                 (IEnumerable<SelectListItem>)ViewBag.CountryList,
+                                                 "-- اختر الدولة --",
+                                                 new { @class = "form-control", id = "CountryCode" })
                                         <span asp-validation-for="CountryCode" class="text-danger"></span>
                                     </div>
                                 </div>
