@@ -70,7 +70,7 @@ namespace AseerAlkotb.API
             #region Context Registeration
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             {
-                var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+                var connectionString = builder.Configuration.GetConnectionString("Shared");
                 options.UseSqlServer(connectionString).UseLazyLoadingProxies();
             });
             #endregion
@@ -281,12 +281,11 @@ namespace AseerAlkotb.API
 
             // RAG Services
             builder.Services.AddScoped<IRagService, RagService>();
-            // RAG deps
-            //builder.Services.AddScoped<IQuestionRouterService, GeminiQuestionRouterService>();
-            //builder.Services.AddScoped<IWebsiteCatalogService, WebsiteCatalogService>();
+            builder.Services.AddScoped<IQuestionRouterService, GeminiQuestionRouterService>();
+            builder.Services.AddScoped<ITranslationService, GeminiTranslationService>();
+            builder.Services.AddScoped<IWebsiteCatalogService, WebsiteCatalogService>();
             builder.Services.AddScoped<IEmbeddingService, GeminiEmbeddingService>();
             builder.Services.AddScoped<IAnswerSynthesisService, GeminiAnswerSynthesisService>();
-
 
             builder.Services.AddInfrastructure(builder.Configuration);
 
@@ -392,23 +391,21 @@ namespace AseerAlkotb.API
             #endregion
 
             // HttpClient: Gemini + Website مع Polly
+            // HttpClient: Gemini + Website مع Polly
             static IAsyncPolicy<HttpResponseMessage> ResilientPolicy() =>
-                HttpPolicyExtensions.HandleTransientHttpError()
+                HttpPolicyExtensions
+                    .HandleTransientHttpError()
                     .OrResult(r => r.StatusCode == HttpStatusCode.TooManyRequests)
                     .WaitAndRetryAsync(3, attempt => TimeSpan.FromMilliseconds(400 * attempt * attempt));
 
+            // مثال عميل لـ Gemini (عدّل الـ BaseAddress حسب خدمتك)
             builder.Services.AddHttpClient("gemini", c =>
             {
-                c.BaseAddress = new Uri("https://g...content-available-to-author-only...s.com");
-                //c.Timeout = TimeSpan.FromSeconds(30);
-            }).AddPolicyHandler(ResilientPolicy());
+                c.BaseAddress = new Uri("https://generativelanguage.googleapis.com");
+                // c.Timeout = TimeSpan.FromSeconds(30);
+            })
+            .AddPolicyHandler(ResilientPolicy());
 
-            //builder.Services.AddHttpClient("website")
-            //                .AddPolicyHandler(ResilientPolicy());
-            // لو هتوقفي الـ ExternalBookService (اختياري):
-            // builder.Services.Remove(...)
-            // أو ببساطة ما تستخدمهوش في Ask، وخلّيه للـ endpoint المخصص book-summary فقط.
-            //builder.Services.AddMemoryCache();
 
 
             #region Swagger

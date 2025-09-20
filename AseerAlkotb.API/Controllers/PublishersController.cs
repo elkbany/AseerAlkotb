@@ -93,6 +93,19 @@ namespace AseerAlkotb.API.Controllers
             var result = await _publisherServices.GetFollowerPublisher(request);
             return ApiResult(result);
         }
+        [HttpGet("IsFollowing")]
+        public async Task<IActionResult> IsFollowing([FromQuery] IsFollowingRequest request)
+        {
+            var result = await _publisherServices.IsFollowing(request);
+            return ApiResult(result);
+        }
+
+        [HttpGet("GetAuthorRelatedToPublisher")]
+        public async Task<IActionResult> GetAuthorRelatedToPublisher([FromQuery] GetAuthorRelatedToPublisherRequest request)
+        {
+            var result = await _publisherServices.GetAuthorRelatedToPublisher(request);
+            return ApiResult(result);
+        }
 
     }
 }

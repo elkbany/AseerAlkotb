@@ -11,10 +11,10 @@ namespace AseerAlkotb.Application.Features.Authors.Validators
     public class UnFollowAuthorRequestValidation : AbstractValidator<UnFollowAuthorRequest>
     {
         public UnFollowAuthorRequestValidation() {
-            RuleFor(x => x.userId)
-             .NotEmpty()
-             .GreaterThan(0)
-             .WithMessage("User ID must be greater than 0");
+            //RuleFor(x => x.userId)
+            // .NotEmpty()
+            // .GreaterThan(0)
+            // .WithMessage("User ID must be greater than 0");
 
             RuleFor(x => x.authorId)
               .NotEmpty()

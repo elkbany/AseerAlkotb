@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿using AseerAlkotb.Application.Contracts;
+﻿﻿﻿﻿﻿﻿﻿﻿﻿using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Features.Publishers.Requests;
 using AseerAlkotb.Application.Features.Publishers.Response;
 using AseerAlkotb.Application.ResponseHandler;
@@ -60,27 +60,49 @@ namespace AseerAlkotb.Dashboard.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(AddPublisherRequest request)
         {
-            if (ModelState.IsValid)
+            try
             {
-                // Extract English fields from form
-                var nameEn = Request.Form["EnglishName"].ToString();
-                var descriptionEn = Request.Form["EnglishDescription"].ToString();
-                
-                // Create new request with English fields
-                var updatedRequest = request with 
-                { 
-                    Name_en = !string.IsNullOrWhiteSpace(nameEn) ? nameEn : null,
-                    Description_en = !string.IsNullOrWhiteSpace(descriptionEn) ? descriptionEn : null
-                };
-                
-                var result = await _publisherService.AddPublisherAsync(updatedRequest);
-                if (result.Succeeded)
+                if (ModelState.IsValid)
                 {
-                    TempData["Success"] = "Publisher created successfully.";
-                    return RedirectToAction(nameof(Index));
+                    // Extract English fields from form
+                    var nameEn = Request.Form["EnglishName"].ToString();
+                    var descriptionEn = Request.Form["EnglishDescription"].ToString();
+                    
+                    // Create new request with English fields
+                    var updatedRequest = request with 
+                    { 
+                        Name_en = !string.IsNullOrWhiteSpace(nameEn) ? nameEn : null,
+                        Description_en = !string.IsNullOrWhiteSpace(descriptionEn) ? descriptionEn : null
+                    };
+                    
+                    var result = await _publisherService.AddPublisherAsync(updatedRequest);
+                    if (result.Succeeded)
+                    {
+                        TempData["Success"] = "Publisher created successfully.";
+                        return RedirectToAction(nameof(Index));
+                    }
+                    
+                    // Handle validation errors from FluentValidation
+                    if (result.Errors != null && result.Errors.Any())
+                    {
+                        foreach (var error in result.Errors)
+                        {
+                            foreach (var error2 in error.Value)
+                                ModelState.AddModelError(string.Empty, error2);
+                        }
+                    }
+                    else
+                    {
+                        TempData["Error"] = result.Message ?? "Failed to create publisher. Please check your input and try again.";
+                    }
                 }
-                TempData["Error"] = result.Message;
             }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "An error occurred while creating the publisher. Please try again.";
+                // Log the exception if you have logging configured
+            }
+            
             return View(request);
         }
 
@@ -115,27 +137,49 @@ namespace AseerAlkotb.Dashboard.Controllers
                 return BadRequest("ID mismatch");
             }
 
-            if (ModelState.IsValid)
+            try
             {
-                // Extract English fields from form
-                var nameEn = Request.Form["EnglishName"].ToString();
-                var descriptionEn = Request.Form["EnglishDescription"].ToString();
-                
-                // Create new request with English fields
-                var updatedRequest = request with 
-                { 
-                    Name_en = !string.IsNullOrWhiteSpace(nameEn) ? nameEn : null,
-                    Description_en = !string.IsNullOrWhiteSpace(descriptionEn) ? descriptionEn : null
-                };
-                
-                var result = await _publisherService.UpdatePublisherAsync(updatedRequest);
-                if (result.Succeeded)
+                if (ModelState.IsValid)
                 {
-                    TempData["Success"] = "Publisher updated successfully.";
-                    return RedirectToAction(nameof(Index));
+                    // Extract English fields from form
+                    var nameEn = Request.Form["EnglishName"].ToString();
+                    var descriptionEn = Request.Form["EnglishDescription"].ToString();
+                    
+                    // Create new request with English fields
+                    var updatedRequest = request with 
+                    { 
+                        Name_en = !string.IsNullOrWhiteSpace(nameEn) ? nameEn : null,
+                        Description_en = !string.IsNullOrWhiteSpace(descriptionEn) ? descriptionEn : null
+                    };
+                    
+                    var result = await _publisherService.UpdatePublisherAsync(updatedRequest);
+                    if (result.Succeeded)
+                    {
+                        TempData["Success"] = "Publisher updated successfully.";
+                        return RedirectToAction(nameof(Index));
+                    }
+                    
+                    // Handle validation errors from FluentValidation
+                    if (result.Errors != null && result.Errors.Any())
+                    {
+                        foreach (var error in result.Errors)
+                        {
+                            foreach (var error2 in error.Value)
+                                ModelState.AddModelError(string.Empty, error2);
+                        }
+                    }
+                    else
+                    {
+                        TempData["Error"] = result.Message ?? "Failed to update publisher. Please check your input and try again.";
+                    }
                 }
-                TempData["Error"] = result.Message;
             }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "An error occurred while updating the publisher. Please try again.";
+                // Log the exception if you have logging configured
+            }
+            
             return View(request);
         }
 

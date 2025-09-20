@@ -1,6 +1,8 @@
 ﻿using AseerAlkotb.API.Bases;
 using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Features.Authors.Requests;
+using AseerAlkotb.Application.Features.Publishers.Requests;
+using AseerAlkotb.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -52,7 +54,7 @@ namespace AseerAlkotb.API.Controllers
         }
 
         /////////////////////////////////follow///////////////////////////////////////////////////////
-        [HttpPost("FollowAuther")]
+        [HttpPost("FollowAuthor")]
         public async Task<IActionResult> FollowAuther(FollowAutherRequest request)
         {
             var result=await authorServices.FollowAuther(request);
@@ -73,7 +75,7 @@ namespace AseerAlkotb.API.Controllers
             return ApiResult(result);
         }
 
-        [HttpGet("GetFollowedAuther")]
+        [HttpGet("GetFollowedAuthor")]
         public async Task<IActionResult> GetFollowedAuther([FromQuery] GetFollowedAuthorRequest request)
         {
             var result = await authorServices.GetFollowedAuther(request);
@@ -81,10 +83,16 @@ namespace AseerAlkotb.API.Controllers
         }
 
 
-        [HttpGet("GetFollowerAuther")]
+        [HttpGet("GetFollowerAuthor")]
         public async Task<IActionResult> GetFollowerAuther([FromQuery] GetFollowersAuthorRequest request)
         {
             var result = await authorServices.GetFollowerAuther(request);
+            return ApiResult(result);
+        }
+        [HttpGet("IsFollowing")]
+        public async Task<IActionResult> IsFollowing([FromQuery] IsFollowingAuthorRequest request)
+        {
+            var result = await authorServices.IsFollowing(request);
             return ApiResult(result);
         }
 

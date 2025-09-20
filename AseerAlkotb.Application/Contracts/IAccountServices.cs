@@ -28,7 +28,7 @@ namespace AseerAlkotb.Application.Contracts
         Task<ApiResponse<string>> ResetPassword(ResetPasswordRequest request);
         Task<ApiResponse<LoginResponse>> Login(LoginRequest request);
         Task<ApiResponse<string>> ResendEmailConfirmation(string email);
-        Task<ApiResponse<UpdateProfileResponse>> UpdateProfile(int userId, UpdateProfileRequest request);     
-        Task<ApiResponse<GetProfileResponse>> GetProfile(GetProfileRequest request);
+        Task<ApiResponse<UpdateProfileResponse>> UpdateProfile(UpdateProfileRequest request);     
+        Task<ApiResponse<GetProfileResponse>> GetProfile();
     }
 }
