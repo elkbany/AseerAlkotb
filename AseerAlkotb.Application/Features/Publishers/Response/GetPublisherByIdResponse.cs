@@ -6,6 +6,6 @@ using System.Threading.Tasks;
 
 namespace AseerAlkotb.Application.Features.Publishers.Response
 {
-    public record GetPublisherByIdResponse(int Id,string Name,string Description,string LogoUrl,string ContactEmail);
+    public record GetPublisherByIdResponse(int Id,string Name,string Name_en,string Description,string Description_en,string LogoUrl,string ContactEmail);
 
 }

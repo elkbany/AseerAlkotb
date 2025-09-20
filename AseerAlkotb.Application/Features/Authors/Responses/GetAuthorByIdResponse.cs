@@ -13,7 +13,9 @@ namespace AseerAlkotb.Application.Features.Authors.Responses
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        public string Name_en { get; set; }
         public string Bio { get; set; }
+        public string Bio_en { get; set; }
         public string ImageUrl { get; set; }
         public decimal Rating { get; set; }
         public string CountryCode { get; set; }

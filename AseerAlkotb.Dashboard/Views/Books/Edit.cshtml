@@ -63,9 +63,10 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="EnglishTitle" class="control-label">Title (English)</label>
-                                        <input name="EnglishTitle" id="EnglishTitle" class="form-control" placeholder="Enter English title" />
+                                        <label asp-for="Title_en" class="control-label">Title (English)</label>
+                                        <input asp-for="Title_en" id="EnglishTitle" class="form-control" placeholder="Enter English title" />
                                         <small class="form-text text-muted">If left empty, Arabic title will be used</small>
+                                        <span asp-validation-for="Title" class="text-danger"></span>
                                     </div>
 
                                     <div class="form-group">
@@ -75,9 +76,10 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="EnglishDescription" class="control-label">Description (English)</label>
-                                        <textarea name="EnglishDescription" id="EnglishDescription" class="form-control" rows="4" placeholder="Enter English description"></textarea>
+                                        <label asp-for="Description_en" class="control-label">Description (English)</label>
+                                        <textarea asp-for="Description_en" id="EnglishDescription" class="form-control" rows="4" placeholder="Enter English description"></textarea>
                                         <small class="form-text text-muted">If left empty, Arabic description will be used</small>
+                                        <span asp-validation-for="Description" class="text-danger"></span>
                                     </div>
 
                                     <div class="row">
@@ -106,7 +108,7 @@
                                                     <div class="input-group-prepend">
                                                         <span class="input-group-text">$</span>
                                                     </div>
-                                                    <input asp-for="Price" class="form-control" />
+                                                    <input asp-for="Price" class="form-control" type="number" step="0.01" lang="en-US" />
                                                 </div>
                                                 <span asp-validation-for="Price" class="text-danger"></span>
                                             </div>

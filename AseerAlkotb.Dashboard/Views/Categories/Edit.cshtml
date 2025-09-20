@@ -50,9 +50,10 @@
                             
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
-                                    <label for="EnglishName" class="form-label">Category Name (English)</label>
-                                    <input name="EnglishName" id="EnglishName" class="form-control" placeholder="Enter English category name" />
+                                    <label asp-for="Name_en" class="form-label">Category Name (English)</label>
+                                    <input asp-for="Name_en" id="EnglishName" class="form-control" placeholder="Enter English category name" />
                                     <small class="form-text text-muted">If left empty, Arabic name will be used</small>
+                                    <span asp-validation-for="Name" class="text-danger"></span>
                                 </div>
                             </div>
                         </div>
