@@ -1,4 +1,5 @@
 @model AseerAlkotb.Application.Features.Authors.Responses.GetAuthorByIdResponse
+@using AseerAlkotb.Dashboard.Helpers
 
 @{
     ViewData["Title"] = "Author Details";
@@ -24,9 +25,7 @@
                                 <dt class="col-sm-3">Bio</dt>
                                 <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Bio) ? "-" : Model.Bio)</dd>
                                 <dt class="col-sm-3">Country</dt>
-                                <dd class="col-sm-9">@Model.CountryCode</dd>
-                                <dt class="col-sm-3">Rating</dt>
-                                <dd class="col-sm-9">@Model.Rating</dd>
+                                <dd class="col-sm-9">@CountryHelper.ToArabic(Model.CountryCode)</dd>
                             </dl>
 
                             <h5 class="mt-4">Books (@(Model.Books?.Count ?? 0))</h5>
@@ -35,16 +34,26 @@
                                 {
                                     @foreach (var b in Model.Books)
                                     {
+                                        var src = b.CoverImageUrl;
+
+                                        if (!string.IsNullOrWhiteSpace(src) && src.StartsWith("/"))
+                                        {
+                                            src = $"{Context.Request.Scheme}://{Context.Request.Host}{src}";
+                                        }
+
                                         <div class="col">
                                             <div class="card h-100">
-                                                <img src="@($"http://localhost:5234{b.CoverImageUrl}")" class="card-img-top" alt="@b.Title" />
+                                                <img src="@src"
+                                                     class="card-img-top"
+                                                     alt="@b.Title"
+                                                     onerror="this.onerror=null;this.src='/images/placeholders/book-cover.png';" />
                                                 <div class="card-body">
                                                     <h6 class="card-title">@b.Title</h6>
-                                                    <p class="card-text text-muted">@b.AuthorName</p>
                                                 </div>
                                             </div>
                                         </div>
                                     }
+
                                 }
                                 else
                                 {
