@@ -1,9 +1,12 @@
-@model AseerAlkotb.Application.Features.Books.Responses.GetBookByIdResponse
+﻿@model AseerAlkotb.Application.Features.Books.Responses.GetBookByIdResponse
 @using System.Globalization
 
 @{
     ViewData["Title"] = "Book Details";
     var egp = CultureInfo.GetCultureInfo("en-EG");
+
+    var inv = CultureInfo.InvariantCulture;
+
     // Get all reviews for this book to calculate rating distribution
     var reviews = ViewBag.Reviews as List<AseerAlkotb.Application.Features.Reviews.Responses.GetAllReviewsPaginatedResponse> ?? new List<AseerAlkotb.Application.Features.Reviews.Responses.GetAllReviewsPaginatedResponse>();
 
@@ -280,13 +283,15 @@
                                             </div>
                                             <div class="progress" style="height: 8px;">
                                                 <div class="progress-bar bg-warning"
-                                                     style="width: @starPercentages[starLevel].ToString("0.0")%"
+                                                     data-target-width="@starPercentages[starLevel].ToString("0.0", inv)"
+                                                     style="width:0%"
                                                      role="progressbar"
-                                                     aria-valuenow="@starPercentages[starLevel].ToString("0.0")"
+                                                     aria-valuenow="@starPercentages[starLevel].ToString("0.0", inv)"
                                                      aria-valuemin="0"
                                                      aria-valuemax="100">
                                                 </div>
                                             </div>
+
                                         </div>
                                     }
                                 }
@@ -306,9 +311,6 @@
                                 <div class="col-12">
                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                         <h5 class="mb-0">Customer Reviews (@totalReviews)</h5>
-                                        <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addReviewModal">
-                                            <i class="fas fa-plus"></i> Write Review
-                                        </button>
                                     </div>
 
                                     @* Display recent reviews *@
@@ -352,6 +354,10 @@
 @section Styles {
 
     <style>
+        .progress-bar {
+            transition: width 0.9s ease-in-out;
+        }
+
         .rating-stars {
             font-size: 1.5rem;
         }
@@ -384,13 +390,43 @@
 
 @section Scripts {
     <script>
-        $(document).ready(function() {
-            $('.select2').select2({
-                theme: 'bootstrap4',
-                width: '100%',
-                placeholder: 'Categories',
-                allowClear: true
+        $(function () {
+        if ($.fn.select2) {
+          $('.select2').select2({
+            theme: 'bootstrap4',
+            width: '100%',
+            placeholder: 'Categories',
+            allowClear: true
+          });
+        }
+
+             const bars = document.querySelectorAll('.progress-bar[data-target-width]');
+        if (!('IntersectionObserver' in window)) {
+            // fallback: لو المتصفح قديم، حرّكها فورًا
+            bars.forEach(bar => {
+                const target = bar.getAttribute('data-target-width');
+                bar.style.width = target + '%';
+                bar.setAttribute('aria-valuenow', target);
             });
+            return;
+        }
+
+        const observer = new IntersectionObserver((entries, obs) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const bar = entry.target;
+                    const target = bar.getAttribute('data-target-width') || '0';
+                    // حرّك العرض للنسبة المطلوبة
+                    requestAnimationFrame(() => {
+                        bar.style.width = target + '%';
+                        bar.setAttribute('aria-valuenow', target);
+                    });
+                    obs.unobserve(bar); // نفّذ مرة واحدة لكل شريط
+                }
+            });
+        }, { threshold: 0.35 }); // يبدأ لما 35% من العنصر تبقى ظاهرة
+
+        bars.forEach(bar => observer.observe(bar));
         });
     </script>
 }
