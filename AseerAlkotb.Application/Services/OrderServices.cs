@@ -437,6 +437,7 @@ namespace AseerAlkotb.Application.Services
      order.FinalAmount,
      order.OrderDate,
      order.UpdatedAt,
+     order.OrderItems.Sum(oi => oi.Quantity),
      order.OrderItems
          .Where(oi => oi.Book != null)
          .Select(oi => new BookDTO(
@@ -447,7 +448,8 @@ namespace AseerAlkotb.Application.Services
             oi.Book.CoverImageUrl,
             oi.Book.DiscountPercentage,
             oi.Book.DiscountedPrice
-         ))
+         )  
+         )
          .ToList()
  );
             return Success(ordMap);
