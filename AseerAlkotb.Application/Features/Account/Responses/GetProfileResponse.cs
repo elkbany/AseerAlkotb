@@ -30,13 +30,20 @@ namespace AseerAlkotb.Application.Features.Account.Responses
     public record ReviewDto
     {
        public int Id { get; set; }
-        public ReviewFor ReviewFor { get; set; }
+        public string? Comment { get; set; }
+        public int Rating { get; set; } 
+        public int? BookId { get; set; }
+        public string Title { get; set; }
+        public string CoverImageUrl { get; set; }
+
     }
 
     public record QuoteDto
     {
         public int Id { get; set; }
-        public QuoteFor QuoteFor { get; set; }
+        public string QouteComment { get; set; }
+
+        //public QuoteFor QuoteFor { get; set; }
     }
 
 
