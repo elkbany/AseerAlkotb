@@ -79,28 +79,48 @@ namespace AseerAlkotb.Dashboard.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(AddCategoryRequest request)
         {
-            if (ModelState.IsValid)
+            try
             {
-                // Extract English fields from form
-                var nameEn = Request.Form["EnglishName"].ToString();
-                var descriptionEn = Request.Form["EnglishDescription"].ToString();
-                
-                // Create new request with English fields
-                var updatedRequest = request with 
-                { 
-                    Name_en = !string.IsNullOrWhiteSpace(nameEn) ? nameEn : null,
-                    Description_en = !string.IsNullOrWhiteSpace(descriptionEn) ? descriptionEn : null
-                };
-                
-                var result = await _categoryServices.AddCategoryAsync(updatedRequest);
-                
-                if (result.Succeeded)
+                if (ModelState.IsValid)
                 {
-                    TempData["Success"] = "تم إضافة التصنيف بنجاح";
-                    return RedirectToAction(nameof(Index));
+                    // Extract English fields from form
+                    var nameEn = Request.Form["EnglishName"].ToString();
+                    var descriptionEn = Request.Form["EnglishDescription"].ToString();
+                    
+                    // Create new request with English fields
+                    var updatedRequest = request with 
+                    { 
+                        Name_en = !string.IsNullOrWhiteSpace(nameEn) ? nameEn : null,
+                        Description_en = !string.IsNullOrWhiteSpace(descriptionEn) ? descriptionEn : null
+                    };
+                    
+                    var result = await _categoryServices.AddCategoryAsync(updatedRequest);
+                    
+                    if (result.Succeeded)
+                    {
+                        TempData["Success"] = "Category created successfully!";
+                        return RedirectToAction(nameof(Index));
+                    }
+                    
+                    // Handle validation errors from FluentValidation
+                    if (result.Errors != null && result.Errors.Any())
+                    {
+                        foreach (var error in result.Errors)
+                        {
+                            foreach (var error2 in error.Value)
+                                ModelState.AddModelError(string.Empty, error2);
+                        }
+                    }
+                    else
+                    {
+                        TempData["Error"] = result.Message ?? "Failed to create category. Please check your input and try again.";
+                    }
                 }
-                
-                TempData["Error"] = result.Message ?? "حدث خطأ أثناء إضافة التصنيف";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "An error occurred while creating the category. Please try again.";
+                // Log the exception if you have logging configured
             }
 
             // Reload parent categories for dropdown
@@ -162,28 +182,48 @@ namespace AseerAlkotb.Dashboard.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            try
             {
-                // Extract English fields from form
-                var nameEn = Request.Form["EnglishName"].ToString();
-                var descriptionEn = Request.Form["EnglishDescription"].ToString();
-                
-                // Create new request with English fields
-                var updatedRequest = request with 
-                { 
-                    Name_en = !string.IsNullOrWhiteSpace(nameEn) ? nameEn : null,
-                    Description_en = !string.IsNullOrWhiteSpace(descriptionEn) ? descriptionEn : null
-                };
-                
-                var result = await _categoryServices.UpdateCategoryAsync(updatedRequest);
-                
-                if (result.Succeeded)
+                if (ModelState.IsValid)
                 {
-                    TempData["Success"] = "تم تحديث التصنيف بنجاح";
-                    return RedirectToAction(nameof(Index));
+                    // Extract English fields from form
+                    var nameEn = Request.Form["EnglishName"].ToString();
+                    var descriptionEn = Request.Form["EnglishDescription"].ToString();
+                    
+                    // Create new request with English fields
+                    var updatedRequest = request with 
+                    { 
+                        Name_en = !string.IsNullOrWhiteSpace(nameEn) ? nameEn : null,
+                        Description_en = !string.IsNullOrWhiteSpace(descriptionEn) ? descriptionEn : null
+                    };
+                    
+                    var result = await _categoryServices.UpdateCategoryAsync(updatedRequest);
+                    
+                    if (result.Succeeded)
+                    {
+                        TempData["Success"] = "Category updated successfully!";
+                        return RedirectToAction(nameof(Index));
+                    }
+                    
+                    // Handle validation errors from FluentValidation
+                    if (result.Errors != null && result.Errors.Any())
+                    {
+                        foreach (var error in result.Errors)
+                        {
+                            foreach (var error2 in error.Value)
+                                ModelState.AddModelError(string.Empty, error2);
+                        }
+                    }
+                    else
+                    {
+                        TempData["Error"] = result.Message ?? "Failed to update category. Please check your input and try again.";
+                    }
                 }
-                
-                TempData["Error"] = result.Message ?? "حدث خطأ أثناء تحديث التصنيف";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "An error occurred while updating the category. Please try again.";
+                // Log the exception if you have logging configured
             }
 
             // Reload parent categories for dropdown

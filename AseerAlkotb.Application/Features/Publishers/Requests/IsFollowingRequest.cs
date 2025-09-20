@@ -6,5 +6,5 @@ using System.Threading.Tasks;
 
 namespace AseerAlkotb.Application.Features.Publishers.Requests
 {
-    public record IsFollowingRequest(int UserId, int PublisherId);
+    public record IsFollowingRequest(int publisherId);
 }

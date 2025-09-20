@@ -70,7 +70,7 @@ namespace AseerAlkotb.API
             #region Context Registeration
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             {
-                var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+                var connectionString = builder.Configuration.GetConnectionString("Shared");
                 options.UseSqlServer(connectionString).UseLazyLoadingProxies();
             });
             #endregion

@@ -6,6 +6,6 @@ using System.Threading.Tasks;
 
 namespace AseerAlkotb.Application.Features.Publishers.Requests
 {
-    public record FollowPublisherRequest(int UserId, int PublisherId);
+    public record FollowPublisherRequest(int publisherId);
     
 }

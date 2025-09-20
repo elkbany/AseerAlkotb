@@ -168,13 +168,13 @@ namespace AseerAlkotb.Application.Services
             }
 
             // Use current user's ID instead of request.UserId for security
-            if (await unitOfWork.Publishers.IsFollowingPublisher(currentUser.Id, request.PublisherId))
+            if (await unitOfWork.Publishers.IsFollowingPublisher(currentUser.Id, request.publisherId))
             {
                 return BadRequest<FollowPublisherResponse>($"{_stringLocalizer["AlreadyFollowing"]} {_stringLocalizer["Publisher"]}");
             }
             else
             {
-                var userFollow = await unitOfWork.Publishers.FollowPublisher(currentUser.Id, request.PublisherId);
+                var userFollow = await unitOfWork.Publishers.FollowPublisher(currentUser.Id, request.publisherId);
                 await unitOfWork.CommitAsync();
                 var response = userFollow.Adapt<FollowPublisherResponse>();
                 return Success(response);
@@ -271,8 +271,27 @@ namespace AseerAlkotb.Application.Services
 
         public async Task<ApiResponse<IsFollowingResponse>> IsFollowing(IsFollowingRequest request)
         {
-            await DoValidationAsync<IsFollowingRequestValidator, IsFollowingRequest>(request);
-            var result = await unitOfWork.Publishers.IsFollowingPublisher(request.UserId, request.PublisherId);
+            //await DoValidationAsync<IsFollowingRequestValidator, IsFollowingRequest>(request);
+            // Get current user from HttpContext
+            var httpContext = httpContextAccessor.HttpContext;
+            if (httpContext?.User?.Identity?.IsAuthenticated != true)
+            {
+                return UnAuthorized<IsFollowingResponse>();
+            }
+
+            var currentUser = await userManager.GetUserAsync(httpContext.User);
+            if (currentUser == null)
+            {
+                return UnAuthorized<IsFollowingResponse>();
+            }
+
+            // Check if user has "Client" role
+            var isInClientRole = await userManager.IsInRoleAsync(currentUser, "Client");
+            if (!isInClientRole)
+            {
+                return UnAuthorized<IsFollowingResponse>();
+            }
+            var result = await unitOfWork.Publishers.IsFollowingPublisher(currentUser.Id, request.publisherId);
             if (result)
             {
                 var isFollowingResponse = new IsFollowingResponse
@@ -296,31 +315,28 @@ namespace AseerAlkotb.Application.Services
 
         public async Task<ApiResponse<List<GetAuthorRelatedToPublisherResponse>>> GetAuthorRelatedToPublisher(GetAuthorRelatedToPublisherRequest request)
         {
-            await DoValidationAsync<GetAuthorRelatedToPublisherRequestValidator, GetAuthorRelatedToPublisherRequest>(request);
-            var Authors = unitOfWork.Publishers.GetAuthorsRelatededToPublisher(request.publisherId).ToList();
+            //await DoValidationAsync<GetAuthorRelatedToPublisherRequestValidator, GetAuthorRelatedToPublisherRequest>(request);
+            var authors = unitOfWork.Publishers.GetAuthorsRelatededToPublisher(request.publisherId).ToList();
 
-            // Apply pagination
-            var pagedAuthors = Authors
+            if (authors == null || !authors.Any())
+            {
+                return Success(new List<GetAuthorRelatedToPublisherResponse>(), 0, request.PageNumber, request.PageSize);
+            }
+
+            var pagedAuthors = authors
                 .Skip((request.PageNumber - 1) * request.PageSize)
                 .Take(request.PageSize)
                 .ToList();
 
-            var totalCount = pagedAuthors.Count;
-            if (pagedAuthors == null)
-            {
-                return BadRequest<List<GetAuthorRelatedToPublisherResponse>>("No Authors Yet");
-            }
-            else
-            {
-                var responseData = pagedAuthors.Select(a => new GetAuthorRelatedToPublisherResponse(
-                 Id: a.Id,
-                 Name: a.Name,
-                 Bio: a.Bio,
-                 ImageUrl: a.ImageUrl
-                  )).ToList();
-                return Success(responseData, totalCount, request.PageNumber, request.PageSize);
-            }
+            var totalCount = authors.Count;
+            var responseData = pagedAuthors.Select(a => new GetAuthorRelatedToPublisherResponse(
+                Id: a.Id,
+                Name: a.Name,
+                Bio: a.Bio,
+                ImageUrl: a.ImageUrl
+            )).ToList();
 
+            return Success(responseData, totalCount, request.PageNumber, request.PageSize);
         }
     }
 }

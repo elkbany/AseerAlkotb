@@ -174,31 +174,52 @@ namespace AseerAlkotb.Dashboard.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(AddBookRequest request)
         {
-            if (ModelState.IsValid)
+            try
             {
-                if (request.CategoryIds == null)
+                if (ModelState.IsValid)
                 {
-                    request = request with { CategoryIds = new List<int>() };
+                    if (request.CategoryIds == null)
+                    {
+                        request = request with { CategoryIds = new List<int>() };
+                    }
+
+                    // Extract English fields from form
+                    var titleEn = Request.Form["EnglishTitle"].ToString();
+                    var descriptionEn = Request.Form["EnglishDescription"].ToString();
+
+                    // Create new request with English fields
+                    var updatedRequest = request with
+                    {
+                        Title_en = !string.IsNullOrWhiteSpace(titleEn) ? titleEn : null,
+                        Description_en = !string.IsNullOrWhiteSpace(descriptionEn) ? descriptionEn : null
+                    };
+
+                    var result = await _bookServices.AddBookAsync(updatedRequest);
+                    if (result.Succeeded)
+                    {
+                        TempData["Success"] = "Book created successfully!";
+                        return RedirectToAction(nameof(Index));
+                    }
+                    
+                    // Handle validation errors from FluentValidation
+                    if (result.Errors != null && result.Errors.Any())
+                    {
+                        foreach (var error in result.Errors)
+                        {
+                            foreach (var error2 in error.Value)
+                                ModelState.AddModelError(string.Empty, error2);
+                        }
+                    }
+                    else
+                    {
+                        TempData["Error"] = result.Message ?? "Failed to create book. Please check your input and try again.";
+                    }
                 }
-
-                // Extract English fields from form
-                var titleEn = Request.Form["EnglishTitle"].ToString();
-                var descriptionEn = Request.Form["EnglishDescription"].ToString();
-
-                // Create new request with English fields
-                var updatedRequest = request with
-                {
-                    Title_en = !string.IsNullOrWhiteSpace(titleEn) ? titleEn : null,
-                    Description_en = !string.IsNullOrWhiteSpace(descriptionEn) ? descriptionEn : null
-                };
-
-                var result = await _bookServices.AddBookAsync(updatedRequest);
-                if (result.Succeeded)
-                {
-                    return RedirectToAction(nameof(Index));
-                }
-
-                TempData["Error"] = result.Message ?? "Failed to create book";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "An error occurred while creating the book. Please try again.";
+                // Log the exception if you have logging configured
             }
 
             return View(request);

@@ -5,7 +5,7 @@
 namespace AseerAlkotb.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class UpdateBookEmbedding : Migration
+    public partial class editsinAI : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -21,44 +21,23 @@ namespace AseerAlkotb.Infrastructure.Migrations
             migrationBuilder.AlterColumn<string>(
                 name: "Content",
                 table: "BookEmbeddings",
-                type: "nvarchar(4000)",
-                maxLength: 4000,
+                type: "nvarchar(max)",
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "nvarchar(2000)",
                 oldMaxLength: 2000);
 
-            migrationBuilder.AddColumn<int>(
-                name: "ChunkIndex",
-                table: "BookEmbeddings",
-                type: "int",
-                nullable: true);
-
-            migrationBuilder.AddColumn<int>(
-                name: "TokenCount",
-                table: "BookEmbeddings",
-                type: "int",
-                nullable: true);
-
             migrationBuilder.CreateIndex(
-                name: "IX_BookEmbeddings_BookId_ContentType_ChunkIndex",
+                name: "IX_BookEmbeddings_BookId_ContentType",
                 table: "BookEmbeddings",
-                columns: new[] { "BookId", "ContentType", "ChunkIndex" });
+                columns: new[] { "BookId", "ContentType" });
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropIndex(
-                name: "IX_BookEmbeddings_BookId_ContentType_ChunkIndex",
-                table: "BookEmbeddings");
-
-            migrationBuilder.DropColumn(
-                name: "ChunkIndex",
-                table: "BookEmbeddings");
-
-            migrationBuilder.DropColumn(
-                name: "TokenCount",
+                name: "IX_BookEmbeddings_BookId_ContentType",
                 table: "BookEmbeddings");
 
             migrationBuilder.AlterColumn<string>(
@@ -68,8 +47,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
                 maxLength: 2000,
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "nvarchar(4000)",
-                oldMaxLength: 4000);
+                oldType: "nvarchar(max)");
 
             migrationBuilder.CreateIndex(
                 name: "IX_BookEmbeddings_BookId",
