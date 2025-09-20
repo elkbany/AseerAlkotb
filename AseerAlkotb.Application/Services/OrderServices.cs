@@ -191,7 +191,7 @@ namespace AseerAlkotb.Application.Services
         private async Task CalculateOrderCostsAsync(Order order, AddOrderRequest request)
         {
             // Calculate base total
-            order.TotalAmount = order.OrderItems.Sum(oi => oi.UnitPrice);
+            order.TotalAmount = order.OrderItems.Sum(oi => oi.UnitPrice*oi.Quantity);
 
             // Calculate shipping
             order.ShippingCost = await ShippingServices.CalculateShippingCostAsync(request, order.TotalAmount, unitOfWork);
@@ -203,7 +203,7 @@ namespace AseerAlkotb.Application.Services
 
         private static decimal CalculateDiscountAmount(Order order)
         {
-            var discountedTotal = order.OrderItems.Sum(oi => oi.Book.DiscountedPrice);
+            var discountedTotal = order.OrderItems.Sum(oi => oi.Book.DiscountedPrice*oi.Quantity);
             order.DiscountAmount = order.TotalAmount - discountedTotal;
 
             // Handle edge case where discount equals total (likely means no discount)
