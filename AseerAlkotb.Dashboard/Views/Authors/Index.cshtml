@@ -1,4 +1,5 @@
 ﻿@model List<AseerAlkotb.Application.Features.Authors.Responses.GetAllAuthorsPaginatedResponse>
+@using AseerAlkotb.Dashboard.Helpers
 
 @{
     ViewData["Title"] = "Authors Management";
@@ -84,7 +85,6 @@
                                 <th>Image</th>
                                 <th>Name</th>
                                 <th>Country</th>
-                                <th>Rating</th>
                                 <th>Books Count</th>
                                 <th>Status</th>
                                 <th>Actions</th>
@@ -103,26 +103,10 @@
                                         <td>
                                             <div class="d-flex flex-column">
                                                 <strong>@item.Name</strong>
-                                                <small class="text-muted">@item.CountryCode</small>
+                                                <small class="text-muted">@CountryHelper.ToArabic(item.CountryCode)</small>
                                             </div>
                                         </td>
-                                        <td>@item.CountryCode</td>
-                                        <td>
-                                            <div class="d-flex">
-                                                @for (int i = 1; i <= 5; i++)
-                                                {
-                                                    if (i <= Math.Round(item.Rating))
-                                                    {
-                                                        <i class="fas fa-star text-warning"></i>
-                                                    }
-                                                    else
-                                                    {
-                                                        <i class="far fa-star text-warning"></i>
-                                                    }
-                                                }
-                                                <small class="text-muted">@item.Rating.ToString("0.0")</small>
-                                            </div>
-                                        </td>
+                                        <td>@CountryHelper.ToArabic(item.CountryCode)</td>
                                         <td>
                                             <span class="badge badge-info">
                                                 @(item.Books?.Count ?? 0) books
@@ -200,3 +184,7 @@
                         });
                     </script>
                 }
+            </div>
+        </div>
+    </div>
+</section>
