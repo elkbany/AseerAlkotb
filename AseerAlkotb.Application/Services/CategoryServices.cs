@@ -84,8 +84,10 @@ namespace AseerAlkotb.Application.Services
 
             var categoryMap = new GetCategoryByIdResponse(
                 category.Id,
-                GetLocalizedText(category.Name, category.Name_en),
-                GetLocalizedText(category.Description, category.Description_en),
+                category.Name,
+                GetLocalizedText(category.Name,category.Name_en),
+                category.Description,
+                GetLocalizedText(category.Description,category.Description_en),
                 category.IsActive,
                 category.CreatedAt,
                 category.UpdatedAt

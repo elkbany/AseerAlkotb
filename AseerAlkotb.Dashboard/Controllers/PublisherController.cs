@@ -119,7 +119,9 @@ namespace AseerAlkotb.Dashboard.Controllers
             var request = new UpdatePublisherResponse(
                 response.Data.Id,
                 response.Data.Name,
+                response.Data.Name_en,
                 response.Data.Description,
+                response.Data.Description_en,
                 response.Data.LogoUrl,
                 response.Data.ContactEmail
             );

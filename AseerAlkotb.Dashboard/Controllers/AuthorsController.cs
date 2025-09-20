@@ -137,7 +137,9 @@ namespace AseerAlkotb.Dashboard.Controllers
             var request = new UpdateAuthorResponse(
                 response.Data.Id,
                 response.Data.Name,
+                response.Data.Name_en,
                 response.Data.Bio,
+                response.Data.Bio_en,
                 response.Data.ImageUrl,
                 countryCode
             );

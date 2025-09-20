@@ -63,9 +63,10 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="EnglishName" class="control-label">Name (English)</label>
-                                        <input name="EnglishName" id="EnglishName" class="form-control" placeholder="Enter English name" />
+                                        <label asp-for="Name_en" class="control-label">Name (English)</label>
+                                        <input asp-for="Name_en" id="EnglishName" class="form-control" placeholder="Enter English name" />
                                         <small class="form-text text-muted">If left empty, Arabic name will be used</small>
+                                        <span asp-validation-for="Name" class="text-danger"></span>
                                     </div>
 
                                     <div class="form-group">
@@ -75,9 +76,10 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="EnglishDescription" class="control-label">Description (English)</label>
-                                        <textarea name="EnglishDescription" id="EnglishDescription" class="form-control" rows="4" placeholder="Enter English description"></textarea>
+                                        <label asp-for="Description_en" class="control-label">Description (English)</label>
+                                        <textarea asp-for="Description_en" id="EnglishDescription" class="form-control" rows="4" placeholder="Enter English description"></textarea>
                                         <small class="form-text text-muted">If left empty, Arabic description will be used</small>
+                                        <span asp-validation-for="Description" class="text-danger"></span>
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="ContactEmail" class="control-label"></label>

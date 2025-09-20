@@ -236,9 +236,11 @@ namespace AseerAlkotb.Dashboard.Controllers
             var model = new UpdateBookResponse(
                 response.Data.Id,
                 response.Data.Title,
+                response.Data.Title_en,
                 response.Data.ISBN,
                 response.Data.Price,
                 response.Data.Description,
+                response.Data.Description_en,
                 response.Data.DiscountPercentage,
                 response.Data.PublishedDate,
                 response.Data.PageCount,
