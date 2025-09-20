@@ -152,6 +152,17 @@
                                         </td>
                                     </tr>
                                 }
+                                @if (!string.IsNullOrEmpty(Model.ProviderPayload))
+                                {
+                                    <tr>
+                                        <td class="fw-bold text-muted">Provider Payload:</td>
+                                        <td>
+                                            <div class="bg-light p-3 rounded">
+                                                <pre class="mb-0" style="white-space: pre-wrap; word-break: break-word;">@Model.ProviderPayload</pre>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
                                 @if (!string.IsNullOrEmpty(Model.AdminNotes))
                                 {
                                     <tr>

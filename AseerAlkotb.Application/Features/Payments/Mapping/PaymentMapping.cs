@@ -40,7 +40,8 @@ namespace AseerAlkotb.Application.Features.Payments.Mapping
                     src.Currency ?? "EGP",
                     src.PaymentDate,
                     src.PaymobOrderId,
-                    null // AdminNotes - not currently used
+                    null, // AdminNotes - not currently used
+                    src.ProviderPayload // ProviderPayload
                 ));
         }
 
@@ -116,7 +117,8 @@ namespace AseerAlkotb.Application.Features.Payments.Mapping
                 payment.Currency ?? "EGP",
                 payment.PaymentDate,
                 payment.PaymobOrderId,
-                null // AdminNotes - not currently used
+                null, // AdminNotes - not currently used
+                payment.ProviderPayload // ProviderPayload
             );
         }
 

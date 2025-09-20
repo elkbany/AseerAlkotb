@@ -16,6 +16,7 @@ namespace AseerAlkotb.Application.Features.Payments.Responses
         string Currency,
         DateTime PaymentDate,
         long? PaymobOrderId = null,
-        string? AdminNotes = null
+        string? AdminNotes = null,
+        string? ProviderPayload = null
     );
 }
