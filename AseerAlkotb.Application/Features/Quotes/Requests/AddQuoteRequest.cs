@@ -6,6 +6,6 @@ using System.Threading.Tasks;
 
 namespace AseerAlkotb.Application.Features.Quotes.Requests
 {
-    public record AddQuoteRequest(int? AuthorId,int? BookId,int UserId,string Comment);
+    public record AddQuoteRequest(int? AuthorId,int? BookId,string Comment);
 
 }

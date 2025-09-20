@@ -197,7 +197,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
 
                     b.HasIndex("BookId", "ContentType");
 
-                    b.ToTable("BookEmbeddings");
+                    b.ToTable("BookEmbeddings", (string)null);
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Cart", b =>
@@ -222,7 +222,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Cart");
+                    b.ToTable("Cart", (string)null);
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.CartItem", b =>
@@ -1535,7 +1535,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
                         .IsUnique()
                         .HasFilter("[ReviewId] IS NOT NULL");
 
-                    b.ToTable("LikeDisLikes");
+                    b.ToTable("LikeDisLikes", (string)null);
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Notification", b =>
@@ -1575,7 +1575,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Notifications");
+                    b.ToTable("Notifications", (string)null);
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Order", b =>
@@ -1808,7 +1808,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RagQueries");
+                    b.ToTable("RagQueries", (string)null);
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Models.Review", b =>
@@ -2056,7 +2056,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
 
                     b.HasIndex("WishlistId");
 
-                    b.ToTable("WishlistItems");
+                    b.ToTable("WishlistItems", (string)null);
                 });
 
             modelBuilder.Entity("AseerAlkotb.Domain.Entites.Payment", b =>
@@ -2130,7 +2130,7 @@ namespace AseerAlkotb.Infrastructure.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("BookCategories");
+                    b.ToTable("BookCategories", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<int>", b =>

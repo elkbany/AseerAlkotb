@@ -1,11 +1,14 @@
+using System.Globalization;
 using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Features.Authors.Mapping;
 using AseerAlkotb.Application.Features.Authors.Requests;
 using AseerAlkotb.Application.Features.Authors.Responses;
+using AseerAlkotb.Dashboard.Helpers;
 using AseerAlkotb.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace AseerAlkotb.Dashboard.Controllers
 {
@@ -68,8 +71,10 @@ namespace AseerAlkotb.Dashboard.Controllers
         // GET: Authors/Create
         public IActionResult Create()
         {
+            ViewBag.CountryList = CountryHelper.BuildCountrySelectList();
             return View();
         }
+
 
         // POST: Authors/Create
         [HttpPost]
@@ -83,28 +88,28 @@ namespace AseerAlkotb.Dashboard.Controllers
                     // Extract English fields from form
                     var nameEn = Request.Form["EnglishName"].ToString();
                     var bioEn = Request.Form["EnglishBio"].ToString();
-                    
+
                     // Create new request with English fields
-                    var updatedRequest = request with 
-                    { 
+                    var updatedRequest = request with
+                    {
                         Name_en = !string.IsNullOrWhiteSpace(nameEn) ? nameEn : null,
                         Bio_en = !string.IsNullOrWhiteSpace(bioEn) ? bioEn : null
                     };
-                    
+
                     var result = await _authorServices.AddAuthorAsync(updatedRequest);
                     if (result.Succeeded)
                     {
                         TempData["Success"] = "Author created successfully!";
                         return RedirectToAction(nameof(Index));
                     }
-                    
+
                     // Handle validation errors from FluentValidation
                     if (result.Errors != null && result.Errors.Any())
                     {
                         foreach (var error in result.Errors)
                         {
                             foreach (var error2 in error.Value)
-                                ModelState.AddModelError(string.Empty,error2);
+                                ModelState.AddModelError(string.Empty, error2);
                         }
                     }
                     else
@@ -118,7 +123,7 @@ namespace AseerAlkotb.Dashboard.Controllers
                 TempData["Error"] = "An error occurred while creating the author. Please try again.";
                 // Log the exception if you have logging configured
             }
-            
+
             return View(request);
         }
 
@@ -126,24 +131,25 @@ namespace AseerAlkotb.Dashboard.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             var response = await _authorServices.GetAuthorByIdAsync(new GetAuthorByIdRequest(id));
-
             if (!response.Succeeded || response.Data == null)
                 return NotFound();
 
-            // استخدام Mapster للتعيين من GetAuthorByIdResponse إلى UpdateAuthorRequest
-            // تحويل CountryCode من string إلى enum
             var countryCode = Enum.Parse<CountryCode>(response.Data.CountryCode);
-            
+
             var request = new UpdateAuthorResponse(
                 response.Data.Id,
                 response.Data.Name,
+                response.Data.Name_en,
                 response.Data.Bio,
+                response.Data.Bio_en,
                 response.Data.ImageUrl,
                 countryCode
             );
 
+            ViewBag.CountryList = CountryHelper.BuildCountrySelectList(countryCode.ToString());
             return View(request);
         }
+
 
         // POST: Authors/Edit/5
         [HttpPost]
@@ -154,27 +160,27 @@ namespace AseerAlkotb.Dashboard.Controllers
             {
                 // إضافة الـ Id إلى الـ Request
                 request = request with { Id = id };
-                
+
                 if (ModelState.IsValid)
                 {
                     // Extract English fields from form
                     var nameEn = Request.Form["EnglishName"].ToString();
                     var bioEn = Request.Form["EnglishBio"].ToString();
-                    
+
                     // Create new request with English fields
-                    var updatedRequest = request with 
-                    { 
+                    var updatedRequest = request with
+                    {
                         Name_en = !string.IsNullOrWhiteSpace(nameEn) ? nameEn : null,
                         Bio_en = !string.IsNullOrWhiteSpace(bioEn) ? bioEn : null
                     };
-                    
+
                     var result = await _authorServices.UpdateAuthorAsync(updatedRequest);
                     if (result.Succeeded)
                     {
                         TempData["Success"] = "Author updated successfully!";
                         return RedirectToAction(nameof(Index));
                     }
-                    
+
                     // Handle validation errors from FluentValidation
                     if (result.Errors != null && result.Errors.Any())
                     {
@@ -195,7 +201,7 @@ namespace AseerAlkotb.Dashboard.Controllers
                 TempData["Error"] = "An error occurred while updating the author. Please try again.";
                 // Log the exception if you have logging configured
             }
-            
+
             return View(request);
         }
 
@@ -205,7 +211,7 @@ namespace AseerAlkotb.Dashboard.Controllers
             var author = await _authorServices.GetAuthorByIdAsync(new GetAuthorByIdRequest(id));
             if (!author.Succeeded || author.Data == null)
                 return NotFound();
-                
+
             return View(author.Data);
         }
 
@@ -217,9 +223,9 @@ namespace AseerAlkotb.Dashboard.Controllers
             await _authorServices.DeleteAuthorAsync(new DeleteAuthorRequest(id));
             return RedirectToAction(nameof(Index));
         }
-        
+
         // ==================== AJAX ENDPOINTS ====================
-        
+
         [HttpGet]
         public async Task<IActionResult> SearchAuthors(string term)
         {
@@ -230,3 +236,5 @@ namespace AseerAlkotb.Dashboard.Controllers
         }
     }
 }
+
+       

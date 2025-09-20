@@ -1,4 +1,4 @@
-@model AseerAlkotb.Application.Features.Authors.Responses.UpdateAuthorResponse;
+﻿@model AseerAlkotb.Application.Features.Authors.Responses.UpdateAuthorResponse;
 @{
     ViewData["Title"] = "Edit Author";
 }
@@ -65,9 +65,10 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="EnglishName">Name (English)</label>
-                                        <input name="EnglishName" id="EnglishName" class="form-control" placeholder="Enter English name" />
+                                        <label asp-for="Name_en">Name (English)</label>
+                                        <input asp-for="Name_en" id="EnglishName" class="form-control" placeholder="Enter English name" />
                                         <small class="form-text text-muted">If left empty, Arabic name will be used</small>
+                                        <span asp-validation-for="Name" class="text-danger"></span>
                                     </div>
 
                                     <div class="form-group">
@@ -78,15 +79,18 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="EnglishBio">Bio (English)</label>
-                                        <textarea name="EnglishBio" id="EnglishBio" class="form-control" rows="4" placeholder="Enter English biography"></textarea>
+                                        <label asp-for="Bio_en">Bio (English)</label>
+                                        <textarea asp-for="Bio_en" id="EnglishBio" class="form-control" rows="4" placeholder="Enter English biography"></textarea>
                                         <small class="form-text text-muted">If left empty, Arabic bio will be used</small>
+                                        <span asp-validation-for="Bio" class="text-danger"></span>
                                     </div>
 
                                     <div class="form-group">
                                         <label asp-for="CountryCode"></label>
-                                        <select asp-for="CountryCode" class="form-control"
-                                                asp-items="Html.GetEnumSelectList<AseerAlkotb.Domain.Enums.CountryCode>()"></select>
+                                        @Html.DropDownListFor(m => m.CountryCode,
+                                                 (IEnumerable<SelectListItem>)ViewBag.CountryList,
+                                                 "-- اختر الدولة --",
+                                                 new { @class = "form-control", id = "CountryCode" })
                                         <span asp-validation-for="CountryCode" class="text-danger"></span>
                                     </div>
                                 </div>
