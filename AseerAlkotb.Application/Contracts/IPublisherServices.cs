@@ -2,6 +2,7 @@
 using AseerAlkotb.Application.Features.Publishers.Response;
 using AseerAlkotb.Application.Features.Publishers.Validators;
 using AseerAlkotb.Application.ResponseHandler;
+using AseerAlkotb.Domain.Interfaces.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,5 +33,8 @@ namespace AseerAlkotb.Application.Contracts
         Task<ApiResponse<List<GetFollowedPublisherResponse>>> GetFollowedPublisher(GetFollowedPublisherRequest request);
 
         Task<ApiResponse<List<GetFollowersPublisherResponse>>> GetFollowerPublisher(GetFollowersPublisherRequest request);
-    }
+
+        Task<ApiResponse<IsFollowingResponse>> IsFollowing(IsFollowingRequest request);
+        Task<ApiResponse<List<GetAuthorRelatedToPublisherResponse>>> GetAuthorRelatedToPublisher(GetAuthorRelatedToPublisherRequest request);
+    }  
 }

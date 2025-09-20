@@ -8,6 +8,7 @@ namespace AseerAlkotb.Application.Features.Books.DTOs
         public string Title { get; set; }
         public decimal Price { get; set; }
         public decimal DiscountedPrice { get; set; }
+        public decimal DiscountPercentage { get; set; }
         public string CoverImageUrl { get; set; }
         public string AuthorName { get; set; }
         public decimal Rating { get; set; } // now mutable

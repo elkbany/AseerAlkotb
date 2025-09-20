@@ -25,6 +25,7 @@ namespace AseerAlkotb.Domain.Interfaces.Repositories
         IQueryable<Author> GetFollowedPublisher(int userId);
 
         IQueryable<User> GetFollowerPublisher(int publisherId);
+        IQueryable<Author> GetAuthorsRelatededToPublisher(int publisherId);
 
     }
 }

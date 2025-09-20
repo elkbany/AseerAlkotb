@@ -6,6 +6,6 @@ using System.Threading.Tasks;
 
 namespace AseerAlkotb.Application.Features.Quotes.Responses
 {
-    public record GetAllQuotesPaginatedResponse(int Id , int? AuthorId , int? BookId , int UserId , string Comment);
+    public record GetAllQuotesPaginatedResponse(int Id , int? AuthorId , int? BookId , int UserId , string Comment , string UserName);
 
 }

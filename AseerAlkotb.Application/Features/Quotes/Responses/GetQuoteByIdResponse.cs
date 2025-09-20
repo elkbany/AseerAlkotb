@@ -11,7 +11,8 @@ namespace AseerAlkotb.Application.Features.Quotes.Responses
         int? AuthorId,
         int? BookId,
         int UserId,
-        string Comment
+        string Comment,
+        string UserName
     );
 
 }

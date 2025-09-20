@@ -1,4 +1,4 @@
-﻿using AseerAlkotb.Application.Contracts;
+﻿﻿﻿﻿using AseerAlkotb.Application.Contracts;
 using AseerAlkotb.Application.Features.Categories.Requests;
 using AseerAlkotb.Application.Features.Categories.Responses;
 using AseerAlkotb.Application.Features.Categories.Validators;
@@ -84,8 +84,8 @@ namespace AseerAlkotb.Application.Services
 
             var categoryMap = new GetCategoryByIdResponse(
                 category.Id,
-                LocalizeEntity("Category", category.Id, "Name", category.Name),
-                LocalizeEntity("Category", category.Id, "Description", category.Description),
+                GetLocalizedText(category.Name, category.Name_en),
+                GetLocalizedText(category.Description, category.Description_en),
                 category.IsActive,
                 category.CreatedAt,
                 category.UpdatedAt
@@ -113,8 +113,8 @@ namespace AseerAlkotb.Application.Services
 
             var categoriesMap = categories.Select(c => new GetAllCategoriesPaginatedResponse(
                 c.Id,
-                LocalizeEntity("Category", c.Id, "Name", c.Name),
-                LocalizeEntity("Category", c.Id, "Description", c.Description),
+                GetLocalizedText(c.Name, c.Name_en),
+                GetLocalizedText(c.Description, c.Description_en),
                 c.IsActive,
                 c.ParentCategoryId,
                 subCounts.TryGetValue(c.Id, out var cnt) ? cnt : 0,
@@ -173,8 +173,8 @@ namespace AseerAlkotb.Application.Services
 
             var result = query.Select(c => new GetAllSubCategoriesPaginatedResponse(
                 c.Id,
-                LocalizeEntity("Category", c.Id, "Name", c.Name),
-                LocalizeEntity("Category", c.Id, "Description", c.Description),
+                GetLocalizedText(c.Name, c.Name_en),
+                GetLocalizedText(c.Description, c.Description_en),
                 c.IsActive,
                 c.ParentCategoryId.Value,
                 c.CreatedAt

@@ -62,5 +62,13 @@ namespace AseerAlkotb.Infrastructure.Repositories.Implementations
                 .Include(u => u.User)
                 .Select(u => u.User);
         }
+        public IQueryable<Author> GetAuthorsRelatededToPublisher(int publisherId)
+        {
+            return context.Publishers
+                .Where(p => p.Id == publisherId)
+                .SelectMany(p => p.Books)
+                .Select(b => b.Author)
+                .Distinct();         // Remove duplicate authors
+        }
     }
 }

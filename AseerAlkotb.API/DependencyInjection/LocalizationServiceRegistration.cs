@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Localization;
+﻿﻿using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Localization;
 using System.Globalization;
 using AseerAlkotb.Localization.Resources;
@@ -32,15 +32,18 @@ namespace AseerAlkotb.API.DependencyInjection
 
             var localizationOptions = new RequestLocalizationOptions
             {
-                DefaultRequestCulture = new RequestCulture("ar"),
+                DefaultRequestCulture = new RequestCulture("ar"), // Default to Arabic
                 SupportedCultures = supportedCultures,
                 SupportedUICultures = supportedCultures,
                 RequestCultureProviders = new List<IRequestCultureProvider>
                 {
-                    new AcceptLanguageHeaderRequestCultureProvider(), // يقرأ Accept-Language header
+                    new AcceptLanguageHeaderRequestCultureProvider(), // يقرأ Accept-Language header (أولوية عالية)
                     new QueryStringRequestCultureProvider(),          // يقرأ ?culture=ar
                     new CookieRequestCultureProvider()                // يقرأ من Cookie
-                }
+                },
+                // Enable fallback to default culture if requested culture is not supported
+                FallBackToParentCultures = true,
+                FallBackToParentUICultures = true
             };
 
             app.UseRequestLocalization(localizationOptions);
