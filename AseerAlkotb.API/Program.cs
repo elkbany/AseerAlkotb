@@ -1,4 +1,4 @@
-﻿using AseerAlkotb.API.DependencyInjection;
+﻿﻿using AseerAlkotb.API.DependencyInjection;
 using AseerAlkotb.API.Extensions;
 using AseerAlkotb.API.Middlewares;
 using AseerAlkotb.API.Services;
@@ -286,6 +286,9 @@ namespace AseerAlkotb.API
             builder.Services.AddScoped<IWebsiteCatalogService, WebsiteCatalogService>();
             builder.Services.AddScoped<IEmbeddingService, GeminiEmbeddingService>();
             builder.Services.AddScoped<IAnswerSynthesisService, GeminiAnswerSynthesisService>();
+            
+            // Session Memory Service (Singleton for in-memory caching across requests)
+            builder.Services.AddSingleton<ISessionMemoryService, SessionMemoryService>();
 
             builder.Services.AddInfrastructure(builder.Configuration);
 
