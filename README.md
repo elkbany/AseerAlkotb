@@ -2,6 +2,8 @@
 
 **AseerAlkotb** is an **AI-powered bilingual (Arabic/English)** book e-commerce platform that combines modern ASP.NET Core Web API architecture with intelligent search powered by **RAG (Retrieval-Augmented Generation)** and **Google Gemini AI**. It enables users to explore books naturally — whether asking for summaries, author info, or similar recommendations — while offering a full e-commerce experience.
 
+🌐 **[🚀 Live Demo](https://aseeralkotb.vercel.app)**  
+
 ---
 
 ## 🚀 Project Overview
