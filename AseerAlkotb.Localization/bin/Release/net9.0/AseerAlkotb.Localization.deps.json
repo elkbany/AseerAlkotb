@@ -1,0 +1,152 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v9.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v9.0": {
+      "AseerAlkotb.Localization/1.0.0": {
+        "dependencies": {
+          "FluentValidation": "12.0.0",
+          "Microsoft.Extensions.Configuration": "9.0.9",
+          "Microsoft.Extensions.Localization.Abstractions": "9.0.8",
+          "System.Resources.Extensions": "9.0.0"
+        },
+        "runtime": {
+          "AseerAlkotb.Localization.dll": {}
+        },
+        "resources": {
+          "ar/AseerAlkotb.Localization.resources.dll": {
+            "locale": "ar"
+          },
+          "en/AseerAlkotb.Localization.resources.dll": {
+            "locale": "en"
+          }
+        }
+      },
+      "FluentValidation/12.0.0": {
+        "runtime": {
+          "lib/net8.0/FluentValidation.dll": {
+            "assemblyVersion": "12.0.0.0",
+            "fileVersion": "12.0.0.0"
+          }
+        }
+      },
+      "Microsoft.Extensions.Configuration/9.0.9": {
+        "dependencies": {
+          "Microsoft.Extensions.Configuration.Abstractions": "9.0.9",
+          "Microsoft.Extensions.Primitives": "9.0.9"
+        },
+        "runtime": {
+          "lib/net9.0/Microsoft.Extensions.Configuration.dll": {
+            "assemblyVersion": "9.0.0.0",
+            "fileVersion": "9.0.925.41916"
+          }
+        }
+      },
+      "Microsoft.Extensions.Configuration.Abstractions/9.0.9": {
+        "dependencies": {
+          "Microsoft.Extensions.Primitives": "9.0.9"
+        },
+        "runtime": {
+          "lib/net9.0/Microsoft.Extensions.Configuration.Abstractions.dll": {
+            "assemblyVersion": "9.0.0.0",
+            "fileVersion": "9.0.925.41916"
+          }
+        }
+      },
+      "Microsoft.Extensions.Localization.Abstractions/9.0.8": {
+        "runtime": {
+          "lib/net9.0/Microsoft.Extensions.Localization.Abstractions.dll": {
+            "assemblyVersion": "9.0.0.0",
+            "fileVersion": "9.0.825.36808"
+          }
+        }
+      },
+      "Microsoft.Extensions.Primitives/9.0.9": {
+        "runtime": {
+          "lib/net9.0/Microsoft.Extensions.Primitives.dll": {
+            "assemblyVersion": "9.0.0.0",
+            "fileVersion": "9.0.925.41916"
+          }
+        }
+      },
+      "System.Formats.Nrbf/9.0.0": {
+        "runtime": {
+          "lib/net9.0/System.Formats.Nrbf.dll": {
+            "assemblyVersion": "9.0.0.0",
+            "fileVersion": "9.0.24.52809"
+          }
+        }
+      },
+      "System.Resources.Extensions/9.0.0": {
+        "dependencies": {
+          "System.Formats.Nrbf": "9.0.0"
+        },
+        "runtime": {
+          "lib/net9.0/System.Resources.Extensions.dll": {
+            "assemblyVersion": "9.0.0.0",
+            "fileVersion": "9.0.24.52809"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "AseerAlkotb.Localization/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "FluentValidation/12.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-8NVLxtMUXynRHJIX3Hn1ACovaqZIJASufXIIFkD0EUbcd5PmMsL1xUD5h548gCezJ5BzlITaR9CAMrGe29aWpA==",
+      "path": "fluentvalidation/12.0.0",
+      "hashPath": "fluentvalidation.12.0.0.nupkg.sha512"
+    },
+    "Microsoft.Extensions.Configuration/9.0.9": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-w87wF/90/VI0ZQBhf4rbMEeyEy0vi2WKjFmACsNAKNaorY+ZlVz7ddyXkbADvaWouMKffNmR0yQOGcrvSSvKGg==",
+      "path": "microsoft.extensions.configuration/9.0.9",
+      "hashPath": "microsoft.extensions.configuration.9.0.9.nupkg.sha512"
+    },
+    "Microsoft.Extensions.Configuration.Abstractions/9.0.9": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-p5RKAY9POvs3axwA/AQRuJeM8AHuE8h4qbP1NxQeGm0ep46aXz1oCLAp/oOYxX1GsjStgdhHrN3XXLLXr0+b3w==",
+      "path": "microsoft.extensions.configuration.abstractions/9.0.9",
+      "hashPath": "microsoft.extensions.configuration.abstractions.9.0.9.nupkg.sha512"
+    },
+    "Microsoft.Extensions.Localization.Abstractions/9.0.8": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-guqP/5IRbVZ9FibWI7ieIouzB18prqWwKlfhzqF3LY+mqmP9kz1SjnlOrqvapw0C49PUght/3GRQAxDs2AEKOA==",
+      "path": "microsoft.extensions.localization.abstractions/9.0.8",
+      "hashPath": "microsoft.extensions.localization.abstractions.9.0.8.nupkg.sha512"
+    },
+    "Microsoft.Extensions.Primitives/9.0.9": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-z4pyMePOrl733ltTowbN565PxBw1oAr8IHmIXNDiDqd22nFpYltX9KhrNC/qBWAG1/Zx5MHX+cOYhWJQYCO/iw==",
+      "path": "microsoft.extensions.primitives/9.0.9",
+      "hashPath": "microsoft.extensions.primitives.9.0.9.nupkg.sha512"
+    },
+    "System.Formats.Nrbf/9.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-F/6tNE+ckmdFeSQAyQo26bQOqfPFKEfZcuqnp4kBE6/7jP26diP+QTHCJJ6vpEfaY6bLy+hBLiIQUSxSmNwLkA==",
+      "path": "system.formats.nrbf/9.0.0",
+      "hashPath": "system.formats.nrbf.9.0.0.nupkg.sha512"
+    },
+    "System.Resources.Extensions/9.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-tvhuT1D2OwPROdL1kRWtaTJliQo0WdyhvwDpd8RM997G7m3Hya5nhbYhNTS75x6Vu+ypSOgL5qxDCn8IROtCxw==",
+      "path": "system.resources.extensions/9.0.0",
+      "hashPath": "system.resources.extensions.9.0.0.nupkg.sha512"
+    }
+  }
+}

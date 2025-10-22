@@ -1,0 +1,13 @@
+D:\a\AseerAlkotb\AseerAlkotb\AseerAlkotb.Domain\bin\Release\net9.0\AseerAlkotb.Domain.deps.json
+D:\a\AseerAlkotb\AseerAlkotb\AseerAlkotb.Domain\bin\Release\net9.0\AseerAlkotb.Domain.dll
+D:\a\AseerAlkotb\AseerAlkotb\AseerAlkotb.Domain\bin\Release\net9.0\AseerAlkotb.Domain.pdb
+D:\a\AseerAlkotb\AseerAlkotb\AseerAlkotb.Domain\obj\Release\net9.0\AseerAlkotb.Domain.csproj.AssemblyReference.cache
+D:\a\AseerAlkotb\AseerAlkotb\AseerAlkotb.Domain\obj\Release\net9.0\AseerAlkotb.Domain.GeneratedMSBuildEditorConfig.editorconfig
+D:\a\AseerAlkotb\AseerAlkotb\AseerAlkotb.Domain\obj\Release\net9.0\AseerAlkotb.Domain.AssemblyInfoInputs.cache
+D:\a\AseerAlkotb\AseerAlkotb\AseerAlkotb.Domain\obj\Release\net9.0\AseerAlkotb.Domain.AssemblyInfo.cs
+D:\a\AseerAlkotb\AseerAlkotb\AseerAlkotb.Domain\obj\Release\net9.0\AseerAlkotb.Domain.csproj.CoreCompileInputs.cache
+D:\a\AseerAlkotb\AseerAlkotb\AseerAlkotb.Domain\obj\Release\net9.0\AseerAlkotb.Domain.sourcelink.json
+D:\a\AseerAlkotb\AseerAlkotb\AseerAlkotb.Domain\obj\Release\net9.0\AseerAlkotb.Domain.dll
+D:\a\AseerAlkotb\AseerAlkotb\AseerAlkotb.Domain\obj\Release\net9.0\refint\AseerAlkotb.Domain.dll
+D:\a\AseerAlkotb\AseerAlkotb\AseerAlkotb.Domain\obj\Release\net9.0\AseerAlkotb.Domain.pdb
+D:\a\AseerAlkotb\AseerAlkotb\AseerAlkotb.Domain\obj\Release\net9.0\ref\AseerAlkotb.Domain.dll
