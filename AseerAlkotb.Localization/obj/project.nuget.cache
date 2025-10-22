@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "dgSpecHash": "VNfjE5ibe9A=",
+  "success": true,
+  "projectFilePath": "D:\\a\\AseerAlkotb\\AseerAlkotb\\AseerAlkotb.Localization\\AseerAlkotb.Localization.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\runneradmin\\.nuget\\packages\\fluentvalidation\\12.0.0\\fluentvalidation.12.0.0.nupkg.sha512",
+    "C:\\Users\\runneradmin\\.nuget\\packages\\microsoft.extensions.configuration\\9.0.9\\microsoft.extensions.configuration.9.0.9.nupkg.sha512",
+    "C:\\Users\\runneradmin\\.nuget\\packages\\microsoft.extensions.configuration.abstractions\\9.0.9\\microsoft.extensions.configuration.abstractions.9.0.9.nupkg.sha512",
+    "C:\\Users\\runneradmin\\.nuget\\packages\\microsoft.extensions.localization.abstractions\\9.0.8\\microsoft.extensions.localization.abstractions.9.0.8.nupkg.sha512",
+    "C:\\Users\\runneradmin\\.nuget\\packages\\microsoft.extensions.primitives\\9.0.9\\microsoft.extensions.primitives.9.0.9.nupkg.sha512",
+    "C:\\Users\\runneradmin\\.nuget\\packages\\system.formats.nrbf\\9.0.0\\system.formats.nrbf.9.0.0.nupkg.sha512",
+    "C:\\Users\\runneradmin\\.nuget\\packages\\system.resources.extensions\\9.0.0\\system.resources.extensions.9.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
